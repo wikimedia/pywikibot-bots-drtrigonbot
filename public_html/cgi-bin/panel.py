@@ -36,6 +36,9 @@ import commands, os, errno
 #import subprocess
 import re
 
+import Image,ImageDraw
+import cStringIO
+
 
 footer = """<small>DrTrigonBot status panel, written by <a href="https://wiki.toolserver.org/view/User:DrTrigon">DrTrigon</a>. 
 <!-- <img src="https://wiki.toolserver.org/w/images/e/e1/Wikimedia_Community_Logo-Toolserver.png" 
@@ -147,6 +150,7 @@ History compressed: %(histcomp_count)s (times)<br>
 <br>
 Problem rate (in %%):<br>
 %(reliability)s<br>
+<a href="panel.py?action=logstat&format=graph"><img src="panel.py?action=logstat&format=graph"></a><br>
 <br>
 Warnings (%(warn_total)s distilled to %(warn_dist)s):<br>
 %(warnings)s<br>
@@ -168,6 +172,8 @@ bottimeout = 24
 
 botdonemsg = 'Done.'
 
+X,Y = 500, 275			# image width and height
+
 
 def oldlogfiles(all=False):
 	#localdir = os.path.dirname('../DrTrigonBot/')
@@ -183,6 +189,37 @@ def oldlogfiles(all=False):
 	log = os.path.join(localdir, str(a) + ".log")
 
 	return (localdir, files, log)
+
+def graph(xdata, xscale=1, xticks=10, xmajor=5, yscale=1, yticks=10, ymajor=1):
+	img = Image.new("RGB", (X,Y), "#FFFFFF")
+	draw = ImageDraw.Draw(img)
+
+	#draw some axes and markers
+	for i in range(X/10):
+		draw.line((i*10+30, Y-15, i*10+30, 20), fill="#DDD")
+		if i % xmajor == 0:
+			draw.text((xscale*(i*xticks)+15, Y-15), `i*xticks`, fill="#000")
+	for j in range(1,Y/10-2):
+		if i % ymajor == 0:
+			#draw.text((xscale*(0),Y-15-yscale*(j*yticks)), `j*yticks`, fill="#000")
+			draw.text((xscale*(0),Y-15-yscale*(2*j*yticks)), `j*yticks`, fill="#000")	# cheap patch
+	draw.line((20,Y-19,X,Y-19), fill="#000")
+	draw.line((19,20,19,Y-18), fill="#000")
+
+	#graph data (file)
+	#log = file(r"c:\python\random_img\%s" % filename)
+	#log = file(filename)
+	for (i, value) in enumerate(xdata):
+		#value = int(value.strip())
+		draw.line((xscale*(i)+20,Y-20,xscale*(i)+20,Y-20-yscale*(value)), fill="#55d")
+
+	#write to file object
+	f = cStringIO.StringIO()
+	img.save(f, "PNG")
+	f.seek(0)
+
+	#output to browser
+	return "Content-type: image/png\n\n" + f.read()
 
 
 def displaystate():
@@ -356,6 +393,9 @@ def logstat(form):
 	# http://www.scipy.org/Cookbook/Matplotlib/Using_MatPlotLib_in_a_CGI_script
 
 	if (format == 'plain'): return "Content-Type: text/plain\n\n%s" % str(stat)
+	if (format == 'graph'):
+		xdata = [ item[1]*100 for item in stat['reliability_list'] ]
+		return graph(xdata, xscale=3, xticks=10, xmajor=1, yscale=4, yticks=10, ymajor=1)
 
 	return logstat_content % data
 
