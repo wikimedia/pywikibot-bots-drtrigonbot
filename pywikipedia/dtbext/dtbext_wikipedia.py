@@ -132,7 +132,8 @@ class Page(wikipedia.Page):
 							'revisions',
 							'rev',
 		#					['revid', 'user', 'timestamp', 'comment'] )
-							['revid', 'user', 'timestamp', 'comment', 'redirect'],
+		#					['revid', 'user', 'timestamp', 'comment', 'redirect'],
+							['revid', 'user', 'timestamp', 'comment', 'redirect', 'revisions'],
 							pages = 'pages' )
 		redirect  = (u'redirect' in buf[0])
 
@@ -140,8 +141,10 @@ class Page(wikipedia.Page):
 
 		# change time/date format
 		data = []
-		for item in buf:
-			data.append( (u'%s'%item[0], dtbext_date.GetTime(item[2]), item[1], item[3]) )
+		#for item in buf:
+		for item in buf[0][5]:
+			#data.append( (u'%s'%item[0], dtbext_date.GetTime(item[2]), item[1], item[3]) )
+			data.append( (u'%s'%item['revid'], dtbext_date.GetTime(item['timestamp']), item['user'], item.get('comment', u'')) )
 
 		if reverseOrder: data.reverse()
 

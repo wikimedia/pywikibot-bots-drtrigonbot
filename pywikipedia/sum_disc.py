@@ -1083,14 +1083,14 @@ class SumDiscRobot:
 						if not (item[0] == ""):
 							headings.append( u'[[%s#%s|%s]]' % (data[1].title(), subitem, renderitem) )
 					if (len(headings) == 0):			# no subsections on page...
-						data = (data[0], data[1].title(), data[2], self._localizeDateTime(data[3]))
-						data = u'*%s: [[%s]] - last edit by [[User:%s]] (%s)' % data
+						data = (data[0], data[1].title(), self._getLastHumanEditor(data[2]), self._localizeDateTime(data[3]))
+						data = u'*%s: [[%s]] - last edit by %s (%s)' % data
 					else:
-						data = (data[0], data[1].title(), string.join(headings, u', '), data[2], self._localizeDateTime(data[3]))
-						data = u'*%s: [[%s]] at %s - last edit by [[User:%s]] (%s)' % data
+						data = (data[0], data[1].title(), string.join(headings, u', '), self._getLastHumanEditor(data[2]), self._localizeDateTime(data[3]))
+						data = u'*%s: [[%s]] at %s - last edit by %s (%s)' % data
 				elif data[5] in ps_types[1]:
-					data = (data[0], data[1].title(), data[2], self._localizeDateTime(data[3]))
-					data = u'*%s: [[%s]] all discussions have finished (surveillance stopped) - last edit by [[User:%s]] (%s)' % data
+					data = (data[0], data[1].title(), self._getLastHumanEditor(data[2]), self._localizeDateTime(data[3]))
+					data = u'*%s: [[%s]] all discussions have finished (surveillance stopped) - last edit by %s (%s)' % data
 				elif data[5] in [self._PS_warning]:
 					data = (data[1].title(), data[0])
 					data = u'*Bot warning message: [[%s]] "\'\'%s\'\'"' % data
@@ -1223,6 +1223,35 @@ class SumDiscRobot:
 				result = (relevant, info, user, check)		#
 		#return (relevant, info, self._user, check)
 		return result
+
+	def _getLastHumanEditor(self, username):
+		'''
+		search the last 10 edits/revisions for the most recent human editor and replaces that
+		one. (the non-human/bot)
+
+		input:  user [text]
+                        self-objects
+		returns:  last human user name [string]
+		'''
+
+		if not (u'bot' in dtbext.userlib.User(wikipedia.getSite(), username).getGroups()):
+			return username
+
+		result = ''
+		for info in page.getVersionHistory(revCount=10)[1:]:
+			groups = dtbext.userlib.User(wikipedia.getSite(), info[2]).getGroups()
+			#print info[2], groups
+			if not (u'bot' in groups):
+				result = info[2]
+				break
+
+		if (result == ''):
+			return '?/[[User:%s]]' % username
+		else:
+			#return '[[User:%s]]' % result
+			return '[[User:%s]]/[[User:%s]]' % (result, username)
+			#return '[[User:%s]] <small>([[User:%s]])</small>' % (result, username)
+
 
 class Timer(threading.Thread):
 	'''
