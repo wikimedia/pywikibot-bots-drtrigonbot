@@ -142,6 +142,7 @@ class SumDiscRobot:
 	_bracketopen_regex	= re.compile('\[')
 	_bracketclose_regex	= re.compile('\]')
 	_reftag_err_regex	= re.compile(r'<strong class="error">Referenz-Fehler: Einzelnachweisfehler: <code>&lt;ref&gt;</code>-Tags existieren, jedoch wurde kein <code>&lt;references&#160;/&gt;</code>-Tag gefunden.</strong>')
+	_timestamp_regex	= re.compile('--(.*?)\(CEST\)')
 
 	_PS_warning	= 1	# serious or no classified warnings/errors that should be reported
 	_PS_changed	= 2	# changed page   (if closed, will be removed)
@@ -1154,10 +1155,13 @@ class SumDiscRobot:
 			# enhanced: with template
 			tmpl_params = tmpl_buf.groups()[0]
 			tmpl_params = conf['tmpl_params_regex'].search(tmpl_params)
-			(waste, tmpl_data, tmpl_timestamp) = tmpl_params.groups()
+			#(waste, tmpl_data, tmpl_timestamp) = tmpl_params.groups()
+			(waste, tmpl_data, tmpl_options) = tmpl_params.groups()
 			tmpl_data = self._eol_regex.sub(u'', tmpl_data)
+			#tmpl_options = self._eol_regex.sub(u'', tmpl_options)
+			tmpl_options = self._timestamp_regex.sub(u'', tmpl_options)
 
-			self._content = page_buf[:tmpl_buf.start()] + (tmpl_SumDisc % tmpl_data) + page_buf[tmpl_buf.end():]
+			self._content = page_buf[:tmpl_buf.start()] + (tmpl_SumDisc % (tmpl_data, tmpl_options)) + page_buf[tmpl_buf.end():]
 			self._mode = True
 			self._tmpl_data = tmpl_data
 			self._param['ignorepage_list'].append( re.compile(self._tmpl_data) )
