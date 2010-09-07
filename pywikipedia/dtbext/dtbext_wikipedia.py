@@ -415,9 +415,9 @@ class Page(wikipedia.Page):
 		Same as in wikipedia.py but with some minor changes. Important for ReferringPageGenerator().
 		  - uses API
 		  - 'follow_redirects' is IGNORED
-                  - 'withTemplateInclusion' same function as in original (also returns pages where self is
-                                            used as a template
-		  - 'onlyTemplateInclusion' is IGNORED
+                  - 'withTemplateInclusion' is DEFAULT MODE and 'False' is ignored
+		  - 'onlyTemplateInclusion' use 'list=embeddedin (ei)' instead of 'list=backlinks (bl)'
+                    (overwrites 'withTemplateInclusion')
 		  - 'redirectsOnly' is IGNORED
 
 		If you need a full list of referring pages, use this:
@@ -426,31 +426,10 @@ class Page(wikipedia.Page):
 
 		# according to 'ContributionsGen(...)'
 
-		# Lists pages that link to a given page, similar to Special:Whatlinkshere. Ordered by linking page title.
-		# (http://www.mediawiki.org/wiki/API:Query_-_Lists#backlinks_.2F_bl)
-		# request = REQUEST_getBacklinks % (urllib.quote(self.title().encode(config.textfile_encoding)), number)
-		request = {
-		    'action'	: 'query',
-		    'list'	: 'backlinks',
-		    'bltitle'	: self.title(),
-		    'bllimit'	: number,
-		    }
-		wikipedia.output(u'Getting references to %s' % self.aslink())
-		#buf = APIRequest( self.site(),
-		#		  request,
-		#		  'backlinks',
-		#		  'bl',
-		#		  ['pageid', 'ns', 'title'] )
-		wikipedia.get_throttle()
-		buf = dtbext_query.GetProcessedData(request,
-							'backlinks',
-							'bl',
-							['pageid', 'ns', 'title'] )
-
-		# List pages that include a certain page.
-		# (http://www.mediawiki.org/wiki/API:Query_-_Lists#embeddedin_.2F_ei)
-		# http://de.wikipedia.org/w/api.php?action=query&list=embeddedin&eititle=Benutzer:DrTrigon/Entwurf/Vorlage:AutoMail&eilimit=5
-		if withTemplateInclusion:
+		if onlyTemplateInclusion:
+			# List pages that include a certain page.
+			# (http://www.mediawiki.org/wiki/API:Query_-_Lists#embeddedin_.2F_ei)
+			# http://de.wikipedia.org/w/api.php?action=query&list=embeddedin&eititle=Benutzer:DrTrigon/Entwurf/Vorlage:AutoMail&eilimit=5
 			request = {
 			    'action'	: 'query',
 			    'list'	: 'embeddedin',
@@ -463,11 +442,33 @@ class Page(wikipedia.Page):
 			#		  'bl',
 			#		  ['pageid', 'ns', 'title'] )
 			wikipedia.get_throttle()
-			buf += dtbext_query.GetProcessedData(request,
+			#buf += dtbext_query.GetProcessedData(request,
+			buf = dtbext_query.GetProcessedData(request,
 								'embeddedin',
 								'ei',
 								['pageid', 'ns', 'title'] )
-			buf = buf[:number]
+			#buf = buf[:number]
+		else:
+			# Lists pages that link to a given page, similar to Special:Whatlinkshere. Ordered by linking page title.
+			# (http://www.mediawiki.org/wiki/API:Query_-_Lists#backlinks_.2F_bl)
+			# request = REQUEST_getBacklinks % (urllib.quote(self.title().encode(config.textfile_encoding)), number)
+			request = {
+			    'action'	: 'query',
+			    'list'	: 'backlinks',
+			    'bltitle'	: self.title(),
+			    'bllimit'	: number,
+			    }
+			wikipedia.output(u'Getting references to %s' % self.aslink())
+			#buf = APIRequest( self.site(),
+			#		  request,
+			#		  'backlinks',
+			#		  'bl',
+			#		  ['pageid', 'ns', 'title'] )
+			wikipedia.get_throttle()
+			buf = dtbext_query.GetProcessedData(request,
+								'backlinks',
+								'bl',
+								['pageid', 'ns', 'title'] )
 
 		# since it is a generator; set the page title in index 0 of the tuple
         	refPages = []

@@ -57,7 +57,8 @@ class SubsterRobot:
 				'value':	'',
 				'count':	'0',
 				'notags':	'',
-				'postproc':	'("","")',
+				#'postproc':	'("","")',
+				'postproc':	'(\'\', \'\')',
 				'wiki':		'False', }
 
 	# -template and subst-tag handling taken from MerlBot
@@ -82,8 +83,8 @@ class SubsterRobot:
 		wikipedia.output(u'\03{lightgreen}* Processing Template Backlink List:\03{default}')
 
 		if sim:	pagegen = ['dummy']
-		else:	pagegen = dtbext.pagegenerators.ReferringPageGenerator(self._userListPage)
-		#else:	pagegen = dtbext.pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True):
+		#else:	pagegen = dtbext.pagegenerators.ReferringPageGenerator(self._userListPage)
+		else:	pagegen = dtbext.pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
 
 		for page in pagegen:
 			if sim:
@@ -216,6 +217,7 @@ class SubsterRobot:
 		for item in tmpl_buf:
 			#tmpl_params = tmpl_buf.groups()[0]
 			#default = {'count':'0', 'notags':'False'}
+			#default = {'count':'0', 'notags':'', 'postproc':'("","")'}
 			default = copy.deepcopy(self._param_default)
 			tmpl_params = item
 			#tmpl_params = re.sub('\|', "','", tmpl_params)

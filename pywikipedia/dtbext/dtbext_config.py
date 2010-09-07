@@ -38,6 +38,8 @@ import wikipedia
 
 
 REGEX_eol		= re.compile('\n')
+#REGEX_subster_tag	= '<!--SUBSTER-%(var)s-->%(cont)s<!--SUBSTER-%(var)s-->'	# from 'subster.py'
+REGEX_subster_tag	= '<!--SUBSTER-%(var)s-->'					#
 
 
 # ====================================================================================================
@@ -57,6 +59,11 @@ def getUsersConfig(page):
 	users = {}
 	for item in REGEX_eol.split(page.get()):
 		item = re.split(',', item, maxsplit=1)
+		#print "A"
+		if (len(item) > 1):	# for compatibility with 'subster.py' (if needed)
+			#item[1] = re.compile((REGEX_subster_tag%{'var':'.*?','cont':'.*?'}), re.S | re.I).sub(u'', item[1])
+			item[1] = re.compile((REGEX_subster_tag%{'var':'.*?'}), re.S | re.I).sub(u'', item[1])
+		#print item
 		try:	param = eval(item[1])
 		except:	param = {}
 		item = item[0]

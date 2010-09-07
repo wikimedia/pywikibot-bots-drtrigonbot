@@ -39,8 +39,31 @@ import wikipedia, config
 import dtbext
 import re, sys, os, time
 import math
+import copy
 #import StringIO, pickle
-import pickle
+
+
+# ====================================================================================================
+#
+# read external config vars
+#from sum_disc_conf import *
+tmpl_Mailer = '\{\{Benutzer:DrTrigon/Entwurf/Vorlage:AutoMail(.*?)\}\}'
+
+conf = {	# unicode values
+		'userlist':	u'Benutzer:DrTrigon/Entwurf/Vorlage:AutoMail',
+		'default':	{ 'expandtemplates':'False', 'clearpage':'False' },
+#		'maildb':	'/home/ursin/toolserver/mailerreg.pkl',			# LOCAL
+		'maildb':	'/home/drtrigon/mailerreg.pkl',					# TOOLSERVER
+}
+
+# debug tools
+debug = { 'sendmail': True, 'write2wiki': True, 'forcesend': False }	# operational mode (default)
+#debug = { 'sendmail': False, 'write2wiki': False, 'forcesend': False }	# debug mode
+#debug = { 'sendmail': False, 'write2wiki': False, 'forcesend': True }	# debug mode
+#debug = { 'sendmail': True, 'write2wiki': False, 'forcesend': True }	# debug mode
+#debug = { 'sendmail': False, 'write2wiki': True, 'forcesend': False }	# debug mode
+#
+# ====================================================================================================
 
 
 class MailerRobot:
@@ -54,17 +77,26 @@ class MailerRobot:
 	#_content_maxlen = 2900
 	_content_maxlen = 100000				# huge, to DEACTIVATE splitting
 
+	_tmpl_regex = re.compile(tmpl_Mailer, re.S)
+
 	def __init__(self):
 		'''
 		constructor of SumDiscBot(), initialize needed vars
 		'''
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 28, 30, 17)
 
-        	self._userListPage = dtbext.wikipedia.Page(wikipedia.getSite(), u'Benutzer:DrTrigon/Entwurf/Vorlage:AutoMail')
-
-		self._tmpl_regex = re.compile('\{\{Benutzer:DrTrigon/Entwurf/Vorlage:AutoMail(.*?)\}\}', re.S)
+        	self._userListPage = dtbext.wikipedia.Page(wikipedia.getSite(), conf['userlist'])
 
 		self._today = int(time.time() / (60*60*24))
+
+		#wikipedia.output(u'\03{lightgreen}* Reading list of users registered for long mail delivery.\03{default}')
+		#
+		#
+		# this function has also to be used in mailer-bot and thus should be put into the dtbext package
+		# (it comes from 'mailerreg.py')
+		#
+		#self._user_longmail = loaduserdb(conf['maildb'])
+		self._user_longmail = []			# DEACTIVATE long mail support
 
 	def run(self):
 		'''
@@ -72,28 +104,21 @@ class MailerRobot:
 		'''
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 24, 38, 17)
 
-		wikipedia.output(u'\03{lightgreen}* Reading list of users registered for long mail delivery.\03{default}')
-
-		#
-		# this function has also to be used in mailer-bot and thus should be put into the dtbext package
-		# (it comes from 'mailerreg.py')
-		#
-		data_path = '/home/drtrigon/mailerreg.pkl'
-		#self._user_longmail = loaduserdb(data_path)
-		self._user_longmail = []			# DEACTIVATE long mail support
-
 		wikipedia.output(u'\03{lightgreen}* Processing Template Backlink List:\03{default}')
 
-		for page in dtbext.pagegenerators.ReferringPageGenerator(self._userListPage):
+		#for page in dtbext.pagegenerators.ReferringPageGenerator(self._userListPage):
+		for page in dtbext.pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True):
 			content = self._readPage(page)
 
-			params = self._getMode(content)				# get operating mode
+			(params, clearedcontent) = self._getMode(content)	# get operating mode
 
 			if not params: continue
 
 			for item in params:
 				days = self._today % int(item['Frequenz'])
-				#days = 0
+				if debug['forcesend']:
+					days = 0
+					wikipedia.output(u'\03{lightred}=== ! DEBUG MODE FORCING MAIL DELIVERY ! ===\03{default}')
 				if not (days == 0):
 					wikipedia.output(u'INFO: mail to %s will be sent in %i day(s)' % (item['Benutzer'], (int(item['Frequenz'])-days)))
 					continue
@@ -101,8 +126,11 @@ class MailerRobot:
 				wikipedia.output(u'\03{lightblue}** Sending page %s as mail to user %s...\03{default}' % (page.aslink(), item['Benutzer']))
 
 				mail_content = content
-				if ( ('expandtemplates' in item) and item['expandtemplates'] ): mail_content = self._readPage(page, full=True)
+				if ( ('expandtemplates' in item) and eval(item['expandtemplates']) ): mail_content = self._readPage(page, full=True)
 				mail_content = mail_content.encode(config.textfile_encoding)
+
+				url = "http://" + page.site().hostname() + page.site().nice_get_address(page.title(underscore = True))
+				mail_content = url + "\n\n" + mail_content
 
 				#if not dtbext.wikipedia.SendMail(item['Benutzer'], page.title().encode(config.textfile_encoding), mail_content.encode(config.textfile_encoding)):
 				success = True
@@ -124,12 +152,21 @@ class MailerRobot:
 					for i in range(0, len(mail_content), content_maxlen):
 						text = mail_content[i:(i+content_maxlen)]
 						title = page.title() + (u' %i/%i' % (j, j_max))
+						if not debug['sendmail']:
+							wikipedia.output(u'\03{lightred}=== ! DEBUG MODE NO MAILS SENT ! ===\03{default}')
+							continue
 						success = success and dtbext.wikipedia.SendMail(item['Benutzer'], title.encode(config.textfile_encoding), text)
 						#success = success and dtbext.wikipedia.SendMail(u"DrTrigon", title.encode(config.textfile_encoding), text)
 						j += 1
 						wikipedia.output(u"\03{lightblue}*** Mail '%s' sent. \03{default}" % title)
 
 				if not success: wikipedia.output(u'!!! WARNING: mail could not be sent!')
+
+				if success and eval(item['clearpage']):
+					if debug['write2wiki']:		# debug mode
+						self._writePage(page, clearedcontent + u'\n', u'clearing page after mail has been sent')
+					else:
+						wikipedia.output(u'\03{lightred}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
 
 	def _readPage(self, page, full=False):
 		'''
@@ -140,20 +177,40 @@ class MailerRobot:
 		'''
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 28)
 
-		if full:	(mode, info) = ('full', ' using "getFull()" mode')
-		else:		(mode, info) = ('default', '')
+		if full:	(mode, info, plaintext) = ('full', ' using "getFull()" mode', True)
+		else:		(mode, info, plaintext) = ('default', '', False)
 
 		#wikipedia.output(u'\03{lightblue}Reading Wiki at %s...\03{default}' % page.aslink())
 		wikipedia.output(u'\03{lightblue}Reading Wiki%s at %s...\03{default}' % (info, page.aslink()))
 		try:
 			#content = page.get()
-			content = page.get(mode=mode)
+			content = page.get(mode=mode, plaintext=plaintext)
 			#if url in content:		# durch history schon gegeben! (achtung dann bei multithreading... wobei ist ja thread per user...)
 			#	wikipedia.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.aslink())
 			#	continue
 		except (wikipedia.NoPage, wikipedia.IsRedirectPage):
 			content = u''
 		return content
+
+	def _writePage(self, page, data, comment, minorEdit = True):
+		'''
+		write wiki page
+
+		input:  page
+                        data [string (unicode)]
+		returns:  (writes data to page on the wiki, nothing else)
+		'''
+
+		wikipedia.output(u'\03{lightblue}Writing to Wiki on %s...\03{default}' % page.aslink())
+
+		wikipedia.setAction(comment)
+
+		content = data
+		try:
+			if minorEdit:	page.put(content)
+			else:		page.put(content, minorEdit = False)
+		except wikipedia.SpamfilterError, error:
+			wikipedia.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.aslink(), "error.url"))
 
 	def _getMode(self, content):
 		'''
@@ -165,34 +222,46 @@ class MailerRobot:
 		'''
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 28, 17)
 
-		tmpl_buf = self._tmpl_regex.search(content)
+		#tmpl_buf = self._tmpl_regex.search(content)
+		#print "C:", content
+		tmpl_buf = self._tmpl_regex.findall(content)
 		params = []
-		if tmpl_buf:
-			# enhanced: with template
-			for item in tmpl_buf.groups():
-				tmpl_params = tmpl_buf.groups()[0]
-				tmpl_params = re.sub('\n', '', tmpl_params)
-				tmpl_params = re.sub('\|', "','", tmpl_params)
-				tmpl_params = re.sub('=', "':'", tmpl_params)
-				params.append( eval( "{" + tmpl_params[2:] + "'}" ) )
+		#if tmpl_buf:
+		# enhanced: with template
+		#for item in tmpl_buf.groups():
+		for item in tmpl_buf:
+			#tmpl_params = tmpl_buf.groups()[0]
+			default = copy.deepcopy(conf['default'])
+			tmpl_params = item
+			tmpl_params = re.sub('\n', '', tmpl_params)
+			tmpl_params = re.sub('\|', "','", tmpl_params)
+			tmpl_params = re.sub('=', "':'", tmpl_params)
+			#params.append( eval( "{" + tmpl_params[2:] + "'}" ) )
+			default.update( eval( "{" + tmpl_params[2:] + "'}" ) )
+			params.append( default )
 
-		return params
+		try:	pos = self._tmpl_regex.search(content).span()
+		except:	pos = (0, 0)
+		clearedcontent = content[:pos[1]]
+
+		return (params, clearedcontent)
 
 #
 # this function has also to be used in mailer-bot and thus should be put into the dtbext package
 # (it comes from 'mailerreg.py')
+# (from 'mailerreg.py'; ev. besser wenn es in 'dtbext.config' käme und dann von
+# 'mailerreg.py' laden wie 'subster.py' von 'substersim.py' geladen wird...)
 #
 def loaduserdb(path):
 	if os.path.exists(path):
 		# http://docs.python.org/library/pickle.html
 		pkl_file = open(path, 'rb')
 		data1 = pickle.load(pkl_file)
-		buf = pkl_file.read()
+		#buf = pkl_file.read()
 		#pprint.pprint(data1)
 		#data2 = pickle.load(pkl_file)
 		#pprint.pprint(data2)
 		pkl_file.close()
-
 		return data1
 	else:
 		return {}
