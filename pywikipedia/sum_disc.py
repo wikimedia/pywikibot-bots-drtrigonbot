@@ -1265,7 +1265,11 @@ class Timer(threading.Thread):
 		self.function = func
 		self.kwargs = kwargs
 		self._t = threading.Timer(self.seconds, self._action)
+		self._watchdog = [None]*5
 	def _action(self):
+		self._watchdog = self._watchdog.append(self.kwargs)		# watchdog (for security)
+		self._watchdog.pop(0)						#
+		if (self._watchdog[0] == self._watchdog[-1]): self.cancel()	#
 		self.function(self)
 		del self._t
 		self._t = threading.Timer(self.seconds, self._action)
