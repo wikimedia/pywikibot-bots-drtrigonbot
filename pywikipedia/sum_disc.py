@@ -794,6 +794,13 @@ class SumDiscRobot:
 					item = body[i]
 					heading = head[i][0].strip()
 
+					skip = False								# ignorelist for headings
+					for check in self._param['ignorehead_list']:				#
+						if check.search(heading):					#
+							skip = True						#
+							break							#
+					if skip: continue							#
+
 					(probable, checksum_cur, hires_probable) = self._checkThData(item, checksum, heading)
 
 					sign_rel = sign_rel or hires_probable['sign']	# signature check
