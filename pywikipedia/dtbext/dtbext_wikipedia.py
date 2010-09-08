@@ -784,6 +784,7 @@ def SendMail(user, subject, text, CCme = False):
 	emailtoken = buf[0][0]
 
 	# send mail by POST request
+	# (23:46:20) Merlissimo: ~ ist der "delevoper-Token". Schummelei, wenn du zu faul bist vorher den echten token abzufragen
 	request = {
 	    'action'	: 'emailuser',
 	    'target'	: user,

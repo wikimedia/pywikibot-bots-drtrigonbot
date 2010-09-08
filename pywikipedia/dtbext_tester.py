@@ -39,6 +39,9 @@ TESTPAGES = [u'Hilfe Diskussion:Weiterleitung', u'Benutzer Diskussion:BitH', u'B
 
 TESTPAGE = u'...'
 TESTPAGE = u'Wikipedia:Löschkandidaten/20. Juli 2009'
+TESTPAGE = u'Benutzer Diskussion:Karsten11'
+TESTPAGE = u'Benutzer Diskussion:GregorHelms'
+TESTPAGE = u'Wikipedia:WikiProjekt Vorlagen/Werkstatt'
 
 
 def TEST_getSections():
@@ -46,8 +49,8 @@ def TEST_getSections():
 	#
 	##site = wikipedia.Page(wikipedia.getSite(), TESTPAGE)
 	site = dtbext.wikipedia.Page(wikipedia.getSite(), TESTPAGE)
-	#buf = site.get()
-	buf = site.get(mode='full')
+	buf = site.get()
+	#buf = site.get(mode='full')
 	##buf = site.getFullB()[:1000]
 	#print buf
 
@@ -208,7 +211,7 @@ def TEST_SendMail():
 
 # wikipedia.py
 #TEST_getVersionHistory()
-##TEST_getSections()
+TEST_getSections()
 #TEST_purgePageCache()
 #TEST_get()
 #TEST_getParsedContent()

@@ -32,7 +32,7 @@ __version__ = '$Id: clean_user_sandbox.py 0.2.0000/3968 2009-06-06 15:01:00Z drt
 
 import wikipedia
 import time
-import re, sets
+import re
 import dtbext
 
 content = {

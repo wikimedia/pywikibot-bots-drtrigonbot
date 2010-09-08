@@ -415,6 +415,7 @@ class SumDiscRobot:
 								self._PS_warning )
 				#wikipedia.output(u'INFO: skipping [[%s]], no version history/page deleted/missing' % keys)
 				continue
+
 			actual = actual[0]
 			j += 1
 			if page.title() in self._hist_list:
@@ -536,7 +537,8 @@ class SumDiscRobot:
 
 		# according to '_AddMaintenanceMsg(...)', '_getUserBacklinks'
 		work_list = {}
-		for (page, data) in dtbext.pagegenerators.GlobalWikiNotificationsGenerator(self._user):
+		for page in dtbext.pagegenerators.GlobalWikiNotificationsGenerator(self._user):
+			data = page.extradata
 			#self._news_list[page.title()] = (conf['globwiki_notify'], page, data['user'], data['timestamp'], {u'':('',True,u'')}, self._PS_maintmsg)
 			#tmst = time.strftime('%H:%M, %d. %b. %Y')
 			#tmst = u'%s' % re.sub(' 0', ' ', tmst)
@@ -1099,7 +1101,7 @@ class SumDiscRobot:
 					if not self._param['reportwarn_switch']: continue
 				elif data[5] in [self._PS_notify]:
 					data = (data[0], data[1].extradata['url'], data[1].title(), data[2], self._localizeDateTime(data[3]))
-					data = u'*%s: [%s %s] - last edit by [[User:%s]] (%s)' % data
+					data = u'*%s: <span class="plainlinks">[%s %s]</span> - last edit by [[User:%s]] (%s)' % data
 				else:
 					continue	# skip append
 				buf.append( data )

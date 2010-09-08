@@ -50,7 +50,7 @@ from xml.sax import saxutils, make_parser
 from xml.sax.handler import feature_namespaces
 import xml.utils.iso8601
 import httplib, urllib
-import re, sets
+import re
 from HTMLParser import HTMLParser
 
 # Application specific imports
@@ -164,7 +164,7 @@ def GlobalWikiNotificationsGenerator(username, site = wikipedia.Site(config.myla
 	#		#data.append( re.split(u': ', item, maxsplit=1) )
 	#		yield dtbext_wikipedia.Page(site, re.split(u': ', item, maxsplit=1))
 
-	if not buf: return
+	if not buf: return	# nothing got (error?! how to catch later??)
 
 	buf = dtbext_wikipedia.GetDataXML(buf, ['userpages'])
 	for i in range(0, len(buf), 2):
@@ -182,7 +182,7 @@ def GlobalWikiNotificationsGenerator(username, site = wikipedia.Site(config.myla
 		try:
 			page = dtbext_wikipedia.Page(site, data['link'])
 			page.extradata = data
-			yield (page, data)
+			yield page
 		except wikipedia.NoPage:
 			wikipedia.output(u'!!! WARNING [[%s]]: this wiki is not supported by framework, skipped!' % data['link'])
 
