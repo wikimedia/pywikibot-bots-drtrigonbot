@@ -682,12 +682,7 @@ class PageDiscRobot:
 				buf.append( data )
 
 		count = len(buf)
-		if (count > 0):
-			#buf[-1] += u'<noinclude>'
-			#buf.append( u'Summary generated from and at: ~~~~</noinclude>' )
-			buf.append( u'Summary generated from and at: ~~~~' )
-			buf = string.join(buf, u'\n')
-                else:
+		if not (count > 0):
 			buf = u''
 
 		return (buf, count)

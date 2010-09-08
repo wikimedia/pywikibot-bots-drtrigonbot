@@ -26,10 +26,10 @@ conf = {	# unicode values
 		# NON (!) unicode values
 		##'sitepath':		'/wiki/%s',
 		#'sitepath':		'/w/index.php?title=%s',
-		'script_path':		'',															# local on a PC
-		'logger_path':		"logs/%s.log",												#
-#		'script_path':		os.environ['HOME'] + '/pywikipedia/',						# on toolserver
-#		'logger_path':		os.environ['HOME'] + "/public_html/DrTrigonBot/%s.log",		# ('/home/drtrigon' + ...)
+		'script_path':		'',							# local on a PC
+		'logger_path':		"logs/%s.log",						#
+#		'script_path':		os.environ['HOME'] + '/pywikipedia/',			# on toolserver
+#		'logger_path':		os.environ['HOME'] + "/public_html/DrTrigonBot/%s.log",	# ('/home/drtrigon' + ...)
 		'logger_tmsp':		True,
 		'backup_hist':		True,
 
@@ -122,7 +122,7 @@ conf = {	# unicode values
 ##debug = { 'write2wiki': False, 'user': True, 'write2hist': False, 'toolserver': False, }	# no write, skip users
 ##debug = { 'write2wiki': False, 'user': True, 'write2hist': True, 'toolserver': False, }	# write only history, skip users
 ##debug = { 'write2wiki': False, 'user': False, 'write2hist': False, 'toolserver': False, }	# no write, all users
-##debug = { 'write2wiki': True, 'user': True, 'write2hist': True, 'toolserver': False, }		# write, skip users
+##debug = { 'write2wiki': True, 'user': True, 'write2hist': True, 'toolserver': False, }	# write, skip users
 debug = { 'write2wiki': False, 'user': False, 'write2hist': True, 'toolserver': False, }	# write only history (for code changes and smooth update)
 ##debug = { 'write2wiki': True, 'user': True, 'write2hist': False, 'toolserver': False, }	# write wiki, skip users
 ##debug = { 'write2wiki': False, 'user': False, 'write2hist': True, 'toolserver': True, }	# write only history (for code changes and smooth update), toolserver down
