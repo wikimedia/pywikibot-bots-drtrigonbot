@@ -29,7 +29,7 @@ including all namespaces. It checks several users (at request), sequential
 #  B: bigger relases with tidy code and nice comments
 #  A: really big release with multi lang. and toolserver support, ready
 #     to use in pywikipedia framework, should also be contributed to it
-__version__='$Id: subster.py 0.2.0000 beta2 2009-09-09 18:46:00Z drtrigon $'
+__version__='$Id: subster.py 0.2.0001 2009-09-09 18:46:00Z drtrigon $'
 #
 
 

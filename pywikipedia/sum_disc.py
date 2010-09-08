@@ -84,7 +84,7 @@ Syntax example:
 #  B: bigger relases with tidy code and nice comments
 #  A: really big release with multi lang. and toolserver support, ready
 #     to use in pywikipedia framework, should also be contributed to it
-__version__='$Id: sum_disc.py 0.2.0000 2009-06-05 16:12:00Z drtrigon $'
+__version__='$Id: sum_disc.py 0.2.0001 2009-06-05 16:12:00Z drtrigon $'
 #
 
 
@@ -1295,12 +1295,12 @@ def main():
 			#if 	arg[:17] == "-compress_history":
 				bot.compressHistory( eval(arg[18:]) )
 				return
-			elif	(arg[:5] == "-auto") or (arg[:5] == "-cron"):
-				bot.silent = True
-			elif	(arg == "-skip_clean_user_sandbox"):
-				pass
 			elif	(arg[:17] == "-rollback_history"):
 				bot.rollback = int( arg[18:] )
+			elif	(arg[:5] == "-auto") or (arg[:5] == "-cron"):
+				bot.silent = True
+			elif	(arg == "-all") or ("-sum_disc" in arg):
+				pass
 			#elif	(arg == "-test_run"):
 			#	debug = ...
 			else:

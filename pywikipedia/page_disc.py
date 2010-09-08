@@ -88,7 +88,7 @@ Syntax example:
 #  B: bigger relases with tidy code and nice comments
 #  A: really big release with multi lang. and toolserver support, ready
 #     to use in pywikipedia framework, should also be contributed to it
-__version__='$Id: page_disc.py 0.2.0000 BETA 2010-07-31 16:21:00Z drtrigon $'
+__version__='$Id: page_disc.py 0.2.0001 BETA 2010-07-31 16:21:00Z drtrigon $'
 #
 
 

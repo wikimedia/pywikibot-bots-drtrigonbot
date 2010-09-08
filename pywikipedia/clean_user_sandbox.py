@@ -124,7 +124,7 @@ def main():
             no_repeat = False
         elif	(arg[:5] == "-auto") or (arg[:5] == "-cron"):
             pass
-        elif	(arg == "-skip_clean_user_sandbox"):
+        elif	(arg == "-all") or ("-clean_user_sandbox" in arg):
             pass
         else:
             wikipedia.showHelp('clean_sandbox')
