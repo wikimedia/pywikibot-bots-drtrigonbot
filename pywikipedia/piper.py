@@ -39,7 +39,7 @@ supported.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: piper.py 7924 2010-02-12 06:40:57Z xqt $'
+__version__ = '$Id: piper.py 8365 2010-07-26 20:52:10Z huji $'
 
 import wikipedia
 import pagegenerators
@@ -58,8 +58,9 @@ class PiperBot:
     # Edit summary message that should be used.
     # NOTE: Put a good description here, and add translations, if possible!
     msg = {
-        'en': u'Robot: Piping the article text through %s',
         'ar': u'روبوت: استبدال نص المقال من خلال %s',
+        'en': u'Robot: Piping the article text through %s',
+        'fa': u'ربات: رد کردن متن مقاله از درون %s',
         'is': u'Vélmenni: Pípa texta síðunnar í gegnum %s',
         'nl': u'Bot: paginatekst door %s geleid'
     }

@@ -22,7 +22,7 @@ All other parameters will be regarded as a page title; in this case, the bot
 will only touch a single page.
 """
 
-__version__='$Id: inline_images.py 6540 2009-03-24 01:15:50Z nicdumz $'
+__version__='$Id: inline_images.py 8365 2010-07-26 20:52:10Z huji $'
 
 import wikipedia, pagegenerators, catlib, weblinkchecker, upload
 import sys, re
@@ -34,8 +34,9 @@ docuReplacements = {
 }
 
 msg = {
-    'en': u'This image was inline linked from %s. No information on author, copyright status, or license is available.',
     'ar': u'هذه الصورة كانت موصولة داخليا من %s. لا معلومات عن المؤلف، حالة حقوق النشر، أو الترخيص متوفرة.',
+    'en': u'This image was inline linked from %s. No information on author, copyright status, or license is available.',
+    'fa': u'این تصویر به طور مستقیم از %s پیوند شده بود. اطلاعاتی در مورد مولف، وضعیت حق تکثیر و اجازه‌نامه این تصویر موجودنیست.',
     'he': u'תמונה זו הייתה מקושרת מהדף %s. אין מידע זמין על המחבר, מצב זכויות היוצרים או הרישיון.',
     'pl': u'Obraz ten został dolinkowany z adresu %s. Brak jest informacji o autorze, prawach autorskich czy licencji.',
     'pt': u'Esta imagem foi inserida como linha de %s. Nenhum infomação sobre autor, direitos autorais ou licença foi listada.',

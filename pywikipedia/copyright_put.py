@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """
 """
-__version__ = '$Id: copyright_put.py 7895 2010-01-27 07:36:13Z xqt $'
+__version__ = '$Id: copyright_put.py 8264 2010-06-09 13:55:26Z amir $'
 
 #
 # (C) Francesco Cosoleto, 2006
@@ -27,8 +27,10 @@ append_day_to_wiki_save_path = False
 append_date_to_entries = False
 
 msg_table = {
+    'ar': {'_default': [u'مدخلات جديدة', u'مدخلات جديدة']},
     'en': {'_default': [u'New entries', u'New entries']},
     'es': {'_default': [u'Entradas nuevas', u'Entradas nuevas']},
+    'fa': {'_default': [u'محتویات جدید', u'محتویات جدید']},
     'it': {'_default': [u'Pagine nuove', u'Nuove voci'],
            'feed': [u'Aggiunte a voci esistenti', u'Testo aggiunto in']},
 }
@@ -42,6 +44,7 @@ stat_msg = {
     'ar': [u'إحصاءات', u'صفحة', u'مدخلات', u'حجم', u'إجمالي', 'تحديث'],
     'en': [u'Statistics', u'Page', u'Entries', u'Size', u'Total', 'Update'],
     'es': [u'Estadísticas', u'Página', u'Entradas', u'Tamaño', u'Total', u'Actualizacion'],
+    'fa': [u'آمار', u'صفحه', u'محتویات', u'اندازه', u'مجموع', 'بروزرسانی'],
     'it': [u'Statistiche', u'Pagina', u'Segnalazioni', u'Lunghezza', u'Totale', u'Ultimo aggiornamento'],
 }
 

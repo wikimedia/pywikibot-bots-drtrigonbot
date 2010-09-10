@@ -15,7 +15,7 @@ Parameters:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: unusedfiles.py 5612 2008-06-23 03:06:44Z leogregianin $'
+__version__ = '$Id: unusedfiles.py 8516 2010-09-10 21:27:06Z amir $'
 #
 
 import wikipedia
@@ -31,6 +31,7 @@ import sys
 comment = {
     'ar': u'صور للاستبعاد',
     'en': u'images for elimination',
+    'fa': u'تصویر استفاده نشده',
     'he': u'תמונות להסרה',
     'it': u'Bot: segnalo immagine orfana da eliminare',
     'pt': u'Bot: marcação de imagens para eliminação',
@@ -42,6 +43,7 @@ template_to_the_image = {
     }
 template_to_the_user = {
     'en': u'\n\n{{img-sem-uso|%s}}',
+    'fa': u'\n\n{{اخطار به کاربر برای تصاویر بدون استفاده|%s}}--~~~~',
     'it': u'\n\n{{Utente:Filbot/Immagine orfana}}',
     }
 except_text = {
@@ -56,6 +58,7 @@ except_text = {
 #**********************#
 
 def appendtext(page, apptext, always):
+    msg = wikipedia.translate(wikipedia.getSite(), comment)
     try:
         text = page.get()
     except wikipedia.IsRedirectPage:
@@ -65,12 +68,14 @@ def appendtext(page, apptext, always):
     text += apptext;
     if text != page.get():
         wikipedia.showDiff(page.get(),text)
-        choice = wikipedia.inputChoice(u'Do you want to accept these changes?', ['Yes', 'No', 'All'], ['y', 'N', 'a'], 'N')
-        if choice == 'a':
-            always = True
-            choice = 'y'
-        if choice == 'y':
-            msg = wikipedia.translate(wikipedia.getSite(), comment)
+        if not always==True:
+            choice = wikipedia.inputChoice(u'Do you want to accept these changes?', ['Yes', 'No', 'All'], ['y', 'N', 'a'], 'N')
+            if choice == 'a':
+                always = True
+                choice = 'y'
+            if choice == 'y':
+                page.put(text, msg)
+        else:
             page.put(text, msg)
 
 def main():

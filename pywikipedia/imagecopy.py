@@ -79,7 +79,7 @@ Known issues/FIXMEs (no critical issues known):
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: imagecopy.py 7944 2010-02-18 19:23:43Z multichill $'
+__version__='$Id: imagecopy.py 8365 2010-07-26 20:52:10Z huji $'
 #
 
 from Tkinter import *
@@ -189,6 +189,7 @@ nowCommonsMessage = {
     'de': u'Datei ist jetzt auf Wikimedia Commons verfügbar.',
     'en': u'File is now available on Wikimedia Commons.',
     'eo': u'Dosiero nun estas havebla en la Wikimedia-Komunejo.',
+    'fa': u'اینک پرونده در ویکی‌انبار قابل دسترسی است.',
     'he': u'הקובץ זמין כעת בוויקישיתוף.',
     'hu': u'A fájl most már elérhető a Wikimedia Commonson.',
     'ia': u'Le file es ora disponibile in Wikimedia Commons.',
@@ -225,6 +226,7 @@ imageMoveMessage = {
     '_default': u'[[:File:%s|File]] moved to [[:commons:File:%s|commons]].',
     'ar': u'[[:File:%s|الصورة]] تم نقلها إلى [[:commons:File:%s|كومنز]].',
     'en': u'[[:File:%s|File]] moved to [[:commons:File:%s|commons]].',
+    'fa': u'[[:پرونده:%s|پرونده]] به [[:commons:File:%s|commons]] منتقل شد.',
     'hu': u'[[:File:%s|Kép]] átmozgatva a [[:commons:File:%s|Commons]]ba.',
     'nl': u'[[:File:%s|Bestand]] is verplaatst naar [[:commons:File:%s|commons]].',
     'pl': u'[[:File:%s|Plik]] przeniesiona do [[:commons:File:%s|commons]].',

@@ -15,9 +15,9 @@ This script understands various command-line arguments:
 
 -after:zzzz       process pages after and including page zzzz
 
--top              use -top if you want to move all {{Link FA|lang}} to the top
-                  of the interwiki links. Default is placing {{Link FA|lang}}
-                  next to the corresponding interwiki link.
+-side             use -side if you want to move all {{Link FA|lang}} next to the
+                  corresponding interwiki links. Default is placing
+                  {{Link FA|lang}} on top of the interwiki links.
                   
 -count            Only counts how many featured/good articles exist
                   on all wikis (given with the "-fromlang" argument) or
@@ -30,6 +30,9 @@ This script understands various command-line arguments:
 
 -good             use this script for good articles.
 
+-former           use this script for removing {{Link FA|xx}} from former
+                  fearured articles
+
 -quiet            no corresponding pages are displayed.
 
 -dry              for debug purposes. No changes will be made.
@@ -37,7 +40,7 @@ This script understands various command-line arguments:
 usage: featured.py [-interactive] [-nocache] [-top] [-after:zzzz] [-fromlang:xx,yy--zz|-fromall]
 
 """
-__version__ = '$Id: featured.py 8051 2010-04-04 15:33:15Z mfarag $'
+__version__ = '$Id: featured.py 8456 2010-08-25 11:26:47Z xqt $'
 
 #
 # (C) Maxim Razin, 2005
@@ -67,6 +70,7 @@ msg = {
     'bat-smg': u'robots: Pavīzdėnė straipsnė nūruoda [[%s:%s]]',
     'be-x-old': u'Робат: [[%s:%s]] — абраны артыкул',
     'bs': u'Bot: Interwiki za izabrane članke za [[%s:%s]]',
+    'ca': u'Bot: Enllaç a article destacat per: [[%s:%s]]',
     'cs': u'Robot přidal nejlepší článek: [[%s:%s]]',
     'cy': u'Robot: Mae [[%s:%s]] yn erthygl ddethol',
     'de': u'Bot: [[%s:%s]] ist ein ausgezeichneter Artikel',
@@ -74,16 +78,17 @@ msg = {
     'en': u'Bot: [[%s:%s]] is a featured article',
     'eo': u'roboto: [[%s:%s]] estas artikolo elstara',
     'es': u'Bot: Enlace a artículo destacado para: [[%s:%s]]',
-    'fa': u' ربات: [[%s:%s]] یک مقاله برگزیده‌است',
+    'fa': u'ربات: [[%s:%s]] یک مقاله برگزیده است',
     'fi': u'Botti: [[%s:%s]] on suositeltu artikkeli',
     'fr': u'Bot: Lien AdQ pour [[%s:%s]]',
+    'frr':u'Bot: [[%s:%s]] as en auer a miaten guden artiikel',
     'he': u'בוט: קישור לערך מומלץ עבור [[%s:%s]]',
     'hr': u'Bot: Interwiki za izabrane članke za [[%s:%s]]',
     'hsb':u'Bot: [[%s:%s]] je wuběrny nastawk',
     'hu': u'Bot: a(z) [[%s:%s]] kiemelt szócikk',
     'ia': u'Robot: Ligamine verso articulo eminente [[%s:%s]]',
     'it': u'Bot: collegamento articolo in vetrina [[%s:%s]]',
-    'ja': u'ロボットによる: 秀逸な項目へのリンク [[%s:%s]]',
+    'ja': u'ロボットによる: 秀逸な記事へのリンク [[%s:%s]]',
     'ka': u'ბოტი: რჩეული სტატიის ბმული გვერდისათვის [[%s:%s]]',
     'ko': u'로봇: 알찬 글 [[%s:%s]] 를 가리키는 링크',#로봇이：?
     'ksh':u'bot: [[%s:%s]] ess_enen ußjezëijshneten Atikkel',
@@ -92,6 +97,7 @@ msg = {
     'nl': u'Bot: verwijzing naar etalage-artikel voor [[%s:%s]]',
     'no': u'bot: [[%s:%s]] er en utmerka artikkel',
     'nn': u'bot: [[%s:%s]] er ein god artikkel',
+    'nv': u'Naaltsoos [[%s:%s]] kʼad nizhónígo ályaa',
     'mk': u'Бот: Интервики за избрани статии за [[%s:%s]]',
     'pl': u'Bot: Link do artykułu wyróżnionego [[%s:%s]]',
     'pt': u'Bot: Ligando artigos destacados para [[%s:%s]]',
@@ -113,11 +119,16 @@ msg_good = {
     'en': u'Bot: [[%s:%s]] is a good article',
     'eo': u'roboto: [[%s:%s]] estas artikolo leginda',
     'es': u'Bot: Enlace a artículo bueno para: [[%s:%s]]',
+    'fa': u'ربات: [[%s:%s]] یک مقاله خوب است',
+    'fi': u'Botti: [[%s:%s]] on hyvä artikkeli',
     'fr': u'Bot: Lien BA pour [[%s:%s]]',
+    'frr':u'Bot: [[%s:%s]] as en guden artiikel',
+    'ja': u'ロボットによる: 良質な記事へのリンク [[%s:%s]]',
     'ksh':u'bot: [[%s:%s]] ess_enen jooden Atikkel',
     'no': u'bot: [[%s:%s]] er en anbefalt artikkel',
     'nn': u'bot: [[%s:%s]] er ein god artikkel',
     'pl': u'Bot: Link do dobrego artykułu: [[%s:%s]]',
+    'pt': u'Bot: [[%s:%s]] é um artigo bom',
     'ru': u'Робот: хорошая статья [[%s:%s]]',
     'sv': u'Bot: [[%s:%s]] är en läsvärd artikel',
 }
@@ -127,10 +138,23 @@ msg_lists = {
     'ar': u'بوت: [[%s:%s]] هي قائمة مختارة',
     'de': u'Bot: [[%s:%s]] ist eine informative Liste',
     'en': u'Bot: [[%s:%s]] is a featured list',
-    'es': u'Bot: Enlace a lista destacado para: [[%s:%s]]',
-    'fi': u'Botti: [[%s:%s]] on suositeltu luetteloon',
+    'es': u'Bot: Enlace a lista destacada para: [[%s:%s]]',
+    'fa': u'ربات: [[%s:%s]] یک فهرست برگزیده است',
+    'fi': u'Botti: [[%s:%s]] on suositeltu luettelo',
+    'frr':u'Bot: [[%s:%s]] as en wäärdag list',
+    'ja': u'ロボットによる: 秀逸な一覧へのリンク [[%s:%s]]',
     'ksh':u'bot: [[%s:%s]] ess_en joode Leß',
+    'pt': u'Bot: [[%s:%s]] é uma lista destacada',
     'sv': u'Bot: [[%s:%s]] är en utmärkt list',
+}
+msg_former = {
+    'ar': u'بوت: [[%s:%s]] مقالة مختارة سابقة',
+    'de': u'Bot: [[%s:%s]] ist ein ehemaliger ausgezeichneter Artikel',
+    'en': u'Bot: [[%s:%s]] is a former featured article',
+    'es': u'Bot: [[%s:%s]] ya no es un artículo destacado',
+    'fa': u'ربات:نوشتار [[%s:%s]] یک نوشتار برگزیده پیشین است.',
+    'fi': u'Botti: [[%s:%s]] on entinen suositeltu artikkeli',
+    'frr':u'Bot: [[%s:%s]] wiar ans en auer a miaten guden artiikel',
 }
 
 # ALL wikis use 'Link FA', and sometimes other localized templates.
@@ -146,6 +170,7 @@ template = {
     'ca': [u'Enllaç AD', 'Destacat'],
     'cy': ['Cyswllt erthygl ddethol', 'Dolen ED'],
     'eo': ['LigoElstara'],
+    'en': ['Link FA', 'FA link'],
     'es': ['Destacado'],
     'eu': ['NA lotura'],
     'fr': ['Lien AdQ'],
@@ -174,6 +199,7 @@ template_good = {
     'is': ['Tengill GG'],
     'nn': ['Link AA'],
     'no': ['Link AA'],
+    'pt': ['Bom interwiki'],
    #'tr': ['Link GA', 'Link KM'],
     'vi': [u'Liên kết bài chất lượng tốt'],
     'wo': ['Lien BA'],
@@ -193,7 +219,7 @@ featured_name = {
     'az': (BACK,u"Seçilmiş məqalə"),
     'bar':(CAT, u"Berig"),
     'bat-smg': (CAT, u"Vikipedėjės pavīzdėnē straipsnē"),
-    'be-x-old':(CAT, u"Вікіпэдыя:Выбраныя артыкулы"),
+    'be-x-old':(CAT, u"Вікіпэдыя:Абраныя артыкулы"),
     'bg': (CAT, u"Избрани статии"),
     'bn': (BACK,u"নির্বাচিত নিবন্ধ"),
     'br': (CAT, u"Pennadoù eus an dibab"),
@@ -214,7 +240,7 @@ featured_name = {
     'et': (CAT, u"Eeskujulikud artiklid"),
     'eu': (CAT, u"Nabarmendutako artikuluak"),
     'ext':(BACK,u"Destacau"),
-    'fa': (BACK,u"نوشتار برگزیده"),
+    'fa': (BACK,u"نوشتارهای برگزیده"),
     'fi': (CAT, u"Suositellut sivut"),
     'fo': (CAT, u"Mánaðargrein"),
     'fr': (CAT, u"Article de qualité"),
@@ -236,7 +262,7 @@ featured_name = {
     'kn': (BACK,u"ವಿಶೇಷ ಲೇಖನ"),
     'ko': (CAT, u"알찬 글"),
     'ksh':(CAT, u"Exzälenter Aatikkel"),
-	'kv': (CAT, u"Википедия:Бур гижӧдъяс"),
+    'kv': (CAT, u"Википедия:Бур гижӧдъяс"),
     'la': (CAT, u"Paginae mensis"),
     'li': (CAT, u"Wikipedia:Sjterartikele"),
     'lmo':(CAT, u"Articol ben faa"),
@@ -253,6 +279,7 @@ featured_name = {
     'nl': (CAT, u"Wikipedia:Etalage-artikelen"),
     'nn': (BACK,u"God artikkel"),
     'no': (CAT, u"Utmerkede artikler"),
+    'nv': (CAT, u"Naaltsoos nizhónígo ályaaígíí"),
     'oc': (CAT, u"Article de qualitat"),
     'pl': (CAT, u"Artykuły na medal"),
     'pt': (CAT, u"!Artigos destacados"),
@@ -299,24 +326,26 @@ good_name = {
     'eo': (CAT, u"Legindaj artikoloj"),
     'es': (CAT, u"Wikipedia:Artículos buenos"),
     'et': (CAT, u"Head artiklid"),
+    'fa': (CAT, u"نوشتارهای خوب"),
     'fi': (CAT, u"Hyvät artikkelit"),
     'fr': (CAT, u"Bon article"),
     'hsb':(CAT, u"Namjet za pohódnoćenje"),
     'id': (BACK,u"Artikel bagus"),
    #'id': (CAT, u"Artikel bagus"),
     'is': (CAT, u"Wikipedia:Gæðagreinar"),
-    'ja': (CAT, u"おすすめ記事"),
+    'ja': (BACK,u"Good article"),
     'ksh':(CAT, u"Joode Aatikkel"),
     'lt': (CAT, u"Vertingi straipsniai"),
     'lv': (CAT, u"Labi raksti"),
     'no': (CAT, u"Anbefalte artikler"),
     'oc': (CAT, u"Bon article"),
     'pl': (CAT, u"Dobre artykuły"),
+    'pt': (CAT, u"Artigos bons"),
     'ro': (BACK, u"Articol bun"),
     'ru': (CAT, u"Википедия:Хорошие статьи"),
     'simple': (CAT, u"Good articles"),
     'sr': (BACK,u"Иконица добар"),
-    'sv': (CAT, u"Wikipedia:Läsvärda artiklar"),
+    'sv': (CAT, u"Wikipedia:Bra artiklar"),
     'tr': (BACK,u"Kaliteli madde"),
     'uk': (CAT, u"Вікіпедія:Добрі статті"),
     'uz': (CAT, u"Vikipediya:Yaxshi maqolalar"),
@@ -330,6 +359,7 @@ lists_name = {
     'da': (BACK, u'FremragendeListe'),
     'de': (BACK, u'Informativ'),
     'en': (BACK, u'Featured list'),
+    'fa': (BACK, u"فهرست برگزیده"),
     'id': (BACK, u'Featured list'),
     'ja': (BACK, u'Featured List'),
     'ksh':(CAT,  u"Joode Leß"),
@@ -345,6 +375,19 @@ lists_name = {
     'da': (BACK, u'FremragendeListe'),
 }
 
+former_name = {
+    'th': (CAT, u"บทความคัดสรรในอดีต"),
+    'pt': (CAT, u"!Ex-Artigos_destacados"),
+    'fa': (CAT, u"مقاله‌های برگزیده پیشین"),
+    'es': (CAT, u"Wikipedia:Artículos anteriormente destacados"),
+    'hu': (CAT, u"Korábbi kiemelt cikkek"),
+    'ru': (CAT, u"Википедия:Устаревшие избранные статьи"),
+    'ca': (CAT, u"Arxiu de propostes de la retirada de la distinció"),
+    'es': (CAT, u"Wikipedia:Artículos anteriormente destacados"),
+    'tr': (CAT, u"Vikipedi eski seçkin maddeler"),
+    'zh': (CAT, u"Wikipedia_former_featured_articles"),
+}
+
 # globals
 interactive=0
 nocache=0
@@ -356,6 +399,8 @@ def featuredArticles(site, pType):
     try:
         if pType == 'good':
             method=good_name[site.lang][0]
+        elif pType == 'former':
+            method=former_name[site.lang][0]
         elif pType == 'list':
             method=lists_name[site.lang][0]
         else:
@@ -365,6 +410,8 @@ def featuredArticles(site, pType):
         return arts
     if pType == 'good':
         name=good_name[site.lang][1]
+    elif pType == 'former':
+        name=former_name[site.lang][1]   
     elif pType == 'list':
         name=lists_name[site.lang][1]
     else:
@@ -448,7 +495,7 @@ def getTemplateList (lang, pType):
             templatest+= template_lists['_default']
         except KeyError:
             templates = template_lists['_default']
-    else:
+    else: #pType in ['former', 'featured']
         try:
             templates = template[lang]
             templates+= template['_default']
@@ -489,55 +536,78 @@ def featuredWithInterwiki(fromsite, tosite, template_on_top, pType, quiet, dry =
                 wikipedia.output(u"source page doesn't exist: %s" % a.title())
                 continue
             atrans = findTranslated(a, tosite, quiet)
-            if atrans:
-                text=atrans.get()
-                m=re_Link_FA.search(text)
-                if m:
-                    wikipedia.output(u"(already done)")
-                else:
-                    # insert just before interwiki
-                    if (not interactive or
-                        wikipedia.input(u'Connecting %s -> %s. Proceed? [Y/N]'%(a.title(), atrans.title())) in ['Y','y']
-                        ):
-                        m=re_this_iw.search(text)
-                        if not m:
-                            wikipedia.output(u"no interwiki record, very strange")
-                            continue
-                        site = wikipedia.getSite()
-                        if pType == 'good':
-                            comment = wikipedia.setAction(wikipedia.translate(site, msg_good) % (fromsite.lang, a.title()))
-                        elif pType == 'list':
-                            comment = wikipedia.setAction(wikipedia.translate(site, msg_lists) % (fromsite.lang, a.title()))
-                        else:
-                            comment = wikipedia.setAction(wikipedia.translate(site, msg) % (fromsite.lang, a.title()))
+            if pType!='former':
+                if atrans:
+                    text=atrans.get()
+                    m=re_Link_FA.search(text)
+                    if m:
+                        wikipedia.output(u"(already done)")
+                    else:
+                        # insert just before interwiki
+                        if (not interactive or
+                            wikipedia.input(u'Connecting %s -> %s. Proceed? [Y/N]'%(a.title(), atrans.title())) in ['Y','y']
+                            ):
+                            m=re_this_iw.search(text)
+                            if not m:
+                                wikipedia.output(u"no interwiki record, very strange")
+                                continue
+                            site = wikipedia.getSite()
+                            if pType == 'good':
+                                comment = wikipedia.setAction(wikipedia.translate(site, msg_good) % (fromsite.lang, a.title()))
+                            elif pType == 'list':
+                                comment = wikipedia.setAction(wikipedia.translate(site, msg_lists) % (fromsite.lang, a.title()))
+                            else:
+                                comment = wikipedia.setAction(wikipedia.translate(site, msg) % (fromsite.lang, a.title()))
+                            ### Moving {{Link FA|xx}} to top of interwikis ###
+                            if template_on_top == True:
+                                # Getting the interwiki
+                                iw = wikipedia.getLanguageLinks(text, site)
+                                # Removing the interwiki
+                                text = wikipedia.removeLanguageLinks(text, site)
+                                text += u"\r\n{{%s|%s}}\r\n"%(templatelist[0], fromsite.lang)
+                                # Adding the interwiki
+                                text = wikipedia.replaceLanguageLinks(text, iw, site)
 
-                        ### Moving {{Link FA|xx}} to top of interwikis ###
-                        if template_on_top == True:
-                            # Getting the interwiki
-                            iw = wikipedia.getLanguageLinks(text, site)
-                            # Removing the interwiki
-                            text = wikipedia.removeLanguageLinks(text, site)
-                            text += u"\r\n{{%s|%s}}\r\n"%(templatelist[0], fromsite.lang)
-                            # Adding the interwiki
-                            text = wikipedia.replaceLanguageLinks(text, iw, site)
-
-                        ### Placing {{Link FA|xx}} right next to corresponding interwiki ###
-                        else:
-                            text=(text[:m.end()]
-                                  + (u" {{%s|%s}}" % (templatelist[0], fromsite.lang))
-                                  + text[m.end():])
-                        if not dry:
-                            try:
-                                atrans.put(text, comment)
-                            except wikipedia.LockedPage:
-                                wikipedia.output(u'Page %s is locked!' % atrans.title())
-
-                cc[a.title()]=atrans.title()
+                            ### Placing {{Link FA|xx}} right next to corresponding interwiki ###
+                            else:
+                                text=(text[:m.end()]
+                                      + (u" {{%s|%s}}" % (templatelist[0], fromsite.lang))
+                                      + text[m.end():])
+                            if not dry:
+                                try:
+                                    atrans.put(text, comment)
+                                except wikipedia.LockedPage:
+                                    wikipedia.output(u'Page %s is locked!' % atrans.title())
+                    cc[a.title()]=atrans.title()
+            else:
+                if atrans:
+                    text=atrans.get()
+                    m=re_Link_FA.search(text)
+                    if m:
+                        # insert just before interwiki
+                        if (not interactive or
+                            wikipedia.input(u'Connecting %s -> %s. Proceed? [Y/N]'%(a.title(), atrans.title())) in ['Y','y']
+                            ):
+                            m=re_this_iw.search(text)
+                            if not m:
+                                wikipedia.output(u"no interwiki record, very strange")
+                                continue
+                            site = wikipedia.getSite()
+                            comment = wikipedia.setAction(wikipedia.translate(site, msg_former) % (fromsite.lang, a.title()))
+                            text=re.sub(re_Link_FA,'',text)
+                            if not dry:
+                                try:
+                                    atrans.put(text, comment)
+                                except wikipedia.LockedPage:
+                                    wikipedia.output(u'Page %s is locked!' % atrans.title())
+                    else:
+                        wikipedia.output(u"(already done)")
+                    cc[a.title()]=atrans.title()
         except wikipedia.PageNotSaved, e:
             wikipedia.output(u"Page not saved")
 
 if __name__=="__main__":
-    template_on_top = False
+    template_on_top = True
     featuredcount = False
     fromlang=[]
     processType = 'featured'
@@ -557,14 +627,16 @@ if __name__=="__main__":
             doAll = True
         elif arg.startswith('-after:'):
             afterpage=arg[7:]
-        elif arg == '-top':
-            template_on_top = True
+        elif arg == '-side':
+            template_on_top = False
         elif arg == '-count':
             featuredcount = True
         elif arg == '-good':
             processType = 'good'
         elif arg == '-lists':
             processType = 'list'
+        elif arg == '-former':
+            processType = 'former'
         elif arg == '-quiet':
             quiet = True
         elif arg == '-dry':
@@ -581,6 +653,8 @@ if __name__=="__main__":
                     fromlang=[ll for ll in good_name.keys() if ll>=ll1 and ll<=ll2]
                 elif processType == 'list':
                     fromlang=[ll for ll in good_lists.keys() if ll>=ll1 and ll<=ll2]
+                elif processType == 'former':
+                    fromlang=[ll for ll in former_lists.keys() if ll>=ll1 and ll<=ll2]
                 else:
                     fromlang=[ll for ll in featured_name.keys() if ll>=ll1 and ll<=ll2]
         except:
@@ -591,6 +665,8 @@ if __name__=="__main__":
             fromlang=good_name.keys()
         elif processType == 'list':
             fromlang=lists_name.keys()
+        elif processType == 'former':
+            fromlang=former_name.keys()
         else:
             fromlang=featured_name.keys()
 

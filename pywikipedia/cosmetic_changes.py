@@ -49,7 +49,7 @@ your user-config.py:
 
     cosmetic_changes_disable['wikipedia'] = ('de', 'en', 'fr')
 """
-__version__ = '$Id: cosmetic_changes.py 7934 2010-02-15 13:49:12Z xqt $'
+__version__ = '$Id: cosmetic_changes.py 8424 2010-08-22 08:38:42Z xqt $'
 import wikipedia as pywikibot
 import pagegenerators, isbn
 import sys
@@ -73,6 +73,7 @@ msg_standalone = {
     'bg': u'Робот козметични промени',
     'br': u'Bot: Kemm dister',
     'ca': u'Robot: Canvis cosmètics',
+    'ckb':u'بۆت: دەستکاریی جوانکاری',
     'cs': u'Robotické: kosmetické úpravy',
     'da': u'Bot: Kosmetiske ændringer',
     'de': u'Bot: Kosmetische Änderungen',
@@ -80,9 +81,10 @@ msg_standalone = {
     'en': u'Robot: Cosmetic changes',
     'es': u'Robot: Cambios triviales',
     'et': u'robot: kosmeetilised muudatused',
-    'fa': u'ربات: ویرایش جزئی',
+    'fa': u'ربات: زیباسازی',
     'fi': u'Botti kosmeettisia muutoksia',
     'fr': u'Robot : Changement de type cosmétique',
+    'frr':u'Bot: Kosmeetisk feranerangen',
     'fy': u'bot tekstwiziging',
     'gl': u'bot Cambios estética',
     'he': u'בוט: שינויים קוסמטיים',
@@ -133,6 +135,7 @@ msg_append = {
     'bg': u'; козметични промени',
     'br': u'; Kemm dister',
     'ca': u'; canvis cosmètics',
+    'ckb':u'; دەستکاریی جوانکاری', 
     'cs': u'; kosmetické úpravy',
     'da': u'; kosmetiske ændringer',
     'de': u'; kosmetische Änderungen',
@@ -140,9 +143,10 @@ msg_append = {
     'en': u'; cosmetic changes',
     'es': u'; cambios triviales',
     'et': u'; kosmeetilised muudatused',
-    'fa': u'; ویرایش جزئی',
+    'fa': u'; زیباسازی',
     'fi': u'; kosmeettisia muutoksia',
     'fr': u'; changement de type cosmétique',
+    'frr':u'; kosmeetisk feranerangen',
     'fy': u'; tekstwiziging',
     'gl': u'; cambios estética',
     'he': u'; שינויים קוסמטיים',
@@ -234,14 +238,10 @@ moved_links = {
 deprecatedTemplates = {
     'wikipedia': {
         'de': [
-            (u'Stub', None),
             (u'Belege', u'Belege fehlen\g<parameters>'),
             (u'Quelle', u'Belege fehlen\g<parameters>'),
             (u'Quellen', u'Belege fehlen\g<parameters>'),
-            (u'CommonsCat', u'Commonscat\g<parameters>'),
-        ],
-        'pdc':[
-            (u'Schkiss', None),
+            (u'Quellen fehlen', u'Belege fehlen\g<parameters>'),
         ],
     }
 }
@@ -362,9 +362,10 @@ class CosmeticChangesToolkit:
             # Removing the interwiki
             text = pywikibot.removeLanguageLinks(text, site = self.site)
             # Removing the stars' issue
+            starstext = pywikibot.removeDisabledParts(text)
             for star in starsList:
                 regex = re.compile('(\{\{(?:template:|)%s\|.*?\}\}[\s]*)' % star, re.I)
-                found = regex.findall(text)
+                found = regex.findall(starstext)
                 if found != []:
                     if pywikibot.verbose:
                         print found
@@ -374,7 +375,7 @@ class CosmeticChangesToolkit:
         # nn got a message between the categories and the iw's
         # and they want to keep it there, first remove it
         if self.site.language()=='nn':
-            regex = re.compile('(<!-- ?interwiki \(no(/nb)?, ?sv, ?da first; then other languages alphabetically by name\) ?-->)')
+            regex = re.compile('(<!-- ?interwiki \(no(?:/nb)?, ?sv, ?da first; then other languages alphabetically by name\) ?-->)')
             found = regex.findall(text)
             if found:
                 if pywikibot.verbose:
@@ -541,6 +542,7 @@ class CosmeticChangesToolkit:
     def resolveHtmlEntities(self, text):
         ignore = [
              38,     # Ampersand (&amp;)
+             39,     # Bugzilla 24093
              60,     # Less than (&lt;)
              62,     # Great than (&gt;)
              91,     # Opening bracket - sometimes used intentionally inside links
@@ -549,8 +551,8 @@ class CosmeticChangesToolkit:
             160,     # Non-breaking space (&nbsp;) - not supported by Firefox textareas
         ]
         # ignore ' see http://eo.wikipedia.org/w/index.php?title=Liberec&diff=next&oldid=2320801
-        if self.site.lang == 'eo':
-            ignore += [39]
+        #if self.site.lang == 'eo':
+        #    ignore += [39]
         text = pywikibot.html2unicode(text, ignore = ignore)
         return text
 
@@ -699,6 +701,7 @@ class CosmeticChangesToolkit:
                 'ref',
                 'source',
                 'startspace',
+                'inputbox',
             ]
             # do not change inside file links
             namespaces = list(self.site.namespace(6, all = True))

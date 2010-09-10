@@ -16,7 +16,7 @@ are taken into account.
 #
 # (C) Pywikipedia team, 2008-2009
 #
-__version__ = '$Id: category_redirect.py 8051 2010-04-04 15:33:15Z mfarag $'
+__version__ = '$Id: category_redirect.py 8367 2010-07-27 07:24:56Z xqt $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -62,10 +62,12 @@ class CategoryRedirectBot(object):
                 'cs': u"Kategorie:Zastaralé kategorie",
                 'da': "Kategori:Omdirigeringskategorier",
                 'en': "Category:Wikipedia soft redirected categories",
+                'es': "Categoría:Wikipedia:Categorías redirigidas",
                 'hu': "Kategória:Kategóriaátirányítások",
                 'ja': "Category:移行中のカテゴリ",
                 'no': "Kategori:Wikipedia omdirigertekategorier",
                 'pl': "Kategoria:Przekierowania kategorii",
+                'pt': "Categoria:!Redirecionamentos de categorias",
                 'simple': "Category:Category redirects",
                 'vi': u"Thể loại:Thể loại đổi hướng",
                 'zh': u"Category:已重定向的分类",
@@ -80,11 +82,13 @@ class CategoryRedirectBot(object):
             'cs': u'Robot přesunul stránku ze zastaralé kategorie',
             'da': u"Robot: flytter sider ud af omdirigeringskategorien",
             'en': u"Robot: moving pages out of redirected category",
+            'es': u"Bot: moviendo páginas de categoría redirigida",
             'hu': u"Bot: Lapok automatikus áthelyezése átirányított kategóriából",
             'ja': u"ロボットによる: 移行中のカテゴリからのカテゴリ変更",
             'ksh': u"Bot: Sigk uß en ömjeleidt Saachjropp eruß jesammdt.",
             'no': u"Robot: Flytter sider ut av omdirigeringskategori",
             'pl': u"Robot: Usuwa strony z przekierowanej kategorii",
+            'pt': u"Bot: movendo páginas de redirecionamentos de categorias",
             'commons': u'Robot: Changing category link (following [[Template:Category redirect|category redirect]])',
             'vi': u"Robot: bỏ trang ra khỏi thể loại đổi hướng",
             'zh': u'机器人：改变已重定向分类中的页面的分类',
@@ -95,11 +99,13 @@ class CategoryRedirectBot(object):
             'cs':u'Robot označil kategorii jako zastaralou',
             'da':u"Robot: tilføjer omdirigeringsskabelon for vedligeholdelse",
             'en':u"Robot: adding category redirect template for maintenance",
+            'es':u"Bot: añadiendo plantilla de categoría redirigida para mantenimiento",
             'hu':u"Bot: kategóriaátirányítás sablon hozzáadása",
             'ja':u"ロボットによる: 移行中のカテゴリとしてタグ付け",
             'ksh':u"Bot: Ömleidungsschalbon dobeijedonn.",
             'no':u"Robot: Legger til vedlikeholdsmal for kategoriomdirigering",
             'pl':u"Robot: Dodaje szablon przekierowanej kategorii",
+            'pt':u"Bot: adicionando a predefinição de redirecionamento de categoria",
             'vi':u"Robot: thêm bản mẫu đổi hướng thể loại để dễ bảo trì",
             'zh':u"机器人: 增加分类重定向模板，用于维护",
         }
@@ -109,12 +115,14 @@ class CategoryRedirectBot(object):
             'cs': u'Robot opravil dvojité přesměrování',
             'da': u"Robot: retter dobbelt omdirigering",
             'en': u"Robot: fixing double-redirect",
+            'es': u"Bot: reparando redirección doble",
             'fr': u"Robot : Correction des redirections doubles",
             'hu': u"Bot: Kettős átirányítás javítása",
             'ja': u"ロボットによる: 二重リダイレクト修正",
             'no': u"Robot: Ordner doble omdirigeringer",
             'ksh': u"Bot: dubbel Ömleidung eruß jemaat.",
             'pl': u"Robot: Poprawia podwójne przekierowanie",
+            'pt': u"Bot: Corrigindo redirecionamento duplo",
             'vi': u"Robot: sửa thể loại đổi hướng kép",
             'zh': u"Bot: 修复双重重定向",
         }
@@ -124,12 +132,14 @@ class CategoryRedirectBot(object):
             'cs': u'Údržba přesměrované kategorie',
             'da': u"Bot til vedligeholdelse af kategoromdirigeringer",
             'en': u"Category redirect maintenance bot",
+            'es': u"Bot de mantenimento de categorías redirigidas",
             'fr': u"Robot de maintenance des redirection de catégorie",
             'hu': u"Kategóriaátirányítás-karbantartó bot",
             'ja': u"移行中のカテゴリのメンテナンス・ボット",
             'no': u"Bot for vedlikehold av kategoriomdirigeringer",
             'ksh': u"Bot för de Saachjroppe ier Ömleidunge.",
             'pl': u"Robot porządkujący przekierowania kategorii",
+            'pt': u"Bot de manutenção de categorias de redirecionamento",
             'vi': u"Robot theo dõi thể loại đổi hướng",
             'zh': u"分类重定向维护机器人",
         }
@@ -138,6 +148,12 @@ class CategoryRedirectBot(object):
             {'en': u"""\
 The following protected pages have been detected as requiring updates to \
 category links:
+%s
+~~~~
+""",
+            'es': u"""\
+Se han detectado las siguientes páginas protegidas y se requieren actualizaciones de \
+enlaces de categorías:
 %s
 ~~~~
 """,
@@ -153,7 +169,14 @@ poprawy kategorii:
 %s
 ~~~~
 """,
-			'vi': u"""\
+            'pt': u"""\
+As seguintes páginas protegidas foram detectadas como carecendo de actualizações de \
+ligações de categorias:
+%s
+~~~~
+""",
+
+            'vi': u"""\
 Các trang đã khóa sau cần phải cập nhật \
 liên kết thể loại:
 %s
@@ -171,9 +194,11 @@ liên kết thể loại:
             {
                 'ar': u"* %s موجودة في %s, وهي تحويلة إلى %s",
                 'en': u"* %s is in %s, which is a redirect to %s",
+                'es': u"* %s está en %s, el cual redirecciona a %s",
                 'fr': u"* %s est dans %s, qui est une redirection vers %s",
                 'ksh': u"* %s es en %s, un dat es en Ömleidung op %s",
                 'pl': u"* %s jest w %s, która jest przekierowaniem do %s",
+                'pt': u"* %s está em %s, que redireciona para %s",
                 'vi': u"* %s đang thuộc %s, là thể loại đổi hướng đến %s",
             })
 

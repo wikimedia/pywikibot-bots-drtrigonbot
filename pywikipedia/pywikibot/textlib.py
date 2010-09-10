@@ -11,7 +11,7 @@ and return a unicode string.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: textlib.py 8022 2010-03-18 06:46:50Z xqt $'
+__version__ = '$Id: textlib.py 8433 2010-08-22 20:52:39Z xqt $'
 
 
 import wikipedia as pywikibot
@@ -77,10 +77,10 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         # improve wiki source code readability.
         # 'template':    re.compile(r'(?s){{.*?}}'),
         # The regex above fails on nested templates. This regex can handle
-        # templates cascaded up to level 3, but no deeper. For arbitrary
+        # templates cascaded up to level 2, but no deeper. For arbitrary
         # depth, we'd need recursion which can't be done in Python's re.
         # After all, the language of correct parenthesis words is not regular.
-        'template':    re.compile(r'(?s){{(({{(({{.*?}})|.)*}})|.)*}}'),
+        'template':    re.compile(r'(?s){{(({{.*?}})|.)*}}'),
         'hyperlink':   compileLinkR(),
         'gallery':     re.compile(r'(?is)<gallery.*?>.*?</gallery>'),
         # this matches internal wikilinks, but also interwiki, categories, and
@@ -492,7 +492,7 @@ def interwikiSort(sites, insite = None):
 # Functions dealing with category links
 #---------------------------------------
 
-def getCategoryLinks(text, site):
+def getCategoryLinks(text, site = None):
     import catlib
     """Return a list of category links found in text.
 
@@ -501,6 +501,10 @@ def getCategoryLinks(text, site):
 
     """
     result = []
+
+    if site is None:
+        site = pywikibot.getSite()
+        
     # Ignore category links within nowiki tags, pre tags, includeonly tags,
     # and HTML comments
     text = removeDisabledParts(text)
@@ -515,7 +519,7 @@ def getCategoryLinks(text, site):
     return result
 
 
-def removeCategoryLinks(text, site, marker = ''):
+def removeCategoryLinks(text, site = None, marker = ''):
     """Return text with all category links removed.
 
     Put the string marker after the last replacement (at the end of the text
@@ -526,6 +530,10 @@ def removeCategoryLinks(text, site, marker = ''):
     # interwiki link, plus trailing whitespace. The language code is grouped.
     # NOTE: This assumes that language codes only consist of non-capital
     # ASCII letters and hyphens.
+
+    if site is None:
+        site = pywikibot.getSite()
+    
     catNamespace = '|'.join(site.category_namespaces())
     categoryR = re.compile(r'\[\[\s*(%s)\s*:.*?\]\]\s*' % catNamespace, re.I)
     text = replaceExcept(text, categoryR, '',
@@ -547,6 +555,10 @@ def removeCategoryLinksAndSeparator(text, site=None, marker='', separator=''):
     if there is no replacement).
 
     """
+
+    if site is None:
+        site = pywikibot.getSite()
+
     if separator:
         mymarker = findmarker(text, u'@C@')
         newtext = removeCategoryLinks(text, site, mymarker)
@@ -677,10 +689,10 @@ def compileLinkR(withoutBracketed=False, onlyBracketed=False):
     # RFC 2396 says that URLs may only contain certain characters.
     # For this regex we also accept non-allowed characters, so that the bot
     # will later show these links as broken ('Non-ASCII Characters in URL').
-    # Note: While allowing parenthesis inside URLs, MediaWiki will regard
-    # right parenthesis at the end of the URL as not part of that URL.
-    # The same applies to dot, comma, colon and some other characters.
-    notAtEnd = '\]\s\)\.:;,<>"\|'
+    # Note: While allowing dots inside URLs, MediaWiki will regard
+    # dots at the end of the URL as not part of that URL.
+    # The same applies to comma, colon and some other characters.
+    notAtEnd = '\]\s\.:;,<>"\|'
     # So characters inside the URL can be anything except whitespace,
     # closing squared brackets, quotation marks, greater than and less
     # than, and the last character also can't be parenthesis or another
@@ -848,7 +860,7 @@ def _altlang(code):
     if code in ['cs', 'sk']:
         return ['cs', 'sk']
     #German
-    if code in ['bar', 'ksh', 'pdc']:
+    if code in ['bar', 'frr', 'ksh', 'pdc']:
         return ['de']
     if code in ['als', 'lb']:
         return ['de', 'fr']
@@ -858,8 +870,8 @@ def _altlang(code):
         return ['hsb', 'dsb', 'de']
     if code == 'rm':
         return ['de', 'it']
-    if code == 'stq':
-        return ['fy', 'de']
+    if code =='stq':
+        return ['nds', 'de']
     #Greek
     if code == 'pnt':
         return ['el']

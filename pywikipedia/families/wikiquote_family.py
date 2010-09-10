@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiquote_family.py 8066 2010-04-09 07:55:32Z xqt $'
+__version__ = '$Id: wikiquote_family.py 8484 2010-09-07 18:39:10Z xqt $'
 
 # The Wikimedia family that is known as Wikiquote
 
@@ -11,13 +11,13 @@ class Family(family.Family):
         self.name = 'wikiquote'
 
         self.languages_by_size = [
-            'en', 'it', 'pl', 'de', 'pt', 'ru', 'sk', 'es', 'bg', 'bs', 'sl',
-            'tr', 'fr', 'he', 'lt', 'cs', 'zh', 'el', 'hu', 'fa', 'uk', 'id',
-            'sv', 'nl', 'eo', 'no', 'ja', 'fi', 'hy', 'nn', 'et', 'ca', 'ka',
-            'ar', 'ko', 'ku', 'hr', 'gl', 'sr', 'ro', 'cy', 'ml', 'li', 'is',
-            'th', 'te', 'af', 'da', 'az', 'sq', 'eu', 'vi', 'la', 'br', 'hi',
-            'be', 'ast', 'uz', 'ta', 'ang', 'mr', 'zh-min-nan', 'gu', 'lb',
-            'su', 'ur', 'wo', 'ky', 'kn', 'am', 'co',
+            'en', 'pl', 'it', 'de', 'pt', 'ru', 'sk', 'es', 'bg', 'bs', 'tr',
+            'sl', 'fr', 'cs', 'he', 'lt', 'el', 'id', 'zh', 'hu', 'fa', 'uk',
+            'eo', 'sv', 'nl', 'no', 'fi', 'ja', 'nn', 'hy', 'et', 'ca', 'li',
+            'ar', 'ka', 'ko', 'hr', 'ku', 'gl', 'ro', 'sr', 'cy', 'ml', 'az',
+            'th', 'is', 'te', 'af', 'da', 'eu', 'sq', 'vi', 'la', 'br', 'hi',
+            'mr', 'be', 'ast', 'ta', 'uz', 'ang', 'zh-min-nan', 'ur', 'lb',
+            'gu', 'su', 'wo', 'kn', 'ky', 'am', 'co',
         ]
 
         if family.config.SSL_connection:
@@ -79,7 +79,7 @@ class Family(family.Family):
             'br': u'Kaozeadenn Wikiarroud',
             'bs': u'Razgovor s Wikicitatima',
             'ca': u'Viquidites Discussió',
-            'cs': u'Wikicitáty diskuse',
+            'cs': u'Diskuse k Wikicitátům',
             'cy': u'Sgwrs Wikiquote',
             'da': u'Wikiquote-diskussion',
             'de': u'Wikiquote Diskussion',
@@ -102,7 +102,7 @@ class Family(family.Family):
             'id': u'Pembicaraan Wikiquote',
             'is': u'Wikivitnunspjall',
             'it': u'Discussioni Wikiquote',
-            'ja': u'Wikiquote‐ノート',
+            'ja': u'Wikiquote・トーク',
             'ka': [u'ვიკიციტატა განხილვა', u'Wikiquote განხილვა'],
             'kk': u'Уикидәйек талқылауы',
             'kn': u'Wikiquote ಚರ್ಚೆ',
@@ -121,7 +121,7 @@ class Family(family.Family):
             'pl': u'Dyskusja Wikicytatów',
             'pt': u'Wikiquote Discussão',
             'qu': u'Wikiquote rimanakuy',
-            'ro': u'Discuţie Wikicitat',
+            'ro': u'Discuție Wikicitat',
             'ru': u'Обсуждение Викицитатника',
             'sk': u'Diskusia k Wikicitátom',
             'sl': u'Pogovor o Wikinavedku',

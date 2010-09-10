@@ -87,7 +87,7 @@ This next example substitutes templates test1, test2, and space test on all page
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: template.py 7946 2010-02-20 11:29:40Z xqt $'
+__version__='$Id: template.py 8364 2010-07-26 20:41:32Z huji $'
 #
 import wikipedia as pywikibot
 import config
@@ -149,6 +149,7 @@ class TemplateRobot:
         'de':u'Bot: Ändere Vorlage: %s',
         'en':u'Robot: Changing template: %s',
         'es':u'Robot: Cambiada la plantilla: %s',
+        'fa':u'ربات:تغییر الگو: %s',
         'fi':u'Botti korvasi mallineen: %s',
         'fr':u'Robot : Change modèle: %s',
         'he':u'בוט: משנה תבנית: %s',
@@ -175,6 +176,7 @@ class TemplateRobot:
         'de':u'Bot: Ändere Vorlagen: %s',
         'en':u'Robot: Changing templates: %s',
         'es':u'Robot: Cambiando las plantillas: %s',
+        'fa':u'ربات:تغییر الگوها: %s',
         'fi':u'Botti korvasi mallineet: %s',
         'fr':u'Robot : Modifie modèles %s',
         'he':u'בוט: משנה תבניות: %s',
@@ -198,6 +200,7 @@ class TemplateRobot:
         'de':u'Bot: Entferne Vorlage: %s',
         'en':u'Robot: Removing template: %s',
         'es':u'Robot: Retirando la plantilla: %s',
+        'fa':u'ربات:حذف الگو: %s',
         'fi':u'Botti poisti mallineen: %s',
         'fr':u'Robot : Enlève le modèle: %s',
         'he':u'בוט: מסיר תבנית: %s',
@@ -224,6 +227,7 @@ class TemplateRobot:
         'de':u'Bot: Entferne Vorlagen: %s',
         'en':u'Robot: Removing templates: %s',
         'es':u'Robot: Retirando las plantillas: %s',
+        'fa':u'ربات:حذف الگوها: %s',
         'fi':u'Botti poisti mallineet: %s',
         'he':u'בוט: מסיר תבניות: %s',
         'fr':u'Robot : Enlève modèles : %s',
@@ -248,6 +252,7 @@ class TemplateRobot:
         'de':u'Bot: Umgehe Vorlage: %s',
         'en':u'Robot: Substituting template: %s',
         'es':u'Robot: Sustituyendo la plantilla: %s',
+        'fa':u'ربات: جایگزینی الگو: %s',
         'fi':u'Botti substasi mallineen: %s',
         'fr':u'Robot : Remplace modèle : %s',
         'he':u'בוט: מכליל תבנית בקוד הדף: %s',
@@ -270,6 +275,7 @@ class TemplateRobot:
         'de':u'Bot: Umgehe Vorlagen: %s',
         'en':u'Robot: Substituting templates: %s',
         'es':u'Robot: Sustituyendo las plantillas: %s',
+        'fa':u'ربات: جایگزینی الگوها: %s',
         'fi':u'Botti substasi mallineet: %s',
         'fr':u'Robot : Remplace modèles : %s',
         'he':u'בוט: מכליל תבניות בקוד הדף: %s',
@@ -339,14 +345,18 @@ class TemplateRobot:
 
         replacements = []
         exceptions = {}
-
+        site = pywikibot.getSite()
         for old, new in self.templates.iteritems():
-            if not pywikibot.getSite().nocapitalize:
+            namespaces = list(site.namespace(10, all=True))
+            if not site.nocapitalize:
                 pattern = '[' + re.escape(old[0].upper()) + re.escape(old[0].lower()) + ']' + re.escape(old[1:])
             else:
                 pattern = re.escape(old)
             pattern = re.sub(r'_|\\ ', r'[_ ]', pattern)
-            templateRegex = re.compile(r'\{\{ *([Tt]emplate:|[mM][sS][gG]:)?' + pattern + r'(?P<parameters>\s*\|.+?|) *}}', re.DOTALL)
+            templateRegex = re.compile(r'\{\{ *(' + ':|'.join(namespaces) + \
+                                       r':|[mM][sS][gG]:)?' + pattern + \
+                                       r'(?P<parameters>\s*\|.+?|) *}}',
+                                       re.DOTALL)
 
             if self.remove:
                 replacements.append((templateRegex, ''))

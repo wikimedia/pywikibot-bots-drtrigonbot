@@ -26,7 +26,7 @@ All other parameters will be regarded as part of the title of a single page,
 and the bot will only work on that single page.
 """
 
-__version__='$Id: selflink.py 8057 2010-04-06 09:02:45Z xqt $'
+__version__='$Id: selflink.py 8173 2010-05-14 21:32:30Z amir $'
 
 import wikipedia, pagegenerators, catlib
 import editarticle
@@ -47,6 +47,7 @@ msg = {
     'de':u'Bot: Entferne Selbstlinks',
     'en':u'Robot: Removing selflinks',
     'es':u'Bot: Eliminando enlaces al mismo artículo',
+    'fa':u'ربات:برداشتن پیوند به خود',
     'fr':u'Robot: Enlève autoliens',
     'he':u'בוט: מסיר קישורים של הדף לעצמו',
     'hu':u'Bot: Önmagukra mutató hivatkozások eltávolítása',

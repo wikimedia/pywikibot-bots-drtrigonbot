@@ -12,7 +12,7 @@ Library to work with category pages on Wikipedia
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: catlib.py 7901 2010-01-31 14:54:36Z alexsh $'
+__version__ = '$Id: catlib.py 8502 2010-09-08 15:09:21Z xqt $'
 #
 import re, time, urllib, query
 import wikipedia
@@ -27,9 +27,11 @@ msg_created_for_renaming = {
     'de':u'Bot: Verschoben von %s. Autoren: %s',
     'en':u'Robot: Moved from %s. Authors: %s',
     'es':u'Bot: Traslado desde %s. Autores: %s',
+    'fa':u'ربات: انتقال از %s. نویسندگان: %s',
     'fi':u'Botti siirsi luokan %s. Muokkaajat: %s',
     'fr':u'Robot : déplacé depuis %s. Auteurs: %s',
     'he':u'בוט: הועבר מהשם %s. כותבים: %s',
+    'hu':u'Bottal áthelyezve innen: %s. Eredeti szerzők: %s',
     'ia':u'Robot: Transferite de %s. Autores: %s',
     'id':u'Bot: Memindahkan dari %s. Kontributor: %s',
     'it':u'Bot: Voce spostata da %s. Autori: %s',
@@ -179,13 +181,7 @@ class Category(wikipedia.Page):
 
         This should not be used outside of this module.
         """
-        try:
-            if wikipedia.config.use_api and self.site().versionnumber() >= 11:
-                api_url = self.site().api_address()
-                del api_url
-            else:
-                raise NotImplementedError # version not support
-        except NotImplementedError:
+        if not self.site().has_api() or self.site().versionnumber() < 11:
             for tag, page in self._oldParseCategory(purge, startFrom):
                 yield tag, page
             return
@@ -442,8 +438,8 @@ class Category(wikipedia.Page):
             supercats.append(cat)
         return unique(supercats)
 
-    def isEmpty(self):
-        # TODO: rename; naming conflict with Page.isEmpty
+    def isEmptyCategory(self):
+        """Return True if category has no members (including subcategories)."""
         for tag, title in self._parseCategory():
             return False
         return True

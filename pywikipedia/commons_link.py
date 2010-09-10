@@ -31,7 +31,7 @@ and option can be one of these:
 # Distributed under the terms of the MIT license.
 #
 
-__version__='$Id: commons_link.py 7345 2009-10-02 09:18:15Z siebrand $'
+__version__='$Id: commons_link.py 8365 2010-07-26 20:52:10Z huji $'
 
 import wikipedia, pagegenerators, catlib
 import re
@@ -40,6 +40,7 @@ comment1 = {
     'ar':u'روبوت: تضمين قالب كومنز',
     'cs':u'Robot přidal šablonu commons',
     'en':u'Robot: Include commons template',
+    'fa':u'ربات: افزودن الگوی ویکی‌انبار',
     'he':u'בוט: מוסיף תבנית Commons',
     'ja':u'ロボットによる: テンプレcommons追加',
     'nl':u'Bot: sjabloon commons toegevoegd',
@@ -49,6 +50,7 @@ comment2 = {
     'ar':u'روبوت: تضمين قالب تصنيف كومنز',
     'cs':u'Robot přidal šablonu commonscat',
     'en':u'Robot: Include commonscat template',
+    'fa':u'ربات: افزودن الگوی رده‌بندی ویکی‌انبار',
     'he':u'בוט: מוסיף תבנית Commonscat',
     'ja':u'ロボットによる: テンプレcommonscat追加',
     'nl':u'Bot: sjabloon commonscat toegevoegd',

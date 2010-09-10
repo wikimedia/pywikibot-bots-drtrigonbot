@@ -37,7 +37,7 @@ Furthermore, the following command line parameters are supported:
 # Distributed under the terms of the MIT license.
 #
 
-__version__='$Id: movepages.py 7246 2009-09-15 08:34:44Z filnik $'
+__version__='$Id: movepages.py 8436 2010-08-23 07:16:01Z xqt $'
 
 import wikipedia, pagegenerators
 import sys, re
@@ -51,11 +51,13 @@ docuReplacements = {
 summary={
     'ar': u'روبوت: نقل الصفحة',
     'cs': u'Robot přesunul stránku',
-    'en': u'Robot: Moved page',
     'de': u'Bot: Seite verschoben',
     'el': u'Μετακίνηση σελίδων με bot',
+    'en': u'Bot: Moved page',
+    'fa': u'ربات: صفحه منتقل شد',
     'fi': u'Botti siirsi sivun',
     'fr': u'Bot: Page renommée',
+    'frr':u'Bot: Sidj fersköwen',
     'ja': u'ロボットによる: ページの移動',
     'he': u'בוט: מעביר דף',
     'nl': u'Bot: paginanaam gewijzigd',

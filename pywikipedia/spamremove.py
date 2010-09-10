@@ -26,7 +26,7 @@ Command line options:
 import sys
 import wikipedia, editarticle, pagegenerators
 
-__version__ = '$Id: spamremove.py 7299 2009-09-24 23:37:56Z siebrand $'
+__version__ = '$Id: spamremove.py 8365 2010-07-26 20:52:10Z huji $'
 
 def main():
     automatic = False
@@ -36,6 +36,7 @@ def main():
         'de': u'Entferne in Spam-Blacklist eingetragenen Weblink auf %s',
         'en': u'Removing links to spamming site %s',
         'es': u'Removiendo enlaces a sitio publicitario %s',
+        'fa': u'حذف پیوند به وبگاه هرزنگاری %s',
         'he': u'מסיר קישורים לאתר ספאם %s',
         'fr': u'Suppression du lien blacklisté %s',
         'it': u'Rimuovo link contenuto nella Spam-Blacklist %s',

@@ -22,7 +22,7 @@ python unlink.py Foo bar -namespace:0 -namespace:6
     Removes links to the page [[Foo bar]] in articles and image descriptions.
 """
 
-__version__='$Id: unlink.py 6844 2009-05-07 09:27:39Z siebrand $'
+__version__='$Id: unlink.py 8354 2010-07-12 15:11:37Z xqt $'
 
 import wikipedia, pagegenerators
 import editarticle
@@ -33,18 +33,20 @@ msg = {
           'ar':u'روبوت: إزالة وصلات "%s"',
           'de':u'Bot: Entlinke "%s"',
           'en':u'Robot: Unlinking "%s"',
+          'fa':u'ربات: حذف پیوند %s',
           'fr':u'Robot: Retire le lien "%s"',
           'fi':u'Botti poisti linkin sivulle "%s"',
           'he':u'בוט: מסיר קישורים לדף "%s"',
           'nn':u'robot: fjerna lenkje til "%s"',
           'no':u'robot: fjerner lenke til "%s"',
           'nl':u'Bot: verwijzing naar "%s" verwijderd',
+          'pl':u'Robot odlinkowuje "%s"',
           'pt':u'Bot: Retirando link para "%s"',
        }
 
 class UnlinkBot:
 
-    def __init__(self, pageToUnlink, namespaces):
+    def __init__(self, pageToUnlink, namespaces, always):
         self.pageToUnlink = pageToUnlink
 
         gen = pagegenerators.ReferringPageGenerator(pageToUnlink)
@@ -61,6 +63,8 @@ class UnlinkBot:
         # group linktrail is the link trail, that's letters after ]] which are part of the word.
         # note that the definition of 'letter' varies from language to language.
         self.linkR = re.compile(r'\[\[(?P<title>[^\]\|#]*)(?P<section>#[^\]\|]*)?(\|(?P<label>[^\]]*))?\]\](?P<linktrail>' + linktrail + ')')
+        self.always = always
+        self.done = False
 
     def handleNextLink(self, text, match, context = 100):
         """
@@ -70,8 +74,11 @@ class UnlinkBot:
         should be reset to 0. This is required after the user has edited the
         article.
         """
-        # ignore interwiki links and links to sections of the same page as well as section links
-        if not match.group('title') or self.pageToUnlink.site().isInterwikiLink(match.group('title')) or match.group('section'):
+        # ignore interwiki links and links to sections of the same page as well
+        # as section links
+        if not match.group('title') \
+           or self.pageToUnlink.site().isInterwikiLink(match.group('title')) \
+           or match.group('section'):
             return text, False
 
         linkedPage = wikipedia.Page(self.pageToUnlink.site(), match.group('title'))
@@ -82,28 +89,42 @@ class UnlinkBot:
         else:
             # at the beginning of the link, start red color.
             # at the end of the link, reset the color to default
-            wikipedia.output(text[max(0, match.start() - context) : match.start()] + '\03{lightred}' + text[match.start() : match.end()] + '\03{default}' + text[match.end() : match.end() + context])
-            choice = wikipedia.inputChoice(u'\nWhat shall be done with this link?',  ['unlink', 'skip', 'edit', 'more context'], ['U', 's', 'e', 'm'], 'u')
-            wikipedia.output(u'')
-
-            if choice == 's':
-                # skip this link
-                return text, False
-            elif choice == 'e':
-                editor = editarticle.TextEditor()
-                newText = editor.edit(text, jumpIndex = match.start())
-                # if user didn't press Cancel
-                if newText:
-                    return newText, True
-                else:
-                    return text, True
-            elif choice == 'm':
-                # show more context by recursive self-call
-                return self.handleNextLink(text, match, context = context + 100)
+            if self.always:
+                choice = 'a'
             else:
-                new = match.group('label') or match.group('title')
-                new += match.group('linktrail')
-                return text[:match.start()] + new + text[match.end():], False
+                wikipedia.output(
+                    text[max(0, match.start() - context) : match.start()] \
+                    + '\03{lightred}' + text[match.start() : match.end()] \
+                    + '\03{default}' + text[match.end() : match.end() + context])
+                choice = wikipedia.inputChoice(
+                    u'\nWhat shall be done with this link?\n',
+                    ['unlink', 'skip', 'edit', 'more context',
+                     'unlink all', 'quit'],
+                    ['U', 's', 'e', 'm', 'a', 'q'], 'u')
+                wikipedia.output(u'')
+
+                if choice == 's':
+                    # skip this link
+                    return text, False
+                elif choice == 'e':
+                    editor = editarticle.TextEditor()
+                    newText = editor.edit(text, jumpIndex = match.start())
+                    # if user didn't press Cancel
+                    if newText:
+                        return newText, True
+                    else:
+                        return text, True
+                elif choice == 'm':
+                    # show more context by recursive self-call
+                    return self.handleNextLink(text, match, context = context + 100)
+                elif choice == 'a':
+                    self.always = True
+                elif choice == 'q':
+                    self.done = True
+                    return text, False
+            new = match.group('label') or match.group('title')
+            new += match.group('linktrail')
+            return text[:match.start()] + new + text[match.end():], False
 
     def treat(self, page):
         # Show the title of the page we're working on.
@@ -140,15 +161,17 @@ class UnlinkBot:
         wikipedia.setAction(comment)
 
         for page in self.generator:
+            if self.done: break
             self.treat(page)
 
 def main():
-    # This temporary array is used to read the title of the page
-    # that should be unlinked.
-    pageTitleParts = []
+    # This temporary array is used to read the page title if one single
+    # page that should be unlinked.
+    pageTitle = []
     # Which namespaces should be processed?
     # default to [] which means all namespaces will be processed
     namespaces = []
+    always = False
 
     for arg in wikipedia.handleArgs():
         if arg.startswith('-namespace:'):
@@ -156,15 +179,17 @@ def main():
                 namespaces.append(int(arg[11:]))
             except ValueError:
                 namespaces.append(arg[11:])
+        elif arg == '-always':
+            always = True
         else:
-            pageTitleParts.append(arg)
+            pageTitle.append(arg)
 
-    if pageTitleParts:
-        page = wikipedia.Page(wikipedia.getSite(), ' '.join(pageTitleParts))
-        bot = UnlinkBot(page, namespaces)
+    if pageTitle:
+        page = wikipedia.Page(wikipedia.getSite(), ' '.join(pageTitle))
+        bot = UnlinkBot(page, namespaces, always)
         bot.run()
     else:
-        wikipedia.showHelp('selflink')
+        wikipedia.showHelp('unlink')
 
 if __name__ == "__main__":
     try:

@@ -1,4 +1,4 @@
-__version__ = '$Id: wikipediatools.py 6630 2009-04-19 08:47:15Z cosoleto $'
+__version__ = '$Id: wikipediatools.py 8464 2010-08-26 12:06:34Z purodha $'
 import os, sys
 
 def create_user_config_file():
@@ -25,7 +25,7 @@ def get_base_dir():
     for arg in sys.argv[1:]:
         if arg.startswith("-dir:"):
             base_dir = arg[5:]
-            sys.argv.remove(arg)
+            # sys.argv.remove(arg) // keep, so as to yield identical results, since this routine is called multiple times.
             break
     else:
         if "PYWIKIBOT_DIR" in os.environ:

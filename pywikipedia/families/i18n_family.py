@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: i18n_family.py 7633 2009-11-11 19:49:37Z siebrand $'
+__version__ = '$Id: i18n_family.py 8400 2010-08-12 21:00:36Z siebrand $'
 
 import family
 
@@ -129,6 +129,24 @@ class Family(family.Family):
         self.namespaces[1223] = {
             '_default': [u'Osm talk'],
         }
+        self.namespaces[1224] = {
+            '_default': [u'WikiReader'],
+        }
+        self.namespaces[1225] = {
+            '_default': [u'WikiReader talk'],
+        }
+        self.namespaces[1226] = {
+            '_default': [u'Shapado'],
+        }
+        self.namespaces[1227] = {
+            '_default': [u'Shapado talk'],
+        }
+        self.namespaces[1228] = {
+            '_default': [u'iHRIS'],
+        }
+        self.namespaces[1229] = {
+            '_default': [u'iHRIS talk'],
+        }
 
     def version(self, code):
-        return "1.16alpha"
+        return "1.17alpha"

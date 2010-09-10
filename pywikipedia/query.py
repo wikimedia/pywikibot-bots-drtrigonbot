@@ -22,7 +22,7 @@ This module allow you to use the API in a simple and easy way.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: query.py 7956 2010-02-24 13:24:37Z xqt $'
+__version__ = '$Id: query.py 8305 2010-06-16 17:55:23Z cydeweys $'
 #
 
 import wikipedia, time
@@ -130,6 +130,13 @@ def GetData(params, site = None, useAPI = True, retryCount = 5, encodeTitle = Tr
             # decodedObj = eval( jsontext )
             
             jsontext = json.loads( jsontext )
+
+            if "error" in jsontext:
+                errorDetails = jsontext["error"]
+                if errorDetails["code"] == 'badtoken':
+                    wikipedia.output('Received a bad login token error from the server.  Attempting to refresh.')
+                    params['token'] = site.getToken(sysop = sysop, getagain = True)
+                    continue
             
             if back_response:
                 return res, jsontext

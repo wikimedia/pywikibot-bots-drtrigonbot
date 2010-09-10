@@ -53,7 +53,7 @@ subdirectory.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: login.py 8071 2010-04-09 16:41:08Z xqt $'
+__version__='$Id: login.py 8114 2010-04-19 20:52:19Z xqt $'
 
 import re, os, query
 import urllib2
@@ -168,32 +168,23 @@ class LoginManager:
 
         if api:
             while True:
+                # build the cookie
+                L = {}
+                L["cookieprefix"] = None
+                index = self.site._userIndex(self.sysop)
+                if self.site._cookies[index]:
+                    #if user is trying re-login, update the new information
+                    self.site.updateCookies(L, self.sysop)
+                else:
+                    # clean type login, setup the new cookies files.
+                    self.site._setupCookies(L, self.sysop)
                 response, data = query.GetData(predata, self.site, sysop=self.sysop, back_response = True)
                 result = data['login']['result']
                 if result == "NeedToken":
                     predata["lgtoken"] = data["login"]["token"]
-                    # build the cookie (q&d-fix)
-                    ####
-                    Reat=re.compile(': (.*?)=(.*?);')
-                    L = {}
-                    L["cookieprefix"] = "pdcwiki"
-                    #print '---------# data #---------'
-                    #print data
-                    #if got_token and got_user:
-                    #process the basic information to Site()
-                    index = self.site._userIndex(self.sysop)
-                    #print index
-                    #API result came back username, token and sessions.
                     if ['lgtoken'] in data['login'].keys():
                         self.site._userName[index] = data['login']['lgusername']
                         self.site._token[index] = data['login']['lgtoken'] + "+\\"
-                    if self.site._cookies[index]:
-                        #if user is trying re-login, update the new information
-                        self.site.updateCookies(L, self.sysop)
-                    else:
-                        # clean type login, setup the new cookies files.
-                        self.site._setupCookies(L, self.sysop)
-                    ####
                     continue
                 break
             if result != "Success":

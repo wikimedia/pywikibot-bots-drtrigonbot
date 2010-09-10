@@ -118,7 +118,7 @@ from __future__ import generators
 #
 # (C) Daniel Herding & the Pywikipedia team, 2004-2009
 #
-__version__='$Id: replace.py 7695 2009-11-26 09:28:38Z alexsh $'
+__version__='$Id: replace.py 8436 2010-08-23 07:16:01Z xqt $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -149,11 +149,12 @@ msg = {
     'cs': u'Robot automaticky nahradil text: %s',
     'de': u'Bot: Automatisierte Textersetzung %s',
     'el': u'Ρομπότ: Αυτόματη αντικατάσταση κειμένου %s',
-    'en': u'Robot: Automated text replacement %s',
+    'en': u'Bot: Automated text replacement %s',
     'es': u'Robot: Reemplazo automático de texto %s',
     'fa': u'ربات: تغییر خودکار متن %s',
     'fi': u'Botti korvasi automaattisesti tekstin %s',
     'fr': u'Robot : Remplacement de texte automatisé %s',
+    'frr': u'Bot: Automatisiaret ütjwakselt tekst %s',
     'he': u'בוט: החלפת טקסט אוטומטית %s',
     'hu': u'Robot: Automatikus szövegcsere %s',
     'ia': u'Robot: Reimplaciamento automatic de texto %s',

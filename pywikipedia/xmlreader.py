@@ -15,7 +15,13 @@ For fastest processing, XmlDump uses the cElementTree library if available
 http://www.effbot.org/ for earlier versions). If not found, it falls back
 to the older method using regular expressions.
 """
-__version__='$Id: xmlreader.py 7886 2010-01-20 06:31:50Z xqt $'
+#
+# (C) Pywikipedia bot team, 2005-2010
+#
+# Distributed under the terms of the MIT license.
+#
+__version__='$Id: xmlreader.py 8404 2010-08-14 22:02:23Z xqt $'
+#
 
 import threading
 import xml.sax
@@ -56,7 +62,9 @@ class XmlEntry:
     """
     Represents a page.
     """
-    def __init__(self, title, id, text, username, ipedit, timestamp, editRestriction, moveRestriction, revisionid, comment, redirect):
+    def __init__(self, title, id, text, username, ipedit, timestamp,
+                 editRestriction, moveRestriction, revisionid, comment,
+                 redirect):
         # TODO: there are more tags we can read.
         self.title = title
         self.id = id
@@ -166,7 +174,8 @@ class MediaWikiXmlHandler(xml.sax.handler.ContentHandler):
         if name == 'contributor':
             self.inContributorTag = False
         elif name == 'restrictions':
-            self.editRestriction, self.moveRestriction = parseRestrictions(self.restrictions)
+            self.editRestriction, self.moveRestriction \
+                                  = parseRestrictions(self.restrictions)
         elif name == 'redirect':
             self.isredirect = True
         elif name == 'revision':
@@ -285,6 +294,16 @@ Consider installing the python-celementtree package.''')
         if self.filename.endswith('.bz2'):
             import bz2
             source = bz2.BZ2File(self.filename)
+        elif self.filename.endswith('.gz'):
+            import gzip
+            source = gzip.open(self.filename)
+        elif self.filename.endswith('.7z'):
+            import subprocess
+            source = subprocess.Popen('7za e -bd -so %s 2>/dev/null'
+                                      % self.filename,
+                                      shell=True,
+                                      stdout=subprocess.PIPE,
+                                      bufsize=65535).stdout
         else:
             # assume it's an uncompressed XML file
             source = open(self.filename)
@@ -305,18 +324,18 @@ Consider installing the python-celementtree package.''')
         """Parser that yields only the latest revision"""
         if event == "end" and elem.tag == "{%s}page" % self.uri:
             self._headers(elem)
-
             revision = elem.find("{%s}revision" % self.uri)
             yield self._create_revision(revision)
+            elem.clear()
             self.root.clear()
 
     def _parse_all(self, event, elem):
         """Parser that yields all revisions"""
         if event == "start" and elem.tag == "{%s}page" % self.uri:
             self._headers(elem)
-
         if event == "end" and elem.tag == "{%s}revision" % self.uri:
             yield self._create_revision(elem)
+            elem.clear()
             self.root.clear()
     
     def _headers(self, elem):
@@ -324,6 +343,9 @@ Consider installing the python-celementtree package.''')
         self.pageid = elem.findtext("{%s}id" % self.uri)
         self.restrictions = elem.findtext("{%s}restrictions" % self.uri)
         self.isredirect = elem.findtext("{%s}redirect" % self.uri) is not None
+        self.editRestriction, self.moveRestriction \
+                              = parseRestrictions(self.restrictions)
+
 
     def _create_revision(self, revision):
         """Creates a Single revision"""
@@ -335,16 +357,14 @@ Consider installing the python-celementtree package.''')
         username = ipeditor or contributor.findtext("{%s}username" % self.uri)
         # could get comment, minor as well
         text = revision.findtext("{%s}text" % self.uri)
-        editRestriction, moveRestriction \
-                = parseRestrictions(self.restrictions)
         return XmlEntry(title=self.title,
                         id=self.pageid,
                         text=text or u'',
                         username=username or u'', #username might be deleted
                         ipedit=bool(ipeditor),
                         timestamp=timestamp,
-                        editRestriction=editRestriction,
-                        moveRestriction=moveRestriction,
+                        editRestriction=self.editRestriction,
+                        moveRestriction=self.moveRestriction,
                         revisionid=revisionid,
                         comment=comment,
                         redirect=self.isredirect
@@ -401,7 +421,8 @@ Consider installing the python-celementtree package.''')
                     lines = u''
                     text = m.group('text') or u''
                     restrictions = m.group('restrictions')
-                    editRestriction, moveRestriction = parseRestrictions(restrictions)
+                    editRestriction, moveRestriction \
+                                     = parseRestrictions(restrictions)
 
                     if m.group('username'):
                         username = m.group('username')

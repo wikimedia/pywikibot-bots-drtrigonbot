@@ -9,7 +9,7 @@ each link that goes to a redirect page whether it should be replaced.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: disambredir.py 7861 2010-01-06 06:49:23Z xqt $'
+__version__='$Id: disambredir.py 8365 2010-07-26 20:52:10Z huji $'
 #
 import wikipedia
 import pagegenerators
@@ -20,6 +20,7 @@ msg = {
     'ar': u'تغيير التحويلات في صفحة توضيح',
     'en': u'Changing redirects on a disambiguation page',
     'he': u'משנה קישורים להפניות בדף פירושונים',
+    'fa': u'اصلاح تغییرمسیرها در یک صفحه ابهام‌زدایی',
     'ja': u'ロボットによる: 曖昧さ回避ページのリダイレクト修正',
     'nl': u'Verandering van redirects op een doorverwijspagina',
     'pl': u'Zmiana przekierowań na stronie ujednoznaczającej',

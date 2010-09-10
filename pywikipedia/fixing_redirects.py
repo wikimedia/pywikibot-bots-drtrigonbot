@@ -5,8 +5,9 @@ This script has the intention to correct all redirect
 links in featured pages or only one page of each wiki.
 
 Can be using with:
--featured      Run over featured pages
--page:XXX      Run over only one page
+&params;
+
+-featured         Run over featured pages
 
 Run fixing_redirects.py -help to see all the command-line
 options -file, -ref, -links, ...
@@ -15,9 +16,11 @@ options -file, -ref, -links, ...
 #
 # This script based on disambredir.py and solve_disambiguation.py
 #
+# (C) Pywikipedia team, 2004-2010
+#
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: fixing_redirects.py 7907 2010-02-03 13:13:43Z xqt $'
+__version__='$Id: fixing_redirects.py 8364 2010-07-26 20:41:32Z huji $'
 #
 import wikipedia
 import pagegenerators
@@ -33,6 +36,7 @@ msg = {
     'ar': u'بوت: إصلاح التحويلات',
     'cs': u'Robot opravil přesměrování',
     'en': u'Bot: Fixing redirects',
+    'fa': u'ربات:تصحیح تغییرمسیرها',
     'he': u'בוט: מתקן הפניות',
     'ja': u'ロボットによる:リダイレクト回避',
     'nn': u'robot: retta omdirigeringar',
@@ -50,6 +54,7 @@ featured_articles = {
     'de': u'Wikipedia:Exzellente_Artikel',
     'en': u'Wikipedia:Featured_articles',
     'es': u'Wikipedia:Artículos_destacados',
+    'fa': u'ویکی‌پدیا:نوشتارهای برگزیده',
     'fr': u'Wikipédia:Articles_de_qualité',
     'he': u'פורטל:ערכים_מומלצים',
     'it': u'Wikipedia:Articoli_in_vetrina',
@@ -182,10 +187,7 @@ def workon(page):
             wikipedia.output('Error: unable to put %s' % page.aslink())
 
 def main():
-    start = '!'
     featured = False
-    title = None
-    namespace = None
     gen = None
 
     # This factory is responsible for processing command line arguments
@@ -196,41 +198,22 @@ def main():
     for arg in wikipedia.handleArgs():
         if arg == '-featured':
             featured = True
-        elif arg.startswith('-page'):
-            if len(arg) == 5:
-                title = wikipedia.input(u'Which page should be processed?')
-            else:
-                title = arg[6:]
-        elif arg.startswith('-namespace'):
-            if len(arg) == 10:
-                namespace = int(wikipedia.input(u'Which namespace should be processed?'))
-            else:
-                namespace = int(arg[11:])
         else:
             genFactory.handleArg(arg)
-
-    gen = genFactory.getCombinedGenerator()
 
     mysite = wikipedia.getSite()
     if mysite.sitename() == 'wikipedia:nl':
         wikipedia.output(u'\03{lightred}There is consensus on the Dutch Wikipedia that bots should not be used to fix redirects.\03{default}')
         sys.exit()
 
-    linktrail = mysite.linktrail()
     if featured:
         featuredList = wikipedia.translate(mysite, featured_articles)
         ref = wikipedia.Page(wikipedia.getSite(), featuredList)
         gen = pagegenerators.ReferringPageGenerator(ref)
-        generator = pagegenerators.NamespaceFilterPageGenerator(gen, [0])
-        for page in generator:
-            workon(page)
-    elif title is not None:
-        page = wikipedia.Page(wikipedia.getSite(), title)
-        workon(page)
-    elif namespace is not None:
-        for page in pagegenerators.AllpagesPageGenerator(start=start, namespace=namespace, includeredirects=False):
-            workon(page)
-    elif gen:
+        gen = pagegenerators.NamespaceFilterPageGenerator(gen, [0])
+    if not gen:
+        gen = genFactory.getCombinedGenerator()
+    if gen:
         for page in pagegenerators.PreloadingGenerator(gen):
             workon(page)
     else:

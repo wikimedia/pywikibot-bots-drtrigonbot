@@ -52,7 +52,7 @@ Please check every article you change.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: table2wiki.py 7924 2010-02-12 06:40:57Z xqt $'
+__version__='$Id: table2wiki.py 8364 2010-07-26 20:41:32Z huji $'
 
 import re, sys, time
 import wikipedia, config, pagegenerators
@@ -68,6 +68,7 @@ msg_no_warnings = {
     'de':u'Bot: Tabellensyntax konvertiert',
     'en':u'User-controlled Bot: table syntax updated',
     'es':u'Bot controlado: actualizada sintaxis de tabla',
+    'fa':u'ربات کاربر: به‌روزرسانی ترکیب جدول',
     'fr':u'Robot : wikification syntaxe tableaux',
     'he':u'בוט בפיקוח משתמש: עדכון תחביר הטבלה',
     'ia':u'Robot controlate: Syntaxe del tabella cambiate de HTML a Wiki',
@@ -86,6 +87,7 @@ msg_one_warning = {
     'de':u'Bot: Tabellensyntax konvertiert - %d Warnung!',
     'en':u'User-controlled Bot: table syntax updated - %d warning!',
     'es':u'Bot controlado: actualizada sintaxis de tabla - %d aviso!',
+    'fa':u'ربات کاربر: به‌روز‌رسانی ترکیب جدول - %d هشدار!',
     'fr':u'Robot : wikification syntaxe tableaux - %d avertissements !',
     'he':u'בוט בפיקוח משתמש: עדכון תחביר הטבלה - אזהרה אחת!',
     'ia':u'Robot controlate: Syntaxe del tabella cambiate - %d advertimento!',
@@ -104,6 +106,7 @@ msg_multiple_warnings = {
     'de':u'Bot: Tabellensyntax konvertiert - %d Warnungen!',
     'en':u'User-controlled Bot: table syntax updated - %d warnings!',
     'es':u'Bot controlado: actualizada sintaxis de tabla - %d avisos!',
+    'fa':u'ربات کاربر: به‌روز‌رسانی ترکیب جدول - %d هشدار!',
     'fr':u'Robot : wikification syntaxe tableaux - %d avertissements !',
     'he':u'בוט בפיקוח משתמש: עדכון תחביר הטבלה - %d אזהרות!',
     'ia':u'Robot controlate: Syntaxe del tabella cambiate - %d advertimentos!',

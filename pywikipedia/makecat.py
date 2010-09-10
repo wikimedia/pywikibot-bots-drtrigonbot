@@ -36,7 +36,7 @@ L(ist) - show current list of pages to include or to check
 # Distributed under the terms of the MIT license.
 #
 
-__version__='$Id: makecat.py 7336 2009-09-29 18:27:04Z alexsh $'
+__version__='$Id: makecat.py 8365 2010-07-26 20:52:10Z huji $'
 
 import sys, codecs, re
 import wikipedia, date, catlib
@@ -45,13 +45,14 @@ msg={
     'ar':u'إنشاء أو تحديث التصنيف:',
     'en':u'Creation or update of category:',
     'es':u'Creación o actualiza de la categoría:',
+    'fa':u'ایجاد یا تصحیح رده:',
     'fr':u'Création ou mise à jour de categorie:',
     'he':u'יצירה או עדכון של קטגוריה:',
     'ia':u'Creation o actualisation de categoria:',
     'it':u'La creazione o laggiornamento di categoria:',
     'nl':u'Aanmaak of uitbreiding van categorie:',
-    'nn':u'oppretting eller oppdatering av kategori:':
-    'no':u'opprettelse eller oppdatering av kategori:':
+    'nn':u'oppretting eller oppdatering av kategori:',
+    'no':u'opprettelse eller oppdatering av kategori:',
     'pl':u'Stworzenie lub aktualizacja kategorii:',
     'pt':u'Criando ou atualizando categoria:',
     }

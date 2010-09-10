@@ -36,7 +36,7 @@ Furthermore, the following command line parameters are supported:
 
 """
 
-__version__='$Id: isbn.py 7565 2009-10-29 15:33:46Z xqt $'
+__version__='$Id: isbn.py 8395 2010-08-10 19:04:28Z xqt $'
 
 import wikipedia as pywikibot
 import pagegenerators
@@ -51,6 +51,7 @@ msg = {
     'ar': u'روبوت: تهيئة ISBN',
     'de': 'Bot: Formatiere ISBN',
     'en': 'Robot: Formatting ISBN',
+    'fa': u'ربات:استانداردسازی شابک',
     'he': u'בוט: מעצב ISBN',
     'ja': u'ロボットによる ISBN の書式化',
     'nl': 'Bot: ISBN opgemaakt',
@@ -1176,11 +1177,14 @@ class IsbnBot:
                 # convert ISBN numbers
                 page.put(text)
             except pywikibot.NoPage:
-                print "Page %s does not exist?!" % page.aslink()
+                pywikibot.output(u"Page %s does not exist?!"
+                                 % page.aslink())
             except pywikibot.IsRedirectPage:
-                print "Page %s is a redirect; skipping." % page.aslink()
+                pywikibot.output(u"Page %s is a redirect; skipping."
+                                 % page.aslink())
             except pywikibot.LockedPage:
-                print "Page %s is locked?!" % page.aslink()
+                pywikibot.output(u"Page %s is locked?!"
+                                 % page.aslink())
 
 
 class InvalidIsbnException(pywikibot.Error):
@@ -1355,7 +1359,7 @@ def _hyphenateIsbnNumber(match):
     return i.code
 
 def hyphenateIsbnNumbers(text):
-    isbnR = re.compile(r'(?<=ISBN )(?P<code>[\d\-]+[Xx]?)')
+    isbnR = re.compile(r'(?<=ISBN )(?P<code>[\d\-]+[\dXx])')
     text = isbnR.sub(_hyphenateIsbnNumber, text)
     return text
 
@@ -1385,6 +1389,7 @@ class IsbnBot:
         self.format = format
         self.always = always
         self.isbnR = re.compile(r'(?<=ISBN )(?P<code>[\d\-]+[Xx]?)')
+        self.comment = pywikibot.translate(pywikibot.getSite(), msg)
 
     def treat(self, page):
         try:
@@ -1425,7 +1430,7 @@ class IsbnBot:
 
             if self.always:
                 try:
-                    page.put(text)
+                    page.put(text, comment=self.comment)
                 except pywikibot.EditConflict:
                     pywikibot.output(u'Skipping %s because of edit conflict' % (page.title(),))
                 except pywikibot.SpamfilterError, e:
@@ -1434,13 +1439,10 @@ class IsbnBot:
                     pywikibot.output(u'Skipping %s (locked page)' % (page.title(),))
             else:
                 # Save the page in the background. No need to catch exceptions.
-                page.put_async(text)
+                page.put_async(text, self.comment)
 
 
     def run(self):
-        comment = pywikibot.translate(pywikibot.getSite(), msg)
-        pywikibot.setAction(comment)
-
         for page in self.generator:
             self.treat(page)
 
@@ -1479,9 +1481,9 @@ def main():
             if not genFactory.handleArg(arg):
                 pageTitle.append(arg)
 
+    site = pywikibot.getSite()
     if pageTitle:
-        page = pywikibot.Page(pywikibot.getSite(), ' '.join(pageTitle))
-        gen = iter([page])
+        gen = iter([pywikibot.Page(site, t) for t in pageTitle])
     if not gen:
         gen = genFactory.getCombinedGenerator()
     if not gen:

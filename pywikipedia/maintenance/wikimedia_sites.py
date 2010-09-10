@@ -14,7 +14,6 @@ sys.path.append('..')
 import wikipedia
 import codecs
 
-families = ['wikipedia', 'wiktionary', 'wikiquote', 'wikisource', 'wikibooks', 'wikinews', 'wikiversity']
 familiesDict = {
     'wikipedia':  'wikipedias_wiki.php',
     'wiktionary': 'wiktionaries_wiki.php',
@@ -26,7 +25,9 @@ familiesDict = {
 }
 exceptions = ['www']
 
-def update_family():
+def update_family(families):
+    if not families:
+        families = familiesDict.keys()
     for family in families:
         wikipedia.output('Checking family %s:' % family)
 
@@ -54,7 +55,7 @@ def update_family():
         else:
             wikipedia.output(u"The lists don't match, the new list is:")
             text = u'        self.languages_by_size = [\r\n'
-            line = '           '
+            line = ' ' * 11
             for lang in new:
                 if len(line)+len(lang) <= 76:
                     line += u" '%s'," % lang
@@ -76,6 +77,10 @@ def update_family():
 
 if __name__ == '__main__':
     try:
-        update_family()
+        fam = []
+        for arg in wikipedia.handleArgs():
+            if arg in familiesDict.keys() and arg not in fam:
+                fam.append(arg)
+        update_family(fam)
     finally:
         wikipedia.stopme()

@@ -27,7 +27,7 @@ used on a page reachable via interwiki links.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: imagetransfer.py 7336 2009-09-29 18:27:04Z alexsh $'
+__version__='$Id: imagetransfer.py 8257 2010-06-07 08:41:56Z xqt $'
 
 import re, sys, md5, urllib
 import wikipedia, upload, config, pagegenerators
@@ -96,6 +96,7 @@ nowCommonsMessage = {
 }
 
 #nowCommonsThisMessage = {
+    #'ar': u'الملف الآن متوفر في كومنز بنفس الاسم.',
     #'en': u'File is now available on Commons with the same name.',
     #'he': u'הקובץ זמין כעת בוויקישיתוף בשם זהה.',
     #'it': u'L\'immagine è adesso disponibile su Wikimedia Commons con lo stesso nome.',

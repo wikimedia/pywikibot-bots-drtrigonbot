@@ -31,7 +31,7 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 
-__version__='$Id: noreferences.py 7870 2010-01-12 08:24:55Z xqt $'
+__version__='$Id: noreferences.py 8469 2010-08-30 07:17:37Z xqt $'
 
 import wikipedia, pagegenerators, catlib
 import editarticle
@@ -49,6 +49,9 @@ msg = {
     'cs':u'Robot doplnil chybějící <references />',
     'de':u'Bot: Trage fehlendes <references /> nach',
     'en':u'Robot: Adding missing <references /> tag',
+    'ru':u'Robot: Добавлен отсутствующий тег <references />',
+    'eo':u'Roboto: Aldono de "<references />"',
+    'fa':u'ربات: برچسب <references /> فراموش شده‌است',
     'fi':u'Botti lisäsi puuttuvan {{viitteet}}-mallineen',
     'he':u'בוט: מוסיף תגית <references /> חסרה',
     'hu':u'Hiányzó {{Források}} pótlása',
@@ -91,10 +94,26 @@ placeBeforeSections = {
         u'See also',
         u'Notes'
     ],
+    'ru': [
+        u'Ссылки',
+        u'Литература',
+    ],
+    'eo': [
+        u'Eksteraj ligiloj',
+        u'Ekstera ligilo',
+        u'Eksteraj ligoj',
+        u'Ekstera ligo',
+        u'Rete'
+    ],
     'es': [
         u'Enlaces externos',
         u'Véase también',
         u'Notas',
+    ],
+    'fa': [
+        u'پیوند به بیرون',
+        u'پانویس',
+        u'جستارهای وابسته'
     ],
     'fi': [
         u'Kirjallisuutta',
@@ -184,9 +203,21 @@ referencesSections = {
         u'Footnotes',
         u'Notes',
     ],
+    'ru': [
+        u'Примечания',
+        u'Сноски',
+        u'Источники',
+    ],
+    'eo': [
+        u'Referencoj',
+    ],
     'es': [
         u'Referencias',
         u'Notas',
+    ],
+    'fa': [
+        u'منابع',
+        u'منبع'
     ],
     'fi': [
         u'Lähteet',
@@ -267,25 +298,31 @@ referencesSections = {
 # on your wiki, you don't have to enter anything here.
 referencesTemplates = {
     'wikipedia': {
-        'ar': [u'Reflist',u'ثبت المراجع',u'قائمة المراجع'],
-        'en': [u'Reflist',u'Refs',u'FootnotesSmall',u'Reference',
-               u'Ref-list',u'Reference list',u'References-small',u'Reflink',
-               u'Footnotes',u'FootnotesSmall'],
+        'ar': [u'Reflist', u'ثبت المراجع', u'قائمة المراجع'],
+        'en': [u'Reflist', u'Refs', u'FootnotesSmall', u'Reference',
+               u'Ref-list', u'Reference list', u'References-small', u'Reflink',
+               u'Footnotes', u'FootnotesSmall'],
+        'ru': [u'Reflist', u'Ref-list', u'Refs', u'Sources',
+               u'Примечания', u'Список примечаний',
+               u'Сноска', u'Сноски'],
+        'eo': [u'Referencoj'],
         'es': ['Listaref', 'Reflist', 'muchasref'],
+        'fa': [u'Reflist', u'Refs', u'FootnotesSmall', u'Reference',
+               u'پانویس', u'پانویس‌ها ', u'پانویس ۲', u'پانویس۲'],
         'fi': [u'Viitteet', u'Reflist'],
-        'fr': [u'Références',u'Notes', u'References', u'Reflist'],
-        'hu': [u'reflist',u'források'],
+        'fr': [u'Références', u'Notes', u'References', u'Reflist'],
+        'hu': [u'reflist', u'források', u'references', u'megjegyzések'],
         'it': [u'References'],
         'ja': [u'Reflist', u'脚注リスト'],
         'ko': [u'주석', u'Reflist'],
         'lt': [u'Reflist', u'Ref', u'Litref'],
-        'nl': [u'Reflist',u'Refs',u'FootnotesSmall',u'Reference',
-               u'Ref-list',u'Reference list',u'References-small',u'Reflink',
-               u'Referenties',u'Bron',u'Bronnen/noten/referenties',u'Bron2',
-               u'Bron3',u'ref',u'references',u'appendix',
-               u'Noot',u'FootnotesSmall'],
+        'nl': [u'Reflist', u'Refs', u'FootnotesSmall', u'Reference',
+               u'Ref-list', u'Reference list', u'References-small', u'Reflink',
+               u'Referenties', u'Bron', u'Bronnen/noten/referenties', u'Bron2',
+               u'Bron3', u'ref', u'references', u'appendix',
+               u'Noot', u'FootnotesSmall'],
         'pl': [u'przypisy', u'Przypisy'],
-        'pt': [u'Notas', 'ref-section'],
+        'pt': [u'Notas', u'ref-section', u'Referências', u'Reflist'],
         'zh': [u'Reflist'],
     },
 }
@@ -296,6 +333,8 @@ referencesSubstitute = {
     'wikipedia': {
         'fi': u'{{viitteet}}',
         'hu': u'{{Források}}',
+        'pl': u'{{Przypisy}}',
+        'ru': u'{{примечания}}',
     },
 }
 
@@ -331,6 +370,7 @@ class NoReferencesBot:
         self.site = wikipedia.getSite()
         self.refR = re.compile('</ref>', re.IGNORECASE)
         self.referencesR = re.compile('<references.*?/>', re.IGNORECASE)
+        self.referencesTagR = re.compile('<references>.*?</references>', re.IGNORECASE|re.DOTALL)
         try:
             self.referencesTemplates = referencesTemplates[wikipedia.getSite().family.name][wikipedia.getSite().lang]
         except KeyError:
@@ -345,17 +385,18 @@ class NoReferencesBot:
         Checks whether or not the page is lacking a references tag.
         """
         oldTextCleaned = wikipedia.removeDisabledParts(text)
-        if self.referencesR.search(oldTextCleaned):
+        if self.referencesR.search(oldTextCleaned) or \
+           self.referencesTagR.search(oldTextCleaned):
             if verbose:
                 wikipedia.output(u'No changes necessary: references tag found.')
             return False
         elif self.referencesTemplates:
             templateR = u'{{(' + u'|'.join(self.referencesTemplates) + ')'
-            if re.search(templateR, oldTextCleaned, re.IGNORECASE):
+            if re.search(templateR, oldTextCleaned, re.IGNORECASE|re.UNICODE):
                 if verbose:
                     wikipedia.output(u'No changes necessary: references template found.')
                 return False
-        elif not self.refR.search(oldTextCleaned):
+        if not self.refR.search(oldTextCleaned):
             if verbose:
                 wikipedia.output(u'No changes necessary: no ref tags found.')
             return False
@@ -482,6 +523,9 @@ class NoReferencesBot:
                 continue
             except wikipedia.LockedPage:
                 wikipedia.output(u"Page %s is locked?!" % page.aslink())
+                continue
+            if wikipedia.getSite().sitename() == 'wikipedia:en' and page.isIpEdit():
+                wikipedia.output(u"Page %s is edited by IP. Possible vandalized" % page.aslink())
                 continue
             if self.lacksReferences(text):
                 newText = self.addReferences(text)

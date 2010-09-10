@@ -9,7 +9,7 @@ There must be A LOT of bugs ! Use with caution and verify what
 it is doing !
 """
 
-__version__='$Id: followlive.py 7846 2009-12-31 09:44:51Z xqt $'
+__version__='$Id: followlive.py 8257 2010-06-07 08:41:56Z xqt $'
 
 import sys, datetime, time, traceback
 import wikipedia, editarticle
@@ -110,7 +110,7 @@ templates = {
 
         u'{{ébauche}}' : {
             'msg': u'à l\'aide du robot: cet article est une ébauche',
-            'pos': 'bottom'},
+            'pos': 'top'},
     },
     'he':{
         u'{{מחק}}': {
@@ -324,6 +324,7 @@ blanking = {
 
 # do nothing if this is in it
 done = {
+    'ar':(u'{{شطب}}', u'{{حذف}}', u'{{خرق}}'),
     'en':('{{VfD}}', '{{AfD}}', '{{AfD1}}', '{{cleanup}}', '{{nonsense}}', '{{deletedpage}}',
           '{{db-reason}}', '{{notability}}', '{{not verified}}', '{{unreferenced}}', '{{db-empty}}',
           '{{db-nocontext}}', '{{db-foreign}}', '{{db-notenglish}}', '{{db-nocontent}}', '{{db-blankcsd}}',
@@ -461,8 +462,8 @@ class PageHandler:
                 sys.exit("Exiting")
             summary += tpl['msg']+' '
             wikipedia.output(u'Probably added %s' % questionlist[answer])
-        wikipedia.output(newcontent)
-        self.page.put(newcontent, comment = summary)
+#        wikipedia.output(newcontent) bug #2986247
+        self.page.put(self.content, comment = summary)
         wikipedia.output(u'with comment %s\n' % summary)
 
     def run(self):

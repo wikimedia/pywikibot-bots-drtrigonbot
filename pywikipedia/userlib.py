@@ -7,18 +7,19 @@ Library to work with users, their pages and talk pages.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: userlib.py 8004 2010-03-13 16:37:27Z xqt $'
+__version__ = '$Id: userlib.py 8451 2010-08-24 12:11:22Z xqt $'
 
 import re
-import wikipedia, query
+import wikipedia as pywikibot
+import query
 
-class AutoblockUser(wikipedia.Error):
+class AutoblockUser(pywikibot.Error):
     """
     The class AutoblockUserError is an exception that is raised whenever
     an action is requested on a virtual autoblock user that's not available
     for him (i.e. roughly everything except unblock).
     """
-class UserActionRefuse(wikipedia.Error): pass
+class UserActionRefuse(pywikibot.Error): pass
 
 class BlockError(UserActionRefuse): pass
 
@@ -30,50 +31,61 @@ class BlockIDError(UnblockError): pass
 
 class AlreadyUnblocked(UnblockError): pass
 
-class InvalidUser(wikipedia.InvalidTitle):
+class InvalidUser(pywikibot.InvalidTitle):
     """The mediawiki API does not allow IP lookups."""
     pass
 
+ip_regexp = re.compile(r'^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}' \
+                       r'(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
+
 class User(object):
-    """
-    A class that represents a Wiki user.
-    Has getters for the user's User: an User talk: (sub-)pages,
-    as well as methods for blocking and unblocking.
+    """A class that represents a Wiki user.
     """
 
     def __init__(self, site, name):
-        """
-        Initializer for a User object.
+        """Initializer for a User object.
 
         Parameters:
-        site - a wikipedia.Site object
+        site - a pywikibot.Site object
         name - name of the user, without the trailing User:
         """
+        if len(name) > 1 and name[0] == u'#':
+            self._isAutoblock = True
+        else:
+            self._isAutoblock = False
+        if self._isAutoblock:
+            # This user is probably being queried for purpose of lifting
+            # an autoblock.
+            pywikibot.output(
+                "This is an autoblock ID, you can only use to unblock it.")
         if type(site) in [str, unicode]:
-            self._site = wikipedia.getSite(site)
+            self._site = pywikibot.getSite(site)
         else:
             self._site = site
+        # None means not loaded
         self._name = name
-        self._blocked = None #None mean not loaded
-        self._groups = None #None mean not loaded
-        #self._editcount = -1 # -1 mean not loaded
+        self._blocked = None
+        self._groups = None
         self._registrationTime = -1
         #if self.site().versionnumber() >= 16:
         #    self._urToken = None
-        if name[0] == '#':
-            # This user is probably being queried for purpose of lifting an
-            # autoblock.
-            wikipedia.output(
-                "This is an autoblock ID, you can only use to unblock it.")
+
 
     def site(self):
         return self._site
 
     def name(self):
+        return self.username
+
+    @property
+    def username(self):
         return self._name
 
+    def isAnonymous(self):
+        return ip_regexp.match(self.username) is not None
+
     def __str__(self):
-        return u'%s:%s' % (self.site() , self.name() )
+        return u'%s:%s' % (self.site() , self.name())
 
     def __repr__(self):
         return self.__str__()
@@ -82,58 +94,104 @@ class User(object):
         getall(self.site(), [self], force=True)
         return
 
-    def registrationTime(self, force = False):
+    def registrationTime(self, force=False):
         if not hasattr(self, '_registrationTime') or force:
             self._load()
         return self._registrationTime
 
-    def editCount(self, force = False):
+    def editCount(self, force=False):
+        """ Return edit count for this user as int.
+
+        @param force: if True, forces reloading the data
+        @type force: bool
+        """
         if not hasattr(self, '_editcount') or force:
             self._load()
         return self._editcount
 
-    def isBlocked(self, force = False):
+    def isBlocked(self, force=False):
+        """ Return True if this user is currently blocked, False otherwise.
+
+        @param force: if True, forces reloading the data
+        @type force: bool
+        """
         if not self._blocked or force:
             self._load()
         return self._blocked
 
-    def groups(self, force = False):
+    def isEmailable(self, force=False):
+        """ Return True if emails can be send to this user through mediawiki,
+        False otherwise.
+
+        @param force: if True, forces reloading the data
+        @type force: bool
+        """
+        if not hasattr(self, '_mailable'):
+            self._load()
+        return self._mailable
+
+    def groups(self, force=False):
+        """ Return a list of groups to wich this user belongs. The return value
+        is guaranteed to be a list object, possibly empty.
+
+        @param force: if True, forces reloading the data
+        @type force: bool
+        """
         if not self._groups or force:
             self._load()
         return self._groups
 
-    def getUserPage(self, subpage=''):
-        if self.name()[0] == '#':
+    def getUserPage(self, subpage=u''):
+        """ Return a pywikibot.Page object corresponding to this user's main
+        page, or a subpage of it if subpage is set.
+
+        @param subpage: subpage part to be appended to the main
+                            page title (optional)
+        @type subpage: unicode
+        """
+        if self._isAutoblock:
             #This user is probably being queried for purpose of lifting
             #an autoblock, so has no user pages per se.
-            raise AutoblockUser
+            raise AutoblockUser("This is an autoblock ID, you can only use to unblock it.")
         if subpage:
-            subpage = '/' + subpage
-        return wikipedia.Page(self.site(), self.name() + subpage, defaultNamespace=2)
+            subpage = u'/' + subpage
+        return pywikibot.Page(self.site(), self.name() + subpage, defaultNamespace=2)
 
-    def getUserTalkPage(self, subpage=''):
-        if self.name()[0] == '#':
+    def getUserTalkPage(self, subpage=u''):
+        """ Return a pywikibot.Page object corresponding to this user's main
+        talk page, or a subpage of it if subpage is set.
+
+        @param subpage: subpage part to be appended to the main
+                            talk page title (optional)
+        @type subpage: unicode
+        """
+        if self._isAutoblock:
             #This user is probably being queried for purpose of lifting
             #an autoblock, so has no user talk pages per se.
-            raise AutoblockUser
+            raise AutoblockUser("This is an autoblock ID, you can only use to unblock it.")
         if subpage:
-            subpage = '/' + subpage
-        return wikipedia.Page(self.site(), self.name() + subpage, defaultNamespace=3)
+            subpage = u'/' + subpage
+        return pywikibot.Page(self.site(), self.name() + subpage,
+                              defaultNamespace=3)
 
-    def editedPages(self, limit=500):
-        """ Deprecated function that wraps 'contributions'
-        for backwards compatibility
+    def sendMail(self, subject=u'', text=u'', ccMe = False):
+        """ Send an email to this user via mediawiki's email interface.
+        Return True on success, False otherwise.
+        This method can raise an UserActionRefuse exception in case this user
+        doesn't allow sending email to him or the currently logged in bot
+        doesn't have the right to send emails.
+
+        @param subject: the subject header of the mail
+        @type subject: unicode
+        @param text: mail body
+        @type text: unicode
+        @param ccme: if True, sends a copy of this email to the bot
+        @type ccme: bool
         """
-        for page in self.contributions(limit):
-            yield page[0]
-
-    def sendMail(self, subject = u'', text = u'', ccMe = False):
-        if not hasattr(self, '_mailable'):
-            self._load()
-        if not self._mailable:
-            raise UserActionRefuse("This user is not mailable")
+        if not self.isEmailable():
+            raise UserActionRefuse('This user is not mailable')
         if not self.site().isAllowed('sendemail'):
-            raise UserActionRefuse("You don't have permission to send mail")
+            raise UserActionRefuse('You don\'t have permission to send mail')
 
         if not self.site().has_api() or self.site().versionnumber() < 14:
             return self.sendMailOld(subject, text, ccMe)
@@ -147,16 +205,14 @@ class User(object):
         }
         if ccMe:
             params['ccme'] = 1
-        result = query.GetData(params, self.site())
-        if 'error' in result:
-            code = result['error']['code']
-            if code == 'usermaildisabled ':
-                wikipedia.output("User mail has been disabled")
-            #elif code == '':
-            #
-        elif 'emailuser' in result:
-            if result['emailuser']['result'] == 'Success':
-                wikipedia.output(u'Email sent.')
+        maildata = query.GetData(params, self.site())
+        if 'error' in maildata:
+            code = maildata['error']['code']
+            if code == u'usermaildisabled ':
+                pywikibot.output(u'User mail has been disabled')
+        elif 'emailuser' in maildata:
+            if maildata['emailuser']['result'] == u'Success':
+                pywikibot.output(u'Email sent.')
                 return True
         return False
 
@@ -175,26 +231,42 @@ class User(object):
         response, data = self.site().postForm(address, predata, sysop = False)
         if data:
             if 'var wgAction = "success";' in data:
-                wikipedia.output(u'Email sent.')
+                pywikibot.output(u'Email sent.')
                 return True
             else:
-                wikipedia.output(u'Email not sent.')
+                pywikibot.output(u'Email not sent.')
                 return False
         else:
-            wikipedia.output(u'No data found.')
+            pywikibot.output(u'No data found.')
             return False
 
     
-    def contributions(self, limit = 500, namespace = []):
-        """ Yields pages that the user has edited, with an upper bound of ``limit''.
-        Pages returned are not guaranteed to be unique
-        (straight Special:Contributions parsing, in chunks of 500 items)."""
+    @pywikibot.deprecated('contributions()')
+    def editedPages(self, limit=500):
+        """ Deprecated function that wraps 'contributions' for backwards
+        compatibility. Yields pywikibot.Page objects that this user has
+        edited, with an upper bound of 'limit'. Pages returned are not
+        guaranteed to be unique.
+
+        @param limit: limit result to this number of pages.
+        @type limit: int.
+        """
+        for item in self.contributions(limit):
+            yield item[0]
+
+    def contributions(self, limit=500, namespace=[]):
+        """ Yield tuples describing this user edits with an upper bound of
+        'limit'. Each tuple is composed of a pywikibot.Page object,
+        the revision id (int), the edit timestamp and the comment (unicode).
+        Pages returned are not guaranteed to be unique.
+
+        @param limit: limit result to this number of pages
+        @type limit: int
+        @param namespace: only iterate links in these namespaces
+        @type namespace: list
+        """
         if not self.site().has_api():
             raise NotImplementedError
-        # please stay this in comment until the regex is fixed
-        #    for pg, oldid, date, comment in self._ContributionsOld(limit):
-        #       yield pg, oldid, date, comment
-        #    return
 
         params = {
             'action': 'query',
@@ -204,8 +276,8 @@ class User(object):
             'uclimit': int(limit),
             'ucdir': 'older',
         }
-        if limit > wikipedia.config.special_page_limit:
-            params['uclimit'] = wikipedia.config.special_page_limit
+        if limit > pywikibot.config.special_page_limit:
+            params['uclimit'] = pywikibot.config.special_page_limit
             if limit > 5000 and self.site().isAllowed('apihighlimits'):
                 params['uclimit'] = 5000
         if namespace:
@@ -216,13 +288,12 @@ class User(object):
         while True:
             result = query.GetData(params, self.site())
             if 'error' in result:
-                wikipedia.output('%s' % result)
-                raise wikipedia.Error
-            for c in result['query']['usercontribs']:
-                yield (wikipedia.Page(self.site(), c['title'], defaultNamespace=c['ns']),
-                  c['revid'],
-                  wikipedia.parsetime2stamp(c['timestamp']),
-                  c['comment']
+                pywikibot.output('%s' % result)
+                raise pywikibot.Error
+            for contrib in result['query']['usercontribs']:
+                ts = pywikibot.parsetime2stamp(contrib['timestamp'])
+                yield (pywikibot.Page(self.site(), contrib['title'], defaultNamespace=contrib['ns']),
+                            contrib['revid'], ts, contrib['comment']
                 )
                 nbresults += 1
                 if nbresults >= limit:
@@ -233,78 +304,26 @@ class User(object):
                 break
         return
 
-    def _contributionsOld(self, limit = 250, namespace = []):
 
-        if self.name()[0] == '#':
-            #This user is probably being queried for purpose of lifting
-            #an autoblock, so has no contribs.
-            raise AutoblockUser
-        #
-        #TODO: fix contribRX regex
-        #
-        offset = 0
-        step = min(limit,500)
-        older_str = None
-        if self.site().versionnumber() <= 11:
-            older_str = self.site().mediawiki_message('sp-contributions-older')
-        else:
-            older_str = self.site().mediawiki_message('pager-older-n')
-        if older_str.startswith('{{PLURAL:$1'):
-            older_str = older_str[13:]
-            older_str = older_str[older_str.find('|')+1:]
-            older_str = older_str[:-2]
-        older_str = older_str.replace('$1',str(step))
-        address = self.site().contribs_address(self.name(),limit=step)
-        contribRX = re.compile(r'<li[^>]*> *<a href="(?P<url>[^"]*?)" title="[^"]+">(?P<date>[^<]+)</a>.*>%s</a>\) *(<span class="[^"]+">[A-Za-z]</span>)* *<a href="[^"]+" (class="[^"]+" )?title="[^"]+">(?P<title>[^<]+)</a> *(?P<comment>.*?)(?P<top><strong> *\(top\) *</strong>)? *(<span class="mw-rollback-link">\[<a href="[^"]+token=(?P<rollbackToken>[^"]+)%2B%5C".*%s</a>\]</span>)? *</li>' % (self.site().mediawiki_message('diff'),self.site().mediawiki_message('rollback') ) )
-        while offset < limit:
-            data = self.site().getUrl(address)
-            for pg in contribRX.finditer(data):
-                url = pg.group('url')
-                oldid = url[url.find('&amp;oldid=')+11:]
-                date = pg.group('date')
-                comment = pg.group('comment')
-                #rollbackToken = pg.group('rollbackToken')
-                top = None
-                if pg.group('top'):
-                    top = True
-                # top, new, minor, should all go in a flags field
-                yield wikipedia.Page(self.site(), pg.group('title')), oldid, date, comment
+    def uploadedImages(self, number=10):
+        """ Yield tuples describing files uploaded by this user.
+        Each tuple is composed of a pywikibot.Page, the timestamp
+        comment (unicode) and a bool (always False...).
+        Pages returned are not guaranteed to be unique.
 
-                offset += 1
-                if offset == limit:
-                    break
-            nextRX = re.search('\(<a href="(?P<address>[^"]+)"[^>]*>' + older_str + '</a>\)',data)
-            if nextRX:
-                address = nextRX.group('address').replace('&amp;','&')
-            else:
-                break
-
-    def uploadedImages(self, number = 10):
+        @param total: limit result to this number of pages
+        @type total: int
+        """
+        if self.isAnonymous():
+            raise StopIteration
         if not self.site().has_api() or self.site().versionnumber() < 11:
-            for p,t,c,a in self._uploadedImagesOld(number):
-                yield p,t,c,a
+            for c in self._uploadedImagesOld(number):
+                yield c
             return
 
-        params = {
-            'action': 'query',
-            'list': 'logevents',
-            'letype': 'upload',
-            'leuser': self.name(),
-            'lelimit': int(number),
-        }
-        count = 0
-        while True:
-            data = query.GetData(params, self.site())
-            for info in data['query']['logevents']:
-                count += 1
-                yield wikipedia.ImagePage(self.site(), info['title']), info['timestamp'], info['comment'], False
-
-                if count >= number:
-                    break
-            if 'query-continue' in data and count < number:
-                params['lestart'] = data['query-continue']['logevents']['lestart']
-            else:
-                break
+        for item in self.site().logpages(number, mode='upload', user=self.username, dump=True):
+            yield pywikibot.ImagePage(self.site(), item['title']), item['timestamp'], item['comment'], item['pageid'] > 0
+        return
 
     def _uploadedImagesOld(self, number = 10):
         """Yield ImagePages from Special:Log&type=upload"""
@@ -326,40 +345,45 @@ class User(object):
 
             date = m.group('date')
             comment = m.group('comment') or ''
-            yield wikipedia.ImagePage(self.site(), image), date, comment, deleted
+            yield pywikibot.ImagePage(self.site(), image), date, comment, deleted
     
-    def block(self, expiry = None, reason = None, anon= True, noCreate = False,
-          onAutoblock = False, banMail = False, watchUser = False, allowUsertalk = True,
-          reBlock = False):
+    def block(self, expiry=None, reason=None, anon=True, noCreate=False,
+          onAutoblock=False, banMail=False, watchUser=False, allowUsertalk=True,
+          reBlock=False, hidename=False):
         """
         Block the user by API.
 
-        Parameters:
-        expiry - expiry time of block, may be a period of time (incl. infinite)
-                 or the block's expiry time
-        reason - reason for block
-        anonOnly - is the block affecting only anonymous users?
-        noSignup - does the block disable account creation?
-        enableAutoblock - is autoblock enabled on the block?
-        emailBan - prevent user from sending e-mail?
-        watchUser - watch the user's user and talk pages?
-        allowUsertalk - allow this user to edit own talk page?
-
+        Parameters (from http://en.wikipedia.org/w/api.php)
+        expiry        - Expiry time of block, may be a period of time
+                        or the block's expiry time
+                        If set to 'infinite', 'indefinite' or 'never',
+                        the block will never expire.
+        reason        - Reason for block 
+        anon          - Block anonymous users only
+        noCreate      - Prevent account creation
+        onAutoblock   - Automatically block the last used IP address, and any
+                        subsequent IP addresses they try to login from
+        banMail       - Prevent user from sending e-mail through the wiki.
+        hidename      - Hide the username from the block log. (API only)
+        allowUsertalk - Allow the user to edit their own talk page
+        reBlock       - If user is already blocked, overwrite the existing block
+        watchUser     - watch the user's user and talk pages (not used with API)
+        
         The default values for block options are set to as most unrestrictive
         """
 
-        if self.name()[0] == '#':
+        if self._isAutoblock:
             #This user is probably being queried for purpose of lifting
             #an autoblock, so can't be blocked.
             raise AutoblockUser
         if self.isBlocked() and not reBlock:
             raise AlreadyBlocked()
-
-        self.site()._getActionUser('block', sysop=True)
+        if not self.site().isAllowed('block', sysop=True):
+            raise UserActionRefuse('You don\'t have permission to block')
         if not expiry:
-            expiry = wikipedia.input(u'Please enter the expiry time for the block:')
+            expiry = pywikibot.input(u'Please enter the expiry time for the block:')
         if not reason:
-            reason = wikipedia.input(u'Please enter a reason for the block:')
+            reason = pywikibot.input(u'Please enter a reason for the block:')
 
         if not self.site().has_api() or self.site().versionnumber() < 12:
             return self._blockOld(expiry, reason, anon, noCreate,
@@ -370,7 +394,6 @@ class User(object):
             'user': self.name(),
             'token': self.site().getToken(self, sysop = True),
             'reason': reason,
-            #'':'',
         }
         if expiry:
             params['expiry'] = expiry
@@ -382,13 +405,13 @@ class User(object):
             params['autoblock'] = 1
         if banMail:
             params['noemail'] = 1
-        #if watchUser:
-        #    
-        if reBlock:
-            params['reblock'] = 1
+        if hidename:
+            params['hidename'] = 1
         if allowUsertalk:
             params['allowusertalk'] = 1
-            
+        if reBlock:
+            params['reblock'] = 1
+
         data = query.GetData(params, self.site(), sysop=True)
         if 'error' in data: #error occured
             errCode = data['error']['code']
@@ -408,28 +431,20 @@ class User(object):
         elif 'block' in data: #success
                 return True
         else:
-            wikipedia.output("Unknown Error, result: %s" % data)
+            pywikibot.output("Unknown Error, result: %s" % data)
             raise BlockError
         raise False
 
     def _blockOld(self, expiry, reason, anonOnly, noSignup, enableAutoblock, emailBan,
                 watchUser, allowUsertalk):
         """
-        Block the user by web page.
+        Internal use to block the user by web page.
+        Don't use this function directly.
 
         """
 
-        if self.name()[0] == '#':
-            #This user is probably being queried for purpose of lifting
-            #an autoblock, so can't be blocked.
-            raise AutoblockUser
-        sefl.site()._getActionUser('block', sysop=True)
-        if expiry is None:
-            expiry = input(u'Please enter the expiry time for the block:')
-        if reason is None:
-            reason = input(u'Please enter a reason for the block:')
         token = self.site().getToken(self, sysop = True)
-        wikipedia.output(u"Blocking [[User:%s]]..." % self.name())
+        pywikibot.output(u"Blocking [[User:%s]]..." % self.name())
         boolStr = ['0','1']
         predata = {
             'wpBlockAddress': self.name(),
@@ -469,17 +484,17 @@ class User(object):
         self._unblock(blockID,reason)
 
     def _getBlockID(self):
-        wikipedia.output(u"Getting block id for [[User:%s]]..." % self.name())
+        pywikibot.output(u"Getting block id for [[User:%s]]..." % self.name())
         address = self.site().blocksearch_address(self.name())
         data = self.site().getUrl(address)
         bIDre = re.search(r'action=unblock&amp;id=(\d+)', data)
         if not bIDre:
-            wikipedia.output(data)
+            pywikibot.output(data)
             raise BlockIDError
         return bIDre.group(1)
 
     def _unblock(self, blockID, reason):
-        wikipedia.output(u"Unblocking [[User:%s]]..." % self.name())
+        pywikibot.output(u"Unblocking [[User:%s]]..." % self.name())
         token = self.site().getToken(self, sysop = True)
         predata = {
             'id': blockID,
@@ -503,7 +518,9 @@ def getall(site, users, throttle=True, force=False):
 
     """
     users = list(users)  # if pages is an iterator, we need to make it a list
-    if len(users) > 1: wikipedia.output(u'Getting %d users data from %s...' % (len(users), site))
+    if len(users) > 1:
+        pywikibot.output(u'Getting %d users data from %s...'
+                         % (len(users), site))
     
     if len(users) > 250: # max load prevents HTTPError 400
         for urg in range(0, len(users), 250):
@@ -528,8 +545,8 @@ class _GetAllUI(object):
         for user in users:
             if not hasattr(user, '_editcount') or force:
                 self.users.append(user)
-            elif wikipedia.verbose:
-                wikipedia.output(u"BUGWARNING: %s already done!" % user.name())
+            elif pywikibot.verbose:
+                pywikibot.output(u"BUGWARNING: %s already done!" % user.name())
 
     def run(self):
         if self.users:
@@ -553,7 +570,7 @@ class _GetAllUI(object):
                 else:
                     uj._groups = []
                 if x['registration']:
-                    uj._registrationTime = wikipedia.parsetime2stamp(x['registration'])
+                    uj._registrationTime = pywikibot.parsetime2stamp(x['registration'])
                 else:
                     uj._registrationTime = 0
                 uj._mailable = ("emailable" in x)
@@ -577,16 +594,16 @@ class _GetAllUI(object):
 
 if __name__ == '__main__':
     """
-    Simple testing code for the [[User:Example]] on the English Wikipedia.
+    Simple testing code for the [[User:Example]] on the English pywikibot.
     """
-    wikipedia.output("""
+    pywikibot.output("""
     This module is not for direct usage from the command prompt.
     In code, the usage is as follows:
     
     >>> exampleUser = User("en", 'Example')
-    >>> wikipedia.output(exampleUser.getUserPage().get())
-    >>> wikipedia.output(exampleUser.getUserPage('Lipsum').get())
-    >>> wikipedia.output(exampleUser.getUserTalkPage().get())
+    >>> pywikibot.output(exampleUser.getUserPage().get())
+    >>> pywikibot.output(exampleUser.getUserPage('Lipsum').get())
+    >>> pywikibot.output(exampleUser.getUserTalkPage().get())
     """)
     # unit tests
     import tests.test_userlib

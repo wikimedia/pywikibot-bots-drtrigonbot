@@ -14,7 +14,7 @@ Specific arguments:
 -force: Don't ask whether to create pages, just create them.
 
 """
-__version__ = '$Id: us-states.py 6540 2009-03-24 01:15:50Z nicdumz $'
+__version__ = '$Id: us-states.py 8365 2010-07-26 20:52:10Z huji $'
 #
 # (C) Andre Engels, 2004
 #
@@ -27,7 +27,8 @@ def main():
     start = '0'
     force = False
     msg = {'en':'Creating state abbreviation redirect',
-           'ar':'إنشاء تحويلة اختصار الولاية',
+           'ar':u'إنشاء تحويلة اختصار الولاية',
+           'fa':u'ایجاد تغییرمسیر برای نام اختصاری ایالت',
            'he':u'יוצר הפניה מראשי התיבות של המדינה',
            }
 

@@ -91,7 +91,7 @@ Syntax examples:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: weblinkchecker.py 8026 2010-03-18 15:02:49Z xqt $'
+__version__='$Id: weblinkchecker.py 8256 2010-06-07 08:14:38Z xqt $'
 
 import wikipedia, config, pagegenerators
 import sys, re
@@ -111,6 +111,7 @@ talk_report_msg = {
     'ar': u'روبوت: الإبلاغ عن وصلات خارجية غير متوفرة',
     'de': u'Bot: Berichte nicht verfügbaren Weblink',
     'en': u'Robot: Reporting unavailable external link',
+    'fa': u'ربات:گزارش پیوند غیرقابل دسترسی',
     'fr': u'Robot : Rapporte lien externe inaccessible',
     'he': u'בוט: מדווח על קישור חיצוני בלתי זמין',
     'ia': u'Robot: Reporto de un ligamine externe non functionante',
@@ -133,6 +134,7 @@ talk_report = {
     'ar': u'== %s ==\n\nخلال عدة عمليات أوتوماتيكية من البوت الوصلة الخارجية التالية كانت غير متوفرة. من فضلك تحقق من أن الوصلة لا تعمل وأزلها أو أصلحها في هذه الحالة!\n\n%s\n%s--~~~~',
     'de': u'== %s ==\n\nBei mehreren automatisierten Botläufen wurde der folgende Weblink als nicht verfügbar erkannt. Bitte überprüfe, ob der Link tatsächlich unerreichbar ist, und korrigiere oder entferne ihn in diesem Fall!\n\n%s\n%s--~~~~',
     'en': u'== %s ==\n\nDuring several automated bot runs the following external link was found to be unavailable. Please check if the link is in fact down and fix or remove it in that case!\n\n%s\n%s--~~~~',
+    'fa': u'== %s ==\n\nبر طبق بررسی‌های رباتیکی من چندین پیوند غیرقابل دسترس پیدا شد. لطفا آنها بررسی و در صورت لزوم درستش کنید.تشکر!\n\n%s\n%s--~~~~',
     'fr': u'== %s ==\n\nPendant plusieurs patrouilles par un robot, le lien suivant a été inaccessible. Veuillez vérifier si le lien est effectivement mort et si oui corrigez ou retirez-le.\n\n%s\n%s--~~~~',
     'he': u'== %s ==\n\nבמהלך מספר ריצות אוטומטיות של הבוט, נמצא שהקישור החיצוני הבא אינו זמין. אנא בדקו אם הקישור אכן שבור, ותקנו אותו או הסירו אותו במקרה זה!\n\n%s\n%s--~~~~',
     'ia': u'== %s ==\n\nDurante plure sessiones automatic, le robot ha constatate que le sequente ligamine externe non es disponibile. Per favor confirma que le ligamine de facto es defuncte, e in caso de si, repara o elimina lo!\n\n%s\n%s--~~~~',
@@ -143,7 +145,7 @@ talk_report = {
     'nl': u'== %s ==\nTijdens enkele automatische controles bleek de onderstaande externe verwijzing onbereikbaar. Controleer alstublieft of de verwijzing inderdaad onbereikbaar is. Verwijder deze tekst alstublieft na een succesvolle controle of na het verwijderen of corrigeren van de externe verwijzing.\n\n%s\n%s--~~~~[[Categorie:Wikipedia:Onbereikbare externe link]]',
     # This is not a good solution as it only works on the Norwegian Wikipedia, not on Wiktionary etc.
     'no': u'%s{{subst:Bruker:JhsBot/Død lenke}}\n\n%s\n%s~~~~\n\n{{ødelagt lenke}}',
-    'pl': u'== %s ==\n\nW czasie kilku automatycznych przebiegów bota, poniższy link zewnętrzny był niedostępny. Proszę sprawdzić czy odnośnik jest faktycznie niedziałający i ewentualnie go usunąć.\n\n%s\n%s--~~~~',
+    'pl': u'{{Martwy link dyskusja|numer=%s|link=%s|IA=%s}}',
     'pt': u'== %s ==\n\nFoi checado os links externos deste artigo por vários minutos. Alguém verifique por favor se a ligação estiver fora do ar e tente arrumá-lo ou removê-la!\n\n%s\n --~~~~ ',
     'sr': u'== %s ==\n\nТоком неколико аутоматски провера, бот је пронашао покварене спољашње повезнице. Молимо вас проверите да ли је повезница добра, поправите је или је уклоните!\n\n%s\n%s--~~~~',
     'zh': u'== %s ==\n\n一个自动运行的bot发现下列外部链接可能已经失效。请帮助修复错误的链接或者移除它!\n\n%s\n%s--~~~~',
@@ -153,6 +155,7 @@ talk_report_caption = {
     'ar': u'وصلة ميتة',
     'de': u'Toter Weblink',
     'en': u'Dead link',
+    'fa': u'پیوند مرده',
     'fr': u'Lien mort',
     'he': u'קישור שבור',
     'ia': u'Ligamine defuncte',
@@ -162,7 +165,7 @@ talk_report_caption = {
     'nds': u'Weblenk geiht nich mehr',
     'nl': u'Dode verwijzing',
     'no': u'',
-    'pl': u'Martwy link',
+    'pl': u'',
     'pt': u'Link quebrado',
     'sr': u'Покварене спољашње повезнице',
     'zh': u'失效链接',
@@ -172,6 +175,7 @@ talk_report_archive = {
     'ar': u'\nصفحة الويب تم حفظها بواسطة أرشيف الإنترنت. من فضلك ضع في الاعتبار الوصل لنسخة مؤرشفة مناسبة: [%s]. ',
     'de': u'Die Webseite wurde vom Internet Archive gespeichert. Bitte verlinke gegebenenfalls eine geeignete archivierte Version: [%s]. ',
     'en': u'\nThe web page has been saved by the Internet Archive. Please consider linking to an appropriate archived version: [%s]. ',
+    'fa': u'\nوب‌گاه اینترنت آرشیو یک نسخه بایگانی شده از این پیوند دارد لطفا از آن استفاده نمایید:[%s]',
     'fr': u"\nLa page a été sauvegardée dans l’''Internet Archive''. Il serait peut-être utile de faire pointer le lien vers une des versions archivées : [%s]. ",
     'he': u'\nעמוד האינטרנט נשמר על־ידי ארכיון האינטרנט. אנא שקלו לקשר לגרסה המאורכבת המתאימה: [%s]',
     'kk': u'\nБұл ғаламтордың беті Интернет Мұрағатында сақталған. Мұрағатталған нұсқасына сәйкесті сілтеуді ескеріңіз: [%s]. ',
@@ -179,7 +183,7 @@ talk_report_archive = {
     'ja': u'\nウェブ・ページはインターネット・アーカイブによって保存されました。アーカイブに保管された適切なバージョンにリンクすることを検討してください: [%s]. ',
     'nl': u'\nDeze website is bewaard in het Internet Archive. Overweeg te verwijzen naar een gearchiveerde pagina: [%s]. ',
     'no': u'\nDenne nettsiden er lagra i Internet Archive. Vurder om lenka kan endres til å peke til en av de arkiverte versjonene: [%s]. ',
-    'pl': u'\nStrona została zarchiwizowana przez Internet Archive. Możesz wykorzystać link archiwalny: [%s]. ',
+    'pl': u'%s',
     'pt': u'Esta página web foi gravada na Internet Archive. Por favor considere o link para a versão arquivada: [%s]. ',
     'zh': u'这个网页已经被保存在互联网档案馆（Internet Archive）。请为该网页提供一个合适的存档版本： [%s]。',
 }

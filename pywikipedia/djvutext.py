@@ -23,7 +23,7 @@ and the bot will only work on that single page.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: djvutext.py 8051 2010-04-04 15:33:15Z mfarag $'
+__version__ = '$Id: djvutext.py 8365 2010-07-26 20:52:10Z huji $'
 import wikipedia
 import os, sys
 import config, codecs
@@ -38,7 +38,8 @@ class DjVuTextBot:
     # NOTE: Put a good description here, and add translations, if possible!
     msg = {
         'ar': u'روبوت: إنشاء صفحة بنص مستخرج من DjVu',
-        'en': u'Robot: creating page with text extracted from DjVu',
+        'en': u'Robot: Creating page with text extracted from DjVu',
+        'fa': u'ربات: ایجاد صفحه با متنی که از دژاوو استخراج شد',
         'fr': u'Bot: Creating page with texte extracted from DjVu',
         'nl': u'Bot: pagina aangemaakt met tekst geëxtraheerd uit DjVu-bestand',
         'pt': u'Bot: criando página com texto extraído do DjVu',
@@ -47,6 +48,7 @@ class DjVuTextBot:
     # It may be omitted by adding an empty string like has been done for 'fr'.
     blank = {
         'en': u'{{blank page}}',
+        'fa': u'',
         'fr': u'',
         'pt': u'',
     }

@@ -14,7 +14,7 @@ Way:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: deledpimage.py 7021 2009-07-06 08:16:35Z alexsh $'
+__version__ = '$Id: deledpimage.py 8257 2010-06-07 08:41:56Z xqt $'
 #
 
 """
@@ -30,16 +30,19 @@ import wikipedia,catlib
 site = wikipedia.getSite()
 
 cat = {
+    'ar': u'تصنيف:وسوم حقوق نسخ الصور غير الحرة',
     'en': u'Category:Non-free image copyright tags',
     'zh': u'Category:合理使用图像模板',
     }
 
 content = {
+    'ar': u'هذه الصورة غير الحرة غير مستخدمة في نطاق المقالات، انظر [[Wikipedia:Non-free content#Policy]]',
     'en': u'This Non-free image NOT used in non-article namespaces, see[[Wikipedia:Non-free content#Policy]]',
     'zh': u'不是使用在条目中的非自由版权图像，根据[[Wikipedia:合理使用]]，不能在非条目名字空间展示：\n',
     }
     
 msg = {
+    'ar': u'روبوت: إصلاح استخدام صورة EDP: [[%s]]',
     'en': u'Robot: Fix EDP image use: [[%s]]',
     'zh': u'Bot修正EDP图像用法：[[%s]]',
     }

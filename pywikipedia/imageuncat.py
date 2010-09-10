@@ -4,7 +4,7 @@ Program to add uncat template to images without categories at commons.
 See imagerecat.py (still working on that one) to add these images to categories.
 
 """
-__version__ = '$Id: imageuncat.py 7565 2009-10-29 15:33:46Z xqt $'
+__version__ = '$Id: imageuncat.py 8391 2010-08-08 16:00:24Z multichill $'
 #
 #  (C) Multichill 2008
 #
@@ -253,6 +253,7 @@ ignoreTemplates = [ u'1000Bit',
                     u'Created by ForrestSjap',
                     u'Created with Inkscape',
                     u'Creator',
+                    u'Credit line',
                     u'Credits-panoramafotos.net',
                     u'Crh',
                     u'Crh-cyrl',
@@ -609,6 +610,7 @@ ignoreTemplates = [ u'1000Bit',
                     u'Otrs pending',
                     u'OTRS pending',
                     u'Own',
+                    u'Own work',
                     u'Pa',
                     u'Pag',
                     u'PAGENAME',
@@ -1238,26 +1240,9 @@ def uploadedYesterday(site = None):
     today = datetime.utcnow()
     yesterday = today + timedelta(days=-1)
 
-    params = {
-        'action'    :'query',
-        'list'      :'logevents',
-        'leprop'    :'title',
-        'letype'    :'upload',
-        'ledir'     :'newer',
-        'lelimit'   :'5000',
-        'lestart'   :yesterday.strftime(dateformat),
-        'leend'     :today.strftime(dateformat)
-        }
-
-    data = query.GetData(params, site, encodeTitle = False)
-    try:
-        for item in data['query']['logevents']:
-            result.append(item['title'])
-    except IndexError:
-        raise NoPage(u'API Error, nothing found in the APIs')
-    except KeyError:
-        raise NoPage(u'API Error, nothing found in the APIs')
-
+    for item in site.logpages( number = 5000, mode = 'upload', start = yesterday.strftime(dateformat),
+                end = today.strftime(dateformat), newer = True, dump = True):
+        result.append(item['title'])
     return pagegenerators.PagesFromTitlesGenerator(result, site)
 
 def recentChanges(site = None, delay=0, block=70):

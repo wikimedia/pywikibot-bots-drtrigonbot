@@ -62,6 +62,12 @@ These command-line arguments can be used to specify which pages to work on:
 
     -quiet:        Use this option to get less output
 
+    -async:        Put page on queue to be saved to wiki asynchronously. This
+                   enables loading pages during saving throtteling and gives a
+                   better performance.
+                   NOTE: For post-processing it always assumes that saving the
+                   the pages was sucessful.
+
 Additionaly, these arguments can be used to restrict the bot to certain pages:
 
     -namespace:n   Number or name of namespace to process. The parameter can be
@@ -294,7 +300,7 @@ have to break it off, use "-continue" next time.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: interwiki.py 8049 2010-04-01 15:17:08Z xqt $'
+__version__ = '$Id: interwiki.py 8467 2010-08-29 13:07:19Z amir $'
 #
 
 import sys, copy, re, os
@@ -329,7 +335,9 @@ except NameError:
         return seq2
 
 import wikipedia as pywikibot
-import config, pagegenerators, catlib
+import config
+import catlib
+import pagegenerators
 import titletranslate, interwiki_graph
 import webbrowser
 
@@ -375,6 +383,7 @@ msg = {
     'ca': (u'Robot ', u'afegeix', u'esborra', u'modifica'),
     'ce': (u'робот ', u'тIетоьхна', u'дIаяьккхина', u'хийцина'),
     'ceb': (u'robot ', u'Gidugang', u'Gitangtang', u'Gimodipikar'),
+    'ckb': (u'بۆت ', u'زیادکردن', u'لابردن', u'چاکسازی'),
     'crh': (u'robot ', u'ekley', u'çetleştire', u'deñiştire'),
     'cs': (u'robot ', u'přidal', u'odebral', u'změnil'),
     'cv': (u'робот ', u'хушрĕ', u'кăларса пăрахрĕ', u'улăштарчĕ'),
@@ -395,6 +404,7 @@ msg = {
     'fo': (u'bottur ', u'leggur aftrat', u'strikar', u'broytur'),
     'fr': (u'robot ', u'Ajoute', u'Retire', u'Modifie'),
     'frp': (u'robot ', u'Apond', u'Retire', u'Modifie'),
+    'frr': (u'Bot:', u'Diartudu', u'Wechnem', u'Feranere'),
     'fur': (u'Robot: ', u'o zonti', u'o cambii', u'o gjavi'),
     'fy': (u'Bot ', u'- derby', u'- fuort', u'- oars'),
     'ga': (u'róbat ', u'ag suimiú', u'ag baint', u'ag mionathrú'),
@@ -440,7 +450,7 @@ msg = {
     'mr': (u'सांगकाम्याने ',  u'वाढविले', u'काढले', u'बदलले'),
     'ms': (u'bot ', u'menambah', u'membuang', u'mengubah'),
     'myv': (u'роботось ', u'путызеть', u'нардызеть', u'полавтызеть'),
-    'mzn': (u'Rebot ', u'Biyeshten', u'Bayten', u'Hekărden'),
+    'mzn': (u'ربوت ', u'بیشتن', u'بیتن', u'هکردن'),
     'nah': (u'Tepozcuayollotl', u'Tlamahxiltilli', u'Tlaquixtilli', u'Tlapatlalli'),
     'nds': (u'IW-Bot: ', u'dorto', u'rut', u'ännert'),
     'nds-nl': (u'bot ', u'derbie', u'derof', u'aanders'),
@@ -449,6 +459,7 @@ msg = {
     'no': (u'robot ', u'legger til', u'fjerner', u'endrer'),
     'nov': (u'robote ', u'Adid', u'Ekartad', u'Modifikad'),
     'nrm': (u'robot ', u'ajouôte', u'hale', u'amende'),
+    'nv': (u'botígíí díí naaltsoos tʼáá bíniʼ łahgo áyiilaa ', u'(+)', u'(-)', u'(+/-)'),
     'os': (u'Робот ', u'баххæст кодта', u'Баивта', u'Аиуварс'),
     'pdc': (u'Bot: ', u'dezu geduh', u'raus gnumme', u'gennert'),
     'pl': (u'robot ', u'dodaje', u'usuwa', u'poprawia'),
@@ -508,6 +519,11 @@ moved_links = {
              u'documentation, template'], u'/doc'),
     'es' : ([u'documentación', u'documentación de plantilla'], u'/doc'),
     'eu' : (u'txantiloi dokumentazioa', u'/dok'),
+    'fa' : ([u'documentation',
+             u'template documentation',
+             u'template doc',
+             u'doc',
+             u'توضیحات'], u'/doc'),
     # fi: no idea how to handle this type of subpage at :Metasivu:
     'fi' : (u'mallineohje', None),
     'fr' : ([u'/documentation', u'documentation', u'doc_modèle',
@@ -536,8 +552,10 @@ moved_links = {
 # Pages which contains these shouldn't be changed.
 ignoreTemplates = {
     '_default': [u'delete'],
+    'ar' : [u'قيد الاستخدام'],
     'cs' : [u'Pracuje_se'],
-    'de' : [u'inuse', u'löschen', u'sla', u'löschantrag', u'löschantragstext'],
+    'de' : [u'inuse', u'in bearbeitung', u'löschen', u'sla', u'löschantrag',
+            u'löschantragstext'],
     'en' : [u'inuse', u'softredirect'],
     'pdc': [u'lösche'],
 }
@@ -583,6 +601,7 @@ class Global(object):
     minlinks = 0
     quiet  = False
     restoreAll = False
+    async  = False
 
     def readOptions(self, arg):
         """ Read all commandline parameters for the global container """
@@ -677,6 +696,8 @@ class Global(object):
             self.nobackonly = True
         elif arg == '-quiet':
             self.quiet = True
+        elif arg == '-async':
+            self.async = True
         elif arg.startswith('-lack:'):
             remainder = arg[6:].split(':')
             self.lacklanguage = remainder[0]
@@ -1043,12 +1064,12 @@ class Subject(object):
         if globalvar.nobackonly:
             if page == self.originPage:
                 try:
-                    pywikibot.output(u"%s has a backlink from %s."%(page,linkingPage))
+                    pywikibot.output(u"%s has a backlink from %s."
+                                     % (page.aslink(), linkingPage.aslink()))
                 except UnicodeDecodeError:
                     pywikibot.output(u"Found a backlink for a page.")
                 self.makeForcedStop(counter)
                 return False
-
 
         if page in self.foundIn:
             # not new
@@ -1086,14 +1107,14 @@ class Subject(object):
             if linkedPage.namespace() in nsmatch:
                 return False
             if globalvar.autonomous:
-                pywikibot.output(u"NOTE: Ignoring link from page %s in namespace %i to page %s in namespace %i." % (self.originPage.aslink(True), self.originPage.namespace(), linkedPage.aslink(True), linkedPage.namespace()))
+                pywikibot.output(u"NOTE: Ignoring link from page %s in namespace %i to page %s in namespace %i." % (linkingPage.aslink(True), linkingPage.namespace(), linkedPage.aslink(True), linkedPage.namespace()))
                 # Fill up foundIn, so that we will not write this notice
                 self.foundIn[linkedPage] = [linkingPage]
                 return True
             else:
                 preferredPage = self.getFoundInCorrectNamespace(linkedPage.site())
                 if preferredPage:
-                    pywikibot.output(u"NOTE: Ignoring link from page %s in namespace %i to page %s in namespace %i because page %s in the correct namespace has already been found." % (self.originPage.aslink(True), self.originPage.namespace(), linkedPage.aslink(True), linkedPage.namespace(), preferredPage.aslink(True)))
+                    pywikibot.output(u"NOTE: Ignoring link from page %s in namespace %i to page %s in namespace %i because page %s in the correct namespace has already been found." % (linkingPage.aslink(True), linkingPage.namespace(), linkedPage.aslink(True), linkedPage.namespace(), preferredPage.aslink(True)))
                     return True
                 else:
                     choice = pywikibot.inputChoice('WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?' % (self.originPage.aslink(True), self.originPage.namespace(), linkedPage.aslink(True), linkedPage.namespace()), ['Yes', 'No', 'Add an alternative', 'give up'], ['y', 'n', 'a', 'g'])
@@ -1155,14 +1176,14 @@ class Subject(object):
                     pywikibot.output(u"NOTE: Ignoring non-disambiguation page %s for %s because disambiguation page %s has already been found." % (page.aslink(True), self.originPage.aslink(True), disambig.aslink(True)))
                     return (True, None)
                 else:
-                    choice = pywikibot.inputChoice('WARNING: %s is a disambiguation page, but %s doesn\'t seem to be one. Follow it anyway?' % (self.originPage.aslink(True), page.aslink(True)), ['Yes', 'No', 'Add an alternative', 'Give up'], ['y', 'n', 'a', 'g'])
+                    choice = pywikibot.inputChoice(u'WARNING: %s is a disambiguation page, but %s doesn\'t seem to be one. Follow it anyway?' % (self.originPage.aslink(True), page.aslink(True)), ['Yes', 'No', 'Add an alternative', 'Give up'], ['y', 'n', 'a', 'g'])
             elif not self.originPage.isDisambig() and page.isDisambig():
                 nondisambig = self.getFoundNonDisambig(page.site())
                 if nondisambig:
                     pywikibot.output(u"NOTE: Ignoring disambiguation page %s for %s because non-disambiguation page %s has already been found." % (page.aslink(True), self.originPage.aslink(True), nondisambig.aslink(True)))
                     return (True, None)
                 else:
-                    choice = pywikibot.inputChoice('WARNING: %s doesn\'t seem to be a disambiguation page, but %s is one. Follow it anyway?' % (self.originPage.aslink(True), page.aslink(True)), ['Yes', 'No', 'Add an alternative', 'Give up'], ['y', 'n', 'a', 'g'])
+                    choice = pywikibot.inputChoice(u'WARNING: %s doesn\'t seem to be a disambiguation page, but %s is one. Follow it anyway?' % (self.originPage.aslink(True), page.aslink(True)), ['Yes', 'No', 'Add an alternative', 'Give up'], ['y', 'n', 'a', 'g'])
             if choice == 'n':
                 return (True, None)
             elif choice == 'a':
@@ -1190,7 +1211,7 @@ class Subject(object):
         if config.without_interwiki:
             f = codecs.open(
                 pywikibot.config.datafilepath('without_interwiki.txt'), 'a', 'utf-8')
-            f.write("# %s \n" % page.aslink(forceInterwiki=True))
+            f.write(u"# %s \n" % page.aslink(forceInterwiki=True))
             f.close()
 
     def askForHints(self, counter):
@@ -1316,7 +1337,7 @@ class Subject(object):
                             pywikibot.output(u"%s: %s gives new %sredirect %s"
                                              %  (self.originPage.aslink(), page.aslink(True), redir, redirectTargetPage.aslink(True)))
                 continue
-            
+
             # must be behind the page.isRedirectPage() part
             # otherwise a redirect error would be raised
             if page.isEmpty() and not page.isCategory():
@@ -1380,10 +1401,10 @@ class Subject(object):
                     f = codecs.open(
                             pywikibot.config.datafilepath('autonomous_problems.dat'),
                             'a', 'utf-8')
-                    f.write("* %s {Found more than one link for %s}" % (self.originPage.aslink(True), page.site()))
+                    f.write(u"* %s {Found more than one link for %s}" % (self.originPage.aslink(True), page.site()))
                     if config.interwiki_graph and config.interwiki_graph_url:
                         filename = interwiki_graph.getFilename(self.originPage, extension = config.interwiki_graph_formats[0])
-                        f.write(" [%s%s graph]" % (config.interwiki_graph_url, filename))
+                        f.write(u" [%s%s graph]" % (config.interwiki_graph_url, filename))
                     f.write("\n")
                     f.close()
                 # FIXME: What errors are we catching here? 
@@ -1459,7 +1480,7 @@ class Subject(object):
                 site = page.site()
                 if site == self.originPage.site():
                     if page != self.originPage:
-                        self.problem("Found link to %s" % page.aslink(True) )
+                        self.problem(u"Found link to %s" % page.aslink(True) )
                         self.whereReport(page)
                         errorCount += 1
                 else:
@@ -1472,7 +1493,7 @@ class Subject(object):
         for site, pages in new.iteritems():
             if len(pages) > 1:
                 errorCount += 1
-                self.problem("Found more than one link for %s" % site)
+                self.problem(u"Found more than one link for %s" % site)
 
         if not errorCount and not globalvar.select:
             # no errors, so all lists have only one item
@@ -1553,6 +1574,17 @@ class Subject(object):
            bot, just before submitting a page change to the live wiki it is
            checked whether we will have to wait. If that is the case, the bot will
            be told to make another get request first."""
+
+        #from clean_sandbox
+        def minutesDiff(time1, time2):
+            if type(time1) is long:
+                time1 = str(time1)
+            if type(time2) is long:
+                time2 = str(time2)
+            t1 = (((int(time1[0:4])*12+int(time1[4:6]))*30+int(time1[6:8]))*24+int(time1[8:10])*60)+int(time1[10:12])
+            t2 = (((int(time2[0:4])*12+int(time2[4:6]))*30+int(time2[6:8]))*24+int(time2[8:10])*60)+int(time2[10:12])
+            return abs(t2-t1)
+
         if not self.isDone():
             raise "Bugcheck: finish called before done"
         if not self.workonme:
@@ -1597,7 +1629,8 @@ class Subject(object):
 
             for siteCode in lclSite.family.languages_by_size:
                 site = pywikibot.getSite(code = siteCode)
-                if (not lclSiteDone and site == lclSite) or (not frgnSiteDone and site != lclSite and site in new):
+                if (not lclSiteDone and site == lclSite) or \
+                   (not frgnSiteDone and site != lclSite and site in new):
                     if site == lclSite:
                         lclSiteDone = True   # even if we fail the update
                     if site.family.name in config.usernames and site.lang in config.usernames[site.family.name]:
@@ -1610,16 +1643,23 @@ class Subject(object):
                             notUpdatedSites.append(site)
                         except GiveUpOnPage:
                             break
-                elif not globalvar.strictlimittwo and site in new and site != lclSite:
+                elif not globalvar.strictlimittwo and site in new \
+                     and site != lclSite:
                     old={}
                     try:
                         for page in new[site].interwiki():
                             old[page.site()] = page
                     except pywikibot.NoPage:
-                        pywikibot.output(u"BUG>>> %s no longer exists?" % new[site].aslink(True))
+                        pywikibot.output(u"BUG>>> %s no longer exists?"
+                                         % new[site].aslink(True))
                         continue
-                    mods, mcomment, adding, removing, modifying = compareLanguages(old, new, insite = lclSite)
-                    if (len(removing) > 0 and not globalvar.autonomous) or (len(modifying) > 0 and self.problemfound) or len(old) == 0 or (globalvar.needlimit and len(adding) + len(modifying) >= globalvar.needlimit +1):
+                    mods, mcomment, adding, removing, modifying \
+                          = compareLanguages(old, new, insite = lclSite)
+                    if (len(removing) > 0 and not globalvar.autonomous) or \
+                       (len(modifying) > 0 and self.problemfound) or \
+                       len(old) == 0 or \
+                       (globalvar.needlimit and \
+                        len(adding) + len(modifying) >= globalvar.needlimit +1):
                         try:
                             if self.replaceLinks(new[site], new, bot):
                                 updatedSites.append(site)
@@ -1631,8 +1671,50 @@ class Subject(object):
                             break
         else:
             for (site, page) in new.iteritems():
+                # edit restriction on is-wiki
+                # http://is.wikipedia.org/wiki/Wikipediaspjall:V%C3%A9lmenni
+                # allow edits for the same conditions as -whenneeded
+                # or the last edit wasn't a bot
+                # or the last edit as 1 month ago
+                smallWikiAllowed = True
+                if globalvar.autonomous and page.site().sitename() == 'wikipedia:is':
+                    old={}
+                    try:
+                        for mypage in new[page.site()].interwiki():
+                            old[mypage.site()] = mypage
+                    except pywikibot.NoPage:
+                        pywikibot.output(u"BUG>>> %s no longer exists?"
+                                         % new[site].aslink(True))
+                        continue
+                    mods, mcomment, adding, removing, modifying \
+                          = compareLanguages(old, new, insite=site)
+                    #cannot create userlib.User with IP
+                    smallWikiAllowed = page.isIpEdit() or \
+                                       len(removing) > 0 or len(old) == 0 or \
+                                       len(adding) + len(modifying) > 2 or \
+                                       len(removing) + len(modifying) == 0 and \
+                                       adding == [page.site()]
+                    if not smallWikiAllowed:
+                        import userlib
+                        user = userlib.User(page.site(), page.userName())
+                        if not 'bot' in user.groups() \
+                           and not 'bot' in page.userName().lower(): #erstmal auch keine namen mit bot
+                            smallWikiAllowed = True
+                        else:
+                            diff = minutesDiff(page.editTime(),
+                                               time.strftime("%Y%m%d%H%M%S",
+                                                             time.gmtime()))
+                            if diff > 30*24*60:
+                                smallWikiAllowed = True
+                            else:
+                                pywikibot.output(
+u'NOTE: number of edits are restricted at %s'
+                                    % page.site().sitename())
+
                 # if we have an account for this site
-                if site.family.name in config.usernames and site.lang in config.usernames[site.family.name]:
+                if site.family.name in config.usernames \
+                   and site.lang in config.usernames[site.family.name] \
+                   and smallWikiAllowed:
                     # Try to do the changes
                     try:
                         if self.replaceLinks(page, new, bot):
@@ -1692,9 +1774,6 @@ class Subject(object):
             pywikibot.output(u"Not editing %s: page does not exist" % page.aslink(True))
             raise SaveError
 
-        # Show a message in purple.
-        pywikibot.output(u"\03{lightpurple}Updating links on page %s.\03{default}" % page.aslink(True))
-
         # clone original newPages dictionary, so that we can modify it to the local page's needs
         new = dict(newPages)
 
@@ -1709,7 +1788,6 @@ class Subject(object):
 
             try:
                 if (new[ignorepage.site()] == ignorepage) and (ignorepage.site() != page.site()):
-                    
                     if (ignorepage not in interwikis):
                         pywikibot.output(u"Ignoring link to %(to)s for %(from)s" % {'to': ignorepage.aslink(), 'from': page.aslink()})
                         new.pop(ignorepage.site())
@@ -1748,13 +1826,20 @@ class Subject(object):
             mods, mcomment, adding, removing, modifying = compareLanguages(old, new, insite = page.site())
 
         if not mods:
-            pywikibot.output(u'No changes needed' )
+            if not globalvar.quiet or pywikibot.verbose:
+                pywikibot.output(u'No changes needed on page %s'
+                                 % page.aslink(True))
             return False
+
+        # Show a message in purple.
+        pywikibot.output(u"\03{lightpurple}Updating links on page %s.\03{default}" % page.aslink(True))
 
         pywikibot.output(u"Changes to be made: %s" % mods)
         oldtext = page.get()
         template = (page.namespace() == 10)
-        newtext = pywikibot.replaceLanguageLinks(oldtext, new, site = page.site(), template = template)
+        newtext = pywikibot.replaceLanguageLinks(oldtext, new,
+                                                 site = page.site(),
+                                                 template = template)
         # This is for now. Later there should be different funktions for each kind
         if not botMayEdit(page):
             if template:
@@ -1770,7 +1855,7 @@ class Subject(object):
         # Determine whether we need permission to submit
         ask = False
         if removing and removing != [page.site()]:   # Allow for special case of a self-pointing interwiki link
-            self.problem('Found incorrect link to %s in %s'% (",".join([x.lang for x in removing]), page.aslink(True)), createneed = False)
+            self.problem(u'Found incorrect link to %s in %s'% (",".join([x.lang for x in removing]), page.aslink(True)), createneed = False)
             ask = True
         if globalvar.force:
             ask = False
@@ -1790,7 +1875,7 @@ class Subject(object):
                         page.site().hostname(),
                         page.site().nice_get_address(page.title())
                     ))
-                    pywikibot.input("Press Enter when finished in browser.")
+                    pywikibot.input(u"Press Enter when finished in browser.")
                     return True
                 elif answer == 'a':
                     # don't ask for the rest of this subject
@@ -1814,11 +1899,16 @@ class Subject(object):
             if not globalvar.quiet or pywikibot.verbose:
                 pywikibot.output(u"NOTE: Updating live wiki...")
             timeout=60
-            while 1:
+            while True:
                 try:
-                    status, reason, data = page.put(newtext, comment = mcomment)
+                    if globalvar.async:
+                        page.put_async(newtext, comment = mcomment)
+                        status = 302
+                    else:
+                        status, reason, data = page.put(newtext, comment = mcomment)
                 except pywikibot.LockedPage:
-                    pywikibot.output(u'Page %s is locked. Skipping.' % (page.title(),))
+                    pywikibot.output(u'Page %s is locked. Skipping.'
+                                     % page.aslink(True))
                     raise SaveError
                 except pywikibot.EditConflict:
                     pywikibot.output(u'ERROR putting page: An edit conflict occurred. Giving up.')
@@ -1853,7 +1943,7 @@ class Subject(object):
         elif answer == 'g':
             raise GiveUpOnPage
         else:
-            raise LinkMustBeRemoved('Found incorrect link to %s in %s'% (",".join([x.lang for x in removing]), page.aslink(True)))
+            raise LinkMustBeRemoved(u'Found incorrect link to %s in %s'% (",".join([x.lang for x in removing]), page.aslink(True)))
 
     def reportBacklinks(self, new, updatedSites):
         """

@@ -51,7 +51,7 @@ Please fix these if you are capable and motivated:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: nowcommons.py 7336 2009-09-29 18:27:04Z alexsh $'
+__version__ = '$Id: nowcommons.py 8406 2010-08-17 17:09:03Z amir $'
 #
 
 import sys, re, webbrowser
@@ -103,6 +103,10 @@ nowCommons = {
     ],
     'eo': [
         u'Nun en komunejo',
+        u'NowCommons',
+    ],
+    'fa': [
+        u'موجود در انبار',
         u'NowCommons',
     ],
     'fr': [

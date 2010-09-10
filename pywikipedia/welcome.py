@@ -179,7 +179,7 @@ badword at all but can be used for some bad-nickname.
 #
 #
 
-__version__ = '$Id: welcome.py 8045 2010-04-01 09:43:55Z filnik $'
+__version__ = '$Id: welcome.py 8258 2010-06-08 17:40:39Z amir $'
 
 
 import wikipedia, config, query, userlib
@@ -213,9 +213,8 @@ logbook = {
     'commons': {'_default': u'Project:Welcome log', },
     'wikipedia': {
         '_default': None,
-        # Log disabled: da, de, en, he, id, ka, pdc, pt, ru, vo. 
+        # Log disabled: da, de, en, fa, he, id, ka, pdc, pt, ru, vo. 
         'ar': u'Project:سجل الترحيب',
-        'fa': u'Project:سیاهه خوشامد',
         'fr': u'Wikipedia:Prise de décision/Accueil automatique des nouveaux par un robot/log',
         'ga': u'Project:Log fáilte',
         'it': u'Project:Benvenuto Bot/Log',
@@ -283,7 +282,7 @@ netext = {
         'zh-yue': u'{{歡迎}}--%s',
     },
     'wikinews':{
-        'it': u'{{subst:benvenuto|%s}}',
+        'it': u'{{subst:benvenuto}}',
         'zh': u'{{subst:welcome}} %s',
     },
     'wiktionary':{
@@ -680,45 +679,31 @@ class WelcomeBot(object):
                 yield x
             return
 
-        params = {
-            'action':'query',
-            'list':'logevents',
-            'letype':'newusers',
-            'ledir':'older',
-            'leprop':'ids|type|user',
-            'lelimit':int(globalvar.queryLimit),
-        }
+        starttime = None
         if globalvar.timeoffset != 0:
             now = self.site.server_time() - timedelta(minutes=globalvar.timeoffset)
-            params['lestart'] = int(now.strftime("%Y%m%d%H%M%S"))
+            starttime = int(now.strftime("%Y%m%d%H%M%S"))
         elif globalvar.offset != 0:
-            params['lestart'] = globalvar.offset
+            starttime = globalvar.offset
 
         count_auto = 0
         wikipedia.output("Querying new user log from API....")
-        while True:
-            lev = query.GetData(params, self.site)
-            count = len(lev['query']['logevents'])
-            for x in lev['query']['logevents']:
-                someone_found = True
-                if 'user' not in x:
-                    continue
-                #created twice?
-                if not globalvar.welcomeAuto and x['action'] == 'create2':
-                    continue
-                if not globalvar.welcomeAuto and x['action'] == 'autocreate':
-                    if not globalvar.quick:
-                        showStatus(3)
-                        wikipedia.output(u'%s has been created automatically.' % x['user'])
-                    count_auto += 1
-                    continue
+        for x in self.site.logpages(number = globalvar.queryLimit, mode = 'newusers',start = starttime, dump = True):
+            someone_found = True
+            if 'user' not in x:
+                continue
+            #created twice?
+            if not globalvar.welcomeAuto and x['action'] == 'create2':
+                continue
+            if not globalvar.welcomeAuto and x['action'] == 'autocreate':
+                if not globalvar.quick:
+                    showStatus(3)
+                    wikipedia.output(u'%s has been created automatically.' % x['user'])
+                count_auto += 1
+                continue
 
-                yield userlib.User(self.site, x['user'])
+            yield userlib.User(self.site, x['user'])
 
-            if count < globalvar.queryLimit and 'query-continue' in lev:
-                params['lestart'] = lev['query-continue']['logevents']['lestart']
-            else:
-                break
         if someone_found:
             if globalvar.quick and count_auto > 0:
                 showStatus()
@@ -848,12 +833,13 @@ class WelcomeBot(object):
                             continue
                         welcome_text = wikipedia.translate(self.site, netext)
                         if globalvar.randomSign:
-                            welcome_text = welcome_text % choice(self.defineSign())
+                            if self.site.family != 'wikinews':
+                                welcome_text = welcome_text % choice(self.defineSign())
                             if self.site.family == 'wiktionary' and self.site.lang == 'it':
                                 pass
                             else:
                                 welcome_text += timeselected
-                        else:
+                        elif (self.site.family != 'wikinews' and self.site.lang != 'it'):
                             welcome_text = welcome_text % globalvar.defaultSign
                         if self.site.lang in final_new_text_additions:
                             welcome_text += wikipedia.translate(self.site, final_new_text_additions)

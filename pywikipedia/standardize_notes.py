@@ -39,7 +39,7 @@ NOTE: Only use either -sql or -file or -page, but don't mix them.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: standardize_notes.py 8051 2010-04-04 15:33:15Z mfarag $'
+__version__ = '$Id: standardize_notes.py 8161 2010-05-14 08:37:03Z xqt $'
 #
 # 2005-07-15: Find name of section containing citations: doFindRefSection(). (SEWilco)
 # 2005-07-15: Obey robots.txt restrictions. (SEWilco)
@@ -329,7 +329,9 @@ class ReplacePageGenerator:
                 yield wikipedia.Page(wikipedia.getSite(), pagename)
 
 class ReplaceRobot:
-    def __init__(self, generator, replacements, refsequence, references, refusage, exceptions = [], regex = False, acceptall = False):
+    def __init__(self, generator, replacements, refsequence, references,
+                 refusage, exceptions = [], regex = False, acceptall = False,
+                 summary = ''):
         self.generator = generator
         self.replacements = replacements
         self.exceptions = exceptions
@@ -338,6 +340,7 @@ class ReplaceRobot:
         self.references = references
         self.refsequence = refsequence
         self.refusage = refusage
+        self.summary = summary
 
     def checkExceptions(self, original_text):
         """
@@ -998,7 +1001,7 @@ class ReplaceRobot:
                         if choice in ['a', 'A']:
                             self.acceptall = True
                     if self.acceptall or choice in ['y', 'Y']:
-                        pl.put(new_text)
+                        pl.put(new_text, self.summary)
 
 def main():
     # How we want to retrieve information on which pages need to be changed.
@@ -1063,7 +1066,8 @@ def main():
             source = 'sqldump'
         elif arg.startswith('-page'):
             if len(arg) == 5:
-                pagenames.append(wikipedia.input(u'Which page do you want to chage?'))
+                pagenames.append(
+                    wikipedia.input(u'Which page do you want to change?'))
             else:
                 pagenames.append(arg[6:])
             source = 'userinput'
@@ -1109,9 +1113,11 @@ def main():
             exceptions = fix['exceptions']
         replacements = fix['replacements']
 
-    gen = ReplacePageGenerator(source, replacements, exceptions, regex, namespace,  textfilename, sqlfilename, categoryname, pagenames)
+    gen = ReplacePageGenerator(source, replacements, exceptions, regex, namespace,
+                               textfilename, sqlfilename, categoryname, pagenames)
     preloadingGen = pagegenerators.PreloadingGenerator(gen, pageNumber = 20)
-    bot = ReplaceRobot(preloadingGen, replacements, refsequence, references, refusage, exceptions, regex, acceptall, editSummary)
+    bot = ReplaceRobot(preloadingGen, replacements, refsequence, references,
+                       refusage, exceptions, regex, acceptall, editSummary)
     bot.run()
 
 

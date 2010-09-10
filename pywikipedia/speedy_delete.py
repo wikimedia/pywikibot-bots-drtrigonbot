@@ -19,7 +19,7 @@ article.  The onus is on you to avoid making these mistakes.
 NOTE: This script currently only works for the Wikipedia project.
 
 """
-__version__ = '$Id: speedy_delete.py 8051 2010-04-04 15:33:15Z mfarag $'
+__version__ = '$Id: speedy_delete.py 8364 2010-07-26 20:41:32Z huji $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -281,6 +281,9 @@ class SpeedyRobot:
                 u'Db-r1':         u'Deleting page per [[WP:CSD|CSD]] R1: Redirect to a deleted or non-existent page.',
                 u'Db-experiment': u'Deleting page per [[WP:CSD|CSD]] G2: Page was created as an experiment.',
                 },
+            'fa': {
+                u'_default': u'ربات: حذف سریع بر اساس [[وپ:محس|معیارهای حذف سریع]]',
+                },
             'he': {
                 u'_default':      u'מחיקת מועמד למחיקה מהירה לפי [[ויקיפדיה:מדיניות המחיקה|מדיניות המחיקה]]',
                 u'גם בוויקישיתוף': u'הקובץ זמין כעת בוויקישיתוף.',
@@ -335,6 +338,7 @@ class SpeedyRobot:
             'cs':u'Osiřelá diskusní stránka',
             'de':u'Verwaiste Diskussionsseite',
             'en':u'Orphaned talk page',
+            'fa':u'بحث یتیم',
             'fr':u'Page de discussion orpheline',
             'he':u'דף שיחה של ערך שנמחק',
             'it':u'Rimuovo pagina di discussione di una pagina già cancellata',

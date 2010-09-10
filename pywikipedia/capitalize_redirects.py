@@ -23,7 +23,7 @@ Example: "python capitalize_redirects.py -start:B -always"
 #
 # Class licensed under terms of the MIT license
 #
-__version__ = '$Id: capitalize_redirects.py 7918 2010-02-08 11:24:22Z xqt $'
+__version__ = '$Id: capitalize_redirects.py 8369 2010-07-29 07:22:06Z xqt $'
 #
 
 import time, sys, re
@@ -113,8 +113,11 @@ def main():
 
     gen = genFactory.getCombinedGenerator()
     preloadingGen = pagegenerators.PreloadingGenerator(gen)
-    bot = CapitalizeBot(preloadingGen, acceptall, titlecase, standard)
-    bot.run()
+    bot = CapitalizeBot(preloadingGen, acceptall, titlecase)
+    try:
+        bot.run()
+    except KeyboardInterrupt:
+        pywikibot.output('\nQuitting program...')
 
 if __name__ == "__main__":
     try:

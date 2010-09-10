@@ -4,12 +4,12 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: version.py 7033 2009-07-09 02:32:41Z alexsh $'
+__version__ = '$Id: version.py 8460 2010-08-26 10:54:49Z purodha $'
 
 import os
 import time
 import sys
-import wikipediatools
+import config
 
 cache = None
 
@@ -46,7 +46,10 @@ def getversiondict():
     return cache
 
 def getversion_svn():
-    entries = open(os.path.join(wikipediatools.get_base_dir(), '.svn/entries'))
+    _program_dir = os.path.normpath(os.path.dirname(sys.argv[0]))
+#   if not os.path.isabs(_program_dir):
+#      _program_dir = os.path.normpath(os.path.join(os.getcwd(), _program_dir))
+    entries = open(os.path.join(_program_dir, '.svn/entries'))
     for i in range(4):
         entries.readline()
     tag = entries.readline().strip()
@@ -73,3 +76,6 @@ def getversion_nightly():
 if __name__ == '__main__':
     print 'Pywikipedia %s' % getversion()
     print 'Python %s' % sys.version
+    print 'config-settings:'
+    print 'use_api =', config.use_api
+    print 'use_api_login =', config.use_api_login

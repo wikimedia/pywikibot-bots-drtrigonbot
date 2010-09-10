@@ -15,7 +15,14 @@ The following parameters are supported:
 All other parameters will be regarded as part of the title of a single page,
 and the bot will only work on that single page.
 """
-__version__ = '$Id: basic.py 7845 2009-12-30 17:02:05Z xqt $'
+#
+# (C) Pywikipedia bot team, 2006-2010
+#
+# Distributed under the terms of the MIT license.
+#
+__version__ = '$Id: basic.py 8435 2010-08-23 07:10:44Z purodha $'
+#
+
 import wikipedia as pywikibot
 import pagegenerators
 
@@ -33,10 +40,11 @@ class BasicBot:
         'cs': u'Robot změnil ...',
         'de': u'Bot: Ändere ...',
         'en': u'Robot: Changing ...',
+        'fa': u'ربات: تغییر ...',
         'fr': u'Robot: Changé ...',
         'ja':u'ロボットによる：編集',
-        'ksh': u'Bot: Ännern ...',
-        'nds': u'Bot: Änderung ...',
+        'ksh': u'Bot: Änderung ...',
+        'nds': u'Bot: Ännern ...',
         'nl': u'Bot: wijziging ...',
         'pl': u'Bot: zmienia ...',
         'pt': u'Bot: alterando...',
@@ -65,14 +73,8 @@ class BasicBot:
         """
         Loads the given page, does some changes, and saves it.
         """
-        try:
-            # Load the page
-            text = page.get()
-        except pywikibot.NoPage:
-            pywikibot.output(u"Page %s does not exist; skipping." % page.aslink())
-            return
-        except pywikibot.IsRedirectPage:
-            pywikibot.output(u"Page %s is a redirect; skipping." % page.aslink())
+        text = self.load(page)
+        if not text:
             return
 
         ################################################################
@@ -83,26 +85,59 @@ class BasicBot:
         # Example: This puts the text 'Test' at the beginning of the page.
         text = 'Test ' + text
 
+        if not self.save(text, page, self.summary):
+            pywikibot.output(u'Page %s not saved.' % page.aslink())
+
+    def load(self, page):
+        """
+        Loads the given page, does some changes, and saves it.
+        """
+        try:
+            # Load the page
+            text = page.get()
+        except pywikibot.NoPage:
+            pywikibot.output(u"Page %s does not exist; skipping."
+                             % page.aslink())
+        except pywikibot.IsRedirectPage:
+            pywikibot.output(u"Page %s is a redirect; skipping."
+                             % page.aslink())
+        else:
+            return text
+        return None
+
+    def save(self, text, page, comment, minorEdit=True, botflag=True):
         # only save if something was changed
         if text != page.get():
             # Show the title of the page we're working on.
             # Highlight the title in purple.
-            pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<" % page.title())
+            pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
+                             % page.title())
             # show what was changed
             pywikibot.showDiff(page.get(), text)
+            pywikibot.output(u'Comment: %s' %comment)
             if not self.dry:
-                choice = pywikibot.inputChoice(u'Do you want to accept these changes?', ['Yes', 'No'], ['y', 'N'], 'N')
+                choice = pywikibot.inputChoice(
+                    u'Do you want to accept these changes?',
+                    ['Yes', 'No'], ['y', 'N'], 'N')
                 if choice == 'y':
                     try:
                         # Save the page
-                        page.put(text, comment=self.summary)
+                        page.put(text, comment=comment,
+                                 minorEdit=minorEdit, botflag=botflag)
                     except pywikibot.LockedPage:
-                        pywikibot.output(u"Page %s is locked; skipping." % page.aslink())
+                        pywikibot.output(u"Page %s is locked; skipping."
+                                         % page.aslink())
                     except pywikibot.EditConflict:
-                        pywikibot.output(u'Skipping %s because of edit conflict' % (page.title()))
+                        pywikibot.output(
+                            u'Skipping %s because of edit conflict'
+                            % (page.title()))
                     except pywikibot.SpamfilterError, error:
-                        pywikibot.output(u'Cannot change %s because of spam blacklist entry %s' % (page.title(), error.url))
-
+                        pywikibot.output(
+u'Cannot change %s because of spam blacklist entry %s'
+                            % (page.title(), error.url))
+                    else:
+                        return True
+        return False
 
 def main():
     # This factory is responsible for processing command line arguments

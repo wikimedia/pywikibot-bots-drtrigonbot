@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiversity_family.py 8066 2010-04-09 07:55:32Z xqt $'
+__version__ = '$Id: wikiversity_family.py 8375 2010-08-01 13:52:56Z xqt $'
 
 # The Wikimedia family that is known as Wikiversity
 
@@ -11,8 +11,8 @@ class Family(family.Family):
         self.name = 'wikiversity'
 
         self.languages_by_size = [
-            'en', 'fr', 'de', 'beta', 'cs', 'es', 'it', 'pt', 'ru', 'el',
-            'fi', 'ja',
+            'en', 'fr', 'de', 'cs', 'beta', 'ru', 'es', 'it', 'pt', 'el', 'fi',
+            'ja',
         ]
 
         if family.config.SSL_connection:
@@ -38,14 +38,14 @@ class Family(family.Family):
         }
         self.namespaces[5] = {
             '_default': [u'Wikiversity talk', self.namespaces[5]['_default']],
-            'cs': u'Wikiverzita diskuse',
+            'cs': u'Diskuse k Wikiverzitě',
             'de': u'Wikiversity Diskussion',
             'el': u'Συζήτηση Βικιεπιστημίου',
             'es': u'Wikiversidad Discusión',
             'fi': u'Keskustelu Wikiopistosta',
             'fr': u'Discussion Wikiversité',
             'it': u'Discussioni Wikiversità',
-            'ja': u'Wikiversity‐ノート',
+            'ja': u'Wikiversity・トーク',
             'pt': u'Wikiversidade Discussão',
             'ru': u'Обсуждение Викиверситета',
         }
@@ -58,7 +58,7 @@ class Family(family.Family):
             'ja': u'School',
         }
         self.namespaces[101] = {
-            'cs': u'Fórum diskuse',
+            'cs': u'Diskuse k fóru',
             'el': u'Συζήτηση Σχολής',
             'en': u'School talk',
             'it': u'Discussioni facoltà',

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """
 """
-__version__ = '$Id: copyright_clean.py 7131 2009-08-08 01:00:08Z alexsh $'
+__version__ = '$Id: copyright_clean.py 8289 2010-06-14 09:34:19Z xqt $'
 
 #
 # (C) Francesco Cosoleto, 2006
@@ -20,6 +20,7 @@ import sys
 summary_msg = {
     'ar': u'إزالة',
     'en': u'Removing',
+    'fa': u'حذف',
     'fr': u'Retiré',
     'it': u'Rimozione',
 }
@@ -119,7 +120,7 @@ for page in gen:
     for s in mysplit(query.ListToParam(titles), 50, "|"):
         query_results_titles.append(query_api({'titles': s,}))
     for s in mysplit(query.ListToParam(revids), 50, "|"):
-        query_results_revids.append(query_api({'revids': ,}))
+        query_results_revids.append(query_api({'revids': s,}))
 
     comment_entry = list()
     add_separator = False

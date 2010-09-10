@@ -1311,7 +1311,7 @@ class transliterator(object):
             self.trans[char] = u"ü"
         for char in u"ว":
             self.trans[char] = u"ua"
-        for char in u"อว–โิ":
+        for char in u"อวโิ":
             self.trans[char] = u"o"
         for char in u"ะัา":
             self.trans[char] = u"a"
@@ -1343,8 +1343,250 @@ class transliterator(object):
             self.trans[char] = u"."
         for char in u"ๆ":
             self.trans[char] = u"(2)"
-              
-              
+
+        # Korean (Revised Romanization system within possible, incomplete)
+        for char in u"국":
+            self.trans[char] = u"guk"
+        for char in u"명":
+            self.trans[char] = u"myeong"
+        for char in u"검":
+            self.trans[char] = u"geom"
+        for char in u"타":
+            self.trans[char] = u"ta"
+        for char in u"분":
+            self.trans[char] = u"bun"
+        for char in u"사":
+            self.trans[char] = u"sa"
+        for char in u"류":
+            self.trans[char] = u"ryu"
+        for char in u"포":
+            self.trans[char] = u"po"
+        for char in u"르":
+            self.trans[char] = u"reu"
+        for char in u"투":
+            self.trans[char] = u"tu"
+        for char in u"갈":
+            self.trans[char] = u"gal"
+        for char in u"어":
+            self.trans[char] = u"eo"
+        for char in u"노":
+            self.trans[char] = u"no"
+        for char in u"웨":
+            self.trans[char] = u"we"
+        for char in u"이":
+            self.trans[char] = u"i"
+        for char in u"라":
+            self.trans[char] = u"ra"
+        for char in u"틴":
+            self.trans[char] = u"tin"
+        for char in u"루":
+            self.trans[char] = u"ru"
+        for char in u"마":
+            self.trans[char] = u"ma"
+        for char in u"니":
+            self.trans[char] = u"ni"
+        for char in u"아":
+            self.trans[char] = u"a"
+        for char in u"독":
+            self.trans[char] = u"dok"
+        for char in u"일":
+            self.trans[char] = u"il"
+        for char in u"모":
+            self.trans[char] = u"mo"
+        for char in u"크":
+            self.trans[char] = u"keu"
+        for char in u"샤":
+            self.trans[char] = u"sya"
+        for char in u"영":
+            self.trans[char] = u"yeong"
+        for char in u"불":
+            self.trans[char] = u"bul"
+        for char in u"가":
+            self.trans[char] = u"ga"
+        for char in u"리":
+            self.trans[char] = u"ri"
+        for char in u"그":
+            self.trans[char] = u"geu"
+        for char in u"지":
+            self.trans[char] = u"ji"
+        for char in u"야":
+            self.trans[char] = u"ya"
+        for char in u"바":
+            self.trans[char] = u"ba"
+        for char in u"슈":
+            self.trans[char] = u"syu"
+        for char in u"키":
+            self.trans[char] = u"ki"
+        for char in u"프":
+            self.trans[char] = u"peu"
+        for char in u"랑":
+            self.trans[char] = u"rang"
+        for char in u"스":
+            self.trans[char] = u"seu"
+        for char in u"로":
+            self.trans[char] = u"ro"
+        for char in u"메":
+            self.trans[char] = u"me"
+        # Kannada
+        self.trans[u"ಅ"] = u"a"
+        for char in u"ಆಾ":
+            self.trans[char] = u"aa"
+        for char in u"ಇಿ":
+            self.trans[char] = u"i"
+        for char in u"ಈೀ":
+            self.trans[char] = u"ii"
+        for char in u"ಉು":
+            self.trans[char] = u"u"
+        for char in u"ಊೂ":
+            self.trans[char] = u"uu"
+        for char in u"ಋೂ":
+            self.trans[char] = u"r'"
+        for char in u"ಎೆ":
+            self.trans[char] = u"e"
+        for char in u"ಏೇ":
+            self.trans[char] = u"ee"
+        for char in u"ಐೈ":
+            self.trans[char] = u"ai"
+        for char in u"ಒೊ":
+            self.trans[char] = u"o"
+        for char in u"ಓೋ":
+            self.trans[char] = u"oo"
+        for char in u"ಔೌ":
+            self.trans[char] = u"au"
+        self.trans[u"ಂ"] = u"m'"
+        self.trans[u"ಃ"] = u"h'"
+        self.trans[u"ಕ"] = u"k"
+        self.trans[u"ಖ"] = u"kh"
+        self.trans[u"ಗ"] = u"g"
+        self.trans[u"ಘ"] = u"gh"
+        self.trans[u"ಙ"] = u"ng"
+        self.trans[u"ಚ"] = u"c"
+        self.trans[u"ಛ"] = u"ch"
+        self.trans[u"ಜ"] = u"j"
+        self.trans[u"ಝ"] = u"ny"
+        self.trans[u"ಟ"] = u"tt"
+        self.trans[u"ಠ"] = u"tth"
+        self.trans[u"ಡ"] = u"dd"
+        self.trans[u"ಢ"] = u"ddh"
+        self.trans[u"ಣ"] = u"nn"
+        self.trans[u"ತ"] = u"t"
+        self.trans[u"ಥ"] = u"th"
+        self.trans[u"ದ"] = u"d"
+        self.trans[u"ಧ"] = u"dh"
+        self.trans[u"ನ"] = u"n"
+        self.trans[u"ಪ"] = u"p"
+        self.trans[u"ಫ"] = u"ph"
+        self.trans[u"ಬ"] = u"b"
+        self.trans[u"ಭ"] = u"bh"
+        self.trans[u"ಮ"] = u"m"
+        self.trans[u"ಯ"] = u"y"
+        self.trans[u"ರ"] = u"r"
+        self.trans[u"ಲ"] = u"l"
+        self.trans[u"ವ"] = u"v"
+        self.trans[u"ಶ"] = u"sh"
+        self.trans[u"ಷ"] = u"ss"
+        self.trans[u"ಸ"] = u"s"
+        self.trans[u"ಹ"] = u"h"
+        self.trans[u"ಳ"] = u"ll"
+        self.trans[u"೦"] = u"0"
+        self.trans[u"೧"] = u"1"
+        self.trans[u"೨"] = u"2"
+        self.trans[u"೩"] = u"3"
+        self.trans[u"೪"] = u"4"
+        self.trans[u"೫"] = u"5"
+        self.trans[u"೬"] = u"6"
+        self.trans[u"೭"] = u"7"
+        self.trans[u"೮"] = u"8"
+        self.trans[u"೯"] = u"9"
+        # Telugu
+        for char in u"అ":
+            self.trans[char] = u"a"
+        for char in u"ఆా":
+            self.trans[char] = u"aa"
+        for char in u"ఇి":
+            self.trans[char] = u"i"
+        for char in u"ఈీ":
+            self.trans[char] = u"ii"
+        for char in u"ఉు":
+            self.trans[char] = u"u"
+        for char in u"ఊూ":
+            self.trans[char] = u"uu"
+        for char in u"ఋృ":
+            self.trans[char] = u"r'"
+        for char in u"ౠౄ":
+            self.trans[char] = u'r"'
+        self.trans[u"ఌ"] = u"l'"
+        self.trans[u"ౡ"] = u'l"'
+        for char in u"ఎె":
+            self.trans[char] = u"e"
+        for char in u"ఏే":
+            self.trans[char] = u"ee"
+        for char in u"ఐై":
+            self.trans[char] = u"ai"
+        for char in u"ఒొ":
+            self.trans[char] = u"o"
+        for char in u"ఓో":
+            self.trans[char] = u"oo"
+        for char in u"ఔౌ":
+            self.trans[char] = u"au"
+        self.trans[u"ం"] = u"'"
+        self.trans[u"ః"] = u'"'
+        self.trans[u"క"] = u"k"
+        self.trans[u"ఖ"] = u"kh"
+        self.trans[u"గ"] = u"g"
+        self.trans[u"ఘ"] = u"gh"
+        self.trans[u"ఙ"] = u"ng"
+        self.trans[u"చ"] = u"ts"
+        self.trans[u"ఛ"] = u"tsh"
+        self.trans[u"జ"] = u"j"
+        self.trans[u"ఝ"] = u"jh"
+        self.trans[u"ఞ"] = u"ñ"
+        for char in u"టత":
+            self.trans[char] = u"t"
+        for char in u"ఠథ":
+            self.trans[char] = u"th"
+        for char in u"డద":
+            self.trans[char] = u"d"
+        for char in u"ఢధ":
+            self.trans[char] = u"dh"
+        for char in u"ణన":
+            self.trans[char] = u"n"
+        self.trans[u"ప"] = u"p"
+        self.trans[u"ఫ"] = u"ph"
+        self.trans[u"బ"] = u"b"
+        self.trans[u"భ"] = u"bh"
+        self.trans[u"మ"] = u"m"
+        self.trans[u"య"] = u"y"
+        for char in u"రఱ":
+            self.trans[char] = u"r"
+        for char in u"లళ":
+            self.trans[char] = u"l"
+        self.trans[u"వ"] = u"v"
+        self.trans[u"శ"] = u"sh"
+        for char in u"షస":
+            self.trans[char] = u"s"
+        self.trans[u"హ"] = u"h"
+        self.trans[u"్"] = ""
+        for char in u"ంఁ":
+            self.trans[char] = u"^"
+        self.trans[u"ః"] = u"-"
+        self.trans[u"౦"] = u"0"
+        self.trans[u"౧"] = u"1"
+        self.trans[u"౨"] = u"2"
+        self.trans[u"౩"] = u"3"
+        self.trans[u"౪"] = u"4"
+        self.trans[u"౫"] = u"5"
+        self.trans[u"౬"] = u"6"
+        self.trans[u"౭"] = u"7"
+        self.trans[u"౮"] = u"8"
+        self.trans[u"౯"] = u"9"
+        self.trans[u"౹"] = u"1/4"
+        self.trans[u"౺"] = u"1/2"
+        self.trans[u"౻"] = u"3/4"
+        self.trans[u"౼"] = u"1/16"
+        self.trans[u"౽"] = u"1/8"
+        self.trans[u"౾"] = u"3/16"
+
     def transliterate(self, char, default="?", prev="-", next="-"):
         if char in self.trans:
             return self.trans[char]             

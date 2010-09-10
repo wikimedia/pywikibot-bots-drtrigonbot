@@ -47,7 +47,7 @@ If the page to be uploaded already exists:
 # Distributed under the terms of the MIT license.
 #
 
-__version__='$Id: pagefromfile.py 7924 2010-02-12 06:40:57Z xqt $'
+__version__='$Id: pagefromfile.py 8467 2010-08-29 13:07:19Z amir $'
 
 import re, codecs
 import wikipedia, config
@@ -67,6 +67,7 @@ class PageFromFileRobot:
         'ar': u'استيراد تلقائي للمقالات',
         'de': u'Automatischer Import von Artikeln',
         'en': u'Automated import of articles',
+        'fa': u'درون‌ریزی خودکار مقاله‌ها',
         'fr': u'Import automatique',
         'he': u'ייבוא ערכים אוטומטי',
         'ia': u'Importation automatic de articulos',
@@ -74,6 +75,7 @@ class PageFromFileRobot:
         'it': u'Caricamento automatico',
         'ja': u'記事の自動取り込み',
         'ksh': u'Bot: automatesch huhjelaade',
+        'mzn': u'ربوت:صفحه شه خاد به خاد دله دکته',
         'nl': u'Geautomatiseerde import',
         'no': u'bot: Automatisk import',
         'pl': u'Automatyczny import artykułów',
@@ -86,6 +88,7 @@ class PageFromFileRobot:
         'ar': u'كتابة على الأعلى',
         'de': u'ergänze am Anfang',
         'en': u'append on top',
+        'fa': u'به بالا اضافه شد',
         'he': u'הוספה בראש הדף',
         'fr': u'rajouté en haut',
         'id': u'ditambahkan di atas',
@@ -103,6 +106,7 @@ class PageFromFileRobot:
         'ar': u'كتابة على الأسفل',
         'de': u'ergänze am Ende',
         'en': u'append on bottom',
+        'fa': u'به پایین اضافه شد',
         'he': u'הוספה בתחתית הדף',
         'fr': u'rajouté en bas',
         'id': u'ditambahkan di bawah',
@@ -120,6 +124,7 @@ class PageFromFileRobot:
         'ar': u'تمت الكتابة على النص الموجود',
         'de': u'bestehender Text überschrieben',
         'en': u'existing text overwritten',
+        'fa': u'متن جایگزین شد',
         'he': u'הטקסט הישן נמחק',
         'fr': u'texte existant écrasé',
         'id': u'menimpa teks yang ada',

@@ -75,7 +75,7 @@ while Findonly= search only if the exactly text that you give is in the image's 
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: checkimages.py 8051 2010-04-04 15:33:15Z mfarag $'
+__version__ = '$Id: checkimages.py 8364 2010-07-26 20:41:32Z huji $'
 #
 
 import re, time, urllib, urllib2, os, locale, sys, datetime
@@ -96,6 +96,7 @@ n_txt = {
     'ar'     :u'\n{{subst:لم}}',
     'de'     :u'{{Benutzer:ABF/D|~~~~}} {{Dateiüberprüfung/benachrichtigt (Kategorie)|{{subst:LOCALYEAR}}|{{subst:LOCALMONTH}}|{{subst:LOCALDAY}}}} {{Dateiüberprüfung/benachrichtigt (Text)|Lizenz|||||}} --This was added by ~~~~-- ',
     'en'     :u'\n{{subst:nld}}',
+    'fa'     :u'{{حق تکثیر تصویر نامعلوم}}',
     'fr'     :u'\n{{subst:lid}}',
     'ga'     :u'\n{{subst:Ceadúnas de dhíth}}',
     'hu'     :u'\n{{nincslicenc|~~~~~}}',
@@ -113,8 +114,10 @@ n_txt = {
 # If there's not a {{ it will work as usual (if x in Text)
 txt_find =  {
         'commons':[u'{{no license', u'{{no license/en', u'{{nld', u'{{no permission', u'{{no permission since'],
-        'de':[u'{{DÜP', u'{{Dateiüberprüfung'],
+        'ar':[u'{{لت', u'{{لا ترخيص'],
+		'de':[u'{{DÜP', u'{{Dateiüberprüfung'],
         'en':[u'{{nld', u'{{no license'],
+        'fa':[u'{{حق تکثیر تصویر نامعلوم'],
         'ga':[u'{{Ceadúnas de dhíth', u'{{Ceadúnas de dhíth'],
         'hu':[u'{{nincsforrás',u'{{nincslicenc'],
         'it':[u'{{unverdata', u'{{unverified'],
@@ -130,6 +133,7 @@ comm = {
         'commons':u'Bot: Marking newly uploaded untagged file',
         'de'     :u'Bot: Markierung als Bild ohne Lizenz',
         'en'     :u'Bot: Marking newly uploaded untagged file',
+        'fa'     :u'ربات: حق تکثیر تصویر تازه بارگذاری شده نامعلوم است.',
         'ga'     :u'Róbó: Ag márcáil comhad nua-uaslódáilte gan ceadúnas',
         'hu'     :u'Robot: Frissen feltöltött licencsablon nélküli fájl megjelölése',
         'it'     :u"Bot: Aggiungo unverified",
@@ -145,6 +149,7 @@ empty = {
         'ar'     :u'{{ترحيب}}\n~~~~\n',
         'de'     :u'{{subst:willkommen}} ~~~~',
         'en'     :u'{{welcome}}\n~~~~\n',
+        'fa'     :u'{{جا:خوشامدید|%s}}',
         'fr'     :u'{{Bienvenue nouveau\n~~~~\n',
         'ga'     :u'{{subst:Fáilte}} - ~~~~\n',
         'hu'     :u'{{subst:Üdvözlet|~~~~}}\n',
@@ -160,7 +165,8 @@ comm2 = {
         'ar'     :u"بوت: طلب معلومات المصدر." ,
         'commons':u"Bot: Requesting source information." ,
         'de'     :u'Bot:Notify User',
-        'en'     :u"Bot: Requesting source information." ,
+        'en'     :u"Robot: Requesting source information." ,
+        'fa'     :u"ربات: درخواست منبع تصویر",
         'ga'     :u"Róbó: Ag iarraidh eolais foinse." ,
         'it'     :u"Bot: Notifico l'unverified",
         'hu'     :u'Robot: Forrásinformáció kérése',
@@ -176,6 +182,7 @@ delete_immediately = {
             'commons':u"{{speedy|The file has .%s as extension. Is it ok? Please check.}}",
             'ar'     :u"{{شطب|الملف له .%s كامتداد.}}",
             'en'     :u"{{db-meta|The file has .%s as extension.}}",
+            'fa'     :u"{{حذف سریع|تصویر %s اضافی است.}}",
             'ga'     :u"{{scrios|Tá iarmhír .%s ar an comhad seo.}}",
             'hu'     :u'{{azonnali|A fájlnak .%s a kiterjesztése}}',
             'it'     :u'{{cancella subito|motivo=Il file ha come estensione ".%s"}}',
@@ -190,6 +197,7 @@ delete_immediately_head = {
             'commons':u"\n== Unknown extension! ==\n",
             'ar'     :u"\n== امتداد غير معروف! ==\n",
             'en'     :u"\n== Unknown extension! ==\n",
+            'fa'     :u"\n==بارگذاری تصاویر موجود در انبار==\n",
             'ga'     :u"\n== Iarmhír neamhaithnid! ==\n",
             'fr'     :u'\n== Extension inconnue ==\n',
             'hu'     :u'\n== Ismeretlen kiterjesztésű fájl ==\n',
@@ -204,6 +212,7 @@ delete_immediately_notification = {
                 'ar'     :u'الملف [[:File:%s]] يبدو أن امتداده خاطيء, من فضلك تحقق. ~~~~',
                 'commons':u'The [[:File:%s]] file seems to have a wrong extension, please check. ~~~~',
                 'en'     :u'The [[:File:%s]] file seems to have a wrong extension, please check. ~~~~',
+                'fa'     :u'به نظر می‌آید تصویر [[:تصویر:%s]] مسیر نادرستی داشته باشد لطفا بررسی کنید.~~~~',
                 'ga'     :u'Tá iarmhír mícheart ar an comhad [[:File:%s]], scrúdaigh le d\'thoil. ~~~~',
                 'fr'     :u'Le fichier [[:File:%s]] semble avoir une mauvaise extension, veuillez vérifier. ~~~~',
                 'hu'     :u'A [[:Kép:%s]] fájlnak rossz a kiterjesztése, kérlek ellenőrízd. ~~~~',
@@ -217,6 +226,7 @@ del_comm = {
             'ar'     :u'بوت: إضافة %s',
             'commons':u'Bot: Adding %s',
             'en'     :u'Bot: Adding %s',
+            'fa'     :u'ربات: اضافه کردن %s',
             'ga'     :u'Róbó: Cuir %s leis',
             'fr'     :u'Robot : Ajouté %s',
             'hu'     :u'Robot:"%s" hozzáadása',
@@ -240,6 +250,7 @@ nothing_head = {
                 'it'     :u"\n\n== File senza licenza ==\n",
                 'ja'     :u'',
                 'ko'     :u'',
+                'fa'     :u'',
                 'ta'     :u'',
                 'zh'     :u'',
                 }
@@ -251,6 +262,7 @@ nothing_notification = {
                 'ar'     :u"{{subst:مصدر الصورة|File:%s}} --~~~~",
                 'de'     :u'\n{{subst:Benutzer:ABF/D2|%s}} ~~~~ ',
                 'en'     :u"{{subst:image source|File:%s}} --~~~~",
+                'fa'     :u"{{جا:اخطار نگاره|%s}}",
                 'ga'     :u"{{subst:Foinse na híomhá|File:%s}} --~~~~",
                 'hu'     :u"{{subst:adjforrást|Kép:%s}} \n Ezt az üzenetet ~~~ automatikusan helyezte el a vitalapodon, kérdéseddel fordulj a gazdájához, vagy a [[WP:KF|Kocsmafalhoz]]. --~~~~",
                 'it'     :u"{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Senza licenza|%s|__botnick__}} --~~~~",
@@ -266,6 +278,7 @@ bot_list = {
             'commons':[u'Siebot', u'CommonsDelinker', u'Filbot', u'John Bot', u'Sz-iwbot', u'ABFbot'],
             'de'     :[u'ABFbot'],
             'en'     :[u'OrphanBot'],
+            'fa'     :[u'Amirobot'],
             'ga'     :[u'AllieBot'],
             'it'     :[u'Filbot', u'Nikbot', u'.snoopyBot.'],
             'ja'     :[u'Alexbot'],
@@ -294,6 +307,7 @@ report_page = {
                 'commons':u'User:Filbot/Report',
                 'de'     :u'Benutzer:ABFbot/Report',
                 'en'     :u'User:Filnik/Report',
+                'fa'     :u'کاربر:Amirobot/گزارش تصویر',
                 'ga'     :u'User:AllieBot/ReportImages',
                 'hu'     :u'User:Bdamokos/Report',
                 'it'     :u'Progetto:Coordinamento/Immagini/Bot/Report',
@@ -310,6 +324,7 @@ report_text = {
             'ar':u"\n*[[:ملف:%s]] " + timeselected,
             'de':u"\n*[[:Bild:%s]] " + timeselected,
             'en':u"\n*[[:File:%s]] " + timeselected,
+            'fa':u"n*[[:پرونده:%s]] "+ timeselected,
             'ga':u"\n*[[:File:%s]] " + timeselected,
             'hu':u"\n*[[:Kép:%s]] " + timeselected,
             'it':u"\n*[[:File:%s]] " + timeselected,
@@ -324,6 +339,7 @@ comm10 = {
         'ar'     :u'بوت: تحديث السجل',
         'de'     :u'Bot:schreibe Log',
         'en'     :u'Bot: Updating the log',
+        'fa'     :u'ربات: به‌روزرسانی سیاهه',
         'fr'     :u'Robot: Mise à jour du journal',
         'ga'     :u'Róbó: Log a thabhairt suas chun dáta',
         'hu'     :u'Robot: A napló frissítése',
@@ -345,6 +361,7 @@ HiddenTemplate = {
         'ar':[u'Template:معلومات'],
         'de':[u'Template:Information'],
         'en':[u'Template:Information'],
+        'fa':[u'الگو:اطلاعات'],
         'fr':[u'Template:Information'],
         'ga':[u'Template:Information'],
         'hu':[u'Template:Információ', u'Template:Enwiki', u'Template:Azonnali'],
@@ -416,13 +433,15 @@ duplicates_comment_image = {
 # Regex to detect the template put in the image's decription to find the dupe
 duplicatesRegex = {
         '_default':None,
-        'commons': r'\{\{(?:[Tt]emplate:|)[Dd]upe[|}]',
+        'commons': r'\{\{(?:[Tt]emplate:|)(?:[Dd]up(?:licat|)e|[Bb]ad[ _][Nn]ame)[|}]',
         'it'     : r'\{\{(?:[Tt]emplate:|)[Pp]rogetto:[Cc]oordinamento/Immagini/Bot/Template duplicati[|}]',
         }
 # Category with the licenses and / or with subcategories with the other licenses.
 category_with_licenses = {
         'commons': 'Category:License tags',
+        'ar'     : 'تصنيف:قوالب حقوق الصور',
         'en'     : 'Category:Wikipedia image copyright templates',
+        'fa'     : u'رده:برچسب‌های حق تکثیر نگاره',
         'ga'     : 'Catagóir:Clibeanna cóipchirt d\'íomhánna',
         'it'     : 'Categoria:Template Licenze copyright',
         'ja'     : 'Category:画像の著作権表示テンプレート',
@@ -452,8 +471,16 @@ uploadBots = {
         'commons':[['File Upload Bot (Magnus Manske)', r'\|[Ss]ource=Transferred from .*?; transferred to Commons by \[\[User:(.*?)\]\]']],
 }
 
+# Service images that don't have to be deleted and/or reported has a template inside them
+# (you can let this param as None)
+
+serviceTemplates = {
+        '_default': None,
+        'it': ['Template:Immagine di servizio'],
+}
+
 # Add your project (in alphabetical order) if you want that the bot start
-project_inserted = [u'ar', u'commons', u'de', u'en', u'ga', u'hu', u'it', u'ja', u'ko', u'ta', u'zh']
+project_inserted = [u'ar', u'commons', u'de', u'en', u'fa', u'ga', u'hu', u'it', u'ja', u'ko', u'ta', u'zh']
 
 # Ok, that's all. What is below, is the rest of code, now the code is fixed and it will run correctly in your project.
 #########################################################################################################################
@@ -843,6 +870,13 @@ class main:
         else:
             commons_image_with_this_hash = commons_site.getFilesFromAnHash(hash_found)
             if commons_image_with_this_hash != [] and commons_image_with_this_hash != 'None':
+                servTMP = wikipedia.translate(self.site, serviceTemplates)
+                templatesInTheImage = self.image.getTemplates()
+                if servTMP != None:
+                    for template in servTMP:
+                        if wikipedia.Page(self.site, template) in templatesInTheImage:
+                            wikipedia.output(u"%s is on commons but it's a service image." % self.imageName)
+                            return True # Problems? No, return True and continue with the check-part
                 wikipedia.output(u'%s is on commons!' % self.imageName)
                 on_commons_text = self.image.getImagePageHtml()
                 if u"<div class='sharedUploadNotice'>" in on_commons_text:
@@ -860,11 +894,9 @@ class main:
                     else:
                         repme = u"\n*[[:File:%s]] is also on '''Commons''': [[commons:File:%s]]" % (self.imageName, commons_image_with_this_hash[0])
                     self.report_image(self.imageName, self.rep_page, self.com, repme, addings = False, regex = regexOnCommons)
-                    # Problems? No, return True
-                    return True
+                    return True # Problems? No, return True
             else:
-                # Problems? No, return True
-                return True
+                return True # Problems? No, return True
     
     def checkImageDuplicated(self, duplicates_rollback):
         """ Function to check the duplicated files. """
@@ -898,13 +930,10 @@ class main:
                 
                 for duplicate in duplicates:
                     DupePage = wikipedia.ImagePage(self.site, duplicate)
-                    
-                    if DupePage.urlname() == self.image.urlname() and self.timestamp != None:
-                        imagedata = self.timestamp
-                    else:
-                        imagedata = DupePage.getLatestUploader()[1]
-                    # '2008-06-18T08:04:29Z'
-                    data = time.strptime(imagedata, u"%Y-%m-%dT%H:%M:%SZ")
+
+                    if DupePage.urlname() != self.image.urlname() or self.timestamp == None:
+                        self.timestamp = DupePage.getLatestUploader()[1]
+                    data = time.strptime(self.timestamp, u"%Y-%m-%dT%H:%M:%SZ")
                     data_seconds = time.mktime(data)
                     time_image_list.append([data_seconds, duplicate])
                     time_list.append(data_seconds)
@@ -933,7 +962,7 @@ class main:
                         #    string += "*[[:%s%s]]" % (self.image_namespace, duplicate)
                     else:
                         wikipedia.output(u"Already put the dupe-template in the files's page or in the dupe's page. Skip.")
-                        return True # Ok - No problem. Let's continue the checking phase
+                        return False # Ok - No problem. Let's continue the checking phase
                 older_image_ns = u'%s%s' % (self.image_namespace, older_image) # adding the namespace
                 only_report = False # true if the image are not to be tagged as dupes
                 
@@ -1329,12 +1358,16 @@ class main:
                     if normal:
                         imageData = image
                         image = imageData[0]
-                        timestamp = imageData[1]
+                        #20100511133318L --- 15:33, 11 mag 2010 e 18 sec
+                        b = str(imageData[1]) # use b as variable to make smaller the timestamp-formula used below..
+                        # fixing the timestamp to the format that we normally use..
+                        timestamp = "%s-%s-%sT%s:%s:%sZ" % (b[0:4], b[4:6], b[6:8], b[8:10], b[10:12], b[12:14])
                     else:
+                        #http://pytz.sourceforge.net/ <- maybe useful?
+                        # '2008-06-18T08:04:29Z'
                         timestamp = image.getLatestUploader()[1]
-                    #http://pytz.sourceforge.net/ <- maybe useful?
-                    # '2008-06-18T08:04:29Z'
                     img_time = datetime.datetime.strptime(timestamp, u"%Y-%m-%dT%H:%M:%SZ") #not relative to localtime
+
                     now = datetime.datetime.strptime(str(datetime.datetime.utcnow()).split('.')[0], "%Y-%m-%d %H:%M:%S") #timezones are UTC
                     # + seconds to be sure that now > img_time
                     while now < img_time:
@@ -1363,7 +1396,10 @@ class main:
             for imageData in generator:
                 if normal:
                     image = imageData[0]
-                    timestamp = imageData[1]
+                    #20100511133318L --- 15:33, 11 mag 2010 e 18 sec
+                    b = str(imageData[1]) # use b as variable to make smaller the timestamp-formula used below..
+                    # fixing the timestamp to the format that we normally use..
+                    timestamp = "%s-%s-%sT%s:%s:%sZ" % (b[0:4], b[4:6], b[6:8], b[8:10], b[10:12], b[12:14])
                     uploader = imageData[2]
                     comment = imageData[3]
                     newGen.append([image, timestamp, uploader, comment])
@@ -1731,7 +1767,10 @@ def checkbot():
             if normal:
                 imageData = image
                 image = imageData[0]
-                timestamp = imageData[1]
+                #20100511133318L --- 15:33, 11 mag 2010 e 18 sec
+                #b = str(imageData[1]) # use b as variable to make smaller the timestamp-formula used below..
+                # fixing the timestamp to the format that we normally use..
+                timestamp = imageData[1]#"%s-%s-%sT%s:%s:%sZ" % (b[0:4], b[4:6], b[6:8], b[8:10], b[10:12], b[12:14])
                 uploader = imageData[2]
                 comment = imageData[3] # useless, in reality..
             else:

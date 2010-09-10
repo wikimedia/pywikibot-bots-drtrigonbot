@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikinews_family.py 8066 2010-04-09 07:55:32Z xqt $'
+__version__ = '$Id: wikinews_family.py 8484 2010-09-07 18:39:10Z xqt $'
 
 # The Wikimedia family that is known as Wikinews
 
@@ -12,8 +12,8 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'sr', 'en', 'pl', 'de', 'fr', 'it', 'pt', 'es', 'zh', 'ja', 'sv',
-            'ru', 'fi', 'he', 'cs', 'ar', 'sd', 'bg', 'ro', 'hu', 'ta', 'no',
-            'uk', 'ca', 'tr', 'bs', 'th',
+            'ru', 'fi', 'he', 'cs', 'ta', 'bg', 'ro', 'ar', 'sd', 'hu', 'no',
+            'uk', 'tr', 'ca', 'bs', 'th', 'ko',
         ]
 
         if family.config.SSL_connection:
@@ -24,7 +24,7 @@ class Family(family.Family):
         # Override defaults
         self.namespaces[2]['cs'] = u'Redaktor'
         self.namespaces[2]['pl'] = u'Wikireporter'
-        self.namespaces[3]['cs'] = u'Redaktor diskuse'
+        self.namespaces[3]['cs'] = u'Diskuse s redaktorem'
         self.namespaces[3]['pl'] = u'Dyskusja Wikireportera'
 
 
@@ -45,6 +45,7 @@ class Family(family.Family):
             'hu': u'Wikihírek',
             'it': u'Wikinotizie',
             'ja': u'ウィキニュース',
+            'ko': u'위키뉴스',
             'no': u'Wikinytt',
             'pt': u'Wikinotícias',
             'ro': u'Wikiştiri',
@@ -61,7 +62,7 @@ class Family(family.Family):
             'bg': u'Уикиновини беседа',
             'bs': u'Razgovor s Wikivijestima',
             'ca': u'Viquinotícies Discussió',
-            'cs': u'Wikizprávy diskuse',
+            'cs': u'Diskuse k Wikizprávám',
             'de': u'Wikinews Diskussion',
             'es': u'Wikinoticias Discusión',
             'fi': u'Keskustelu Wikiuutisista',
@@ -69,12 +70,13 @@ class Family(family.Family):
             'he': u'שיחת ויקיחדשות',
             'hu': u'Wikihírek-vita',
             'it': u'Discussioni Wikinotizie',
-            'ja': u'ウィキニュース‐ノート',
+            'ja': u'ウィキニュース・トーク',
+            'ko': u'위키뉴스토론',
             'nl': u'Overleg Wikinews',
             'no': u'Wikinytt-diskusjon',
             'pl': u'Dyskusja Wikinews',
             'pt': u'Wikinotícias Discussão',
-            'ro': u'Discuţie Wikiştiri',
+            'ro': u'Discuție Wikiştiri',
             'ru': u'Обсуждение Викиновостей',
             'sd': u'Wikinews بحث',
             'sr': u'Разговор о Викивестима',
@@ -89,19 +91,19 @@ class Family(family.Family):
         self.namespaces[90] = {
             'en': u'Thread',
         }
-        
+
         self.namespaces[91] = {
             'en': u'Thread talk',
         }
-        
+
         self.namespaces[92] = {
             'en': u'Summary',
         }
-        
+
         self.namespaces[93] = {
             'en': u'Summary talk',
         }
-        
+
         self.namespaces[100] = {
             'ar': u'بوابة',
             'cs': u'Portál',
@@ -116,24 +118,26 @@ class Family(family.Family):
             'pt': u'Portal',
             'ru': u'Портал',
             'sv': u'Portal',
+            'ta': u'வலைவாசல்',
             'tr': u'Portal',
             'zh': u'频道',
         }
 
         self.namespaces[101] = {
             'ar': u'نقاش البوابة',
-            'cs': u'Portál diskuse',
+            'cs': u'Diskuse k portálu',
             'de': u'Portal Diskussion',
             'en': u'Portal talk',
             'es': u'Comentarios Discusión',
             'he': u'שיחת פורטל',
             'it': u'Discussioni portale',
-            'ja': u'ポータル‐ノート',
+            'ja': [u'ポータル・トーク', u'ポータル‐ノート'],
             'no': u'Kommentarer-diskusjon',
             'pl': u'Dyskusja portalu',
             'pt': u'Portal Discussão',
             'ru': u'Обсуждение портала',
             'sv': u'Portaldiskussion',
+            'ta': u'வலைவாசல் பேச்சு',
             'tr': u'Portal tartışma',
             'zh': u'频道 talk',
         }
@@ -208,6 +212,7 @@ class Family(family.Family):
             'fi': self.alphabetic,
             'fr': self.alphabetic,
             'he': ['en'],
+            'hu': ['en'],
             'pl': self.alphabetic,
         }
 
