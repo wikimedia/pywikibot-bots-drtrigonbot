@@ -33,7 +33,7 @@ __version__='$Id: subster.py 0.2.0001 2009-09-09 18:46:00Z drtrigon $'
 #
 
 
-import wikipedia, config
+import wikipedia, config, pagegenerators
 import dtbext
 import re, sys, os, time
 import math, copy
@@ -83,8 +83,8 @@ class SubsterRobot:
 		wikipedia.output(u'\03{lightgreen}* Processing Template Backlink List:\03{default}')
 
 		if sim:	pagegen = ['dummy']
-		#else:	pagegen = dtbext.pagegenerators.ReferringPageGenerator(self._userListPage)
-		else:	pagegen = dtbext.pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
+		#else:	pagegen = pagegenerators.ReferringPageGenerator(self._userListPage)
+		else:	pagegen = pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
 
 		for page in pagegen:
 			if sim:

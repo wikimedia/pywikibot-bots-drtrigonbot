@@ -13,24 +13,24 @@ Example: python get.py Wikipedia | grep MediaWiki > results.txt
 #
 # Distributed under the terms of the MIT license.
 
-__version__='$Id: get.py 5706 2008-07-10 05:46:47Z nicdumz $'
+__version__='$Id: get.py 8525 2010-09-11 16:21:58Z xqt $'
 
-import wikipedia
+import wikipedia as pywikibot
 
 def main():
     singlePageTitleParts = []
-    for arg in wikipedia.handleArgs():
+    for arg in pywikibot.handleArgs():
         singlePageTitleParts.append(arg)
 
     pageTitle = " ".join(singlePageTitleParts)
-    page = wikipedia.Page(wikipedia.getSite(), pageTitle)
+    page = pywikibot.Page(pywikibot.getSite(), pageTitle)
 
     # TODO: catch exceptions
-    wikipedia.output(page.get(), toStdout = True)
+    pywikibot.output(page.get(), toStdout = True)
 
 if __name__ == "__main__":
     try:
         main()
     finally:
-        wikipedia.stopme()
+        pywikibot.stopme()
 

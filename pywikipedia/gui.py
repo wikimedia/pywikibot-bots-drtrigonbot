@@ -7,11 +7,11 @@ the contents of an article
 # (C) Rob W.W. Hooft, 2003
 # (C) Daniel Herding, 2004
 #     Wikiwichtel
-# (C) the PyWikipediabot team, 2008
+# (C) the PyWikipediabot team, 2008-2010
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: gui.py 6686 2009-04-23 20:25:23Z cosoleto $'
+__version__='$Id: gui.py 8525 2010-09-11 16:21:58Z xqt $'
 
 from Tkinter import *
 from ScrolledText import ScrolledText
@@ -413,15 +413,15 @@ class ListBoxWindow:
 
 
 if __name__=="__main__":
-    import wikipedia
+    import wikipedia as pywikibot
     try:
         root = Tk()
         root.resizable(width=FALSE, height=FALSE)
         root.title("Pywikipediabot GUI")
-        page = wikipedia.Page(wikipedia.getSite(), u'Wiki')
+        page = pywikibot.Page(pywikibot.getSite(), u'Wiki')
         content = page.get()
         myapp = EditBoxWindow(root)
         myapp.bind("<Control-d>", myapp.debug)
         v = myapp.edit(content, highlight = page.title())
     finally:
-        wikipedia.stopme()
+        pywikibot.stopme()

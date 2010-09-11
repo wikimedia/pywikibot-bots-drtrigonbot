@@ -45,6 +45,7 @@ TESTPAGE = u'Wikipedia:Löschkandidaten/20. Juli 2009'
 TESTPAGE = u'Benutzer Diskussion:Karsten11'
 TESTPAGE = u'Benutzer Diskussion:GregorHelms'
 TESTPAGE = u'Wikipedia:WikiProjekt Vorlagen/Werkstatt'
+#TESTPAGE = u'Benutzer_Diskussion:DrTrigonBot'
 
 
 def TEST_getSections():
@@ -118,10 +119,10 @@ def TEST_getParsedContent():
 	
 	print "*", dtbext.wikipedia.getParsedString(u'Erweiterung für [[Wikipedia:Bots/Bot-Info]]', plaintext=True), "*"
 
-def TEST_purgePageCache():
-	print "\nTest of 'dtbext.wikipedia.Page.purgePageCache()' on page '%s'..." % TESTPAGE
+def TEST_purgeCache():
+	print "\nTest of 'dtbext.wikipedia.Page.purgeCache()' on page '%s'..." % TESTPAGE
 	
-	print dtbext.wikipedia.Page(wikipedia.getSite(), TESTPAGE).purgePageCache()
+	print dtbext.wikipedia.Page(wikipedia.getSite(), TESTPAGE).purgeCache()
 
 def TEST_GlobalWikiNotificationsGen():
 	print "\nTest of 'dtbext.wikipedia.GlobalWikiNotificationsGen()' on page '%s'..." % TESTPAGE
@@ -172,56 +173,15 @@ def TEST_get():
 		i += 1
 	print i
 
-def TEST_UserContributionsGenerator():
-	print "\nTest of 'pagegenerators.UserContributionsGenerator()' for BLUbot..."
-
-	#a = [page for page in pagegenerators.UserContributionsGenerator(u'BLUbot', number=100)]
-	#print a, len(a)
-
-	print "\nTest of 'dtbext.pagegenerators.UserContributionsGenerator()' for BLUbot..."
-
-	a = [page for page in dtbext.pagegenerators.UserContributionsGenerator(u'BLUbot', number=1000)]
-	print a, len(a)
-
-	return
-
-def TEST_ReferringPageGenerator():
-	print "\nTest of 'pagegenerators.ReferringPageGenerator()' for [[Benutzer:DrTrigon]]..."
-
-	#print [page for page in pagegenerators.ReferringPageGenerator(wikipedia.Page(wikipedia.getSite(), 'Benutzer:DrTrigon'))]
-	print [page for page in wikipedia.Page(wikipedia.getSite(), TESTPAGE).getReferences()]
-
-	print "\nTest of 'dtbext.pagegenerators.ReferringPageGenerator()' for [[Benutzer:DrTrigon]]..."
-
-	#print "\n", [page for page in pagegenerators.ReferringPageGenerator(dtbext.wikipedia.Page(wikipedia.getSite(), 'Benutzer:DrTrigon'))]
-	print "\n", [page for page in dtbext.wikipedia.Page(wikipedia.getSite(), TESTPAGE).getReferences()]
-
-	print "\n", [page for page in dtbext.pagegenerators.ReferringPageGenerator(dtbext.wikipedia.Page(wikipedia.getSite(), 'Benutzer:DrTrigon'), number=10)]
-
-	return
-
-def TEST_SendMail():
-	print "\nTest of 'userlib.sendMail()' for 'DrTrigon'..."
-
-	usr = userlib.User(wikipedia.getSite(), u'DrTrigon')
-	print usr.sendMail(subject=u'mail-subject', text=u'blabla', ccMe = False)
-
-	return
-
-
-# pagegenerators.py
-#TEST_UserContributionsGenerator()
-#TEST_ReferringPageGenerator()
 
 # wikipedia.py
 #TEST_getVersionHistory()
 #TEST_getSections()
-#TEST_purgePageCache()
+#TEST_purgeCache()
 #TEST_get()
 #TEST_getParsedContent()
 #print wikipedia.getSite().getUrl('/w/api.php?action=query&meta=userinfo&uiprop=blockinfo|hasmsg|groups|rights|options|preferencestoken|editcount|ratelimits|email&formal=xml')
 #TEST_GlobalWikiNotificationsGen()
-TEST_SendMail()
 
 
 #a_str = r'<strong class="error">Referenz-Fehler: Einzelnachweisfehler: <code>&lt;ref&gt;</code>-Tags existieren, jedoch wurde kein <code>&lt;references&#160;/&gt;</code>-Tag gefunden.</strong>'

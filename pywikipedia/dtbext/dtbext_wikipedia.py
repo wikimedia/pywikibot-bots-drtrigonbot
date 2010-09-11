@@ -57,20 +57,6 @@ import wikipedia, config, query
 import dtbext_query, dtbext_date
 
 
-##REQUEST_getVersionHistory	= '/w/api.php?action=query&titles=%s&rvprop=ids|timestamp|flagged|user|flags&prop=revisions|info&rvlimit=%i&format=xml'
-#REQUEST_getVersionHistory	= '/w/api.php?action=query&titles=%s&rvprop=ids|timestamp|flagged|user|flags|comment&prop=revisions|info&rvlimit=%i&format=xml'
-#REQUEST_getSections		= '/w/api.php?action=parse&text={{%s}}__TOC__&prop=sections&format=xml'
-#REQUEST_getSections_page        = '/w/api.php?action=parse&page=%s&prop=sections&format=xml'
-#REQUEST_getParsedContent	= '/w/api.php?action=parse&text=%s&format=xml'
-#REQUEST_purgePageCache		= '/w/api.php?action=purge&titles=%s&format=xml'
-#REQUEST_getWikiTextContent      = '/w/api.php?action=expandtemplates&text={{%s}}&format=xml'
-##REQUEST_getWikiTextContentB     = '/w/api.php?action=query&prop=revisions&titles=%s&rvprop=content&rvexpandtemplates&rvgeneratexml&format=xml'
-#                                    /w/api.php?action=query&prop=revisions&titles=%s&rvprop=content&rvexpandtemplates&format=xml
-#REQUEST_getBacklinks		= '/w/api.php?action=query&list=backlinks&bltitle=%s&bllimit=%s&format=xml'
-
-#REQUEST_getVersionHistory_s	= '/w/api.php?action=query&titles=%s&rvprop=ids|timestamp|flagged|user|flags|comment&prop=revisions|info&format=xml'
-#REQUEST_getContent_s		= '/w/api.php?action=query&prop=revisions&titles=%s&rvprop=timestamp|user|comment|content&format=xml'
-
 REGEX_hTagOpen			= re.compile('<h(\d).*?>')
 REGEX_hTagClose			= re.compile('</h(\d).*?>')
 REGEX_nowikiTag			= re.compile('<nowiki>(.*?)</nowiki>', re.S | re.I)
@@ -99,65 +85,26 @@ class Page(wikipedia.Page):
 	#def __init__(self, site, title, insite=None, defaultNamespace=0):
 	#	wikipedia.Page.__init__(self, site, title, insite, defaultNamespace)
 
-	#def getVersionHistory(self, forceReload=False, reverseOrder=False,
-	#			getAll=False, revCount=500):
-	def getVersionHistory(self, forceReload=False, reverseOrder=False, 
-				getAll=False, revCount=500):
-		"""
-		Same as in wikipedia.py but with some minor changes.
-		  - uses API
-		  - 'forceReload' is IGNORED
-		  - 'getAll' is IGNORED
-		"""
-
-		# according to http://osdir.com/ml/python.pywikipediabot.general/2006-02/msg00135.html
-		# http://de.wikipedia.org/wiki/Benutzer_Diskussion:Merlissimo/Sig#Frage_bez.C3.BCglich_pywikipediabot
-		# http://de.wikipedia.org/w/api.php?action=query&titles=Benutzer%20Diskussion:Merlissimo&rvprop=ids|timestamp|flagged|user|flags&prop=revisions|info&rvlimit=10
-		# http://de.wikipedia.org/w/api.php
-		#request = REQUEST_getVersionHistory % (urllib.quote(self.title().encode(config.textfile_encoding)), revCount)
-		request = {
-		    'action'	: 'query',
-		    'titles'	: self.title(),
-		    'rvprop'	: 'ids|timestamp|flagged|user|flags|comment',
-		    'prop'	: 'revisions|info',
-		    'rvlimit'	: revCount,
-		    }
-		#buf = APIRequest( self.site(),
-		#		  request,
-		#		  'revisions',
-		#		  'rev',
-		#		  ['revid', 'user', 'timestamp', 'comment'] )
-		wikipedia.get_throttle()
-		buf = dtbext_query.GetProcessedData(request,
-							'revisions',
-							'rev',
-		#					['revid', 'user', 'timestamp', 'comment'] )
-		#					['revid', 'user', 'timestamp', 'comment', 'redirect'],
-							['revid', 'user', 'timestamp', 'comment', 'redirect', 'revisions'],
-							pages = 'pages' )
-		redirect  = (u'redirect' in buf[0])
-
-		self._isRedirectPage = redirect
-
-		# change time/date format
-		data = []
-		#for item in buf:
-		for item in buf[0][5]:
-			#data.append( (u'%s'%item[0], dtbext_date.GetTime(item[2]), item[1], item[3]) )
-			data.append( (u'%s'%item['revid'], dtbext_date.GetTime(item['timestamp']), item['user'], item.get('comment', u'')) )
-
-		if reverseOrder: data.reverse()
-
-		return data
-
-	#def isRedirectPage(self):
+	# original uses 'wikipedia.page.get()' which is slower
 	def isRedirectPage(self):
-		"""Return True if this is a redirect, False if not or not existing."""
+		"""Return True if this is a redirect, False if not or not existing.
+		   (MODIFIED FUNCTION)"""
+
 		if (self._isRedirectPage == None):
-			self.getVersionHistory(revCount=1)
+			params = {
+				'action'	: 'query',
+				'titles'	: self.title(),
+				'prop'		: 'info',
+				'rvlimit'	: 1,
+			}
+
+			result = query.GetData(params, self.site())
+			r = result['query']['pages'].values()[0]
+
+			self._isRedirectPage  = (u'redirect' in r)
 		return self._isRedirectPage
 
-	#  DOES NOT exist in pywikipedia-framework
+	# new
 	def getSections(self, minLevel=2, getter=None, pagewikitext=None, sectionsonly = False):
 		"""Parses the page with API and return section information.
 		   (NEW FUNCTION)
@@ -281,40 +228,29 @@ class Page(wikipedia.Page):
 
 		return (data, verify)
 
+	# new
 	#def purge_address(self, s):	# class Site
-	def purgePageCache(self):
-		"""Purges the page cache with API and return xml content.
-		   (NEW NEW (newer) FUNCTION)
+	def purgeCache(self):
+		"""Purges the page cache with API.
+		   (NEW FUNCTION)
 		"""
-		"""Return URL path to purge cache and retrieve page 's'."""
 
-		notpurged_def  = u'not purged'
-		notmissing_def = u'not missing'
+		params = {
+			'action'	: 'purge',
+			'titles'	: self.title(),
+		}
 
-		#request = REQUEST_purgePageCache % ( urllib.quote(self.title().encode(config.textfile_encoding)) )
-		request = {
-		    'action'	: 'purge',
-		    'titles'	: self.title(),
-		    }
-		#buf = APIRequest( self.site(),
-		#		  request,
-		#		  'purge',
-		#		  'page',
-		#		  [('purged', notpurged_def), ('missing', notmissing_def)] )
-		wikipedia.get_throttle()
-		buf = dtbext_query.GetProcessedData(request,
-							'purge',
-							'page',
-							[] )
-		#purged  = not (buf[0][0] == notpurged_def)
-		#missing = not (buf[0][1] == notmissing_def)
-		purged  = (u'purged' in buf[0])
-		missing = (u'missing' in buf[0])
+		result = query.GetData(params, self.site())
+		r = result['purge'][0]
+
+		purged  = (u'purged' in r)
+		missing = (u'missing' in r)
 
 		if missing: raise wikipedia.NoPage('Was not able to purge cache of %s because it is missing!' % self.aslink())
 
 		return purged
 
+	# changed
 	#def get(self, force=False, get_redirect=False, throttle=True,
 	#	sysop=False, change_edit_time=True):
 	def get(self, force=False, get_redirect=False, throttle=True,
@@ -339,7 +275,7 @@ class Page(wikipedia.Page):
 			return wikipedia.Page.get(self, force=force, get_redirect=get_redirect, throttle=throttle,
 							sysop=sysop, change_edit_time=change_edit_time)
 
-	#  DOES NOT exist in pywikipedia-framework
+	# new
 	def _getFullContent(self, plaintext=False):
 		"""Return the full expanded wiki-text of the page.
 
@@ -385,107 +321,6 @@ class Page(wikipedia.Page):
 
 		#return buf.strip()
 		return buf
-
-	# - EXPERIMENTAL -
-#	def getFullB(self, force=False, get_redirect=False, throttle=True,
-#			sysop=False, change_edit_time=True):
-#		"""Return the full expanded wiki-text of the page.
-#
-#		Return value is a string. NO force, NO get_redirect,
-#		NO throttle, NO sysop, NO change_edit_time!!
-#		"""
-#
-#		request = REQUEST_getWikiTextContentB % ( urllib.quote(self.title().encode(config.textfile_encoding)) )
-#		buf = APIRequest( self.site(),
-#				  request,
-#				  'revisions',
-#				  'rev',
-#				  ['parsetree'] )
-#
-#		return buf
-
-	#def getReferences(self,
-	#	follow_redirects=True, withTemplateInclusion=True,
-	#	onlyTemplateInclusion=False, redirectsOnly=False):
-	def getReferences(self,
-		follow_redirects=True, withTemplateInclusion=True,
-		onlyTemplateInclusion=False, redirectsOnly=False, 
-		number = 500):
-		"""
-		Same as in wikipedia.py but with some minor changes. Important for ReferringPageGenerator().
-		  - uses API
-		  - 'follow_redirects' is IGNORED
-                  - 'withTemplateInclusion' is DEFAULT MODE and 'False' is ignored
-		  - 'onlyTemplateInclusion' use 'list=embeddedin (ei)' instead of 'list=backlinks (bl)'
-                    (overwrites 'withTemplateInclusion')
-		  - 'redirectsOnly' is IGNORED
-
-		If you need a full list of referring pages, use this:
-		    pages = [page for page in s.getReferences()]
-		"""
-
-		# according to 'ContributionsGen(...)'
-
-		if onlyTemplateInclusion:
-			# List pages that include a certain page.
-			# (http://www.mediawiki.org/wiki/API:Query_-_Lists#embeddedin_.2F_ei)
-			# http://de.wikipedia.org/w/api.php?action=query&list=embeddedin&eititle=Benutzer:DrTrigon/Entwurf/Vorlage:AutoMail&eilimit=5
-			request = {
-			    'action'	: 'query',
-			    'list'	: 'embeddedin',
-			    'eititle'	: self.title(),
-			    'eilimit'	: number,
-			    }
-			#buf = APIRequest( self.site(),
-			#		  request,
-			#		  'backlinks',
-			#		  'bl',
-			#		  ['pageid', 'ns', 'title'] )
-			wikipedia.get_throttle()
-			#buf += dtbext_query.GetProcessedData(request,
-			buf = dtbext_query.GetProcessedData(request,
-								'embeddedin',
-								'ei',
-								['pageid', 'ns', 'title'] )
-			#buf = buf[:number]
-		else:
-			# Lists pages that link to a given page, similar to Special:Whatlinkshere. Ordered by linking page title.
-			# (http://www.mediawiki.org/wiki/API:Query_-_Lists#backlinks_.2F_bl)
-			# request = REQUEST_getBacklinks % (urllib.quote(self.title().encode(config.textfile_encoding)), number)
-			request = {
-			    'action'	: 'query',
-			    'list'	: 'backlinks',
-			    'bltitle'	: self.title(),
-			    'bllimit'	: number,
-			    }
-			wikipedia.output(u'Getting references to %s' % self.aslink())
-			#buf = APIRequest( self.site(),
-			#		  request,
-			#		  'backlinks',
-			#		  'bl',
-			#		  ['pageid', 'ns', 'title'] )
-			wikipedia.get_throttle()
-			buf = dtbext_query.GetProcessedData(request,
-								'backlinks',
-								'bl',
-								['pageid', 'ns', 'title'] )
-
-		# since it is a generator; set the page title in index 0 of the tuple
-        	refPages = []
-		for item in buf:
-			#data.append( (item[2], item[0], item[1]) )
-			if not item[2] in refPages:
-				refPages.append(item[2])
-				yield Page(self.site(), item[2])
-
-
-#def output(text, decoder = None, newline = True, toStdout = False, timestmp = True):
-#	"""Output a message to the user via the userinterface.
-#
-#	( according to wikipedia.output(...) )
-#	"""
-#	if timestmp: text = dtbext_date.getTimeStmp(full = True, humanreadable = True, local = True) + '::' + text
-#	wikipedia.output(text, decoder, newline, toStdout)
 
 
 # ====================================================================================================
@@ -759,6 +594,8 @@ def getParsedString(string, plaintext=False, site=wikipedia.getSite()):
 
 ######## Unicode library functions ########
 
+# try to replace with 'textlib.removeDisabledParts()' !!
+#
 def html2notagunicode(text, keep_wikitags=False):
 	"""Remove all HTML tags in text."""
 
@@ -811,45 +648,6 @@ def wikisectionpatch(text):
 
 	return buf
 
-## thanks to: http://pyxml.sourceforge.net/topics/howto/xml-howto.html
-#class GetData(saxutils.DefaultHandler):
-#	"""
-#	Parse XML output of wiki API interface
-#	"""
-#	def __init__(self, parent, content, values = [], pages = None):
-#		self.get_parent, self.get_content, self.get_values = parent, content, values
-#		self._parent, self._content = "", ""
-#		self._page = ''
-#		#self.data = []
-#		self.data = {'':[]}
-#		#self.chars = ""
-#		self.chars = {'':""}
-#		self.pages = pages
-#
-#	def startElement(self, name, attrs):
-#		if (name == self.pages):	# new page
-#			self._page = attrs.get('title', '')
-#			self.data[self._page] = []
-#			self.chars[self._page] = ""
-#
-#		self._content = name
-#		if not ((self._parent == self.get_parent) and (self._content == self.get_content)):
-#			self._content = ""
-#			self._parent = name
-#			return
-#		data = []
-#		for item in self.get_values:
-#			#data.append( attrs.get(item, "") )
-#			try:	(val, default) = item
-#			except:	(val, default) = (item, "")
-#			data.append( attrs.get(val, default) )
-#		self.data[self._page].append( tuple(data) )
-#
-#	def characters(self, content):
-#		if not (self._content == self.get_content): return
-#		#self.chars += content
-#		self.chars[self._page] += content
-
 # thanks to: http://pyxml.sourceforge.net/topics/howto/xml-howto.html
 class GetGenericData(saxutils.DefaultHandler):
 	"""
@@ -897,7 +695,6 @@ class GetDataHTML(HTMLParser):
 		#print "Encountered the end of a %s tag" % tag
 		if tag in self._wikitags: self.textdata += u"</%s>" % tag
 
-#def APIRequest(site, request, parent, content, values, pages = None):
 def GetDataXML(data, root):
 	#wikipedia.get_throttle()
 	#APIdata = site.getUrl( request )

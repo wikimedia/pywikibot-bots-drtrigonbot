@@ -4,5 +4,4 @@ import dtbext_pagegenerators as pagegenerators
 import dtbext_wikipedia as wikipedia
 import dtbext_date as date
 import dtbext_config as config
-import dtbext_userlib as userlib
 

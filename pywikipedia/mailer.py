@@ -35,7 +35,7 @@ __version__='$Id: mailer.py 0.2.0001 2009-08-29 10:12:00Z drtrigon $'
 #
 
 
-import wikipedia, config, userlib
+import wikipedia, config, userlib, pagegenerators
 import dtbext
 import re, sys, os, time
 import math
@@ -106,8 +106,8 @@ class MailerRobot:
 
 		wikipedia.output(u'\03{lightgreen}* Processing Template Backlink List:\03{default}')
 
-		#for page in dtbext.pagegenerators.ReferringPageGenerator(self._userListPage):
-		for page in dtbext.pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True):
+		#for page in pagegenerators.ReferringPageGenerator(self._userListPage):
+		for page in pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True):
 			content = self._readPage(page)
 
 			(params, clearedcontent) = self._getMode(content)	# get operating mode

@@ -55,80 +55,10 @@ from HTMLParser import HTMLParser
 
 # Application specific imports
 import wikipedia, config
-import dtbext_query, dtbext_wikipedia
+import dtbext_wikipedia
 
 
-#REQUEST_ContributionsGen	= '/w/api.php?action=query&list=usercontribs&ucuser=%s&uclimit=%i&format=xml'
-##REQUEST_getBacklinks		= '/w/api.php?action=query&list=backlinks&bltitle=%s&bllimit=%s&format=xml'
 REQUEST_getGlobalWikiNotifys	= 'http://toolserver.org/~merl/UserPages/query.php?user=%s&format=xml'
-
-
-# ====================================================================================================
-#  exists in pywikipedia-framework
-# ====================================================================================================
-
-#def UserContributionsGenerator(username, number = 250, namespaces = [], site = None ):
-def UserContributionsGenerator(username, number = 100, namespaces = [], site = wikipedia.Site(config.mylang)):
-#def UserContributionsGenerator(username, number = 100, namespaces = [], site = wikipedia.getSite()):
-	"""
-	Same as in pagegenerators.py but with some minor changes.
-	  - uses API
-	  - no limit of 500 (since bot may 5000)
-	  - 'namespaces' is IGNORED
-
-	If you need a full list of referring pages, use this:
-	    pages = [page for page in UserContributionsGenerator()]
-	"""
-
-	# according to http://osdir.com/ml/python.pywikipediabot.general/2006-02/msg00135.html
-	# http://de.wikipedia.org/w/api.php?action=query&list=usercontribs&ucuser=Merlissimo&uclimit=20
-	# http://de.wikipedia.org/w/api.php
-	#request = REQUEST_ContributionsGen % (urllib.quote(username.encode(config.textfile_encoding)), number)
-	request = {
-	    'action'	: 'query',
-	    'list'	: 'usercontribs',
-	    'ucuser'	: username,
-	    'uclimit'	: number,
-	    }
-	#buf = dtbext_wikipedia.APIRequest( site,
-	#				  request,
-	#				  'usercontribs',
-	#				  'item',
-	#				  ['user', 'pageid', 'revid', 'ns', 'title', 'timestamp', 'top', 'comment'] )
-	buf = dtbext_query.GetProcessedData(request,
-						'usercontribs',
-						'item',
-						#['user', 'pageid', 'revid', 'ns', 'title', 'timestamp', 'top', 'comment'] )
-						['user', 'pageid', 'revid', 'ns', 'title', 'timestamp', 'comment'] )
-
-	# change time/date format and since it is a generator; set the page
-	# title in index 0 of the tuple
-	titleList = []
-	for item in buf:
-		#data.append( (item[4], item[0], item[1], item[2], item[3], dtbext_wikipedia.GetTime(item[5]), item[6], item[7]) )
-		if not item[4] in titleList:
-			titleList.append(item[4])
-			yield dtbext_wikipedia.Page(site, item[4])
-
-#def ReferringPageGenerator(referredPage, followRedirects=False,
-#                           withTemplateInclusion=True,
-#                           onlyTemplateInclusion=False):
-def ReferringPageGenerator(referredPage, followRedirects=False,
-				withTemplateInclusion=True,
-				onlyTemplateInclusion=False, 
-				number = 500):
-	"""
-	EXACT the same as in wikipedia.py but with 'number'.
-	( THIS SHOULD PROBABLY BE CONTRIBUTED?! )
-
-	If you need a full list of referring pages, use this:
-	    pages = [page for page in ReferringPageGenerator()]
-	"""
-	for page in referredPage.getReferences(followRedirects,
-						withTemplateInclusion,
-						onlyTemplateInclusion,
-						number = number):
-		yield page
 
 
 # ====================================================================================================
@@ -147,22 +77,9 @@ def GlobalWikiNotificationsGenerator(username, site = wikipedia.Site(config.myla
 	returns page-objects with extradata dict in 'page.extradata'
 	"""
 
-	# according to 'ContributionsGen(...)' BUT changed to support simple HTML
 	request = REQUEST_getGlobalWikiNotifys % urllib.quote(username.encode(config.textfile_encoding))
 	wikipedia.get_throttle()
 	buf = site.getUrl( request, no_hostname = True )
-
-	#parser = dtbext_wikipedia.GetDataHTML()
-	#parser.feed(buf)
-	#parser.close()
-	#buf = parser.textdata.split('\n')
-
-	## since it is a generator; set the page title in index 0 of the tuple (keine doppelnennungen!!)
-	##data = []
-	#for item in buf:
-	#	if (item[:2] == u'[['):
-	#		#data.append( re.split(u': ', item, maxsplit=1) )
-	#		yield dtbext_wikipedia.Page(site, re.split(u': ', item, maxsplit=1))
 
 	if not buf: return	# nothing got (error?! how to catch later??)
 

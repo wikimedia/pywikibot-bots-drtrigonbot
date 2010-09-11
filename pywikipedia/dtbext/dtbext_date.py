@@ -32,10 +32,9 @@ __version__='$Id: dtbext/date.py 0.2.0000 2009-08-26 15:54:00Z drtrigon $'
 
 # Standard library imports
 import time
-import xml.utils.iso8601
 
 # Application specific imports
-import config
+import config, pywikibot
 
 
 # ====================================================================================================
@@ -68,6 +67,5 @@ def getTimeStmp(full = False, humanreadable = False, local = False):
 def GetTime(timestamp):
 	# use only UTC for internal timestamps
 	# could also be used as given by the API, but is converted here for compatibility
-	secs = xml.utils.iso8601.parse(timestamp)
-	return time.strftime('%H:%M, %d. %b. %Y', time.gmtime(secs)).decode(config.textfile_encoding)
+	return pywikibot.Timestamp.fromISOformat(timestamp).strftime('%H:%M, %d. %b. %Y')
 

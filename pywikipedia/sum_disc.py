@@ -88,7 +88,7 @@ __version__='$Id: sum_disc.py 0.2.0001 2009-06-05 16:12:00Z drtrigon $'
 #
 
 
-import wikipedia, config, pagegenerators
+import wikipedia, config, pagegenerators, userlib
 import dtbext
 import re, sys
 #import codecs, pickle
@@ -472,7 +472,7 @@ class SumDiscRobot:
 		count = self._param['checkedit_count']
 
 		# thanks to http://www.amk.ca/python/howto/regex/ and http://bytes.com/forum/thread24382.html
-		usersumList = [p.title() for p in dtbext.pagegenerators.UserContributionsGenerator(self._user, number = count)]
+		usersumList = [p.title() for p in pagegenerators.UserContributionsGenerator(self._user, number = count)]
 
 		work_list = {}
 		for item in usersumList:
@@ -504,7 +504,7 @@ class SumDiscRobot:
 		userbacklicksList = []
 		for item in self._param['backlinks_list']:
 			page = dtbext.wikipedia.Page(wikipedia.getSite(), item)		# important for the generator to use the API
-			userbacklicksList += [p.title() for p in dtbext.pagegenerators.ReferringPageGenerator(page, withTemplateInclusion=False)]	# DOES THIS PRESERVE THE ORDER?!?!??
+			userbacklicksList += [p.title() for p in pagegenerators.ReferringPageGenerator(page, withTemplateInclusion=False)]	# DOES THIS PRESERVE THE ORDER?!?!??
 		userbacklicksList = list(sets.Set(userbacklicksList))			# drop duplicates
 
 		work_list = {}
@@ -581,7 +581,7 @@ class SumDiscRobot:
 					self._writePage(self._userPage, self._content, minorEdit = False)
 					wikipedia.setAction(u'Diskussions-Zusammenfassung hinzugefügt: %i Einträge' % count)
 					self._appendPage(tmplsite, buf)
-				purge = dtbext.wikipedia.PageFromPage(self._userPage).purgePageCache()	# I hope (!) this works now, but is it still needed?!??
+				purge = dtbext.wikipedia.PageFromPage(self._userPage).purgeCache()	# I hope (!) this works now, but is it still needed?!??
 
 				wikipedia.output(u'*** Discussion updates added to: %s (purge: %s)' % (self._userPage.aslink(), purge))
 			else:
@@ -1240,12 +1240,12 @@ class SumDiscRobot:
 		returns:  last human user name [string]
 		'''
 
-		if not (u'bot' in dtbext.userlib.User(wikipedia.getSite(), username).getGroups()):
+		if not (u'bot' in userlib.User(wikipedia.getSite(), username).groups()):
 			return username
 
 		result = ''
 		for info in page.getVersionHistory(revCount=10)[1:]:
-			groups = dtbext.userlib.User(wikipedia.getSite(), info[2]).getGroups()
+			groups = userlib.User(wikipedia.getSite(), info[2]).groups()
 			#print info[2], groups
 			if not (u'bot' in groups):
 				result = info[2]

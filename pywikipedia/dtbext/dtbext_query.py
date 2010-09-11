@@ -49,72 +49,7 @@ import sys, time
 import simplejson, urllib
 
 # Application specific imports
-import wikipedia, query
-
-
-# ====================================================================================================
-#  exists in pywikipedia-framework
-# ====================================================================================================
-
-def GetData(params, site = None, verbose = False, useAPI = False, retryCount = 5, encodeTitle = True, post = False):
-	"""Get data from the query api, and convert it into a data object
-	"""
-	# 'verbose' is useless now
-	if post:
-		# according to 'query.py' (minimalized) with 'postForm' instead of 'getUrl'
-		if site is None:
-			site = wikipedia.getSite()
-
-		params['format'] = 'json'
-
-		#if useAPI:
-		#	path = site.api_address() + urllib.urlencode(params.items())
-		#else:
-		#	path = site.query_address() + urllib.urlencode(params.items())
-		# updated with new framework to support 'emailuser' and 'edit' correct
-		postAC = [
-			'edit', 'login', 'purge', 'rollback', 'delete', 'undelete', 'protect', 'parse',
-			'block', 'unblock', 'move', 'emailuser','import', 'userrights', 'upload',
-		]
-		if useAPI:
-			if params['action'] in postAC:
-				path = site.api_address()
-				cont = ''
-			else:
-				path = site.api_address() + site.urlEncode(params.items())
-		else:
-			path = site.query_address() + site.urlEncode(params.items())
-
-		# (according to 'GetData()' in 'query.py')
-		lastError = None
-		retry_idle_time = 5
-		while retryCount >= 0:
-			try:
-				jsontext = "Nothing received"
-				params = dict([ (val, str(params[val])) for val in params ])
-				(response, jsontext) = site.postForm(path, params)
-
-				# This will also work, but all unicode strings will need to be converted from \u notation
-				# decodedObj = eval( jsontext )
-				return simplejson.loads( jsontext )
-
-			except ValueError, error:
-				retryCount -= 1
-				wikipedia.output(u"Error downloading data: %s" % error)
-				wikipedia.output(u"Request %s:%s" % (site.lang, path))
-				wikipedia.debugDump('ApiGetDataParse', site, str(error) + '\n%s' % path, jsontext)
-				lastError = error
-				if retryCount >= 0:
-					wikipedia.output(u"Retrying in %i seconds..." % retry_idle_time)
-					time.sleep(retry_idle_time)
-					# Next time wait longer, but not longer than half an hour
-					retry_idle_time *= 2
-					if retry_idle_time > 300:
-						retry_idle_time = 300
-
-		raise lastError
-	else:
-		return query.GetData(params, site = site, useAPI = useAPI, retryCount = retryCount, encodeTitle = encodeTitle)
+import wikipedia
 
 
 # ====================================================================================================
