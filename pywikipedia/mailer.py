@@ -35,7 +35,7 @@ __version__='$Id: mailer.py 0.2.0001 2009-08-29 10:12:00Z drtrigon $'
 #
 
 
-import wikipedia, config
+import wikipedia, config, userlib
 import dtbext
 import re, sys, os, time
 import math
@@ -132,7 +132,6 @@ class MailerRobot:
 				url = "http://" + page.site().hostname() + page.site().nice_get_address(page.title(underscore = True))
 				mail_content = url + "\n\n" + mail_content
 
-				#if not dtbext.wikipedia.SendMail(item['Benutzer'], page.title().encode(config.textfile_encoding), mail_content.encode(config.textfile_encoding)):
 				success = True
 				#item['Benutzer'] = u"DrTrigon"
 				if item['Benutzer'] in self._user_longmail:
@@ -149,14 +148,15 @@ class MailerRobot:
 					j = 1
 					content_maxlen = self._content_maxlen - len(page.title()) - 6	# calc. max len -6 is for the numbers in subject: ' ##/##'
 					j_max = math.ceil(float(len(mail_content)) / content_maxlen)
+					usr = userlib.User(wikipedia.getSite(), item['Benutzer'])
+					#usr = userlib.User(wikipedia.getSite(), u"DrTrigon")
 					for i in range(0, len(mail_content), content_maxlen):
 						text = mail_content[i:(i+content_maxlen)]
 						title = page.title() + (u' %i/%i' % (j, j_max))
 						if not debug['sendmail']:
 							wikipedia.output(u'\03{lightred}=== ! DEBUG MODE NO MAILS SENT ! ===\03{default}')
 							continue
-						success = success and dtbext.wikipedia.SendMail(item['Benutzer'], title.encode(config.textfile_encoding), text)
-						#success = success and dtbext.wikipedia.SendMail(u"DrTrigon", title.encode(config.textfile_encoding), text)
+						success = success and usr.sendMail(subject=title.encode(config.textfile_encoding), text=text)
 						j += 1
 						wikipedia.output(u"\03{lightblue}*** Mail '%s' sent. \03{default}" % title)
 

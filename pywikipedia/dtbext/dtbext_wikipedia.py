@@ -757,50 +757,6 @@ def getParsedString(string, plaintext=False, site=wikipedia.getSite()):
 
 	return buf.strip()
 
-def SendMail(user, subject, text, CCme = False):
-	"""Bot sends a mail from wiki with API and return success.
-	   (NEW FUNCTION)
-
-	   user:    user to send the mail to
-	   subject: mail subject
-	   text:    mail text
-	   CCme:    send CC to bot's mail address
-	"""
-
-	# get token needed to send a mail
-	#http://de.wikipedia.org/w/api.php?action=query&prop=info&intoken=email&titles=User:DrTrigon
-	request = {
-	    'action'	: 'query',
-	    'prop'	: 'info',
-	    'intoken'	: 'email',
-	    'titles'	: 'User:%s' % user,
-	    }
-	wikipedia.get_throttle()
-	buf = dtbext_query.GetProcessedData(request,
-						'page',
-						'',
-						['emailtoken'],
-						pages = 'pages' )
-	emailtoken = buf[0][0]
-
-	# send mail by POST request
-	# (23:46:20) Merlissimo: ~ ist der "delevoper-Token". Schummelei, wenn du zu faul bist vorher den echten token abzufragen
-	request = {
-	    'action'	: 'emailuser',
-	    'target'	: user,
-	    'subject'	: subject,
-	    'text'	: text,
-	    'token'	: emailtoken,
-	    }
-	if CCme: request['ccme'] = '1'
-	buf = dtbext_query.GetProcessedData(request,
-						'emailuser',
-						'',
-						[],
-						post = True )
-
-	return (buf[u'result'] == u'Success')
-
 ######## Unicode library functions ########
 
 def html2notagunicode(text, keep_wikitags=False):

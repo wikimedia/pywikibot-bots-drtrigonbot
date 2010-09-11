@@ -108,7 +108,7 @@ __revision__='8072'
 #
 
 # wikipedia-bot imports
-import wikipedia, config, query, pagegenerators
+import wikipedia, config, query, pagegenerators, userlib
 import sys, os, re, time, codecs
 import clean_user_sandbox, sum_disc, mailer, subster, page_disc
 #import clean_user_sandbox, sum_disc, replace_tmpl
@@ -131,8 +131,8 @@ logname = conf['logger_path']
 #os.chdir("/home/drtrigon/pywikipedia")
 logger_tmsp = conf['logger_tmsp']
 
-error_mail_fromwiki	= True					# send error mail from wiki too!
-error_mail		= ('DrTrigon', 'Bot ERROR')	# error mail via wiki mail interface instead of CRON job
+error_mail_fromwiki	= True				# send error mail from wiki too!
+error_mail		= (u'DrTrigon', u'Bot ERROR')	# error mail via wiki mail interface instead of CRON job
 
 
 class Logger:
@@ -438,7 +438,8 @@ if __name__ == "__main__":
                 if error_mail_fromwiki:
                     wikipedia.output(u'ERROR:\n%s\n' % item)
                     wikipedia.output(u'Sending mail "%s" to "%s" as notification!' % (error_mail[1], error_mail[0]))
-                    if not dtbext.wikipedia.SendMail(error_mail[0], error_mail[1], item):
+                    usr = userlib.User(wikipedia.getSite(), error_mail[0])
+                    if not usr.sendMail(subject=error_mail[1], text=item):		# 'item' should be unicode!
                         wikipedia.output(u'!!! WARNING: mail could not be sent!')
 
                 # https://wiki.toolserver.org/view/Cronjob#Output use CRON for error and mail handling, if

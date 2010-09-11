@@ -2,9 +2,12 @@
 
 import time
 
+import test_utils
+
 #import wikipedia, wikipediaAPI
 import wikipedia, pagegenerators
 import dtbext
+import userlib
 
 
 #TESTPAGE = u'Benutzer:DrTrigonBot/ToDo-Liste'
@@ -198,9 +201,10 @@ def TEST_ReferringPageGenerator():
 	return
 
 def TEST_SendMail():
-	print "\nTest of 'wikipedia.SendMail()' for 'DrTrigon'..."
+	print "\nTest of 'userlib.sendMail()' for 'DrTrigon'..."
 
-	print dtbext.wikipedia.SendMail('DrTrigon', 'mail-subject', 'blabla', CCme = False)
+	usr = userlib.User(wikipedia.getSite(), u'DrTrigon')
+	print usr.sendMail(subject=u'mail-subject', text=u'blabla', ccMe = False)
 
 	return
 
@@ -211,13 +215,13 @@ def TEST_SendMail():
 
 # wikipedia.py
 #TEST_getVersionHistory()
-TEST_getSections()
+#TEST_getSections()
 #TEST_purgePageCache()
 #TEST_get()
 #TEST_getParsedContent()
 #print wikipedia.getSite().getUrl('/w/api.php?action=query&meta=userinfo&uiprop=blockinfo|hasmsg|groups|rights|options|preferencestoken|editcount|ratelimits|email&formal=xml')
 #TEST_GlobalWikiNotificationsGen()
-#TEST_SendMail()
+TEST_SendMail()
 
 
 #a_str = r'<strong class="error">Referenz-Fehler: Einzelnachweisfehler: <code>&lt;ref&gt;</code>-Tags existieren, jedoch wurde kein <code>&lt;references&#160;/&gt;</code>-Tag gefunden.</strong>'
