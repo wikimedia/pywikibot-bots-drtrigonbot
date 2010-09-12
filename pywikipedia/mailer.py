@@ -168,7 +168,7 @@ class MailerRobot:
 					else:
 						wikipedia.output(u'\03{lightred}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
 
-	def _readPage(self, page, full=False):
+	def _readPage(self, page):
 		'''
 		read wiki page
 
@@ -177,8 +177,7 @@ class MailerRobot:
 		'''
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 28)
 
-		if full:	(mode, info, plaintext) = ('full', ' using "getFull()" mode', True)
-		else:		(mode, info, plaintext) = ('default', '', False)
+		(mode, info, plaintext) = ('default', '', False)
 
 		#wikipedia.output(u'\03{lightblue}Reading Wiki at %s...\03{default}' % page.aslink())
 		wikipedia.output(u'\03{lightblue}Reading Wiki%s at %s...\03{default}' % (info, page.aslink()))

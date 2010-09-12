@@ -37,8 +37,9 @@ TESTPAGE = u'Benutzer:DrTrigon'
 #TESTPAGE = u'Wikipedia:WikiProjekt Begriffsklärungsseiten/Arbeitslisten/NeueVerlinkteBKS'
 #TESTPAGE = u'Wikipedia:WikiProjekt Marxismus/Kandidaturen und Reviews'
 #TESTPAGE = u'Wikipedia:WikiProjekt Schweiz/Wartung/Worklists'
+TESTPAGE = u'Wikipedia:Testseite'
 
-TESTPAGES = [u'Hilfe Diskussion:Weiterleitung', u'Benutzer Diskussion:BitH', u'Benutzer Diskussion:DrTrigonBot']
+TESTPAGES = [u'Hilfe Diskussion:Weiterleitung', u'Benutzer Diskussion:BitH', u'Benutzer Diskussion:DrTrigonBot', u'Benutzer Diskussion:DrTrigonBo']
 
 TESTPAGE = u'...'
 TESTPAGE = u'Wikipedia:Löschkandidaten/20. Juli 2009'
@@ -46,6 +47,7 @@ TESTPAGE = u'Benutzer Diskussion:Karsten11'
 TESTPAGE = u'Benutzer Diskussion:GregorHelms'
 TESTPAGE = u'Wikipedia:WikiProjekt Vorlagen/Werkstatt'
 #TESTPAGE = u'Benutzer_Diskussion:DrTrigonBot'
+TESTPAGE = u'Benutzer_Diskussion:DrTrigo'
 
 
 def TEST_getSections():
@@ -69,10 +71,8 @@ def TEST_getSections():
 	#(sections, test) = siteAPI.getSections(minLevel=1)
 	#(sections, test) = site.getSections(minLevel=1, getter=site.get)
 	#(sections, test) = site.getSections(minLevel=1, getter=site._getFullContent)
-	(sections, test) = site.getSections(minLevel=1, pagewikitext=buf)
+	sections = site.getSections(minLevel=1, pagewikitext=buf)
 	#(sections, test) = site.getSections()
-
-	print "'site.getSections()' self-test: %s" % test
 
 	#print "*"
 	#for item in sections:
@@ -156,20 +156,32 @@ def TEST_getVersionHistory():
 		print item, a[item], ('redirect' in a[item][0])
 
 def TEST_get():
-	print "\nTest of 'dtbext.wikipedia.Page.get()' on page '%s'..." % TESTPAGE
-
-	site = dtbext.wikipedia.Page(wikipedia.getSite(), TESTPAGE)
-	print site.get(mode='full')
-	#print site.get(mode='parse')
-
 	print "\nTest of 'dtbext.wikipedia.Pages.get()' on '%i' page(s)..." % len(TESTPAGES)
 
 	sites = dtbext.wikipedia.Pages(wikipedia.getSite(), TESTPAGES)
 	a = sites.get()
 	i = 0
-	for (page, content) in a:
-		print "\n==========\n", page
-		if not content: print "Page does not exist."
+#	for (page, content) in a:
+#		print "\n==========\n", page
+#		if not content: print "Page does not exist."
+#		i += 1
+	print "\n==========\n"
+	for page in a:
+		if hasattr(page, '_getexception'):
+			print page._getexception
+		else:
+			start = time.time()
+			u = page.get()
+			stop = time.time()
+			buffd = stop-start
+
+			start = time.time()
+			u = page.get(force=True)
+			stop = time.time()
+			unbuffd = stop-start
+
+			print "buffered:", buffd, "\t", "unbuffered:", unbuffd
+		print page, "\n==========\n"
 		i += 1
 	print i
 
@@ -178,7 +190,7 @@ def TEST_get():
 #TEST_getVersionHistory()
 #TEST_getSections()
 #TEST_purgeCache()
-#TEST_get()
+TEST_get()
 #TEST_getParsedContent()
 #print wikipedia.getSite().getUrl('/w/api.php?action=query&meta=userinfo&uiprop=blockinfo|hasmsg|groups|rights|options|preferencestoken|editcount|ratelimits|email&formal=xml')
 #TEST_GlobalWikiNotificationsGen()

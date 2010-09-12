@@ -156,7 +156,7 @@ class SubsterRobot:
 				else:
 					wikipedia.output(u'NOTHING TO DO!')
 
-	def _readPage(self, page, full=False):
+	def _readPage(self, page):
 		'''
 		read wiki page
 
@@ -165,8 +165,7 @@ class SubsterRobot:
 		'''
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 28)
 
-		if full:	(mode, info) = ('full', ' using "getFull()" mode')
-		else:		(mode, info) = ('default', '')
+		(mode, info) = ('default', '')
 
 		#wikipedia.output(u'\03{lightblue}Reading Wiki at %s...\03{default}' % page.aslink())
 		wikipedia.output(u'\03{lightblue}Reading Wiki%s at %s...\03{default}' % (info, page.aslink()))

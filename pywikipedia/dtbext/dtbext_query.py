@@ -49,7 +49,7 @@ import sys, time
 import simplejson, urllib
 
 # Application specific imports
-import wikipedia
+import wikipedia, query
 
 
 # ====================================================================================================
@@ -60,8 +60,8 @@ def GetProcessedData(params, parent, content, values, pages = None, post = False
 	# to be able to catch error messages
 	if values and ('missing' not in values): values.append( 'missing' )
 
-	#data = query.GetData(params, useAPI = True, encodeTitle = False)
-	data = GetData(params, useAPI = True, encodeTitle = False, post = post)
+	#data = GetData(params, useAPI = True, encodeTitle = False, post = post)
+	data = query.GetData(params, site = wikipedia.getSite(), encodeTitle = False)
 	#print data
 	try:
 		# We don't know the page's id, if any other better idea please change it

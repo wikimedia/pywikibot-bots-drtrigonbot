@@ -295,24 +295,6 @@ class SumDiscRobot:
 			# news.update BUT APPEND the heading data in the last tuple arg
 			# additionally provide backwards support and convert all formats to v5 (longer v3 / with dict)
 			for key in news_item.keys():
-				if type(news_item[key][4]) == type([]):
-					new_head = {}
-					for entry in news_item[key][4]:
-						if type(entry) == type(()):		# "CHKSUM (v2), v4
-							new_head[entry[0]] = entry[1:]
-							usage['CHKSUM (v2), v4'] = True
-						else:
-							#pass				# "CHKSUM v1": NO SUPPORT! (not needed anymore!)
-							usage['CHKSUM v1'] = True
-					news_item[key] = (news_item[key][0], news_item[key][1], news_item[key][2], news_item[key][3], new_head)
-				elif type(news_item[key][4]) == type({}):
-					for entry in news_item[key][4].keys():
-						if len(news_item[key][4][entry]) < 3:	# "CHKSUM v3
-							news_item[key][4][entry] = news_item[key][4][entry] + ( entry, )
-							usage['CHKSUM v3'] = True
-						else:
-							#pass				# "CHKSUM v5": (nothing to do)
-							usage['CHKSUM v5'] = True
 				if (len(news_item[key]) == 5):				# old history format
 					news_item[key] += (self._PS_unchanged,)
 					usage['old history'] = True

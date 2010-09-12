@@ -7,7 +7,7 @@ Library to work with users, their pages and talk pages.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: userlib.py 8451 2010-08-24 12:11:22Z xqt $'
+__version__ = '$Id: userlib.py 8527 2010-09-11 22:50:52Z xqt $'
 
 import re
 import wikipedia as pywikibot
@@ -217,7 +217,7 @@ class User(object):
         return False
 
     def sendMailOld(self, subject = u'', text = u'', ccMe = False):
-        addr = self.site().put_address('Special:EmailUser')
+        address = self.site().put_address('Special:EmailUser')
         predata = {
             "wpSubject" : subject,
             "wpText" : text,

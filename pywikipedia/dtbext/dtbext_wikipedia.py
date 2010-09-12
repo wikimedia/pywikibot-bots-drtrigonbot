@@ -51,9 +51,12 @@ from xml.sax.handler import feature_namespaces
 import httplib, urllib
 import re, sets
 from HTMLParser import HTMLParser
+#import difflib
+# Splitting the bot into library parts
+from pywikibot import *
 
 # Application specific imports
-import wikipedia, config, query
+import config, query
 import dtbext_query, dtbext_date
 
 
@@ -74,6 +77,8 @@ REGEX_wikiSection		= re.compile('^(=+)(.*?)(=+)(?=\s)', re.M)
 #  exists in pywikipedia-framework
 # ====================================================================================================
 
+# MODIFIED
+# REASON: (look below)
 class Page(wikipedia.Page):
 	"""Page: A MediaWiki page
 
@@ -82,21 +87,23 @@ class Page(wikipedia.Page):
 
 	_isRedirectPage = None
 
-	#def __init__(self, site, title, insite=None, defaultNamespace=0):
-	#	wikipedia.Page.__init__(self, site, title, insite, defaultNamespace)
-
-	# original uses 'wikipedia.page.get()' which is slower
+	# MODIFIED
+	# REASON: should be faster than original
 	def isRedirectPage(self):
 		"""Return True if this is a redirect, False if not or not existing.
-		   (MODIFIED FUNCTION)"""
+		   MODIFIED METHOD: should be faster than original
+		"""
 
 		if (self._isRedirectPage == None):
 			params = {
-				'action'	: 'query',
-				'titles'	: self.title(),
-				'prop'		: 'info',
-				'rvlimit'	: 1,
+				u'action'	: u'query',
+				u'titles'	: self.title(),
+				u'prop'		: u'info',
+				u'rvlimit'	: 1,
 			}
+
+			wikipedia.get_throttle()
+			wikipedia.output(u"Reading redirect info from %s." % self.aslink())
 
 			result = query.GetData(params, self.site())
 			r = result['query']['pages'].values()[0]
@@ -104,22 +111,23 @@ class Page(wikipedia.Page):
 			self._isRedirectPage  = (u'redirect' in r)
 		return self._isRedirectPage
 
-	# new
-	def getSections(self, minLevel=2, getter=None, pagewikitext=None, sectionsonly = False):
+	# ADDED (is older approach and works with older api; e.g. without 'byteoffset' but still needs api
+	#        or 'anchor'. for non-api: use '_getSectionsByteOffset' BUT how to get 'anchor'?)
+	# REASON: needed by various bots BUT has problems with complex page structures and constructs
+	def getSectionsOldApi(self, minLevel=2, getter=None, pagewikitext=None, sectionsonly = False):
 		"""Parses the page with API and return section information.
-		   (NEW FUNCTION)
+		   ADDED METHOD: needed by various bots BUT has problems with complex page structures and constructs
 
 		   ATTENTION: API DOES NOT WORK IF THERE ARE PARSE-ERRORS ON TH PAGE (e.g. <references />)
+		   ( http://de.wikipedia.org/w/index.php?title=Benutzer:DrTrigonBot&oldid=78708072#Funktionsweise )
 
 		   getter: because get() in API version and default dont give the same
-                           results (html comments are stripped or not ...) you can choose
-                           here which function to use. default is the API version.
-                   pagewikitext: if content is already known, you can use this shortcut!
-                   sectionsonly: return only the recived section headings (for compression e.g.)
+		            results (html comments are stripped or not ...) you can choose
+		            here which function to use. default is the API version.
+		   pagewikitext: if content is already known, you can use this shortcut!
+		   sectionsonly: return only the recived section headings (for compression e.g.)
 		"""
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 35.3)
-
-		# 'BYTEOFFSET' angekuendigt
 
 		if (getter == None): getter = self.get			# default
 		#if (getter == None): getter = self._getFullContent	# default
@@ -147,6 +155,7 @@ class Page(wikipedia.Page):
 		#			  ['toclevel', 'level', 'line'] )
 			wikipedia.get_throttle()
 			old_sections = sections
+			# look at revisions older than r18 for this code or replace with query.GetData()
 			sections = dtbext_query.GetProcessedData(item,
 								'sections',
 								's',
@@ -218,7 +227,8 @@ class Page(wikipedia.Page):
 		verify = (v1 and v2)
 		if not verify:
 			#raise wikipedia.SectionError('Was not able to get Sections of %s properly!' % self.aslink())
-			wikipedia.output(u'!!! WARNING [[%s]]: was not able to get Sections properly!' % self.title())
+			#wikipedia.output(u'!!! WARNING [[%s]]: was not able to get Sections properly!' % self.title())
+			raise Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.aslink())
 
 		# check min. level
 		data = []
@@ -226,19 +236,157 @@ class Page(wikipedia.Page):
 			if (item[1] < minLevel): continue
 			data.append( item )
 
-		return (data, verify)
+		return data
 
-	# new
-	#def purge_address(self, s):	# class Site
+	# ADDED: new (r18)
+	# REASON: needed by various bots
+	def getSections(self, minLevel=2, sectionsonly=False, getter=None, pagewikitext=None):
+		"""Parses the page with API and return section information.
+		   ADDED METHOD: needed by various bots
+
+		   sectionsonly: return only the recived section headings (for compression e.g.)
+#		   getter: because get() in API version and default dont give the same
+#		            results (html comments are stripped or not ...) you can choose
+#		            here which function to use. default is the API version.
+#		   pagewikitext: if content is already known, you can use this shortcut!
+
+		   Returns a list with entries: (byteoffset, level, wikiline, line, anchor)
+		   This list may be empty and if sections are embedded by template, the according
+		   byteoffset and wikiline entries are None.
+		"""
+# - check calling params
+
+		# Old exceptions and contents do not apply any more.
+		for attr in ['_getexception', '_sections']:
+			if hasattr(self, attr):
+				delattr(self,attr)
+
+		params = {
+			u'action'	: u'parse',
+			u'page'		: self.title(),
+			u'prop'		: u'sections',
+		}
+
+		wikipedia.get_throttle()
+		wikipedia.output(u"Reading section info from %s." % self.aslink())
+
+		result = query.GetData(params, self.site())
+		r = result[u'parse'][u'sections']
+		#print r
+
+		if not sectionsonly:
+			# assign sections with wiki text and section byteoffset
+			wikipedia.output(u"\tReading wiki page text from %s (if not already done)." % self.aslink())
+			self.get()
+			for i, item in enumerate(r):
+				l = int(item[u'level'])
+				if item[u'byteoffset']:
+					# section on this page (index in format u"%i")
+					item[u'wikiline'] = self._findSection(item)
+
+					if (len(item[u'wikiline']) == 0) and (len(item[u'line'].strip()) > 0):
+						self._getSectionByteOffset(item)		# raises 'Error' if not sucessfull !
+						item[u'byteoffset'] = item[u'wikiline_bo']
+						item[u'wikiline']   = self._findSection(item)
+				else:
+					# section ebemdded from template (index in format u"T-%i")
+					item[u'wikiline'] = None
+
+				item[u'level'] = l
+
+				r[i] = item
+
+		# check min. level
+		data = []
+		for item in r:
+			if (item[u'level'] < minLevel): continue
+			data.append( item )
+		r = data
+
+		# prepare resulting data
+		self._sections = [ (item[u'byteoffset'], item[u'level'], item.get(u'wikiline', None), item[u'line'], item[u'anchor']) for item in r ]
+
+		return self._sections
+
+	# ADDED: new (r18)
+	# REASON: needed by 'getSections'
+	def _getSectionByteOffset(self, section):
+        	"""determine the byteoffset of the given section (can be slow due another API call).
+		   ADDED METHOD: needed by 'getSections'
+		"""
+		wikitextlines = self._contents.splitlines()
+
+		# how the heading could look like
+		l = int(section[u'level'])
+		#header = u'%(spacer)s %(line)s %(spacer)s' % {'line': section[u'line'], 'spacer': u'=' * l}
+		headers = [ u'%(spacer)s %(line)s %(spacer)s' % {'line': section[u'line'], 'spacer': u'=' * l},
+			    u'<h%(level)i>%(line)s</h%(level)i>' % {'line': section[u'line'], 'level': l}, ]
+
+		# give possible match for heading
+		# http://stackoverflow.com/questions/2923420/fuzzy-string-matching-algorithm-in-python
+		# http://docs.python.org/library/difflib.html
+		# (http://mwh.geek.nz/2009/04/26/python-damerau-levenshtein-distance/)
+		possible_headers = []
+		for h in headers:
+			ph = difflib.get_close_matches(h, wikitextlines)
+			possible_headers += [ (p, h) for p in ph ]
+		#print header, possible_headers
+
+		if len(possible_headers) == 0:		# nothing found, try 'prop=revisions (rv)' or else report/raise error !
+			raise NotImplementedError('The call to API to get exact matching section heading is not implemented yet!')
+			# ?action=query&prop=revisions&titles=Benutzer_Diskussion:DrTrigon&rvprop=content&rvsection=1
+			# section[u'number'] for 'rvsection'
+			#params = {
+			#	u'action'	: u'query',
+			#	u'titles'	: self.title(),
+			#	u'prop'		: u'revisions',
+			#	u'rvprop'	: u'content',
+			#	u'rvsection'	: section[u'number'],
+			#}
+			#wikipedia.get_throttle()
+			#wikipedia.output(u"\tReading section %i from %s." % (section[u'number'], self.aslink()))
+			# if not successfull too, report error/problem
+			# raise Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.aslink())
+
+		# find the most probable match for heading
+		best_match = (0.0, None)
+		for (ph, header) in possible_headers:
+			#print u'\t', difflib.SequenceMatcher(None, header, ph).ratio(), ph
+			mr = difflib.SequenceMatcher(None, header, ph).ratio()
+			if mr > best_match[0]: best_match = (mr, ph)
+		#print u'\t', best_match
+
+		# prepare resulting data
+		section[u'wikiline']    = best_match[1]
+		section[u'wikiline_mq'] = best_match[0]					# match quality
+		section[u'wikiline_bo'] = self._contents.find(section[u'wikiline'])	# byteoffset
+
+	# ADDED: new (r18)
+	# REASON: needed by 'getSections'
+	def _findSection(self, section):
+        	"""find and extract section.
+		   ADDED METHOD: needed by 'getSections'
+		"""
+		bo  = section[u'byteoffset']
+		end = self._contents.find(u'\n', bo)
+		#l = int(section[u'level'])
+		#return self._contents[(bo+l):(end-l)].strip()
+		return self._contents[bo:end].strip()
+
+	# ADDED (non-api purge can be done with 'Page.purge_address()')
+	# REASON: needed by various bots
 	def purgeCache(self):
 		"""Purges the page cache with API.
-		   (NEW FUNCTION)
+		   ADDED METHOD: needed by various bots
 		"""
 
 		params = {
-			'action'	: 'purge',
-			'titles'	: self.title(),
+			u'action'	: u'purge',
+			u'titles'	: self.title(),
 		}
+
+		wikipedia.get_throttle()
+		wikipedia.output(u"Purging page cache for %s." % self.aslink())
 
 		result = query.GetData(params, self.site())
 		r = result['purge'][0]
@@ -250,83 +398,47 @@ class Page(wikipedia.Page):
 
 		return purged
 
-	# changed
-	#def get(self, force=False, get_redirect=False, throttle=True,
-	#	sysop=False, change_edit_time=True):
-	def get(self, force=False, get_redirect=False, throttle=True,
-		sysop=False, change_edit_time=True,
-		mode='default', plaintext=False):
-		"""
-		Same as in wikipedia.py but with some minor changes. Switches between all available
-		read modes. (default API read not yet implemented)
-		  - uses API with mode='full' and mode='parse'
-		  - these modes IGNORE all other options except of
-		  - plaintext: switch for choosing between HTML or plain text output
+# ADDED
+# REASON: ...
+	def getEnh(self, expandtemplates=True):
+		"""Return the wiki text of the page in various formats.
+		   ADDED METHOD: ...
+
+		   force   is ignored; the page is NOT cached
+		   ......
 		"""
 
-		if 	(mode == 'full'):	# getFull
-			return self._getFullContent(plaintext=plaintext)
-		elif	(mode == 'parse'):	# getParsed
-			buf = getParsedString('{{%s}}' % self.title(), plaintext=plaintext, site=self.site())
-			if re.search(('title="%(title)s \(Seite nicht vorhanden\)">%(title)s</a>'%{'title':self.title()}), buf):
-				raise wikipedia.NoPage(self.site(), self.aslink(forceInterwiki = True),"Page does not exist." )
-			return buf
-		else:				# default
-			return wikipedia.Page.get(self, force=force, get_redirect=get_redirect, throttle=throttle,
-							sysop=sysop, change_edit_time=change_edit_time)
-
-	# new
-	def _getFullContent(self, plaintext=False):
-		"""Return the full expanded wiki-text of the page.
-
-		Do not use this directly, use get() instead. Except as getter for getSections().
-		"""
-
-		#request = REQUEST_getWikiTextContent % ( urllib.quote(self.title().encode(config.textfile_encoding)) )
-		#request = {
-		#    'action'	: 'expandtemplates',
-		#    'text'	: '{{%s}}'%self.title(),
-		#    }
-		request = {
-		    'action'		: 'query',
-		    'prop'		: 'revisions',
-		    'titles'		: self.title(),
-		    'rvprop'		: 'content',
-		    'rvexpandtemplates'	: '',
+		params = {
+		    u'action'		: u'query',
+		    u'prop'		: u'revisions',
+		    u'titles'		: self.title(),
+		    u'rvprop'		: u'content',
 		    }
-		#buf = APIRequest( self.site(),
-		#		  request,
-		#		  'api',
-		#		  'expandtemplates',
-		#		  [] )
-		#buf = dtbext_query.GetProcessedData(request,
-		#					'api',
-		#					'expandtemplates',
-		#					[] )
+		if expandtemplates: params[u'rvexpandtemplates'] = u''
+
 		wikipedia.get_throttle()
-		buf = dtbext_query.GetProcessedData(request,
-							'revisions',
-							'rev',
-							['title', '*'],
-							pages = 'pages' )
-		#buf = buf[u'*']
-		buf = buf[0][1]
+		wikipedia.output(u"Purging page cache for %s." % self.aslink())
 
-		if buf == (u'[[:%s]]'%self.title()): raise wikipedia.NoPage(self.site(), self.aslink(forceInterwiki = True),"Page does not exist." )
+		result = query.GetData(params, self.site())
+		r = result[u'query'][u'pages'].values()[0]
 
-		# Patch/adjust wiki section syntax, to enabled full heading recognition
-		buf = wikisectionpatch(buf)
+		missing = (u'missing' in r)
 
-		if plaintext: buf = html2notagunicode(buf)
+		#contents = r[u'revisions'][0][u'*']
 
-		#return buf.strip()
-		return buf
+
+		# and a lot of more code, raise exceptions, ... look at wikipedia.get() and it's sub methods
+		# preferrably to be included into wikipedia.get(), request was placed on maillist...
+
+		raise NotImplementedError('This should be implemented into \'wikipedia.get()\' directly, request placed on maillist!!')
 
 
 # ====================================================================================================
 #  DOES NOT exist in pywikipedia-framework
 # ====================================================================================================
 
+# ADDED
+# REASON: faster and less traffic intense big pageset processing
 class Pages():
 	"""Pages: A set of MediaWiki pages
 	"""
@@ -486,15 +598,14 @@ class Pages():
 
 	#def getSections(self, minLevel=2, getter=None, pagewikitext=None, sectionsonly = False):
 
-	#def get(self, force=False, get_redirect=False, throttle=True,
-	#	sysop=False, change_edit_time=True):
+	# ADDED
+	# REASON: needed by various bots
 	def get(self, force=False, get_redirect=False, throttle=True,
 		sysop=False, change_edit_time=True,
 		mode='default'):
 		"""
 		...
 
-		  - uses API
 		  - 'force' is IGNORED
 		  - 'get_redirect' is IGNORED
 		  - 'sysop' is IGNORED
@@ -504,14 +615,16 @@ class Pages():
 		           instead of ALL pages, therefore it is IMPORTANT to use 'drop_dups()'
                            before to be in sync with outer/other lists!
 			   AND there is no NoPage-exception thrown on error instead content=None
+
+		RETURNS PAGE OBJECT THAT USES CACHED/BUFFERED CONTENT AND HAS NOT TO READ FROM API/NET AGAIN!!!
 		"""
 
 		if 	(mode == 'full'):	# getFull
-			request_default = { 'rvexpandtemplates': '' }
+			params_default = { 'rvexpandtemplates': '' }
 			# Patch/adjust wiki section syntax, to enabled full heading recognition
 			postprocessing = wikisectionpatch
 		else:				# default
-			request_default = {}
+			params_default = {}
 			postprocessing = lambda x: x	# (do nothing)
 
 		(pages, joined_bundle) = self._bundle_list(self._pages, joiner=None)
@@ -519,45 +632,76 @@ class Pages():
 		for i, entry in enumerate(joined_bundle):
 			self._requesting_data = True
 
+			params = dict(params_default)
+			params.update( {
+			    u'action'	: u'query',
+			    u'prop'	: u'revisions|info',
+			    u'titles'	: entry,
+			    u'rvprop'	: u'ids|timestamp|user|comment|content',
+			    } )
+
 			if throttle:
 				wikipedia.get_throttle()
+			wikipedia.output(u"Reading and caching a set of pages.")
 
-			#request = REQUEST_getContent_s % (urllib.quote(joined_bundle[i].encode(config.textfile_encoding)))
-			#request = {
-			request = dict(request_default)
-			request.update( {
-			    'action'	: 'query',
-			    'prop'	: 'revisions',
-			    'titles'	: entry,
-			    'rvprop'	: 'timestamp|user|comment|content',
-			    } )
-			#buf = APIRequest( self._site,
-			#			request,
-			#			'revisions',
-			#			'rev',
-			#			[], 
-			#			pages = 'page' )
-			buf = dtbext_query.GetProcessedData(request,
-								'revisions',
-								'rev',
-								['title', '*'],
-								#['title', '*', 'missing'],
-								pages = 'pages' )
+			result = query.GetData(params, self._site)
+			r = result[u'query'][u'pages'].values()
 
-			result = buf
 			buf = {}
-			for item in result:
-				#if ('missing' in item): raise wikipedia.NoPage(self._site, item[0], "Page does not exist." )
-				if ('missing' in item):
-					buf[item[0]] = None
-					wikipedia.output( u"WARNING: Page [[%s]] does not exist." % item[0] )
-				else:
-					# do postprocessing
-					buf[item[0]] = postprocessing(item[1])
-			for j, item in enumerate(bundle[i]):
-				#yield (Page(self._site, bundle[i][j]), buf[pages[i][j]])
-				yield (pages[i][j], buf[ pages[i][j].sectionFreeTitle() ])
-				self._requesting_data = False
+			for pageInfo in r:
+				# create page object
+				page = Page(self._site, pageInfo[u'title'], defaultNamespace=pageInfo[u'ns'])
+
+				# modify and fill it with actual state (as if 'get' was executed)
+				if 'missing' in pageInfo:
+					page._getexception = NoPage
+					#raise NoPage(page.site(), page.aslink(forceInterwiki = True),
+					#             "Page does not exist. In rare cases, if you are certain the page does exist, look into overriding family.RversionTab" )
+					wikipedia.output( str(NoPage(page.site(), page.aslink(forceInterwiki = True),
+							"Page does not exist. In rare cases, if you are certain the page does exist, look into overriding family.RversionTab" )) )
+					yield page
+					continue
+				elif 'invalid' in pageInfo:
+					raise BadTitle('BadTitle: %s' % page)
+
+				if 'revisions' in pageInfo: #valid Title
+					lastRev = pageInfo['revisions'][0]
+
+				page.editRestriction = ''
+				page.moveRestriction = ''
+
+				page._revisionId = lastRev['revid']
+
+				page._isWatched = False #cannot handle in API in my research for now.
+
+				pagetext = lastRev['*'].rstrip()
+
+				if 'redirect' in pageInfo:
+					if get_redirect:
+                				pass
+					else:
+						page._getexception = IsRedirectPage
+						#raise IsRedirectPage(redirtarget)
+						wikipedia.output( str(IsRedirectPage("Page is a redirect.")) )
+						yield page
+						continue
+
+				page._contents = pagetext	# manipulate page object to use cached/buffered content
+
+				yield page
+
+#				#if ('missing' in item): raise wikipedia.NoPage(self._site, item[0], "Page does not exist." )
+#				if ('missing' in item):
+#					buf[item[0]] = None
+#					wikipedia.output( u"WARNING: Page [[%s]] does not exist." % item[0] )
+#				else:
+#					# do postprocessing
+#					buf[item[0]] = postprocessing(item[1])
+#			for j, item in enumerate(bundle[i]):
+#				print "*", item
+#				#yield (Page(self._site, bundle[i][j]), buf[pages[i][j]])
+#				yield (pages[i][j], buf[ pages[i][j].sectionFreeTitle() ])
+#				self._requesting_data = False
 
 
 def PageFromPage(page):
@@ -594,7 +738,7 @@ def getParsedString(string, plaintext=False, site=wikipedia.getSite()):
 
 ######## Unicode library functions ########
 
-# try to replace with 'textlib.removeDisabledParts()' !!
+# try to replace with 'pywikibot.textlib.removeDisabledParts()' !!
 #
 def html2notagunicode(text, keep_wikitags=False):
 	"""Remove all HTML tags in text."""
