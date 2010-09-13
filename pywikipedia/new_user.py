@@ -100,13 +100,13 @@ class BasicBot:
             # Load the page
             text = page.get()
         except wikipedia.NoPage:
-            wikipedia.output(u"Page %s does not exist; skipping." % page.aslink())
+            wikipedia.output(u"Page %s does not exist; skipping." % page.title(asLink=True))
             return
         except wikipedia.IsRedirectPage:
-            wikipedia.output(u"Page %s is a redirect; skipping." % page.aslink())
+            wikipedia.output(u"Page %s is a redirect; skipping." % page.title(asLink=True))
             return
         except wikipedia.LockedPage:
-            wikipedia.output(u"Page %s is locked; skipping." % page.aslink())
+            wikipedia.output(u"Page %s is locked; skipping." % page.title(asLink=True))
             return
 
         ################################################################
@@ -182,12 +182,12 @@ class BasicBot:
 
 	page = wikipedia.Page(wikipedia.getSite(), logpage)
 
-        wikipedia.output(u'\03{lightblue}Writing log to Wiki on %s...\03{default}' % page.aslink())
+        wikipedia.output(u'\03{lightblue}Writing log to Wiki on %s...\03{default}' % page.title(asLink=True))
         try:
             #content = page.get() + u'\n\n'
             content = u''
             #if url in content:		# durch history schon gegeben! (achtung dann bei multithreading... wobei ist ja thread per user...)
-            #	wikipedia.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.aslink())
+            #	wikipedia.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.title(asLink=True))
             #	continue
         except (wikipedia.NoPage, wikipedia.IsRedirectPage):
             content = u''
@@ -201,7 +201,7 @@ class BasicBot:
         try:
             page.put(content)
         except wikipedia.SpamfilterError, error:
-            wikipedia.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.aslink(), "error.url"))
+            wikipedia.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.title(asLink=True), "error.url"))
 
 
 def main():

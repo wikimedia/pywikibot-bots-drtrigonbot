@@ -429,29 +429,29 @@ class ReplaceRobot:
             if self.isTitleExcepted(page.title()):
                 wikipedia.output(
                     u'Skipping %s because the title is on the exceptions list.'
-                    % page.aslink())
+                    % page.title(asLink=True))
                 continue
             try:
                 # Load the page's text from the wiki
                 original_text = page.get(get_redirect=True)
                 if not page.canBeEdited():
                     wikipedia.output(u"You can't edit page %s"
-                                     % page.aslink())
+                                     % page.title(asLink=True))
                     continue
             except wikipedia.NoPage:
-                wikipedia.output(u'Page %s not found' % page.aslink())
+                wikipedia.output(u'Page %s not found' % page.title(asLink=True))
                 continue
             new_text = original_text
             while True:
                 if self.isTextExcepted(new_text):
                     wikipedia.output(
     u'Skipping %s because it contains text that is on the exceptions list.'
-                        % page.aslink())
+                        % page.title(asLink=True))
                     break
                 new_text = self.doReplacements(new_text)
                 if new_text.strip().replace('\r\n', '\n') == original_text.strip().replace('\r\n', '\n'):
                     wikipedia.output('No changes were necessary in %s'
-                                     % page.aslink())
+                                     % page.title(asLink=True))
                     break
                 if self.recursive:
                     newest_text = self.doReplacements(new_text)
@@ -551,7 +551,7 @@ class ConfigRobot:
         self.ConfigPage = wikipedia.Page(wikipedia.getSite(), ConfigPageTitle)
 
         # read config page
-        wikipedia.output(u'\03{lightblue}Reading Wiki at %s...\03{default}' % self.ConfigPage.aslink())
+        wikipedia.output(u'\03{lightblue}Reading Wiki at %s...\03{default}' % self.ConfigPage.title(asLink=True))
         try:
             self._content = self.ConfigPage.get()
             #self._content = self.ConfigPage.getParsedContent()
@@ -642,7 +642,7 @@ class ConfigRobot:
         '''
         page = wikipedia.Page(wikipedia.getSite(), conf['sim_output'])
 
-        wikipedia.output(u'\03{lightblue}Appending to Wiki on %s...\03{default}' % page.aslink())
+        wikipedia.output(u'\03{lightblue}Appending to Wiki on %s...\03{default}' % page.title(asLink=True))
 
         wikipedia.setAction(summary)
 
@@ -659,7 +659,7 @@ class ConfigRobot:
             else:
                 wikipedia.output(u'\03{lightred}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
         except wikipedia.SpamfilterError, error:
-            wikipedia.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.aslink(), "error.url"))
+            wikipedia.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.title(asLink=True), "error.url"))
         return
 
     def putDoneMarker(self, pos):
@@ -678,7 +678,7 @@ class ConfigRobot:
 
         (most of the code from 'sum_disc.py' and 'putSimulationResult(...)')
         '''
-        wikipedia.output(u'\03{lightblue}Modifing Wiki on %s...\03{default}' % self.ConfigPage.aslink())
+        wikipedia.output(u'\03{lightblue}Modifing Wiki on %s...\03{default}' % self.ConfigPage.title(asLink=True))
 
         #wikipedia.setAction(u'DrTrigonBot: modified')
         wikipedia.setAction(conf['security'][1])
@@ -691,7 +691,7 @@ class ConfigRobot:
             else:
                 wikipedia.output(u'\03{lightred}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
         except wikipedia.SpamfilterError, error:
-            wikipedia.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (self.ConfigPage.aslink(), "error.url"))
+            wikipedia.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (self.ConfigPage.title(asLink=True), "error.url"))
         return
 
 class SimulateRun:

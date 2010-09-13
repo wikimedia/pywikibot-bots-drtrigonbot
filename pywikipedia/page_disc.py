@@ -195,7 +195,7 @@ class PageDiscRobot:
 			#self._datfilename = '%slogs/page_disc-%s-%s-%s.dat' % (conf['script_path'], 'wikipedia', 'de', page.title())
 			self._datfilename = '%slogs/page_disc-%s-%s-%s.dat' % (self._script_path, 'wikipedia', 'de', page.title())
 
-			wikipedia.output(u'\03{lightgreen}** Processing Page: %s\03{default}' % page.aslink())
+			wikipedia.output(u'\03{lightgreen}** Processing Page: %s\03{default}' % page.title(asLink=True))
 
 			self._work_list = {}
 			self._work_list[page] = True
@@ -344,13 +344,13 @@ class PageDiscRobot:
 		if full:	(mode, info) = ('full', ' using "getFull()" mode')
 		else:		(mode, info) = ('default', '')
 
-		#wikipedia.output(u'\03{lightblue}Reading Wiki at %s...\03{default}' % page.aslink())
-		wikipedia.output(u'\03{lightblue}Reading Wiki%s at %s...\03{default}' % (info, page.aslink()))
+		#wikipedia.output(u'\03{lightblue}Reading Wiki at %s...\03{default}' % page.title(asLink=True))
+		wikipedia.output(u'\03{lightblue}Reading Wiki%s at %s...\03{default}' % (info, page.title(asLink=True)))
 		try:
 			#content = page.get()
 			content = page.get(mode=mode)
 			#if url in content:		# durch history schon gegeben! (achtung dann bei multithreading... wobei ist ja thread per user...)
-			#	wikipedia.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.aslink())
+			#	wikipedia.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.title(asLink=True))
 			#	continue
 		except (wikipedia.NoPage, wikipedia.IsRedirectPage):
 			content = u''
@@ -367,7 +367,7 @@ class PageDiscRobot:
 		returns:  (appends data to page on the wiki, nothing else)
 		'''
 
-		wikipedia.output(u'\03{lightblue}Appending to Wiki section %i on %s...\03{default}' % (section, page.aslink()))
+		wikipedia.output(u'\03{lightblue}Appending to Wiki section %i on %s...\03{default}' % (section, page.title(asLink=True)))
 
 		try:
 			# get token needed to send a mail
@@ -414,7 +414,7 @@ class PageDiscRobot:
 								[],
 								post = True )
 		except wikipedia.SpamfilterError, error:
-			wikipedia.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.aslink(), "error.url"))
+			wikipedia.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.title(asLink=True), "error.url"))
 
 		return (buf[u'result'] == u'Success')
 
@@ -510,12 +510,12 @@ class PageDiscRobot:
 		(sections, verify) = site.getSections(minLevel=1, pagewikitext=buf)
 		if not verify:
 			#wikipedia.output(u'!!! WARNING: Have to use "getFull"...')
-			wikipedia.output(u"\03{lightblue}Re-Reading Wiki page (mode='full') at %s...\03{default}" % site.aslink())
+			wikipedia.output(u"\03{lightblue}Re-Reading Wiki page (mode='full') at %s...\03{default}" % site.title(asLink=True))
 			buf = site.get(mode='full')
 			#buf = self._readPage( site, full=True )
 			(sections, verify) = site.getSections(minLevel=1, pagewikitext=buf)
 			if not verify:
-				wikipedia.output(u"\03{lightblue}Re-Reading Wiki page (mode='parse') at %s...\03{default}" % site.aslink())
+				wikipedia.output(u"\03{lightblue}Re-Reading Wiki page (mode='parse') at %s...\03{default}" % site.title(asLink=True))
 				parse_buf = site.get(mode='parse')
 				if self._reftag_err_regex.search(parse_buf):
 					#self._oth_list[site.title()] = (	u'was not able to get Sections properly, because of missing <references /> tag!', 
@@ -647,10 +647,10 @@ class PageDiscRobot:
 					if not item[2]: continue		# is this heading relevant?
 					#renderitem = dtbext.wikipedia.getParsedString(item[3], plaintext=True)	# replaces '_renderWiki()'
 					# try without 'plaintext', gives full html result but we want wikitext which is only some
-					# parts of the html tags striped, thus use 'html2notagunicode' with 'keep_wikitags' (NOT USED IN 'sum_disc.py'... WHY?!???)
-					renderitem = dtbext.wikipedia.html2notagunicode(dtbext.wikipedia.getParsedString(item[3], plaintext=False), keep_wikitags=True).strip()
+					# parts of the html tags striped, thus use 'removeHTMLParts' with 'keep_wikitags' (NOT USED IN 'sum_disc.py'... WHY?!???)
+					renderitem = dtbext.pywikibot.removeHTMLParts(dtbext.wikipedia.getParsedString(item[3], plaintext=False)).strip()
 					subitem = item[0]
-					subitem = dtbext.wikipedia.html2notagunicode(subitem)	# remove any remainig html tags (NOT USED IN 'sum_disc.py'... WHY ARE THERE NO REMAINING TAGS?!???)
+					subitem = dtbext.pywikibot.removeHTMLParts(subitem, tags = [])	# remove any remainig html tags (NOT USED IN 'sum_disc.py'... WHY ARE THERE NO REMAINING TAGS?!???)
 					subitem = self._bracketopen_regex.sub(u'.5B', subitem)	# urllib.quote(...) sets '%' instead of '.'
 					subitem = self._bracketclose_regex.sub(u'.5D', subitem)	#
 					if not (item[0] == ""):

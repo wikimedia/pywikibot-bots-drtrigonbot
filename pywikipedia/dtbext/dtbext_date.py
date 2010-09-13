@@ -27,7 +27,7 @@ This is a part of pywikipedia framework, it is a deviation of date.py.
 #  B: bigger relases with tidy code and nice comments
 #  A: really big release with multi lang. and toolserver support, ready
 #     to use in pywikipedia framework, should also be contributed to it
-__version__='$Id: dtbext/date.py 0.2.0000 2009-08-26 15:54:00Z drtrigon $'
+__version__='$Id: dtbext/date.py 0.2.0019 2009-11-13 23:42 drtrigon $'
 #
 
 # Standard library imports
@@ -37,11 +37,9 @@ import time
 import config, pywikibot
 
 
-# ====================================================================================================
-#  DOES NOT exist in pywikipedia-framework
-# ====================================================================================================
-
-def getTimeStmp(full = False, humanreadable = False, local = False):
+# ADDED
+# REASON: need for some standard timestamp formats
+def getTimeStmpNow(full = False, humanreadable = False, local = False):
 	"""Produce different timestamp formats."""
 
 	format = "%Y%m%d"
@@ -58,13 +56,14 @@ def getTimeStmp(full = False, humanreadable = False, local = False):
 	# according to/taken from 'runbotrun.py'
 	return time.strftime(format, getter())		
 
-######## Unicode library functions ########
-
-# thanks to: http://docs.python.org/library/time.html
-# http://www.mediawiki.org/wiki/API:Data_formats
-# http://www.w3.org/TR/NOTE-datetime
-# http://pytz.sourceforge.net/
-def GetTime(timestamp):
+# ADDED
+# REASON: need to convert wiki timestamp format to python
+def getTime(timestamp):
+	"""Convert wiki timestamp to python."""
+	# thanks to: http://docs.python.org/library/time.html
+	# http://www.mediawiki.org/wiki/API:Data_formats
+	# http://www.w3.org/TR/NOTE-datetime
+	# http://pytz.sourceforge.net/
 	# use only UTC for internal timestamps
 	# could also be used as given by the API, but is converted here for compatibility
 	return pywikibot.Timestamp.fromISOformat(timestamp).strftime('%H:%M, %d. %b. %Y')

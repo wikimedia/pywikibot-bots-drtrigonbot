@@ -4,7 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: interwiki_graph.py 8097 2010-04-16 05:54:38Z xqt $'
+__version__ = '$Id: interwiki_graph.py 8542 2010-09-13 04:24:41Z xqt $'
 import threading
 pydotfound = True
 try:
@@ -96,7 +96,7 @@ class GraphDrawer:
             elif self.graph.get_edge(sourceLabel, targetLabel):
                 pywikibot.output(
                     u'BUG: Tried to create duplicate edge from %s to %s'
-                    % (refPage.aslink(), page.aslink()))
+                    % (refPage.title(asLink=True), page.title(asLink=True)))
                 # duplicate edges would be bad because then get_edge() would
                 # give a list of edges, not a single edge when we handle the
                 # opposite edge.

@@ -6,19 +6,6 @@ the page class from there.
 ...
 """
 
-# dbtext/wikipedia.py - USAGE:
-#	import dbtext
-#	...
-#	page2 = dbtext.wikipedia.PageFromPage(page1)
-#	print page1.getVersionHistory()[0]	# original
-#	print page2.getVersionHistory()[0]	# my API version
-#	...
-#	print dbtext.wikipedia.ContributionsGen(user)
-#	for i in dbtext.wikipedia.SimplePageGenerator(user, dbtext.wikipedia.ContributionsGen): print i
-#
-# !! 2 NEUE FUNKTIONEN NOCH DOKUMENTIEREN... !!!
-# ?? noch mehr mittlerweile!!
-
 # ====================================================================================================
 #
 # ToDo-Liste (Bugs, Features, usw.):
@@ -41,25 +28,22 @@ the page class from there.
 #  B: bigger relases with tidy code and nice comments
 #  A: really big release with multi lang. and toolserver support, ready
 #     to use in pywikipedia framework, should also be contributed to it
-__version__='$Id: dtbext/wikipedia.py 0.2.0000 2009-06-21 16:42:00Z drtrigon $'
+__version__='$Id: dtbext/wikipedia.py 0.2.0019 2009-11-13 00:07 drtrigon $'
 #
 
 # Standard library imports
-import urllib, StringIO
-from xml.sax import saxutils, make_parser
-from xml.sax.handler import feature_namespaces
-import httplib, urllib
+import StringIO
 import re, sets
-from HTMLParser import HTMLParser
-#import difflib
+import difflib
 # Splitting the bot into library parts
 from pywikibot import *
 
 # Application specific imports
 import config, query
-import dtbext_query, dtbext_date
+import dtbext_date, dtbext_pywikibot
 
 
+# needed by 'getSectionsOldApi'
 REGEX_hTagOpen			= re.compile('<h(\d).*?>')
 REGEX_hTagClose			= re.compile('</h(\d).*?>')
 REGEX_nowikiTag			= re.compile('<nowiki>(.*?)</nowiki>', re.S | re.I)
@@ -73,9 +57,23 @@ REGEX_eqChar			= re.compile('=')
 REGEX_wikiSection		= re.compile('^(=+)(.*?)(=+)(?=\s)', re.M)
 
 
-# ====================================================================================================
-#  exists in pywikipedia-framework
-# ====================================================================================================
+# ADDED: new (r19)
+# REASON: needed to convert wikipedia.Page, Site ... objects to dtbext.wikipedia.Page, Site, ... objects
+def addAttributes(obj):
+	"""Add methods to various classes to convert them to the dtbext modified version."""
+	# http://mousebender.wordpress.com/2007/02/17/copying-methods-in-python/
+	# http://code.activestate.com/recipes/52192-add-a-method-to-a-class-instance-at-runtime/
+	if "class 'wikipedia.Page'" in str(type(obj)):
+		# this cannot be looped because of lambda's scope (which is important for page)
+		# look also at http://www.weask.us/entry/scope-python-lambda-functions-parameters
+		obj.__dict__['isRedirectPage']		= lambda *args, **kwds: Page.__dict__['isRedirectPage'](obj, *args, **kwds)
+		obj.__dict__['getSections']		= lambda *args, **kwds: Page.__dict__['getSections'](obj, *args, **kwds)
+		obj.__dict__['_getSectionByteOffset']	= lambda *args, **kwds: Page.__dict__['_getSectionByteOffset'](obj, *args, **kwds)
+		obj.__dict__['_findSection']		= lambda *args, **kwds: Page.__dict__['_findSection'](obj, *args, **kwds)
+		obj.__dict__['purgeCache']		= lambda *args, **kwds: Page.__dict__['purgeCache'](obj, *args, **kwds)
+	elif "class 'wikipedia.Site'" in str(type(obj)):
+		obj.__dict__['getParsedString']		= lambda *args, **kwds: Site.__dict__['getParsedString'](obj, *args, **kwds)
+
 
 # MODIFIED
 # REASON: (look below)
@@ -85,8 +83,6 @@ class Page(wikipedia.Page):
 	   look at wikipedia.py for more information!
 	"""
 
-	_isRedirectPage = None
-
 	# MODIFIED
 	# REASON: should be faster than original
 	def isRedirectPage(self):
@@ -94,22 +90,33 @@ class Page(wikipedia.Page):
 		   MODIFIED METHOD: should be faster than original
 		"""
 
-		if (self._isRedirectPage == None):
-			params = {
-				u'action'	: u'query',
-				u'titles'	: self.title(),
-				u'prop'		: u'info',
-				u'rvlimit'	: 1,
-			}
+		# was there already a call? already some info available?
+		if hasattr(self, '_getexception') and (self._getexception == wikipedia.IsRedirectPage):
+			return True
 
-			wikipedia.get_throttle()
-			wikipedia.output(u"Reading redirect info from %s." % self.aslink())
+		if hasattr(self, '_redir'):	# prevent multiple execute of code below,
+			return self._redir	#  if page is NOT a redirect!
 
-			result = query.GetData(params, self.site())
-			r = result['query']['pages'].values()[0]
+		# call the wiki to get info
+		params = {
+			u'action'	: u'query',
+			u'titles'	: self.title(),
+			u'prop'		: u'info',
+			u'rvlimit'	: 1,
+		}
 
-			self._isRedirectPage  = (u'redirect' in r)
-		return self._isRedirectPage
+		wikipedia.get_throttle()
+		wikipedia.output(u"Reading redirect info from %s." % self.title(asLink=True))
+
+		result = query.GetData(params, self.site())
+		r = result[u'query'][u'pages'].values()[0]
+
+		# store and return info
+		self._redir = (u'redirect' in r)
+		if self._redir:
+			self._getexception == wikipedia.IsRedirectPage
+
+		return self._redir
 
 	# ADDED (is older approach and works with older api; e.g. without 'byteoffset' but still needs api
 	#        or 'anchor'. for non-api: use '_getSectionsByteOffset' BUT how to get 'anchor'?)
@@ -223,12 +230,12 @@ class Page(wikipedia.Page):
 					break
 
 		v1 = (len(info) == len(sections))
-		v2 = not REGEX_wikiSection.search( wikisectionpatch(u'\n'.join(wikitext[first:])) )
+		v2 = not REGEX_wikiSection.search( self._wikisectionpatch(u'\n'.join(wikitext[first:])) )
 		verify = (v1 and v2)
 		if not verify:
-			#raise wikipedia.SectionError('Was not able to get Sections of %s properly!' % self.aslink())
+			#raise wikipedia.SectionError('Was not able to get Sections of %s properly!' % self.title(asLink=True))
 			#wikipedia.output(u'!!! WARNING [[%s]]: was not able to get Sections properly!' % self.title())
-			raise Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.aslink())
+			raise Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.title(asLink=True))
 
 		# check min. level
 		data = []
@@ -238,13 +245,61 @@ class Page(wikipedia.Page):
 
 		return data
 
+	# ADDED
+	# REASON: needed by 'getSectionsOldApi'
+	def _wikisectionpatch(self, text):
+		"""Patch/adjust wiki section syntax, to allow full heading recognition."""
+
+		buf = text
+
+		# convert <h?> und </h?> in wiki heading syntax (to be VERY SURE!)
+		# (this are <h> tags inserted by users writing the wiki! not the parser or something like this...)
+		# (help 'getSections()' to detect the headings correct)
+		pre  = lambda m: '\n' + '='*int(m.groups()[0])
+		post = lambda m: '='*int(m.groups()[0]) + '\n'
+		buf = REGEX_hTagOpen.sub(pre, buf)
+		buf = REGEX_hTagClose.sub(post, buf)
+
+		# convert headings in <nowiki>, ... tags by replaceing all
+		# '=' to '&#61;' which is not recognized by the wiki parser
+		# as heading (and so are '=' in <nowiki>-tags) but displayed
+		# correct in the browser 
+		# (help 'getSections()' to detect the headings correct)
+		tag  = lambda m: REGEX_eqChar.sub('&#61;', m.groups()[0])
+		buf = REGEX_nowikiTag.sub(tag, buf)
+		# same for <pre>-tags
+		buf = REGEX_preTag.sub(tag, buf)
+		# same for <source>-tags
+		buf = REGEX_sourceTag.sub(tag, buf)
+
+		# same for <noinclude>-tags
+		buf = REGEX_noincludeTag.sub(tag, buf)
+		# from pages with <onlyinclude>...</onlyinclude> NO SECTION DATA can be retrieved,
+		# since they have no text to expand, except that within the tag
+		buf_list = REGEX_onlyincludeTag.split(buf)
+		if (len(buf_list) > 1):
+			for i in range(0, len(buf_list), 4):
+				buf_list[i] = REGEX_eqChar.sub('&#61;', buf_list[i])
+			buf = u''.join(buf_list)
+		# probably <noinclude> and <onlyinclude> should be handled in a way, that the page
+		# text is rendered in the same way like the page itself is, NOT the page when used 
+		# as template (means use page.get, remove <noinclude>-tags, remove <onlyinclude>-tags
+		# and their contents, then pass the page text to 'action=parse&text=__TOC__%s&prop=sections'
+		# and at last use the patches here)
+
+		return buf
+
 	# ADDED: new (r18)
 	# REASON: needed by various bots
 	def getSections(self, minLevel=2, sectionsonly=False, getter=None, pagewikitext=None):
 		"""Parses the page with API and return section information.
 		   ADDED METHOD: needed by various bots
 
-		   sectionsonly: return only the recived section headings (for compression e.g.)
+		   @param minLevel: The minimal level of heading for section to be reported.
+		   @type  minLevel: int
+		   @param sectionsonly: Report only the result from API call, do not assign
+                                        the headings to wiki text (for compression e.g.).
+		   @type  sectionsonly: bool
 #		   getter: because get() in API version and default dont give the same
 #		            results (html comments are stripped or not ...) you can choose
 #		            here which function to use. default is the API version.
@@ -256,11 +311,16 @@ class Page(wikipedia.Page):
 		"""
 # - check calling params
 
+		# was there already a call? already some info available?
+		if hasattr(self, '_sections'):
+			return self._sections
+
 		# Old exceptions and contents do not apply any more.
-		for attr in ['_getexception', '_sections']:
+		for attr in ['_sections']:
 			if hasattr(self, attr):
 				delattr(self,attr)
 
+		# call the wiki to get info
 		params = {
 			u'action'	: u'parse',
 			u'page'		: self.title(),
@@ -268,7 +328,7 @@ class Page(wikipedia.Page):
 		}
 
 		wikipedia.get_throttle()
-		wikipedia.output(u"Reading section info from %s." % self.aslink())
+		wikipedia.output(u"Reading section info from %s." % self.title(asLink=True))
 
 		result = query.GetData(params, self.site())
 		r = result[u'parse'][u'sections']
@@ -276,7 +336,7 @@ class Page(wikipedia.Page):
 
 		if not sectionsonly:
 			# assign sections with wiki text and section byteoffset
-			wikipedia.output(u"\tReading wiki page text from %s (if not already done)." % self.aslink())
+			wikipedia.output(u"\tReading wiki page text from %s (if not already done)." % self.title(asLink=True))
 			self.get()
 			for i, item in enumerate(r):
 				l = int(item[u'level'])
@@ -344,9 +404,11 @@ class Page(wikipedia.Page):
 			#	u'rvsection'	: section[u'number'],
 			#}
 			#wikipedia.get_throttle()
-			#wikipedia.output(u"\tReading section %i from %s." % (section[u'number'], self.aslink()))
+			#wikipedia.output(u"\tReading section %i from %s." % (section[u'number'], self.title(asLink=True)))
 			# if not successfull too, report error/problem
-			# raise Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.aslink())
+			#page._getexception = ...
+			#raise Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.title(asLink=True))
+			#wikipedia.output(...)
 
 		# find the most probable match for heading
 		best_match = (0.0, None)
@@ -380,26 +442,32 @@ class Page(wikipedia.Page):
 		   ADDED METHOD: needed by various bots
 		"""
 
+		# Make sure we re-raise an exception we got on an earlier attempt
+		if hasattr(self, '_getexception'):
+			return self._getexception
+
+		# call the wiki to execute the request
 		params = {
 			u'action'	: u'purge',
 			u'titles'	: self.title(),
 		}
 
 		wikipedia.get_throttle()
-		wikipedia.output(u"Purging page cache for %s." % self.aslink())
+		wikipedia.output(u"Purging page cache for %s." % self.title(asLink=True))
 
 		result = query.GetData(params, self.site())
-		r = result['purge'][0]
+		r = result[u'purge'][0]
 
-		purged  = (u'purged' in r)
-		missing = (u'missing' in r)
+		# store and return info
+		if (u'missing' in r):
+		        self._getexception = wikipedia.NoPage
+		        raise wikipedia.NoPage(self.site(), self.title(asLink=True),"Page does not exist. Was not able to purge cache!" )
 
-		if missing: raise wikipedia.NoPage('Was not able to purge cache of %s because it is missing!' % self.aslink())
-
-		return purged
+		return (u'purged' in r)
 
 # ADDED
 # REASON: ...
+#         (this here is just a patch, should be done in framework)
 	def getEnh(self, expandtemplates=True):
 		"""Return the wiki text of the page in various formats.
 		   ADDED METHOD: ...
@@ -407,6 +475,9 @@ class Page(wikipedia.Page):
 		   force   is ignored; the page is NOT cached
 		   ......
 		"""
+
+		raise NotImplementedError('This should be implemented into \'wikipedia.get()\' directly, request placed on maillist!!')
+		# -> JIRA ticket
 
 		params = {
 		    u'action'		: u'query',
@@ -417,7 +488,7 @@ class Page(wikipedia.Page):
 		if expandtemplates: params[u'rvexpandtemplates'] = u''
 
 		wikipedia.get_throttle()
-		wikipedia.output(u"Purging page cache for %s." % self.aslink())
+		wikipedia.output(u"Purging page cache for %s." % self.title(asLink=True))
 
 		result = query.GetData(params, self.site())
 		r = result[u'query'][u'pages'].values()[0]
@@ -426,19 +497,55 @@ class Page(wikipedia.Page):
 
 		#contents = r[u'revisions'][0][u'*']
 
-
 		# and a lot of more code, raise exceptions, ... look at wikipedia.get() and it's sub methods
 		# preferrably to be included into wikipedia.get(), request was placed on maillist...
 
-		raise NotImplementedError('This should be implemented into \'wikipedia.get()\' directly, request placed on maillist!!')
 
+# ADDED: new (r19)
+# REASON: needed by various bots
+class Site(object):
+	"""A MediaWiki site.
 
-# ====================================================================================================
-#  DOES NOT exist in pywikipedia-framework
-# ====================================================================================================
+	   look at wikipedia.py for more information!
+	"""
+
+	# ADDED
+	# REASON: needed by various bots
+	def getParsedString(self, string, keeptags = [u'*']):
+		"""Parses the string with API and return html content.
+		   ADDED METHOD: needed by various bots
+
+		   @param string: String that should be parsed.
+		   @type  string: string
+		   @param keeptags: Defines which tags (wiki, HTML) should be NOT removed.
+		   @type  keeptags: list
+
+		   Returns the string given, parsed through the wiki parser.
+		"""
+
+		# call the wiki to get info
+		params = {
+			u'action'	: u'parse',
+			u'text'		: string,
+		}
+
+		wikipedia.get_throttle()
+		wikipedia.output(u"Parsing string through the wiki parser.")
+
+		result = query.GetData(params, self)
+		r = result[u'parse'][u'text'][u'*']
+
+		r = pywikibot.removeDisabledParts(r, tags = ['comments']).strip()		# disable/remove comments
+
+		if not (keeptags == [u'*']):							# disable/remove ALL tags
+			r = dtbext_pywikibot.removeHTMLParts(r, keeptags = keeptags).strip()	#
+
+		return r
+
 
 # ADDED
 # REASON: faster and less traffic intense big pageset processing
+#         (this here is just a patch, should be done in framework)
 class Pages():
 	"""Pages: A set of MediaWiki pages
 	"""
@@ -448,12 +555,13 @@ class Pages():
 
 	_requesting_data = False
 
-	_isRedirectPage = None
-
 	def __init__(self, site, titles, insite=None, defaultNamespace=0):
 		"""
 		...
 		"""
+
+		raise NotImplementedError('Use PreloadingGenerator for get and the same for getVersionHistory is requested on maillist!!')
+		# -> JIRA ticket
 
 		self._site, self._insite, self._defaultNamespace = site, insite, defaultNamespace
 		self._titles = titles
@@ -589,281 +697,4 @@ class Pages():
 		# validity check, append omitted pages (because the list should be complete)
 		return self._append_missing_pages(result, self._titles, set_item=None)		# 'None' like 'missing' page
 
-	#def isRedirectPage(self):
-	def isRedirectPage(self, title):
-		"""Return True if this is a redirect, False if not or not existing."""
-		if (self._isRedirectPage == None):
-			self.getVersionHistory()
-		return (title in self._isRedirectPage)
-
-	#def getSections(self, minLevel=2, getter=None, pagewikitext=None, sectionsonly = False):
-
-	# ADDED
-	# REASON: needed by various bots
-	def get(self, force=False, get_redirect=False, throttle=True,
-		sysop=False, change_edit_time=True,
-		mode='default'):
-		"""
-		...
-
-		  - 'force' is IGNORED
-		  - 'get_redirect' is IGNORED
-		  - 'sysop' is IGNORED
-		  - 'change_edit_time' is IGNORED
-
-		GENERATOR: this way only a packet of len self._min_request is held in memory
-		           instead of ALL pages, therefore it is IMPORTANT to use 'drop_dups()'
-                           before to be in sync with outer/other lists!
-			   AND there is no NoPage-exception thrown on error instead content=None
-
-		RETURNS PAGE OBJECT THAT USES CACHED/BUFFERED CONTENT AND HAS NOT TO READ FROM API/NET AGAIN!!!
-		"""
-
-		if 	(mode == 'full'):	# getFull
-			params_default = { 'rvexpandtemplates': '' }
-			# Patch/adjust wiki section syntax, to enabled full heading recognition
-			postprocessing = wikisectionpatch
-		else:				# default
-			params_default = {}
-			postprocessing = lambda x: x	# (do nothing)
-
-		(pages, joined_bundle) = self._bundle_list(self._pages, joiner=None)
-		(bundle, joined_bundle) = self._bundle_list(self._titles, size=self._min_request)
-		for i, entry in enumerate(joined_bundle):
-			self._requesting_data = True
-
-			params = dict(params_default)
-			params.update( {
-			    u'action'	: u'query',
-			    u'prop'	: u'revisions|info',
-			    u'titles'	: entry,
-			    u'rvprop'	: u'ids|timestamp|user|comment|content',
-			    } )
-
-			if throttle:
-				wikipedia.get_throttle()
-			wikipedia.output(u"Reading and caching a set of pages.")
-
-			result = query.GetData(params, self._site)
-			r = result[u'query'][u'pages'].values()
-
-			buf = {}
-			for pageInfo in r:
-				# create page object
-				page = Page(self._site, pageInfo[u'title'], defaultNamespace=pageInfo[u'ns'])
-
-				# modify and fill it with actual state (as if 'get' was executed)
-				if 'missing' in pageInfo:
-					page._getexception = NoPage
-					#raise NoPage(page.site(), page.aslink(forceInterwiki = True),
-					#             "Page does not exist. In rare cases, if you are certain the page does exist, look into overriding family.RversionTab" )
-					wikipedia.output( str(NoPage(page.site(), page.aslink(forceInterwiki = True),
-							"Page does not exist. In rare cases, if you are certain the page does exist, look into overriding family.RversionTab" )) )
-					yield page
-					continue
-				elif 'invalid' in pageInfo:
-					raise BadTitle('BadTitle: %s' % page)
-
-				if 'revisions' in pageInfo: #valid Title
-					lastRev = pageInfo['revisions'][0]
-
-				page.editRestriction = ''
-				page.moveRestriction = ''
-
-				page._revisionId = lastRev['revid']
-
-				page._isWatched = False #cannot handle in API in my research for now.
-
-				pagetext = lastRev['*'].rstrip()
-
-				if 'redirect' in pageInfo:
-					if get_redirect:
-                				pass
-					else:
-						page._getexception = IsRedirectPage
-						#raise IsRedirectPage(redirtarget)
-						wikipedia.output( str(IsRedirectPage("Page is a redirect.")) )
-						yield page
-						continue
-
-				page._contents = pagetext	# manipulate page object to use cached/buffered content
-
-				yield page
-
-#				#if ('missing' in item): raise wikipedia.NoPage(self._site, item[0], "Page does not exist." )
-#				if ('missing' in item):
-#					buf[item[0]] = None
-#					wikipedia.output( u"WARNING: Page [[%s]] does not exist." % item[0] )
-#				else:
-#					# do postprocessing
-#					buf[item[0]] = postprocessing(item[1])
-#			for j, item in enumerate(bundle[i]):
-#				print "*", item
-#				#yield (Page(self._site, bundle[i][j]), buf[pages[i][j]])
-#				yield (pages[i][j], buf[ pages[i][j].sectionFreeTitle() ])
-#				self._requesting_data = False
-
-
-def PageFromPage(page):
-	return Page(page._site, page.title(), defaultNamespace=page._namespace)
-
-def getParsedString(string, plaintext=False, site=wikipedia.getSite()):
-	"""Parses the string with API and return html content.
-	   (NEW FUNCTION)
-
-	   plaintext: switch for choosing between HTML or plain text
-	              output
-	"""
-
-	#request = REQUEST_getParsedContent % urllib.quote(string.encode(config.textfile_encoding))
-	request = {
-	    'action'	: 'parse',
-	    'text'	: string,
-	    }
-	#buf = APIRequest( site,
-	#		  request,
-	#		  'parse',
-	#		  'text',
-	#		  [] )
-	wikipedia.get_throttle()
-	buf = dtbext_query.GetProcessedData(request,
-						'parse',
-						'text',
-						[] )
-	buf = buf[u'text'][u'*']
-
-	if plaintext: buf = html2notagunicode(buf)
-
-	return buf.strip()
-
-######## Unicode library functions ########
-
-# try to replace with 'pywikibot.textlib.removeDisabledParts()' !!
-#
-def html2notagunicode(text, keep_wikitags=False):
-	"""Remove all HTML tags in text."""
-
-	# thanks to http://www.hellboundhackers.org/articles/841-using-python-39;s-htmlparser-class.html
-	parser = GetDataHTML()
-	if keep_wikitags: parser._wikitags = ['tt', 'nowiki', 'small', 'sup']
-	parser.feed(text)
-	parser.close()
-	return parser.textdata
-
-def wikisectionpatch(text):
-	"""Patch/adjust wiki section syntax, to enabled full heading recognition."""
-
-	buf = text
-
-	# convert <h?> und </h?> in wiki heading syntax (to be VERY SURE!)
-	# (this are <h> tags inserted by users writing the wiki! not the parser or something like this...)
-	# (help 'getSections()' to detect the headings correct)
-	pre  = lambda m: '\n' + '='*int(m.groups()[0])
-	post = lambda m: '='*int(m.groups()[0]) + '\n'
-	buf = REGEX_hTagOpen.sub(pre, buf)
-	buf = REGEX_hTagClose.sub(post, buf)
-
-	# convert headings in <nowiki>, ... tags by replaceing all
-	# '=' to '&#61;' which is not recognized by the wiki parser
-	# as heading (and so are '=' in <nowiki>-tags) but displayed
-	# correct in the browser 
-	# (help 'getSections()' to detect the headings correct)
-	tag  = lambda m: REGEX_eqChar.sub('&#61;', m.groups()[0])
-	buf = REGEX_nowikiTag.sub(tag, buf)
-	# same for <pre>-tags
-	buf = REGEX_preTag.sub(tag, buf)
-	# same for <source>-tags
-	buf = REGEX_sourceTag.sub(tag, buf)
-
-	# same for <noinclude>-tags
-	buf = REGEX_noincludeTag.sub(tag, buf)
-	# from pages with <onlyinclude>...</onlyinclude> NO SECTION DATA can be retrieved,
-	# since they have no text to expand, except that within the tag
-	buf_list = REGEX_onlyincludeTag.split(buf)
-	if (len(buf_list) > 1):
-		for i in range(0, len(buf_list), 4):
-			buf_list[i] = REGEX_eqChar.sub('&#61;', buf_list[i])
-		buf = u''.join(buf_list)
-	# probably <noinclude> and <onlyinclude> should be handled in a way, that the page
-	# text is rendered in the same way like the page itself is, NOT the page when used 
-	# as template (means use page.get, remove <noinclude>-tags, remove <onlyinclude>-tags
-	# and their contents, then pass the page text to 'action=parse&text=__TOC__%s&prop=sections'
-	# and at last use the patches here)
-
-	return buf
-
-# thanks to: http://pyxml.sourceforge.net/topics/howto/xml-howto.html
-class GetGenericData(saxutils.DefaultHandler):
-	"""
-	Parse XML output of wiki API interface
-	"""
-	def __init__(self, root):
-		self._root = root
-		self._path = []
-		self._parent = False
-
-		self.data = []
-
-	def startElement(self, name, attrs):
-		if (self._path == self._root):
-			self._parent = True
-		self._path.append( name )
-
-		if self._parent:
-			dictdata = dict([ [item, attrs.get(item, '')] for item in attrs.getQNames() ])
-			self.data.append( (name, dictdata) )
-
-	def endElement(self, name):
-		if (self._path == self._root):
-			self._parent = False
-		self._path.reverse()
-		self._path.remove( name )
-		self._path.reverse()
-
-# thanks to http://docs.python.org/library/htmlparser.html
-class GetDataHTML(HTMLParser):
-	textdata = u''
-	#_wikitags = ['tt', 'nowiki', 'small', 'sup']
-	_wikitags = []
-
-	def handle_data(self, data):
-		self.textdata += data
-
-# IMPORTANT for handling of wiki-tags like <tt>, <nowiki>, ...
-#
-	def handle_starttag(self, tag, attrs):
-		#print "Encountered the beginning of a %s tag" % tag
-		if tag in self._wikitags: self.textdata += u"<%s>" % tag
-
-	def handle_endtag(self, tag):
-		#print "Encountered the end of a %s tag" % tag
-		if tag in self._wikitags: self.textdata += u"</%s>" % tag
-
-def GetDataXML(data, root):
-	#wikipedia.get_throttle()
-	#APIdata = site.getUrl( request )
-
-	data = StringIO.StringIO(data.encode(config.textfile_encoding))
-	parser = make_parser()				# Create a XML parser
-	parser.setFeature(feature_namespaces, 0)	# Tell the parser we are not interested in XML namespaces
-	#dh = GetData(parent, content, values)		# Create the handler
-	#dh = GetData(parent, content, values, pages)	# Create the handler
-	dh = GetGenericData(root)			# Create the handler
-	parser.setContentHandler(dh)			# Tell the parser to use our handler
-	parser.parse(data)				# Parse the input
-
-	del parser
-	data.close()
-
-	##if (values == []): return dh.chars
-	##return dh.data
-	#if (values == []):	result = dh.chars
-	#else:			result = dh.data
-	#if pages:
-	#	del result['']
-	#	return result
-	#else:
-	#	return result['']
-
-	return dh.data
 

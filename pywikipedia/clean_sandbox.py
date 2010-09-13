@@ -24,7 +24,7 @@ This script understands the following command-line arguments:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: clean_sandbox.py 8364 2010-07-26 20:41:32Z huji $'
+__version__ = '$Id: clean_sandbox.py 8551 2010-09-13 15:49:35Z xqt $'
 #
 
 import time
@@ -135,8 +135,12 @@ class SandboxBot:
                 time1 = str(time1)
             if type(time2) is long:
                 time2 = str(time2)
-            t1 = (((int(time1[0:4])*12+int(time1[4:6]))*30+int(time1[6:8]))*24+int(time1[8:10])*60)+int(time1[10:12])
-            t2 = (((int(time2[0:4])*12+int(time2[4:6]))*30+int(time2[6:8]))*24+int(time2[8:10])*60)+int(time2[10:12])
+            t1 = (((int(time1[0:4]) * 12 + int(time1[4:6])) * 30 +
+                   int(time1[6:8])) * 24 + int(time1[8:10])) * 60 + \
+                   int(time1[10:12])
+            t2 = (((int(time2[0:4]) * 12 + int(time2[4:6])) * 30 +
+                   int(time2[6:8])) * 24 + int(time2[8:10])) * 60 + \
+                   int(time2[10:12])
             return abs(t2-t1)
 
         mySite = pywikibot.getSite()

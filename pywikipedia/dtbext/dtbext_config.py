@@ -27,7 +27,7 @@ This is a part of pywikipedia framework, it is a deviation of config.py.
 #  B: bigger relases with tidy code and nice comments
 #  A: really big release with multi lang. and toolserver support, ready
 #     to use in pywikipedia framework, should also be contributed to it
-__version__='$Id: dtbext/config.py 0.2.0000 2009-08-26 15:54:00Z drtrigon $'
+__version__='$Id: dtbext/config.py 0.2.0019 2009-11-13 00:04 drtrigon $'
 #
 
 # Standard library imports
@@ -42,19 +42,18 @@ REGEX_eol		= re.compile('\n')
 REGEX_subster_tag	= '<!--SUBSTER-%(var)s-->'					#
 
 
-# ====================================================================================================
-#  DOES NOT exist in pywikipedia-framework
-# ====================================================================================================
-
+# ADDED
+# REASON: common interface to bot user settings on wiki
 def getUsersConfig(page):
-	'''
-	get user list from [[Benutzer:DrTrigonBot/Diene_Mir!]]
+	"""Get user list from wiki page, e.g. [[Benutzer:DrTrigonBot/Diene_Mir!]].
+	   ADDED METHOD: common interface to bot user settings on wiki
 
-	input:  page [page]
-                self-objects
-	returns:  [list] for use as iterator e.g.
-	          format:    (user, param) [tuple]
-	'''
+	   @param page: Wiki page containing user list and config.
+	   @type  page: page
+
+	   Returns a list with entries: (user, param)
+	   This list may be empty.
+	"""
 
 	users = {}
 	for item in REGEX_eol.split(page.get()):
@@ -84,12 +83,23 @@ def getUsersConfig(page):
 
 	return final_users
 
+# ADDED
+# REASON: common interface to bot job queue on wiki
 def getJobQueue(page, queue_security, debug = False):
-	'''
-	check if the data queue security is ok to execute the jobs, if so read the jobs and reset the queue
+	"""Check if the data queue security is ok to execute the jobs,
+	   if so read the jobs and reset the queue.
+	   ADDED METHOD: common interface to bot job queue on wiki
 
-	returns:  job queue [list]
-	'''
+	   @param page: Wiki page containing job queue.
+	   @type  page: page
+	   @param queue_security: This string must match the last edit
+	                          comment, or else nothing is done.
+	   @type  queue_security: string
+	   @param debug: Parameter to prevent writing to wiki in debug mode.
+	   @type  debug: bool
+
+	   Returns a list of jobs. This list may be empty.
+	"""
 
 	try:	actual = page.getVersionHistory(revCount=1)[0]
 	except:	pass

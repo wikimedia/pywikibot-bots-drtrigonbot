@@ -123,7 +123,7 @@ class MailerRobot:
 					wikipedia.output(u'INFO: mail to %s will be sent in %i day(s)' % (item['Benutzer'], (int(item['Frequenz'])-days)))
 					continue
 
-				wikipedia.output(u'\03{lightblue}** Sending page %s as mail to user %s...\03{default}' % (page.aslink(), item['Benutzer']))
+				wikipedia.output(u'\03{lightblue}** Sending page %s as mail to user %s...\03{default}' % (page.title(asLink=True), item['Benutzer']))
 
 				mail_content = content
 				if ( ('expandtemplates' in item) and eval(item['expandtemplates']) ): mail_content = self._readPage(page, full=True)
@@ -179,13 +179,13 @@ class MailerRobot:
 
 		(mode, info, plaintext) = ('default', '', False)
 
-		#wikipedia.output(u'\03{lightblue}Reading Wiki at %s...\03{default}' % page.aslink())
-		wikipedia.output(u'\03{lightblue}Reading Wiki%s at %s...\03{default}' % (info, page.aslink()))
+		#wikipedia.output(u'\03{lightblue}Reading Wiki at %s...\03{default}' % page.title(asLink=True))
+		wikipedia.output(u'\03{lightblue}Reading Wiki%s at %s...\03{default}' % (info, page.title(asLink=True)))
 		try:
 			#content = page.get()
 			content = page.get(mode=mode, plaintext=plaintext)
 			#if url in content:		# durch history schon gegeben! (achtung dann bei multithreading... wobei ist ja thread per user...)
-			#	wikipedia.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.aslink())
+			#	wikipedia.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.title(asLink=True))
 			#	continue
 		except (wikipedia.NoPage, wikipedia.IsRedirectPage):
 			content = u''
@@ -200,7 +200,7 @@ class MailerRobot:
 		returns:  (writes data to page on the wiki, nothing else)
 		'''
 
-		wikipedia.output(u'\03{lightblue}Writing to Wiki on %s...\03{default}' % page.aslink())
+		wikipedia.output(u'\03{lightblue}Writing to Wiki on %s...\03{default}' % page.title(asLink=True))
 
 		wikipedia.setAction(comment)
 
@@ -209,7 +209,7 @@ class MailerRobot:
 			if minorEdit:	page.put(content)
 			else:		page.put(content, minorEdit = False)
 		except wikipedia.SpamfilterError, error:
-			wikipedia.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.aslink(), "error.url"))
+			wikipedia.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.title(asLink=True), "error.url"))
 
 	def _getMode(self, content):
 		'''

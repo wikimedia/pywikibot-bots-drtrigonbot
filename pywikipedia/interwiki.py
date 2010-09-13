@@ -183,6 +183,9 @@ These arguments define how much user confirmation is required:
                    alternatives actually exists.
                    (note: without ending colon)
 
+    -cleanup       like -force but only removes interwiki links to non-existent
+                   or empty pages.
+
     -select        ask for each link whether it should be included before
                    changing any page. This is useful if you want to remove
                    invalid interwiki links and if you do multiple hints of
@@ -300,7 +303,7 @@ have to break it off, use "-continue" next time.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: interwiki.py 8467 2010-08-29 13:07:19Z amir $'
+__version__ = '$Id: interwiki.py 8551 2010-09-13 15:49:35Z xqt $'
 #
 
 import sys, copy, re, os
@@ -572,6 +575,8 @@ class Global(object):
     followredirect = True
     initialredirect = False
     force = False
+    cleanup = False
+    remove = []
     maxquerysize = 60
     same = False
     skip = set()
@@ -620,6 +625,8 @@ class Global(object):
             f.close()
         elif arg == '-force':
             self.force = True
+        elif arg == '-cleanup':
+            self.cleanup = True
         elif arg == '-same':
             self.same = True
         elif arg == '-wiktionary':
@@ -1278,6 +1285,7 @@ class Subject(object):
             # todo list.
 
             if not page.exists():
+                globalvar.remove.append(page.aslink(forceInterwiki=True))
                 if not globalvar.quiet or pywikibot.verbose:
                     pywikibot.output(u"NOTE: %s does not exist. Skipping." % page.aslink(True))
                 if page == self.originPage:
@@ -1341,6 +1349,7 @@ class Subject(object):
             # must be behind the page.isRedirectPage() part
             # otherwise a redirect error would be raised
             if page.isEmpty() and not page.isCategory():
+                globalvar.remove.append(page.aslink(forceInterwiki=True))
                 if not globalvar.quiet or pywikibot.verbose:
                     pywikibot.output(u"NOTE: %s is empty. Skipping." % page.aslink(True))
                 if page == self.originPage:
@@ -1415,6 +1424,7 @@ class Subject(object):
                    sys.exit()
                 iw = ()
             elif page.isEmpty() and not page.isCategory():
+                globalvar.remove.append(page.aslink(forceInterwiki=True))
                 if not globalvar.quiet or pywikibot.verbose:
                     pywikibot.output(u"NOTE: %s is empty; ignoring it and its interwiki links" % page.aslink(True))
                 # Ignore the interwiki links
@@ -1581,8 +1591,12 @@ class Subject(object):
                 time1 = str(time1)
             if type(time2) is long:
                 time2 = str(time2)
-            t1 = (((int(time1[0:4])*12+int(time1[4:6]))*30+int(time1[6:8]))*24+int(time1[8:10])*60)+int(time1[10:12])
-            t2 = (((int(time2[0:4])*12+int(time2[4:6]))*30+int(time2[6:8]))*24+int(time2[8:10])*60)+int(time2[10:12])
+            t1 = (((int(time1[0:4]) * 12 + int(time1[4:6])) * 30 +
+                   int(time1[6:8])) * 24 + int(time1[8:10])) * 60 + \
+                   int(time1[10:12])
+            t2 = (((int(time2[0:4]) * 12 + int(time2[4:6])) * 30 +
+                   int(time2[6:8])) * 24 + int(time2[8:10])) * 60 + \
+                   int(time2[10:12])
             return abs(t2-t1)
 
         if not self.isDone():
@@ -1815,15 +1829,24 @@ u'NOTE: number of edits are restricted at %s'
         # Check what needs to get done
         mods, mcomment, adding, removing, modifying = compareLanguages(old, new, insite = page.site())
 
-        # When running in autonomous mode without -force switch, make sure we don't remove any items, but allow addition of the new ones
+        # When running in autonomous mode without -force switch, make sure we
+        # don't remove any items, but allow addition of the new ones
         if globalvar.autonomous and not globalvar.force and len(removing) > 0:
             for rmsite in removing:
-                if rmsite != page.site():   # Sometimes sites have an erroneous link to itself as an interwiki
-                    rmPage = old[rmsite]
-                    new[rmsite] = old[rmsite] #put it to new means don't delete it
-                    pywikibot.output(u"WARNING: %s is either deleted or has a mismatching disambiguation state." % rmPage.aslink(True))
+                # Sometimes sites have an erroneous link to itself as an
+                # interwiki
+                if rmsite == page.site():
+                    continue
+                rmPage = old[rmsite]
+                #put it to new means don't delete it
+                if not globalvar.cleanup or \
+                   rmPage.aslink(forceInterwiki=True) not in globalvar.remove:
+                    new[rmsite] = rmPage
+                    pywikibot.output(
+                        u"WARNING: %s is either deleted or has a mismatching disambiguation state."
+                        % rmPage.aslink(True))
             # Re-Check what needs to get done
-            mods, mcomment, adding, removing, modifying = compareLanguages(old, new, insite = page.site())
+            mods, mcomment, adding, removing, modifying = compareLanguages(old, new, insite=page.site())
 
         if not mods:
             if not globalvar.quiet or pywikibot.verbose:
@@ -1857,7 +1880,7 @@ u'NOTE: number of edits are restricted at %s'
         if removing and removing != [page.site()]:   # Allow for special case of a self-pointing interwiki link
             self.problem(u'Found incorrect link to %s in %s'% (",".join([x.lang for x in removing]), page.aslink(True)), createneed = False)
             ask = True
-        if globalvar.force:
+        if globalvar.force or globalvar.cleanup:
             ask = False
         if globalvar.confirm and not globalvar.always:
             ask = True

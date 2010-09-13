@@ -16,7 +16,7 @@ Parameters:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: unusedfiles.py 8519 2010-09-11 10:03:42Z xqt $'
+__version__ = '$Id: unusedfiles.py 8540 2010-09-12 18:09:11Z amir $'
 #
 
 import wikipedia as pywikibot
@@ -39,8 +39,9 @@ comment = {
     }
 
 template_to_the_image = {
-    'en': u'\n\n{{subst:No-use2}}',
-    'it': u'\n\n{{immagine orfana}}',
+    'en': u'{{subst:No-use2}}',
+    'it': u'{{immagine orfana}}',
+    'fa': u'{{تصاویر بدون استفاده}}',
     }
 template_to_the_user = {
     'en': u'\n\n{{img-sem-uso|%s}}',
@@ -102,12 +103,15 @@ def main():
         if except_text_translated not in page.getImagePageHtml() and \
            'http://' not in page.get():
             pywikibot.output(u'\n' + page.title())
-            appendtext(page, template_image)
+            if template_image in page.get():
+                pywikibot.output(u"%s done already" % page.aslink())
+                continue
+            appendtext(page, u"\n\n"+template_image)
             uploader = page.getFileVersionHistory().pop()[1]
             usertalkname = u'User Talk:%s' % uploader
             usertalkpage = pywikibot.Page(mysite, usertalkname)
             msg2uploader = template_user % page.title()
-            appendtext(usertalkpage, msg2uploader, always)
+            appendtext(usertalkpage, msg2uploader)
 
 if __name__ == "__main__":
     try:

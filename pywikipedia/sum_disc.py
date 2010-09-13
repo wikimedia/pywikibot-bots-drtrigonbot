@@ -565,7 +565,7 @@ class SumDiscRobot:
 					self._appendPage(tmplsite, buf)
 				purge = dtbext.wikipedia.PageFromPage(self._userPage).purgeCache()	# I hope (!) this works now, but is it still needed?!??
 
-				wikipedia.output(u'*** Discussion updates added to: %s (purge: %s)' % (self._userPage.aslink(), purge))
+				wikipedia.output(u'*** Discussion updates added to: %s (purge: %s)' % (self._userPage.title(asLink=True), purge))
 			else:
 				wikipedia.output(u'\03{lightred}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
 
@@ -630,13 +630,13 @@ class SumDiscRobot:
 		if full:	(mode, info) = ('full', ' using "getFull()" mode')
 		else:		(mode, info) = ('default', '')
 
-		#wikipedia.output(u'\03{lightblue}Reading Wiki at %s...\03{default}' % page.aslink())
-		wikipedia.output(u'\03{lightblue}Reading Wiki%s at %s...\03{default}' % (info, page.aslink()))
+		#wikipedia.output(u'\03{lightblue}Reading Wiki at %s...\03{default}' % page.title(asLink=True))
+		wikipedia.output(u'\03{lightblue}Reading Wiki%s at %s...\03{default}' % (info, page.title(asLink=True)))
 		try:
 			#content = page.get()
 			content = page.get(mode=mode)
 			#if url in content:		# durch history schon gegeben! (achtung dann bei multithreading... wobei ist ja thread per user...)
-			#	wikipedia.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.aslink())
+			#	wikipedia.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.title(asLink=True))
 			#	continue
 		except (wikipedia.NoPage, wikipedia.IsRedirectPage):
 			content = u''
@@ -664,7 +664,7 @@ class SumDiscRobot:
 		for i, pages in enumerate(pages_list):
 			for (page, content) in pages.get(mode=modes[i]):
 				if pages._requesting_data: wikipedia.output(u"\03{lightblue}Reading a set of Wiki pages (mode='%s')...\03{default}"%modes[i])
-				wikipedia.output(u'\03{lightblue}Got Wiki at %s...\03{default}' % page.aslink())
+				wikipedia.output(u'\03{lightblue}Got Wiki at %s...\03{default}' % page.title(asLink=True))
 
 				#except (wikipedia.NoPage, wikipedia.IsRedirectPage):
 				#	content = u''
@@ -674,7 +674,7 @@ class SumDiscRobot:
 				#keys = content.title()
 
 				#if url in content:		# durch history schon gegeben! (achtung dann bei multithreading... wobei ist ja thread per user...)
-				#	wikipedia.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.aslink())
+				#	wikipedia.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.title(asLink=True))
 				#	continue
 
 				yield (page, content)
@@ -688,11 +688,11 @@ class SumDiscRobot:
 		returns:  (appends data to page on the wiki, nothing else)
 		'''
 
-		wikipedia.output(u'\03{lightblue}Appending to Wiki on %s...\03{default}' % page.aslink())
+		wikipedia.output(u'\03{lightblue}Appending to Wiki on %s...\03{default}' % page.title(asLink=True))
 		try:
 			content = page.get() + u'\n\n'
 			#if url in content:		# durch history schon gegeben! (achtung dann bei multithreading... wobei ist ja thread per user...)
-			#	wikipedia.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.aslink())
+			#	wikipedia.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.title(asLink=True))
 			#	continue
 		except (wikipedia.NoPage, wikipedia.IsRedirectPage):
 			content = u''
@@ -707,7 +707,7 @@ class SumDiscRobot:
 			if minorEdit:	page.put(content)
 			else:		page.put(content, minorEdit = False)
 		except wikipedia.SpamfilterError, error:
-			wikipedia.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.aslink(), "error.url"))
+			wikipedia.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.title(asLink=True), "error.url"))
 
 	def _writePage(self, page, data, minorEdit = True):
 		'''
@@ -718,14 +718,14 @@ class SumDiscRobot:
 		returns:  (writes data to page on the wiki, nothing else)
 		'''
 
-		wikipedia.output(u'\03{lightblue}Writing to Wiki on %s...\03{default}' % page.aslink())
+		wikipedia.output(u'\03{lightblue}Writing to Wiki on %s...\03{default}' % page.title(asLink=True))
 
 		content = data
 		try:
 			if minorEdit:	page.put(content)
 			else:		page.put(content, minorEdit = False)
 		except wikipedia.SpamfilterError, error:
-			wikipedia.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.aslink(), "error.url"))
+			wikipedia.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.title(asLink=True), "error.url"))
 
 	def _checkRelevancyTh(self):
 		'''
@@ -854,12 +854,12 @@ class SumDiscRobot:
 		(sections, verify) = site.getSections(minLevel=1, pagewikitext=buf)
 		if not verify:
 			#wikipedia.output(u'!!! WARNING: Have to use "getFull"...')
-			wikipedia.output(u"\03{lightblue}Re-Reading Wiki page (mode='full') at %s...\03{default}" % site.aslink())
+			wikipedia.output(u"\03{lightblue}Re-Reading Wiki page (mode='full') at %s...\03{default}" % site.title(asLink=True))
 			buf = site.get(mode='full')
 			#buf = self._readPage( site, full=True )
 			(sections, verify) = site.getSections(minLevel=1, pagewikitext=buf)
 			if not verify:
-				wikipedia.output(u"\03{lightblue}Re-Reading Wiki page (mode='parse') at %s...\03{default}" % site.aslink())
+				wikipedia.output(u"\03{lightblue}Re-Reading Wiki page (mode='parse') at %s...\03{default}" % site.title(asLink=True))
 				parse_buf = site.get(mode='parse')
 				if self._reftag_err_regex.search(parse_buf):
 					self._oth_list[site.title()] = (	u'was not able to get Sections properly, because of missing <references /> tag!', 

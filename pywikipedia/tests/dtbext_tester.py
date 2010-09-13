@@ -39,7 +39,10 @@ TESTPAGE = u'Benutzer:DrTrigon'
 #TESTPAGE = u'Wikipedia:WikiProjekt Schweiz/Wartung/Worklists'
 TESTPAGE = u'Wikipedia:Testseite'
 
-TESTPAGES = [u'Hilfe Diskussion:Weiterleitung', u'Benutzer Diskussion:BitH', u'Benutzer Diskussion:DrTrigonBot', u'Benutzer Diskussion:DrTrigonBo']
+TESTPAGES = [	u'Hilfe Diskussion:Weiterleitung',
+		u'Benutzer Diskussion:BitH',
+		u'Benutzer Diskussion:DrTrigonBot',
+		u'Benutzer Diskussion:DrTrigonBo', ]
 
 TESTPAGE = u'...'
 TESTPAGE = u'Wikipedia:Löschkandidaten/20. Juli 2009'
@@ -47,7 +50,7 @@ TESTPAGE = u'Benutzer Diskussion:Karsten11'
 TESTPAGE = u'Benutzer Diskussion:GregorHelms'
 TESTPAGE = u'Wikipedia:WikiProjekt Vorlagen/Werkstatt'
 #TESTPAGE = u'Benutzer_Diskussion:DrTrigonBot'
-TESTPAGE = u'Benutzer_Diskussion:DrTrigo'
+TESTPAGE = u'Benutzer_Diskussion:DrTrigon'
 
 
 def TEST_getSections():
@@ -113,11 +116,13 @@ def TEST_getSections():
 
 def TEST_getParsedContent():
 	print "\nTest of 'dtbext.wikipedia.Page.getParsedContent()' on page '%s'..." % TESTPAGE
-	
+
 	#print dtbext.wikipedia.Page(wikipedia.getSite(), TESTPAGE).get(mode='parse')
-	print dtbext.wikipedia.Page(wikipedia.getSite(), TESTPAGE).get(mode='parse', plaintext=True)
-	
-	print "*", dtbext.wikipedia.getParsedString(u'Erweiterung für [[Wikipedia:Bots/Bot-Info]]', plaintext=True), "*"
+	#print dtbext.wikipedia.Page(wikipedia.getSite(), TESTPAGE).get(mode='parse', plaintext=True)
+
+	site = wikipedia.getSite()
+	dtbext.wikipedia.addAttributes( site )
+	print "*", site.getParsedString(u'Erweiterung für [[Wikipedia:Bots/Bot-Info]]', keeptags = []), "*"
 
 def TEST_purgeCache():
 	print "\nTest of 'dtbext.wikipedia.Page.purgeCache()' on page '%s'..." % TESTPAGE
@@ -146,54 +151,82 @@ def TEST_getVersionHistory():
 	print site.getVersionHistory(revCount=1)
 	print site.isRedirectPage()
 
-	print "\nTest of 'dtbext.wikipedia.Pages.getVersionHistory()' on '%i' page(s)..." % len(TESTPAGES)
+def TEST_VersionHistoryGenerator():
+	print "\nTest of 'dtbext.pagegenerators.VersionHistoryGenerator()' on '%i' page(s)..." % len(TESTPAGES)
 
-	#sites = dtbext.wikipedia.Pages(wikipedia.getSite(), TESTPAGES*5)
-	sites = dtbext.wikipedia.Pages(wikipedia.getSite(), TESTPAGES)
-	a = sites.getVersionHistory()
-	#print len(TESTPAGES*5), len(a), a
-	for item in a.keys():	
-		print item, a[item], ('redirect' in a[item][0])
+	gen = dtbext.pagegenerators.VersionHistoryGenerator(TESTPAGES)
+	for item in gen:	
+		print item[1:]
+		#print item, a[item], ('redirect' in a[item][0])
 
 def TEST_get():
-	print "\nTest of 'dtbext.wikipedia.Pages.get()' on '%i' page(s)..." % len(TESTPAGES)
+	#print "\nTest of 'dtbext.wikipedia.Pages.get()' on '%i' page(s)..." % len(TESTPAGES)
+	print "\nTest of sequence:"
+	print "   PagesFromTitlesGenerator ->"
+	print "   (PageTitleFilterPageGenerator) ->"
+	print "   PreloadingGenerator ->"
+	print "   [output]"
+	print
 
-	sites = dtbext.wikipedia.Pages(wikipedia.getSite(), TESTPAGES)
-	a = sites.get()
-	i = 0
-#	for (page, content) in a:
-#		print "\n==========\n", page
-#		if not content: print "Page does not exist."
-#		i += 1
-	print "\n==========\n"
-	for page in a:
-		if hasattr(page, '_getexception'):
-			print page._getexception
-		else:
-			start = time.time()
-			u = page.get()
-			stop = time.time()
-			buffd = stop-start
+	ignore_list = { wikipedia.getSite().family.name: { wikipedia.getSite().lang: [u'Benutzer Diskussion:DrTrigonBo'] }}
+	#ignore_list = { wikipedia.getSite().family.name: { wikipedia.getSite().lang: [] }}
 
-			start = time.time()
-			u = page.get(force=True)
-			stop = time.time()
-			unbuffd = stop-start
+	wikipedia.debug = True		# to enable the use of the API here
+	gen        = pagegenerators.PagesFromTitlesGenerator(TESTPAGES)
+	filter_gen = pagegenerators.PageTitleFilterPageGenerator(gen, ignore_list)	# or RegexFilterPageGenerator
+	prload_gen = pagegenerators.PreloadingGenerator(filter_gen)			# ThreadedGenerator would be nice!
+	for page in prload_gen:
+		print page
 
-			print "buffered:", buffd, "\t", "unbuffered:", unbuffd
-		print page, "\n==========\n"
-		i += 1
-	print i
+		start = time.time()
+		u = page.get()
+		stop = time.time()
+		buffd = stop-start
+
+		start = time.time()
+		u = page.getVersionHistory()
+		stop = time.time()
+		buffd2 = stop-start
+
+		start = time.time()
+		u = page.get(force=True)
+		stop = time.time()
+		unbuffd = stop-start
+
+		start = time.time()
+		u = page.getVersionHistory(forceReload=True)
+		stop = time.time()
+		unbuffd2 = stop-start
+
+		print "GET; buffered:", buffd, "\t", "unbuffered:", unbuffd
+		print "GETVERSIONHISTORY; buffered:", buffd2, "\t", "unbuffered:", unbuffd2
+	wikipedia.debug = False
+
+def TEST_addAttributes():
+	page = wikipedia.Page(wikipedia.getSite(), TESTPAGE)
+	#print page.getSections()
+	dtbext.wikipedia.addAttributes( page )
+	print page.getSections()
+
+	page2 = wikipedia.Page(wikipedia.getSite(), u'Benutzer Diskussion:Karsten11')
+	#print page.getSections()
+	dtbext.wikipedia.addAttributes( page2 )
+	print page2.getSections()
+	print page.getSections()
 
 
 # wikipedia.py
-#TEST_getVersionHistory()
+TEST_getVersionHistory()
 #TEST_getSections()
 #TEST_purgeCache()
-TEST_get()
+#TEST_get()
 #TEST_getParsedContent()
 #print wikipedia.getSite().getUrl('/w/api.php?action=query&meta=userinfo&uiprop=blockinfo|hasmsg|groups|rights|options|preferencestoken|editcount|ratelimits|email&formal=xml')
 #TEST_GlobalWikiNotificationsGen()
+
+#TEST_addAttributes()
+
+TEST_VersionHistoryGenerator()
 
 
 #a_str = r'<strong class="error">Referenz-Fehler: Einzelnachweisfehler: <code>&lt;ref&gt;</code>-Tags existieren, jedoch wurde kein <code>&lt;references&#160;/&gt;</code>-Tag gefunden.</strong>'
@@ -206,6 +239,8 @@ TEST_get()
 #page = wikipedia.Page(wikipedia.getSite(), TESTPAGE)
 #page.extradata = "hallo"
 #print page.title(), page.extradata
+
+#dtbext.wikipedia.Pages(None, None)
 
 
 print "done."
