@@ -160,7 +160,7 @@ def TEST_VersionHistoryGenerator():
 		print item[1:]
 		#print item, a[item], ('redirect' in a[item][0])
 
-def TEST_get():
+def TEST_get(debug=False):
 	#print "\nTest of 'dtbext.pywikibot.Pages.get()' on '%i' page(s)..." % len(TESTPAGES)
 	print "\nTest of sequence:"
 	print "   PagesFromTitlesGenerator ->"
@@ -172,10 +172,11 @@ def TEST_get():
 	ignore_list = { pywikibot.getSite().family.name: { pywikibot.getSite().lang: [u'Benutzer Diskussion:DrTrigonBo'] }}
 	#ignore_list = { pywikibot.getSite().family.name: { pywikibot.getSite().lang: [] }}
 
-	pywikibot.debug = True		# to enable the use of the API here
+	# !!! ATTENTION PROBLEM HERE: xqt says API call can loose pages !!!
 	gen        = pagegenerators.PagesFromTitlesGenerator(TESTPAGES)
 	filter_gen = pagegenerators.PageTitleFilterPageGenerator(gen, ignore_list)	# or RegexFilterPageGenerator
 	prload_gen = pagegenerators.PreloadingGenerator(filter_gen)			# ThreadedGenerator would be nice!
+	pywikibot.debug = debug		# to enable the use of the API here (seams to be slower... ?!?)
 	for page in prload_gen:
 		print page
 
@@ -186,6 +187,7 @@ def TEST_get():
 
 		start = time.time()
 		u = page.getVersionHistory()
+		print u
 		stop = time.time()
 		buffd2 = stop-start
 
@@ -196,6 +198,7 @@ def TEST_get():
 
 		start = time.time()
 		u = page.getVersionHistory(forceReload=True)
+		print u[0:3]
 		stop = time.time()
 		unbuffd2 = stop-start
 
@@ -221,6 +224,7 @@ def TEST_addAttributes():
 #TEST_getSections()
 #TEST_purgeCache()
 TEST_get()
+#TEST_get(debug=True)
 #TEST_getParsedContent()
 #print pywikibot.getSite().getUrl('/w/api.php?action=query&meta=userinfo&uiprop=blockinfo|hasmsg|groups|rights|options|preferencestoken|editcount|ratelimits|email&formal=xml')
 #TEST_GlobalWikiNotificationsGen()

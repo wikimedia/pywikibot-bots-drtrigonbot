@@ -12,7 +12,7 @@ the same functions but enhanced.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_pagegenerators.py 0.2.0020 2009-11-14 11:59 drtrigon $'
+__version__='$Id: dtbext_pagegenerators.py 0.2.0021 2009-11-15 00:37 drtrigon $'
 #
 
 # Standard library imports
@@ -31,7 +31,7 @@ REQUEST_getGlobalWikiNotifys	= 'http://toolserver.org/~merl/UserPages/query.php?
 
 # ADDED: new (r19)
 # REASON: needed by various bots BUT SHOULD BE ALSO DONE BY THE PreloadingGenerator
-#         (this here is just a patch, should be done in framework)
+#         [ look at DRTRIGON-55 and remove it then ]
 def VersionHistoryGenerator(iterable, site=pywikibot.Site(config.mylang), number=5000):
 	"""Provides a list of page names with VersionHistory for the pages.
 	   ADDED METHOD: needed by various bots BUT SHOULD BE DONE BY PreloadingGenerator
@@ -69,13 +69,17 @@ def VersionHistoryGenerator(iterable, site=pywikibot.Site(config.mylang), number
 		result = query.GetData(params, site)		# 1 result per page
 		r = result[u'query'][u'pages'].values()
 
-		for item in r:
-			if u'missing' in item:
-                		#raise NoPage(site, item[u'title'],"Page does not exist." )
-				pywikibot.output( str(pywikibot.NoPage(site, item[u'title'],u"Page does not exist." )) )
+		print item
+		for subitem in r:
+			print subitem
+			if u'missing' in subitem:
+#				page = pywikibot.Page(site, item)
+#				print page
+                		#raise NoPage(site, subitem[u'title'],"Page does not exist." )
+				pywikibot.output( str(pywikibot.NoPage(site, subitem[u'title'],u"Page does not exist." )) )
 			else:
-				entry = item[u'revisions'][0]
-				yield (item[u'title'], entry[u'revid'], entry[u'timestamp'], entry[u'user'], entry[u'comment'])
+				entry = subitem[u'revisions'][0]
+				yield (subitem[u'title'], entry[u'revid'], entry[u'timestamp'], entry[u'user'], entry.get(u'comment', u''))
 		return
 
 
@@ -96,16 +100,20 @@ def GlobalWikiNotificationsGenerator(username, site=pywikibot.Site(config.mylang
 	   Returns a page-objects with extradata dict in 'page.extradata'
 	"""
 
+#	import family
+#	print family.Family().get_known_families(site)['trwiki']
+#	raise
+
 	request = REQUEST_getGlobalWikiNotifys % urllib.quote(username.encode(config.textfile_encoding))
 
 	pywikibot.get_throttle()
-	pywikibot.output(u"Reading GlobalWikiNotifications from toolserver." % len(item))
+	pywikibot.output(u"Reading GlobalWikiNotifications from toolserver.")
 
 	buf = site.getUrl( request, no_hostname = True )
 
 	if not buf: return	# nothing got (error?! how to catch later??)
 
-	buf = dtbext_pywikibot._GetDataXML(buf, [u'userpages'])
+	buf = _GetDataXML(buf, [u'userpages'])
 	for i in range(0, len(buf), 2):
 		item = buf[i:(i+2)]
 		data = {}
@@ -118,12 +126,10 @@ def GlobalWikiNotificationsGenerator(username, site=pywikibot.Site(config.mylang
 
 		# [u'revid', u'user', u'timestamp', u'comment', u'redirect'],
 		#yield (data[u'revid'], data[u'user'], data[u'timestamp'], data[u'comment'], data[u'link'], data[u'url'], data[u'pageid'])
-		try:
-			page = dtbext_pywikibot.Page(site, data[u'link'])
-			page.extradata = data
-			yield page
-		except pywikibot.NoPage:
-			pywikibot.output(u'!!! WARNING [[%s]]: this wiki is not supported by framework, skipped!' % data[u'link'])
+		data[u'link'] = data[u'link'].replace(u'wiki:', u':')	# e.g. 'dewiki:...' --> 'de:...'
+		page = pywikibot.Page(site, data[u'link'])
+		page.extradata = data
+		yield page
 
 # ADDED
 # REASON: needed by 'GlobalWikiNotificationsGenerator' (due to http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 38))

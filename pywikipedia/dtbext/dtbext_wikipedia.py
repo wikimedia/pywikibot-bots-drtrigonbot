@@ -12,7 +12,7 @@ the page class from there.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_wikipedia.py 0.2.0020 2009-11-14 11:50 drtrigon $'
+__version__='$Id: dtbext_wikipedia.py 0.2.0021 2009-11-14 22:50 drtrigon $'
 #
 
 # Standard library imports
@@ -102,177 +102,6 @@ class Page(pywikibot.Page):
 			self._getexception == pywikibot.IsRedirectPage
 
 		return self._redir
-
-	# ADDED (is older approach and works with older api; e.g. without 'byteoffset' but still needs api
-	#        or 'anchor'. for non-api: use '_getSectionsByteOffset' BUT how to get 'anchor'?)
-	# REASON: needed by various bots BUT has problems with complex page structures and constructs
-	def getSectionsOldApi(self, minLevel=2, getter=None, pagewikitext=None, sectionsonly = False):
-		"""Parses the page with API and return section information.
-		   ADDED METHOD: needed by various bots BUT has problems with complex page structures and constructs
-
-		   ATTENTION: API DOES NOT WORK IF THERE ARE PARSE-ERRORS ON TH PAGE (e.g. <references />)
-		   ( http://de.wikipedia.org/w/index.php?title=Benutzer:DrTrigonBot&oldid=78708072#Funktionsweise )
-
-		   getter: because get() in API version and default dont give the same
-		            results (html comments are stripped or not ...) you can choose
-		            here which function to use. default is the API version.
-		   pagewikitext: if content is already known, you can use this shortcut!
-		   sectionsonly: return only the recived section headings (for compression e.g.)
-		"""
-		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 35.3)
-
-		if (getter == None): getter = self.get			# default
-		#if (getter == None): getter = self._getFullContent	# default
-
-		# according to tip in wiki from Merlissimo: http://de.wikipedia.org/wiki/Benutzer_Diskussion:DrTrigon#Bot:_Linkfehler
-		# http://de.wikipedia.org/w/api.php?action=parse&text={{:Wikipedia:Fragen_zur_Wikipedia/Archiv/2009/Woche_10}}__TOC__&prop=sections
-		# http://de.wikipedia.org/w/api.php
-		request = []
-		#request.append( REQUEST_getSections      % urllib.quote(self.title().encode(config.textfile_encoding)) )
-		#request.append( REQUEST_getSections_page % urllib.quote(self.title().encode(config.textfile_encoding)) )
-		request.append( {   'action'	: 'parse',
-				    'text'	: '{{%s}}__TOC__'%self.title(),
-				    'prop'	: 'sections',
-				    } )
-		request.append( {   'action'	: 'parse',
-				    'page'	: self.title(),
-				    'prop'	: 'sections',
-				    } )
-		sections = []
-		for item in request:
-		#	sections = APIRequest( self.site(),
-		#			  item,
-		#			  'sections',
-		#			  's',
-		#			  ['toclevel', 'level', 'line'] )
-			pywikibot.get_throttle()
-			old_sections = sections
-			# look at revisions older than r18 for this code or replace with query.GetData()
-			sections = dtbext_query.GetProcessedData(item,
-								'sections',
-								's',
-								['toclevel', 'level', 'line'] )
-			#if sections: break
-			if len(old_sections) > len(sections):
-				sections = old_sections
-
-		#if not sections: return ([], True)
-
-		#eigentlich nicht mehr noetig nach dieses Aenderungen/Updates:
-		#http://de.wikipedia.org/w/index.php?title=Wikipedia:Projektneuheiten&oldid=61569059#Vorschau
-		#https://bugzilla.wikimedia.org/show_bug.cgi?id=18720
-		#
-		# nummerize twice appearing headings (should be done by the API!!)
-		unique = {}
-		for i, item in enumerate(sections):
-			if item[2] in unique:	unique[item[2]] += 1
-			else:			unique[item[2]] = 1
-			if unique[item[2]] > 1:
-				item = ( item[0], item[1], u'%s %i'%(item[2], unique[item[2]]) )
-			sections[i] = item
-
-		if sectionsonly: return (sections, True)
-
-		# process page text
-		if (pagewikitext == None):
-			#wikitext = self.get().split('\n')
-			wikitext = getter().split('\n')
-			#print wikitext
-		else:	wikitext = pagewikitext.split('\n')
-
-		# sync headings in text
-		info = []
-		first = 0
-		for item in sections:
-			level = int(item[1])
-			#if level == 1:		# work-a-round to get level 1 headings
-			#	ptrn = '^='
-			#	cnt = 1
-			#else:
-			#	ptrn = '='
-			#	cnt = 2
-			for i in range(first, len(wikitext)):
-				#match = re.findall(ptrn*level, wikitext[i])
-				#match = re.findall('='*level, wikitext[i])
-				spacer = '='*level									# make special case for '========' headings?!?!
-				match = re.split(spacer, wikitext[i])
-				#if ((len(match) >= cnt) and (wikitext[i][0] == u'=')):					# UND am Anfang der Zeile! (koennte
-				#if ((len(match) >= 2) and (wikitext[i][0] == u'=')):					#  einheitlich mit '^' gemacht werden!)
-				#if ((len(match) == 3) and (len(match[0]) == 0) and (len(match[2].strip()) == 0)):	#
-				#if ((len(match) == 3) and (len(match[0]) == 0) and (match[2].strip() in ['', '='])):	#
-				#print match
-				#is_section  = ((len(match) == 3) and (len(match[0]) == 0) and (match[2].strip() in ['', '=']))
-				is_section  = ((len(match) in [3,4]) and (len(match[0]) == 0) and (match[(len(match)-1)].strip() in ['', '=']))
-				is_section |= ((level == 1) and (len(match) == 4) and (len(match[0]) == 0) and (match[2].strip() == ''))
-				if is_section:
-					#title = re.split('='*level, wikitext[i])[1]			# fester index hier koennte probleme machen...!!
-					#spacer = '='*level						# make special case for '========' headings?!?!
-					#title = spacer.join(re.split(spacer, wikitext[i])[1:-1])	#
-					title = spacer.join(match[1:-1]) + match[2].strip()		#
-					#print title
-					info.append( (i, level, item[2], title.strip()) )
-					first = i+1
-					break
-
-		v1 = (len(info) == len(sections))
-		v2 = not REGEX_wikiSection.search( self._wikisectionpatch(u'\n'.join(wikitext[first:])) )
-		verify = (v1 and v2)
-		if not verify:
-			#raise pywikibot.SectionError('Was not able to get Sections of %s properly!' % self.title(asLink=True))
-			#pywikibot.output(u'!!! WARNING [[%s]]: was not able to get Sections properly!' % self.title())
-			raise Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.title(asLink=True))
-
-		# check min. level
-		data = []
-		for item in info:
-			if (item[1] < minLevel): continue
-			data.append( item )
-
-		return data
-
-	# ADDED
-	# REASON: needed by 'getSectionsOldApi'
-	def _wikisectionpatch(self, text):
-		"""Patch/adjust wiki section syntax, to allow full heading recognition."""
-
-		buf = text
-
-		# convert <h?> und </h?> in wiki heading syntax (to be VERY SURE!)
-		# (this are <h> tags inserted by users writing the wiki! not the parser or something like this...)
-		# (help 'getSections()' to detect the headings correct)
-		pre  = lambda m: '\n' + '='*int(m.groups()[0])
-		post = lambda m: '='*int(m.groups()[0]) + '\n'
-		buf = REGEX_hTagOpen.sub(pre, buf)
-		buf = REGEX_hTagClose.sub(post, buf)
-
-		# convert headings in <nowiki>, ... tags by replaceing all
-		# '=' to '&#61;' which is not recognized by the wiki parser
-		# as heading (and so are '=' in <nowiki>-tags) but displayed
-		# correct in the browser 
-		# (help 'getSections()' to detect the headings correct)
-		tag  = lambda m: REGEX_eqChar.sub('&#61;', m.groups()[0])
-		buf = REGEX_nowikiTag.sub(tag, buf)
-		# same for <pre>-tags
-		buf = REGEX_preTag.sub(tag, buf)
-		# same for <source>-tags
-		buf = REGEX_sourceTag.sub(tag, buf)
-
-		# same for <noinclude>-tags
-		buf = REGEX_noincludeTag.sub(tag, buf)
-		# from pages with <onlyinclude>...</onlyinclude> NO SECTION DATA can be retrieved,
-		# since they have no text to expand, except that within the tag
-		buf_list = REGEX_onlyincludeTag.split(buf)
-		if (len(buf_list) > 1):
-			for i in range(0, len(buf_list), 4):
-				buf_list[i] = REGEX_eqChar.sub('&#61;', buf_list[i])
-			buf = u''.join(buf_list)
-		# probably <noinclude> and <onlyinclude> should be handled in a way, that the page
-		# text is rendered in the same way like the page itself is, NOT the page when used 
-		# as template (means use page.get, remove <noinclude>-tags, remove <onlyinclude>-tags
-		# and their contents, then pass the page text to 'action=parse&text=__TOC__%s&prop=sections'
-		# and at last use the patches here)
-
-		return buf
 
 	# ADDED: new (r18)
 	# REASON: needed by various bots
@@ -392,8 +221,9 @@ class Page(pywikibot.Page):
 			#pywikibot.output(u"\tReading section %i from %s." % (section[u'number'], self.title(asLink=True)))
 			# if not successfull too, report error/problem
 			#page._getexception = ...
-			#raise Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.title(asLink=True))
+			#raise pywikibot.Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.title(asLink=True))
 			#pywikibot.output(...)
+			# (or create a own error, e.g. look into interwiki.py)
 
 		# find the most probable match for heading
 		best_match = (0.0, None)
@@ -452,7 +282,7 @@ class Page(pywikibot.Page):
 
 # ADDED
 # REASON: ...
-#         (this here is just a patch, should be done in framework)
+#         [ look at DRTRIGON-54 and remove it then ]
 	def getEnh(self, expandtemplates=True):
 		"""Return the wiki text of the page in various formats.
 		   ADDED METHOD: ...
@@ -461,7 +291,7 @@ class Page(pywikibot.Page):
 		   ......
 		"""
 
-		raise NotImplementedError('This should be implemented into \'wikipedia.get()\' directly, request placed on maillist!!')
+		raise NotImplementedError('This should be implemented into \'wikipedia.get()\' directly, patch submitted to maillist!!')
 		# -> JIRA ticket
 
 		params = {

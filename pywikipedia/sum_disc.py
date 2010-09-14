@@ -68,7 +68,7 @@ Syntax example:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: sum_disc.py 0.2.0020 2009-11-14 12:24 drtrigon $'
+__version__='$Id: sum_disc.py 0.2.0021 2009-11-15 00:38 drtrigon $'
 #
 
 
@@ -272,40 +272,43 @@ class SumDiscBot(dtbext_basic.BasicBot):
 
 		if debug['user']: pywikibot.output(u'\03{lightred}=== ! DEBUG MODE USERS WILL BE SKIPPED ! ===\03{default}')
 
-# use a PreloadGenerator for user pages ... !!
-		#for user in self._getUsers():
-		for user in self._user_list:
+		for user in self._user_list:					# may be try with PreloadingGenerator?!
 			if (debug['user'] and (user[0] != 'DrTrigon')):	continue
 
 			self._setUser(user)					# set user and init params
 
 			pywikibot.output(u'\03{lightgreen}** Processing User: %s\03{default}' % self._user)
 
-			print self._param['ignorepage_list']
 			self.loadMode(self._userPage)				# get operating mode
-#
 			self._work_list = {}
 
-			#self._getHistory()
-			self._getHistoryPYF(rollback=self.rollback)
+			#self._getHistory()					# get history entries
+			self.getHistoryPYF(rollback=self.rollback)
 			self._work_list.update( self._hist_list )
 
-			addition = self._checkRecentEdits()			# check special pages for latest contributions
+			# JUST A TEMPORARY PATCH FOR HISTORY			# SHOULD BE REMOVED LATER!
+			# e.g. 'dewiki:...' --> 'de:...'
+			self._work_list = dict([ (key.replace(u'wiki:', u':'), self._work_list[key]) for key in self._work_list.keys() ])
+
+			addition = self.checkRecentEdits()			# check special pages for latest contributions
 			self._work_list.update( addition )			#
 
 			if self._param['getbacklinks_switch']:			# get the backlinks to user disc page
-				addition = self._getUserBacklinks()		#
+				addition = self.getUserBacklinks()		#
 				self._work_list.update( addition )		#
 				# all pages served from here ARE CURRENTLY SIGNED (have a Signature at the moment)
 
 			# (history war bisher HIER)
 
 			if self._param['globwikinotify_switch']:		# [F38] get global wiki notifications (toolserver/merl)
-				addition = self._getGlobalWikiNotifications()	#
+				addition = self.getGlobalWikiNotifications()	#
 				self._work_list.update( addition )		#
 
-			self._getLatestNews()					# check for news to report
+			self.getLatestNews()					# check for news to report
 
+			#print self._work_list
+			continue
+# debug here ^^^
 			self._checkRelevancyTh()				# check self._news_list on relevancy, disc-thread oriented version...
 
 			self._AddMaintenanceMsg()				# gehen auch in jede history... werden aber bei compress entfernt
@@ -351,7 +354,7 @@ class SumDiscBot(dtbext_basic.BasicBot):
 				shutil.copyfile(self._datfilename, dst)
 
 			# truncate histroy (drop old entries)
-			self._getHistoryPYF()
+			self.getHistoryPYF()
 
 			# write new history
 			os.remove(self._datfilename)
@@ -361,7 +364,7 @@ class SumDiscBot(dtbext_basic.BasicBot):
 
 			pywikibot.output(u'** History of %s compressed and written. (%s %%)' % (user, (end/begin)*100))
 
-	def _getHistoryPYF(self, rollback = 0):
+	def getHistoryPYF(self, rollback = 0):
 		buf = self.loadFile()
 		buf = bot_config['page_regex'].sub('[]', buf)
 		buf = self._eol_regex.split(buf)
@@ -399,18 +402,9 @@ class SumDiscBot(dtbext_basic.BasicBot):
 			del rollback_buf
 			usage['rollback'] = i
 
-		if ('CHKSUM v1' in usage) and usage['CHKSUM v1']:
-			#pywikibot.output(u'!!! WARNING: CHKSUM v1 is not supported anymore (getting a new one now)')
-			self._oth_list[self._userPage.title()] = (	u'CHKSUM v1 is not supported anymore (getting a new one now)', 
-								self._userPage, 
-								None, 
-								None, 
-								None, 
-								self._PS_warning )
-
 		pywikibot.output(u'*** History recieved %s' % str(usage))
 
-	def _getLatestNews(self):
+	def getLatestNews(self):
 		'''
 		check latest contributions on recent news
 
@@ -433,8 +427,15 @@ class SumDiscBot(dtbext_basic.BasicBot):
 		self._oth_list = {}
 		size = len(self._work_list)
 		j = 0
-		sites = dtbext.pywikibot.Pages(self.site, self._work_list.keys())
-		actual_dict = sites.getVersionHistory()
+		#sites = dtbext.pywikibot.Pages(self.site, self._work_list.keys())
+		#actual_dict = sites.getVersionHistory()
+#gen1 = pagegenerators.PagesFromTitlesGenerator(self._user_list)
+## Preloads _contents and _versionhistory
+## (DOES NOT USE API YET! / ThreadedGenerator would be nice!)
+#gen2 = pagegenerators.PreloadingGenerator(gen)
+		actual_dict = list(dtbext.pagegenerators.VersionHistoryGenerator(self._work_list.keys()))
+		print len(actual_dict), len(self._work_list.keys())
+		return
 		#for item in self._work_list:
 		for keys in self._work_list.keys():
 			item = self._work_list[keys]
@@ -524,7 +525,7 @@ class SumDiscBot(dtbext_basic.BasicBot):
 
 		pywikibot.output(u'*** Latest News searched')
 
-	def _checkRecentEdits(self):
+	def checkRecentEdits(self):
 		'''
 		check wiki on recent contributions of specific user
 
@@ -536,6 +537,8 @@ class SumDiscBot(dtbext_basic.BasicBot):
 
 		check_list = self._param['checkedit_list']
 		count = self._param['checkedit_count']
+
+		pywikibot.output(u'Getting latest contributions from user "%s" via API...' % self._user)	# should be done in framework
 
 		# thanks to http://www.amk.ca/python/howto/regex/ and http://bytes.com/forum/thread24382.html
 		usersumList = [p.title() for p in pagegenerators.UserContributionsGenerator(self._user, number = count)]
@@ -554,7 +557,7 @@ class SumDiscBot(dtbext_basic.BasicBot):
 		return work_list
 
 	# created due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 24)
-	def _getUserBacklinks(self):
+	def getUserBacklinks(self):
 		'''
 		check wiki on backlinks to specific user
 
@@ -564,7 +567,7 @@ class SumDiscBot(dtbext_basic.BasicBot):
 		'''
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 17)
 
-		# according to '_checkRecentEdits(...)'
+		# according to 'checkRecentEdits(...)'
 		check_list = self._param['checkedit_list']
 
 		userbacklicksList = []
@@ -587,7 +590,7 @@ class SumDiscBot(dtbext_basic.BasicBot):
 		return work_list
 
 	# created due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 38)
-	def _getGlobalWikiNotifications(self):
+	def getGlobalWikiNotifications(self):
 		'''
 		check if there are any (global) messages on a other wiki for same user!!
 
@@ -601,15 +604,12 @@ class SumDiscBot(dtbext_basic.BasicBot):
 			pywikibot.output(u'\03{lightred}=== ! DEBUG MODE TOOLSERVER ACCESS WILL BE SKIPPED ! ===\03{default}')
 			return
 
-		# according to '_AddMaintenanceMsg(...)', '_getUserBacklinks'
+		# according to '_AddMaintenanceMsg(...)', 'getUserBacklinks'
 		work_list = {}
 		for page in dtbext.pagegenerators.GlobalWikiNotificationsGenerator(self._user):
 			data = page.extradata
-			#self._news_list[page.title()] = (bot_config['globwiki_notify'], page, data['user'], data['timestamp'], {u'':('',True,u'')}, self._PS_maintmsg)
-			#tmst = time.strftime('%H:%M, %d. %b. %Y')
-			#tmst = u'%s' % re.sub(' 0', ' ', tmst)
-			#self._news_list[page.title()] = (bot_config['globwiki_notify'], page, data['user'], tmst, {u'':('',True,u'')}, self._PS_maintmsg)
-			work_list[page.title()] = (bot_config['globwiki_notify'], page, data['user'], data['timestamp'], {u'':('',True,u'')}, self._PS_notify)
+			#work_list[page.title()] = (bot_config['globwiki_notify'], page, data['user'], data['timestamp'], {u'':('',True,u'')}, self._PS_notify)
+			work_list[data[u'link']] = (bot_config['globwiki_notify'], page, data['user'], data['timestamp'], {u'':('',True,u'')}, self._PS_notify)
 			#self._hist_list[page.title()] = self._news_list[page.title()]
 
 		pywikibot.output(u'*** %i Global wiki notifications added' % len(work_list))
@@ -664,35 +664,8 @@ class SumDiscBot(dtbext_basic.BasicBot):
 		else:
 			pywikibot.output(u'*** Discussion up to date: NOTHING TO DO')
 
-#	def _getHistory(self):
-#		'''
-#		read histroy (in human-readable format)
-#		( history currently implemented as local file, but wiki page could also be used )
-#		'''
-#
-#		buf = self.loadFile()
-#
-#		historyList = re.findall('\*.*?\) --', buf)
-#
-#		history = {}
-#		for item in historyList:
-#			try:
-#				buf = re.search(': \[\[(.*?)\]\] - last edit by \[\[(.*?)\]\] \((.*?)\)', item).groups()
-#				if history.has_key(buf[0]):
-#					# refresh entry only when newer (more recent)
-#					# http://docs.python.org/lib/module-time.html
-#					histtime = time.strptime(str(history[buf[0]][0]), '%H:%M, %d. %b. %Y')
-#					actutime = time.strptime(str(buf[2]), '%H:%M, %d. %b. %Y')
-#					if (histtime < actutime):	history[buf[0]] = buf[2]
-#				else:
-#					# add new entry
-#					history[buf[0]] = buf[2]
-#			except:	pass
-#		# WITHOUT CHANGING ORDER would be nice...
-#		self._hist_list = history
-#
-#		pywikibot.output(u'*** History recieved')
-
+	# look into (pywikibot.)textlib.translate()
+	#
 	#def _transPage(self, page):
 	#	'''
 	#	???
@@ -855,31 +828,12 @@ class SumDiscBot(dtbext_basic.BasicBot):
 
 		site = page
 
-		#(sections, verify) = siteAPI.getSections(minLevel=1, getter=site.get)
-		(sections, verify) = site.getSections(minLevel=1, pagewikitext=buf)
-		if not verify:
-			#pywikibot.output(u'!!! WARNING: Have to use "getFull"...')
-			pywikibot.output(u"\03{lightblue}Re-Reading Wiki page (mode='full') at %s...\03{default}" % site.title(asLink=True))
-			buf = site.get(mode='full')
-			#buf = self.load( site, full=True )
-			(sections, verify) = site.getSections(minLevel=1, pagewikitext=buf)
-			if not verify:
-				pywikibot.output(u"\03{lightblue}Re-Reading Wiki page (mode='parse') at %s...\03{default}" % site.title(asLink=True))
-				parse_buf = site.get(mode='parse')
-				if self._reftag_err_regex.search(parse_buf):
-					self._oth_list[site.title()] = (	u'was not able to get Sections properly, because of missing <references /> tag!', 
-									site, 
-									None, 
-									None, 
-									None, 
-									self._PS_warning )
-				else:
-					self._oth_list[site.title()] = (	u'was not able to get Sections properly!', 
-									site, 
-									None, 
-									None, 
-									None, 
-									self._PS_warning )
+		dtbext.pywikibot.addAttributes( page )		# enhance to dtbext.pywikibot.Page
+		#try:
+		sections = page.getSections(minLevel=1, pagewikitext=buf)
+		#except pywikibot.Error:
+		#	pass	# sections could not be resoled, process the whole page at once
+
 		if len(sections) == 0:
 			head = [('','')]
 			body = [buf]
@@ -931,7 +885,7 @@ class SumDiscBot(dtbext_basic.BasicBot):
 
 		# check if thread has not changed (because user can be not last but thread has also not changed)
 		# (introduce checksum with backwards compatibility)
-		# converting of different data formats is now done in '_getHistoryPYF()'
+		# converting of different data formats is now done in 'getHistoryPYF()'
 		checksum_cur = hashlib.md5(item.encode('utf8').strip()).hexdigest()
 		if ((checksum and (len(checksum) > 0)) and (heading in checksum)):
 			# CHKSUM v5
