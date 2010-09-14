@@ -93,26 +93,22 @@ For tests its sometimes better to use:
 #
 # (C) Dr. Trigon, 2009
 #
-# Distributed under the terms of the MIT license.
-# (is part of DrTrigonBot-"framework")
+# DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
-# keep the version of 'clean_user_sandbox.py', 'new_user.py', 'runbotrun.py', 'replace_tmpl.py', 'sum_disc-conf.py', ...
-# up to date with this:
-# Versioning scheme: A.B.CCCC
-#  CCCC: beta, minor/dev relases, bugfixes, daily stuff, ...
-#  B: bigger relases with tidy code and nice comments
-#  A: really big release with multi lang. and toolserver support, ready
-#     to use in pywikipedia framework, should also be contributed to it
-__version__='$Id: runbotrun.py 0.2.0001 2009-06-05 14:56:00Z drtrigon $'
+# Distributed under the terms of the MIT license.
+#
+__version__='$Id: runbotrun.py 0.2.0020 2009-11-14 17:53 drtrigon $'
 __revision__='8072'
 #
 
 # wikipedia-bot imports
-import wikipedia, config, query, pagegenerators, userlib
+import config, query, pagegenerators, userlib
 import sys, os, re, time, codecs
 import clean_user_sandbox, sum_disc, mailer, subster, page_disc
 #import clean_user_sandbox, sum_disc, replace_tmpl
 import dtbext
+# Splitting the bot into library parts
+import wikipedia as pywikibot
 
 import traceback, StringIO
 
@@ -196,103 +192,103 @@ def main():
     global do_subster		# alle anderen NICHT noetig, warum diese hier ?!?????
 
     # script call
-    #wikipedia.output(u'SCRIPT CALL:')
-    wikipedia.output(u'\nSCRIPT CALL:')
-    wikipedia.output(u'  ' + u' '.join(sys.argv))
+    #pywikibot.output(u'SCRIPT CALL:')
+    pywikibot.output(u'\nSCRIPT CALL:')
+    pywikibot.output(u'  ' + u' '.join(sys.argv))
 
     # logging of framework info
-    infolist = [ config.__version__, pagegenerators.__version__, query.__version__, wikipedia.__version__,	# framework
-		dtbext.pagegenerators.__version__, dtbext.query.__version__, dtbext.wikipedia.__version__,	# DrTrigonBot extensions
+    infolist = [ config.__version__, pagegenerators.__version__, query.__version__, pywikibot.__version__,	# framework
+		dtbext.pagegenerators.__version__, dtbext.query.__version__, dtbext.pywikibot.__version__,	# DrTrigonBot extensions
 		dtbext.date.__version__, dtbext.config.__version__,						#
 		__version__, clean_user_sandbox.__version__, sum_disc.__version__, mailer.__version__,		# bots
 		subster.__version__, page_disc.__version__ ]												#
-    wikipedia.output(u'FRAMEWORK VERSION:')
-    for item in infolist: wikipedia.output(u'  %s' % item)
+    pywikibot.output(u'FRAMEWORK VERSION:')
+    for item in infolist: pywikibot.output(u'  %s' % item)
 
     # new framework revision?
-    wikipedia.output(u'LATEST FRAMEWORK REVISION:')
-    #buf = wikipedia.getSite().getUrl( 'http://svn.wikimedia.org/viewvc/pywikipedia/trunk/pywikipedia/', no_hostname = True )
-    buf = wikipedia.getSite().getUrl( 'http://svn.wikimedia.org/viewvc/pywikipedia/trunk/pywikipedia/', no_hostname = True, retry = False )
+    pywikibot.output(u'LATEST FRAMEWORK REVISION:')
+    #buf = pywikibot.getSite().getUrl( 'http://svn.wikimedia.org/viewvc/pywikipedia/trunk/pywikipedia/', no_hostname = True )
+    buf = pywikibot.getSite().getUrl( 'http://svn.wikimedia.org/viewvc/pywikipedia/trunk/pywikipedia/', no_hostname = True, retry = False )
     match = re.search('<td>Directory revision:</td>\n<td><a (.*?)>(.*?)</a> \(of <a (.*?)>(.*?)</a>\)</td>', buf)
     if match and (len(match.groups()) > 0):
         info = {True: '=', False: '>'}        
-        wikipedia.output(u'  Directory revision: %s (%s %s)' % (match.groups()[-1], info[(match.groups()[-1]==__revision__)], __revision__))
+        pywikibot.output(u'  Directory revision: %s (%s %s)' % (match.groups()[-1], info[(match.groups()[-1]==__revision__)], __revision__))
     else:
-        wikipedia.output(u'  WARNING: could not retrieve information!')
+        pywikibot.output(u'  WARNING: could not retrieve information!')
 
     # processing of messages on bot discussion page
-    if wikipedia.getSite().messages():
-        wikipedia.output(u'====== new messages on bot discussion page =======')
-        messagesforbot = wikipedia.Page(wikipedia.getSite(), u'Benutzer Diskussion:DrTrigonBot').get(get_redirect=True)
-        wikipedia.output(messagesforbot)
-        wikipedia.output(u'==================================================')
+    if pywikibot.getSite().messages():
+        pywikibot.output(u'====== new messages on bot discussion page =======')
+        messagesforbot = pywikibot.Page(pywikibot.getSite(), u'Benutzer Diskussion:DrTrigonBot').get(get_redirect=True)
+        pywikibot.output(messagesforbot)
+        pywikibot.output(u'==================================================')
 
     while True:
         if do_clean_user_sandbox:
-            wikipedia.output(u'RUN SUB-BOT: clean userspace Sandboxes')
+            pywikibot.output(u'RUN SUB-BOT: clean userspace Sandboxes')
             try:
                 clean_user_sandbox.main()
             except:
                 error = gettraceback(sys.exc_info())
                 if error:
-                    wikipedia.output(u'\03{lightred}%s\03{default}' % error[2])
+                    pywikibot.output(u'\03{lightred}%s\03{default}' % error[2])
                     error_buffer.append( error )
                 else:
                     raise
                 #raise sys.exc_info()[0](sys.exc_info()[1])
         else:
-			wikipedia.output(u'SKIPPING: clean userspace Sandboxes')
+			pywikibot.output(u'SKIPPING: clean userspace Sandboxes')
 
         if do_sum_disc or do_compress_history:
-            if do_sum_disc:		wikipedia.output(u'RUN SUB-BOT: discussion summary')
-            elif do_compress_history:	wikipedia.output(u'RUN SUB-BOT: compressing discussion summary')
+            if do_sum_disc:		pywikibot.output(u'RUN SUB-BOT: discussion summary')
+            elif do_compress_history:	pywikibot.output(u'RUN SUB-BOT: compressing discussion summary')
             try:
                 sum_disc.main()
             except:
                 error = gettraceback(sys.exc_info())
                 if error:
-                    wikipedia.output(u'\03{lightred}%s\03{default}' % error[2])
+                    pywikibot.output(u'\03{lightred}%s\03{default}' % error[2])
                     error_buffer.append( error )
                 else:
                     raise
         else:
-			wikipedia.output(u'SKIPPING: discussion summary or compressing discussion summary')
+			pywikibot.output(u'SKIPPING: discussion summary or compressing discussion summary')
 
         #if do_replace_tmpl:
-        #    wikipedia.output(u'RUN SUB-BOT: replace_tmpl')
+        #    pywikibot.output(u'RUN SUB-BOT: replace_tmpl')
         #    try:
         #        replace_tmpl.main()
         #    except:
         #        error = gettraceback(sys.exc_info())
         #        if error:
-        #            wikipedia.output(u'\03{lightred}%s\03{default}' % error[2])
+        #            pywikibot.output(u'\03{lightred}%s\03{default}' % error[2])
         #            error_buffer.append( error )
         #        else:
         #            raise
         #else:
-		#	wikipedia.output(u'SKIPPING: replace_tmpl')
+		#	pywikibot.output(u'SKIPPING: replace_tmpl')
 
         if do_mailer:
-            wikipedia.output(u'RUN SUB-BOT: "MailerBot"')
+            pywikibot.output(u'RUN SUB-BOT: "MailerBot"')
             try:
                 mailer.main()
             except:
                 error = gettraceback(sys.exc_info())
                 if error:
-                    wikipedia.output(u'\03{lightred}%s\03{default}' % error[2])
+                    pywikibot.output(u'\03{lightred}%s\03{default}' % error[2])
                     error_buffer.append( error )
                 else:
                     raise
         else:
-			wikipedia.output(u'SKIPPING: "MailerBot"')
+			pywikibot.output(u'SKIPPING: "MailerBot"')
 
         if do_subster:
-            wikipedia.output(u'RUN SUB-BOT: "SubsterBot"')
+            pywikibot.output(u'RUN SUB-BOT: "SubsterBot"')
 
             if cron:
                 # use another log (for subster because of 'panel.py')
                 logname_enh = "_subster"
-                wikipedia.output(u'switching log to "...%s.log", please look there ...' % logname_enh)
+                pywikibot.output(u'switching log to "...%s.log", please look there ...' % logname_enh)
                 (sys.stdout, sys.stderr) = (out_stream, err_stream)
                 logfile.close()
                 (logfile, out_stream, err_stream) = setlogfile(addlogname=logname_enh)
@@ -308,7 +304,7 @@ def main():
             except:
                 error = gettraceback(sys.exc_info())
                 if error:
-                    wikipedia.output(u'\03{lightred}%s\03{default}' % error[2])
+                    pywikibot.output(u'\03{lightred}%s\03{default}' % error[2])
                     error_buffer.append( error )
                 else:
                     raise
@@ -316,33 +312,33 @@ def main():
             if cron:
                 # back to default log (for everything else than subster)
                 logname_enh = ""
-                wikipedia.output(u'switching log to "...%s.log", please look there ...' % logname_enh)
+                pywikibot.output(u'switching log to "...%s.log", please look there ...' % logname_enh)
                 (sys.stdout, sys.stderr) = (out_stream, err_stream)
                 logfile.close()
                 (logfile, out_stream, err_stream) = setlogfile(addlogname=logname_enh)
         else:
-			wikipedia.output(u'SKIPPING: "SubsterBot"')
+			pywikibot.output(u'SKIPPING: "SubsterBot"')
 
         if do_page_disc:
-            wikipedia.output(u'RUN SUB-BOT: page_disc')
+            pywikibot.output(u'RUN SUB-BOT: page_disc')
             try:
                 page_disc.main()
             except:
                 error = gettraceback(sys.exc_info())
                 if error:
-                    wikipedia.output(u'\03{lightred}%s\03{default}' % error[2])
+                    pywikibot.output(u'\03{lightred}%s\03{default}' % error[2])
                     error_buffer.append( error )
                 else:
                     raise
         else:
-			wikipedia.output(u'SKIPPING: page_disc')
+			pywikibot.output(u'SKIPPING: page_disc')
 
         if no_repeat:
-            wikipedia.output(u'\nDone.')
+            pywikibot.output(u'\nDone.')
             return
         else:
             now = time.strftime("%d %b %Y %H:%M:%S (UTC)", time.gmtime())
-            wikipedia.output(u'\nSleeping %s hours, now %s' % (hours, now))
+            pywikibot.output(u'\nSleeping %s hours, now %s' % (hours, now))
             (sys.stdout, sys.stderr) = (out_stream, err_stream)
             logfile.close()
             time.sleep(hours * 60 * 60)
@@ -353,9 +349,9 @@ def main():
 if __name__ == "__main__":
     hours = 48
     no_repeat = True
-    arg = wikipedia.handleArgs()
+    arg = pywikibot.handleArgs()
     if len(arg) > 0:
-        #arg = wikipedia.handleArgs()[0]
+        #arg = pywikibot.handleArgs()[0]
         #print sys.argv[0]	# who am I?
         #if (arg[:5] == "-auto") or (arg[:5] == "-cron"):
 
@@ -409,7 +405,7 @@ if __name__ == "__main__":
         error_buffer = []
     else:
         (out_stream, err_stream) = (sys.stdout, sys.stderr)
-        choice = wikipedia.inputChoice('Do you want to compress the histories?', ['Yes', 'No'], ['y', 'n'])
+        choice = pywikibot.inputChoice('Do you want to compress the histories?', ['Yes', 'No'], ['y', 'n'])
         if choice == 'y':
             logs = os.listdir(u'logs')
             for item in logs:
@@ -427,7 +423,7 @@ if __name__ == "__main__":
     except:
         error = gettraceback(sys.exc_info())
         if error:				# sub-bot error OR other/unexpected error
-            #wikipedia.output(u'\03{lightred}%s\03{default}' % error[2])
+            #pywikibot.output(u'\03{lightred}%s\03{default}' % error[2])
             error_buffer.append( error )
         #else:					# Ctrl-C/BREAK/keyb-int
         #    raise
@@ -436,11 +432,11 @@ if __name__ == "__main__":
             for item in error_buffer:		# if Ctrl-C/BREAK/keyb-int; the 'error_buffer' should be empty
                 item = item[2]
                 if error_mail_fromwiki:
-                    wikipedia.output(u'ERROR:\n%s\n' % item)
-                    wikipedia.output(u'Sending mail "%s" to "%s" as notification!' % (error_mail[1], error_mail[0]))
-                    usr = userlib.User(wikipedia.getSite(), error_mail[0])
+                    pywikibot.output(u'ERROR:\n%s\n' % item)
+                    pywikibot.output(u'Sending mail "%s" to "%s" as notification!' % (error_mail[1], error_mail[0]))
+                    usr = userlib.User(pywikibot.getSite(), error_mail[0])
                     if not usr.sendMail(subject=error_mail[1], text=item):		# 'item' should be unicode!
-                        wikipedia.output(u'!!! WARNING: mail could not be sent!')
+                        pywikibot.output(u'!!! WARNING: mail could not be sent!')
 
                 # https://wiki.toolserver.org/view/Cronjob#Output use CRON for error and mail handling, if
                 # something should be mailed/reported just print it to 'out_stream' or 'err_stream'
@@ -448,7 +444,7 @@ if __name__ == "__main__":
         raise
         #raise sys.exc_info()[0](sys.exc_info()[1])
     finally:
-        wikipedia.stopme()
+        pywikibot.stopme()
 
     if not no_repeat:
         (sys.stdout, sys.stderr) = (out_stream, err_stream)

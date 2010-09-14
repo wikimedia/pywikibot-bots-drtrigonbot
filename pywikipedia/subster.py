@@ -19,24 +19,20 @@ including all namespaces. It checks several users (at request), sequential
 #
 # (C) Dr. Trigon, 2008, 2009
 #
+# DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+#
 # Distributed under the terms of the MIT license.
-# (is part of DrTrigonBot-"framework")
 #
-# keep the version of 'clean_user_sandbox.py', 'new_user.py', 'runbotrun.py', 'replace_tmpl.py', 'sum_disc-conf.py', ...
-# up to date with this:
-# Versioning scheme: A.B.CCCC
-#  CCCC: beta, minor/dev relases, bugfixes, daily stuff, ...
-#  B: bigger relases with tidy code and nice comments
-#  A: really big release with multi lang. and toolserver support, ready
-#     to use in pywikipedia framework, should also be contributed to it
-__version__='$Id: subster.py 0.2.0001 2009-09-09 18:46:00Z drtrigon $'
+__version__='$Id: subster.py 0.2.0020 2009-11-14 17:38 drtrigon $'
 #
 
 
-import wikipedia, config, pagegenerators
+import config, pagegenerators
 import dtbext
 import re, sys, os, time
 import math, copy
+# Splitting the bot into library parts
+import wikipedia as pywikibot
 
 
 class SubsterRobot:
@@ -70,7 +66,7 @@ class SubsterRobot:
 		'''
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 28, 30, 17)
 
-        	self._userListPage = dtbext.wikipedia.Page(wikipedia.getSite(), u'Benutzer:DrTrigon/Entwurf/Vorlage:Subster')
+        	self._userListPage = dtbext.pywikibot.Page(pywikibot.getSite(), u'Benutzer:DrTrigon/Entwurf/Vorlage:Subster')
 
 		self._tmpl_regex = re.compile('\{\{Benutzer:DrTrigon/Entwurf/Vorlage:Subster(.*?)\}\}', re.S)
 
@@ -80,7 +76,7 @@ class SubsterRobot:
 		'''
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 24, 38, 17)
 
-		wikipedia.output(u'\03{lightgreen}* Processing Template Backlink List:\03{default}')
+		pywikibot.output(u'\03{lightgreen}* Processing Template Backlink List:\03{default}')
 
 		if sim:	pagegen = ['dummy']
 		#else:	pagegen = pagegenerators.ReferringPageGenerator(self._userListPage)
@@ -100,9 +96,9 @@ class SubsterRobot:
 			for item in params:
 				# 1.) getUrl
 				if eval(item['wiki']):
-					external_buffer = self._readPage( dtbext.wikipedia.Page(wikipedia.getSite(), item['url']) )
+					external_buffer = self._readPage( dtbext.pywikibot.Page(pywikibot.getSite(), item['url']) )
 				else:
-					external_buffer = wikipedia.getSite().getUrl(item['url'], no_hostname = True)
+					external_buffer = pywikibot.getSite().getUrl(item['url'], no_hostname = True)
 
 				# 2.) regexp
 				#regex = re.compile(item['regex'], re.S | re.I | re.M)
@@ -154,7 +150,7 @@ class SubsterRobot:
 				if (substed_content != content):
 					self._writePage(page, substed_content, u'substituting changed tags')
 				else:
-					wikipedia.output(u'NOTHING TO DO!')
+					pywikibot.output(u'NOTHING TO DO!')
 
 	def _readPage(self, page):
 		'''
@@ -167,15 +163,15 @@ class SubsterRobot:
 
 		(mode, info) = ('default', '')
 
-		#wikipedia.output(u'\03{lightblue}Reading Wiki at %s...\03{default}' % page.title(asLink=True))
-		wikipedia.output(u'\03{lightblue}Reading Wiki%s at %s...\03{default}' % (info, page.title(asLink=True)))
+		#pywikibot.output(u'\03{lightblue}Reading Wiki at %s...\03{default}' % page.title(asLink=True))
+		pywikibot.output(u'\03{lightblue}Reading Wiki%s at %s...\03{default}' % (info, page.title(asLink=True)))
 		try:
 			#content = page.get()
 			content = page.get(mode=mode)
 			#if url in content:		# durch history schon gegeben! (achtung dann bei multithreading... wobei ist ja thread per user...)
-			#	wikipedia.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.title(asLink=True))
+			#	pywikibot.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.title(asLink=True))
 			#	continue
-		except (wikipedia.NoPage, wikipedia.IsRedirectPage):
+		except (pywikibot.NoPage, pywikibot.IsRedirectPage):
 			content = u''
 		return content
 
@@ -188,16 +184,16 @@ class SubsterRobot:
 		returns:  (writes data to page on the wiki, nothing else)
 		'''
 
-		wikipedia.output(u'\03{lightblue}Writing to Wiki on %s...\03{default}' % page.title(asLink=True))
+		pywikibot.output(u'\03{lightblue}Writing to Wiki on %s...\03{default}' % page.title(asLink=True))
 
-		wikipedia.setAction(comment)
+		pywikibot.setAction(comment)
 
 		content = data
 		try:
 			if minorEdit:	page.put(content)
 			else:		page.put(content, minorEdit = False)
-		except wikipedia.SpamfilterError, error:
-			wikipedia.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.title(asLink=True), "error.url"))
+		except pywikibot.SpamfilterError, error:
+			pywikibot.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.title(asLink=True), "error.url"))
 
 	def _getMode(self, content):
 		'''
@@ -246,8 +242,8 @@ class SubsterRobot:
 
 def main():
 	bot = SubsterRobot()	# for several user's, but what about complete automation (continous running...)
-	if len(wikipedia.handleArgs()) > 0:
-		for arg in wikipedia.handleArgs():
+	if len(pywikibot.handleArgs()) > 0:
+		for arg in pywikibot.handleArgs():
 			if arg[:2] == "u'": arg = eval(arg)		# for 'runbotrun.py' and unicode compatibility
 			if	(arg[:5] == "-auto") or (arg[:5] == "-cron"):
 				bot.silent = True
@@ -256,7 +252,7 @@ def main():
 			elif	(arg == "-no_magic_words"):
 				pass
 			else:
-				wikipedia.showHelp()
+				pywikibot.showHelp()
 				return
 	bot.run()
 
@@ -264,5 +260,5 @@ if __name__ == "__main__":
     try:
         main()
     finally:
-        wikipedia.stopme()
+        pywikibot.stopme()
 

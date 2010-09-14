@@ -1,40 +1,25 @@
-
+# -*- coding: utf-8  -*-
 """
 This is a part of pywikipedia framework, it is a deviation of date.py.
 
 ...
 """
-
-# ====================================================================================================
 #
-# ToDo-Liste (Bugs, Features, usw.):
-# http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste
+# (C) Dr. Trigon, 2009-2010
 #
-# READ THE *DOGMAS* FIRST!
-# 
-# ====================================================================================================
-
-#
-# (C) Dr. Trigon, 2009
+# DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
 # Distributed under the terms of the MIT license.
-# (is part of DrTrigonBot-"framework")
 #
-# keep the version of 'clean_sandbox2.py', 'new_user.py', 'runbotrun.py', 'replace_tmpl.py', 'sum_disc-conf.py', ...
-# up to date with this:
-# Versioning scheme: A.B.CCCC
-#  CCCC: beta, minor/dev relases, bugfixes, daily stuff, ...
-#  B: bigger relases with tidy code and nice comments
-#  A: really big release with multi lang. and toolserver support, ready
-#     to use in pywikipedia framework, should also be contributed to it
-__version__='$Id: dtbext/date.py 0.2.0019 2009-11-13 23:42 drtrigon $'
+__version__='$Id: dtbext_date.py 0.2.0020 2009-11-14 11:55 drtrigon $'
 #
 
 # Standard library imports
 import time
 
 # Application specific imports
-import config, pywikibot
+import config
+import wikipedia as pywikibot
 
 
 # ADDED

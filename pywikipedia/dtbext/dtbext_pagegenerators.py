@@ -1,34 +1,18 @@
-
+# -*- coding: utf-8  -*-
 """
 This is a part of pywikipedia framework, it is a deviation of pagegenerators.py and mainly provides
 the same functions but enhanced.
 
 ...
 """
-
-# ====================================================================================================
 #
-# ToDo-Liste (Bugs, Features, usw.):
-# http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste
+# (C) Dr. Trigon, 2009-2010
 #
-# READ THE *DOGMAS* FIRST!
-# 
-# ====================================================================================================
-
-#
-# (C) Dr. Trigon, 2009
+# DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
 # Distributed under the terms of the MIT license.
-# (is part of DrTrigonBot-"framework")
 #
-# keep the version of 'clean_sandbox2.py', 'new_user.py', 'runbotrun.py', 'replace_tmpl.py', 'sum_disc-conf.py', ...
-# up to date with this:
-# Versioning scheme: A.B.CCCC
-#  CCCC: beta, minor/dev relases, bugfixes, daily stuff, ...
-#  B: bigger relases with tidy code and nice comments
-#  A: really big release with multi lang. and toolserver support, ready
-#     to use in pywikipedia framework, should also be contributed to it
-__version__='$Id: dtbext/pagegenerators.py 0.2.0019 2009-11-13 23:42 drtrigon $'
+__version__='$Id: dtbext_pagegenerators.py 0.2.0020 2009-11-14 11:59 drtrigon $'
 #
 
 # Standard library imports
@@ -37,7 +21,9 @@ from xml.sax import saxutils, make_parser
 from xml.sax.handler import feature_namespaces
 
 # Application specific imports
-import wikipedia, config, query
+import config, query
+import wikipedia as pywikibot
+import dtbext_wikipedia as dtbext_pywikibot
 
 
 REQUEST_getGlobalWikiNotifys	= 'http://toolserver.org/~merl/UserPages/query.php?user=%s&format=xml'
@@ -46,7 +32,7 @@ REQUEST_getGlobalWikiNotifys	= 'http://toolserver.org/~merl/UserPages/query.php?
 # ADDED: new (r19)
 # REASON: needed by various bots BUT SHOULD BE ALSO DONE BY THE PreloadingGenerator
 #         (this here is just a patch, should be done in framework)
-def VersionHistoryGenerator(iterable, site=wikipedia.Site(config.mylang), number=5000):
+def VersionHistoryGenerator(iterable, site=pywikibot.Site(config.mylang), number=5000):
 	"""Provides a list of page names with VersionHistory for the pages.
 	   ADDED METHOD: needed by various bots BUT SHOULD BE DONE BY PreloadingGenerator
 
@@ -77,8 +63,8 @@ def VersionHistoryGenerator(iterable, site=wikipedia.Site(config.mylang), number
 			if number > 5000:
 				params[u'rvlimit'] = 5000
 
-		wikipedia.get_throttle()
-		wikipedia.output(u"Reading a set of %i pages." % len(item))
+		pywikibot.get_throttle()
+		pywikibot.output(u"Reading a set of %i pages." % len(item))
 
 		result = query.GetData(params, site)		# 1 result per page
 		r = result[u'query'][u'pages'].values()
@@ -86,7 +72,7 @@ def VersionHistoryGenerator(iterable, site=wikipedia.Site(config.mylang), number
 		for item in r:
 			if u'missing' in item:
                 		#raise NoPage(site, item[u'title'],"Page does not exist." )
-				wikipedia.output( str(wikipedia.NoPage(site, item[u'title'],u"Page does not exist." )) )
+				pywikibot.output( str(pywikibot.NoPage(site, item[u'title'],u"Page does not exist." )) )
 			else:
 				entry = item[u'revisions'][0]
 				yield (item[u'title'], entry[u'revid'], entry[u'timestamp'], entry[u'user'], entry[u'comment'])
@@ -95,7 +81,7 @@ def VersionHistoryGenerator(iterable, site=wikipedia.Site(config.mylang), number
 
 # ADDED
 # REASON: due to http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 38)
-def GlobalWikiNotificationsGenerator(username, site=wikipedia.Site(config.mylang)):
+def GlobalWikiNotificationsGenerator(username, site=pywikibot.Site(config.mylang)):
 	"""Provides a list of results using the toolserver Merlissimo API, can also
 	   be used as Generator for 'SimplePageGenerator'
 	   ADDED METHOD: needed by various bots
@@ -111,12 +97,15 @@ def GlobalWikiNotificationsGenerator(username, site=wikipedia.Site(config.mylang
 	"""
 
 	request = REQUEST_getGlobalWikiNotifys % urllib.quote(username.encode(config.textfile_encoding))
-	wikipedia.get_throttle()
+
+	pywikibot.get_throttle()
+	pywikibot.output(u"Reading GlobalWikiNotifications from toolserver." % len(item))
+
 	buf = site.getUrl( request, no_hostname = True )
 
 	if not buf: return	# nothing got (error?! how to catch later??)
 
-	buf = dtbext_wikipedia._GetDataXML(buf, [u'userpages'])
+	buf = dtbext_pywikibot._GetDataXML(buf, [u'userpages'])
 	for i in range(0, len(buf), 2):
 		item = buf[i:(i+2)]
 		data = {}
@@ -130,16 +119,16 @@ def GlobalWikiNotificationsGenerator(username, site=wikipedia.Site(config.mylang
 		# [u'revid', u'user', u'timestamp', u'comment', u'redirect'],
 		#yield (data[u'revid'], data[u'user'], data[u'timestamp'], data[u'comment'], data[u'link'], data[u'url'], data[u'pageid'])
 		try:
-			page = dtbext_wikipedia.Page(site, data[u'link'])
+			page = dtbext_pywikibot.Page(site, data[u'link'])
 			page.extradata = data
 			yield page
-		except wikipedia.NoPage:
-			wikipedia.output(u'!!! WARNING [[%s]]: this wiki is not supported by framework, skipped!' % data[u'link'])
+		except pywikibot.NoPage:
+			pywikibot.output(u'!!! WARNING [[%s]]: this wiki is not supported by framework, skipped!' % data[u'link'])
 
 # ADDED
 # REASON: needed by 'GlobalWikiNotificationsGenerator' (due to http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 38))
 def _GetDataXML(data, root):
-	#wikipedia.get_throttle()
+	#pywikibot.get_throttle()
 	#APIdata = site.getUrl( request )
 
 	data = StringIO.StringIO(data.encode(config.textfile_encoding))

@@ -50,7 +50,7 @@ TODO:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: commonscat.py 8550 2010-09-13 11:10:07Z xqt $'
+__version__ = '$Id: commonscat.py 8552 2010-09-14 05:47:44Z xqt $'
 #
 
 import wikipedia as pywikibot
@@ -472,7 +472,7 @@ u'Cannot change %s because of spam blacklist entry %s'
             elif commonsPage.isRedirectPage():
                 if pywikibot.verbose:
                     pywikibot.output(u"getCommonscat: The category is a redirect")
-                return checkCommonscatLink(
+                return self.checkCommonscatLink(
                     commonsPage.getRedirectTarget().titleWithoutNamespace())
             elif "Category redirect" in commonsPage.templates():
                 if pywikibot.verbose:

@@ -1,31 +1,20 @@
-
+# -*- coding: utf-8  -*-
 """
 ...
 """
-
 #
-# (C) Dr. Trigon, 2009
+# (C) Dr. Trigon, 2009-2010
+#
+# DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
 # Distributed under the terms of the MIT license.
-# (is part of DrTrigonBot-"framework")
 #
-# keep the version of 'clean_sandbox2.py', 'new_user.py', 'runbotrun.py', 'replace_tmpl.py', 'sum_disc-conf.py', ...
-# up to date with this:
-# Versioning scheme: A.B.CCCC
-#  CCCC: beta, minor/dev relases, bugfixes, daily stuff, ...
-#  B: bigger relases with tidy code and nice comments
-#  A: really big release with multi lang. and toolserver support, ready
-#     to use in pywikipedia framework, should also be contributed to it
-__version__='$Id: dtbext/pywikibot.py 0.2.0019 2009-11-13 23:43 drtrigon $'
+__version__='$Id: dtbext_textlib.py 0.2.0020 2009-11-14 15:56 drtrigon $'
 #
 
 # Standard library imports
 from HTMLParser import HTMLParser
 
-
-# ====================================================================================================
-#  textlib.py
-# ====================================================================================================
 
 # ADDED: new (r19)
 # REASON: needed by various bots
@@ -61,5 +50,26 @@ class _GetDataHTML(HTMLParser):
 
 	def handle_endtag(self, tag):
 		if tag in self.keeptags: self.textdata += u"</%s>" % tag
+
+#----------------------------------
+# Functions dealing with templates
+#----------------------------------
+
+# ADDED: new (r20)
+# REASON: needed by various bots
+def glue_template_and_params(template_and_params):
+	"""Return wiki text of template glued from params.
+
+	You can use items from extract_templates_and_params here to get
+	an equivalent template wiki text (it may happen that the order
+	of the params changes).
+	"""
+	(template, params) = template_and_params
+
+	text = u''
+	for item in params:
+		text +=  u'|%s=%s\n' % (item, params[item])
+
+	return u'{{%s\n%s}}' % (template, text)
 
 

@@ -78,21 +78,15 @@ Syntax example:
 #
 # (C) Dr. Trigon, 2008, 2009
 #
+# DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+#
 # Distributed under the terms of the MIT license.
-# (is part of DrTrigonBot-"framework")
 #
-# keep the version of 'clean_user_sandbox.py', 'new_user.py', 'runbotrun.py', 'replace_tmpl.py', 'sum_disc-conf.py', ...
-# up to date with this:
-# Versioning scheme: A.B.CCCC
-#  CCCC: beta, minor/dev relases, bugfixes, daily stuff, ...
-#  B: bigger relases with tidy code and nice comments
-#  A: really big release with multi lang. and toolserver support, ready
-#     to use in pywikipedia framework, should also be contributed to it
-__version__='$Id: page_disc.py 0.2.0001 BETA 2010-07-31 16:21:00Z drtrigon $'
+__version__='$Id: page_disc.py 0.2.0020 BETA 2009-11-14 17:45 drtrigon $'
 #
 
 
-import wikipedia, config, pagegenerators
+import config, pagegenerators
 import dtbext
 import re, sys
 #import codecs, pickle
@@ -100,6 +94,8 @@ import re, sys
 import time, codecs, os, calendar
 import threading
 import copy #, zlib
+# Splitting the bot into library parts
+import wikipedia as pywikibot
 
 import sets, string, datetime, hashlib
 #import titletranslate
@@ -165,18 +161,18 @@ class PageDiscRobot:
 		'''
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 28, 30, 17)
 
-		wikipedia.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
+		pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
 
 		# modification of timezone to be in sync with wiki
 		os.environ['TZ'] = 'Europe/Amsterdam'
 		time.tzset()
-		wikipedia.output(u'** Set TZ: %s' % str(time.tzname))	# ('CET', 'CEST')
+		pywikibot.output(u'** Set TZ: %s' % str(time.tzname))	# ('CET', 'CEST')
 
-		wikipedia.output(u'** Setting Page List (source and target)')
+		pywikibot.output(u'** Setting Page List (source and target)')
 		self._page_list = []
 		for item in [u"Benutzer_Diskussion:Hæggis"]:
-			self._page_list.append( dtbext.wikipedia.Page(wikipedia.getSite(), item) )
-		self._target = [ {'page': dtbext.wikipedia.Page(wikipedia.getSite(), u"Benutzer:DrTrigon/Spielwiese"), 'section': 3} ]
+			self._page_list.append( dtbext.pywikibot.Page(pywikibot.getSite(), item) )
+		self._target = [ {'page': dtbext.pywikibot.Page(pywikibot.getSite(), u"Benutzer:DrTrigon/Spielwiese"), 'section': 3} ]
 
 		#self._script_path = '/home/ursin/data/toolserver_bak/pywikipedia/'	# local
 		self._script_path = os.environ['HOME'] + '/pywikipedia/'		# on toolserver
@@ -188,14 +184,14 @@ class PageDiscRobot:
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 24, 38, 17)
 
 
-		wikipedia.output(u'\03{lightgreen}* Processing Page List:\03{default}')
+		pywikibot.output(u'\03{lightgreen}* Processing Page List:\03{default}')
 
 		for page in self._page_list:
 			#self._setUser(user)					# set user and init params
 			#self._datfilename = '%slogs/page_disc-%s-%s-%s.dat' % (conf['script_path'], 'wikipedia', 'de', page.title())
 			self._datfilename = '%slogs/page_disc-%s-%s-%s.dat' % (self._script_path, 'wikipedia', 'de', page.title())
 
-			wikipedia.output(u'\03{lightgreen}** Processing Page: %s\03{default}' % page.title(asLink=True))
+			pywikibot.output(u'\03{lightgreen}** Processing Page: %s\03{default}' % page.title(asLink=True))
 
 			self._work_list = {}
 			self._work_list[page] = True
@@ -208,10 +204,10 @@ class PageDiscRobot:
 
 			self._postDiscSum()					# post results to users Discussion page (with comments for history)
 
-		#wikipedia.output(u'\03{lightgreen}* Processing Warnings:\03{default}')
+		#pywikibot.output(u'\03{lightgreen}* Processing Warnings:\03{default}')
 
 		#for warning in self._global_warn:		# output all warnings to log (what about a special wiki page?)
-		#	wikipedia.output( "%s: %s" % warning )	
+		#	pywikibot.output( "%s: %s" % warning )	
 
 	def _getHistoryPYF(self, rollback = 0):
 		buf = self._readFile()
@@ -250,7 +246,7 @@ class PageDiscRobot:
 			del rollback_buf
 			usage['rollback'] = i
 
-		wikipedia.output(u'*** History recieved %s' % str(usage))
+		pywikibot.output(u'*** History recieved %s' % str(usage))
 
 	def _getLatestNews(self):
 		'''
@@ -269,7 +265,7 @@ class PageDiscRobot:
 
 		# check for news to report
 		self._news_list = {}
-		#sites = dtbext.wikipedia.Pages(wikipedia.getSite(), self._work_list.keys())
+		#sites = dtbext.pywikibot.Pages(pywikibot.getSite(), self._work_list.keys())
 		#actual_dict = sites.getVersionHistory()
 		for keys in self._work_list.keys():
 			site = page = keys
@@ -295,7 +291,7 @@ class PageDiscRobot:
 									{},
 									self._PS_new )
 
-		wikipedia.output(u'*** Latest News searched')
+		pywikibot.output(u'*** Latest News searched')
 
 	def _postDiscSum(self):
 		'''
@@ -311,17 +307,17 @@ class PageDiscRobot:
 		#count = len(self._news_list.keys())
 		(buf, count) = self._parseNews()
 		if (count > 0):
-			wikipedia.output(u'='*50 + u'\n' + buf + u'\n' + u'='*50)
-			wikipedia.output(u'[%i entries]' % count )
+			pywikibot.output(u'='*50 + u'\n' + buf + u'\n' + u'='*50)
+			pywikibot.output(u'[%i entries]' % count )
 
-			wikipedia.setAction(u'Diskussions-Zusammenfassung für Unterseite hinzugefügt: %i Einträge' % count)
+			pywikibot.setAction(u'Diskussions-Zusammenfassung für Unterseite hinzugefügt: %i Einträge' % count)
 			if not self._appendSection(self._target[0]['page'], u'\n' + buf, section = self._target[0]['section']):
-				wikipedia.output(u'*** ERROR: Writing of data to Wiki was not possible !')
+				pywikibot.output(u'*** ERROR: Writing of data to Wiki was not possible !')
 
 			self._writeFile( str(self._hist_list).decode('latin-1') )
-			wikipedia.output(u'*** History updated')
+			pywikibot.output(u'*** History updated')
 		else:
-			wikipedia.output(u'*** Discussion up to date: NOTHING TO DO')
+			pywikibot.output(u'*** Discussion up to date: NOTHING TO DO')
 
 	#def _transPage(self, page):
 	#	'''
@@ -330,7 +326,7 @@ class PageDiscRobot:
 	#	title = page.title()
 	#	for item in trans_str.keys():
 	#		title = re.sub(item, trans_str[item], title)
-	#	return wikipedia.Page(wikipedia.getSite(), title)
+	#	return pywikibot.Page(pywikibot.getSite(), title)
 
 	def _readPage(self, page, full=False):
 		'''
@@ -344,15 +340,15 @@ class PageDiscRobot:
 		if full:	(mode, info) = ('full', ' using "getFull()" mode')
 		else:		(mode, info) = ('default', '')
 
-		#wikipedia.output(u'\03{lightblue}Reading Wiki at %s...\03{default}' % page.title(asLink=True))
-		wikipedia.output(u'\03{lightblue}Reading Wiki%s at %s...\03{default}' % (info, page.title(asLink=True)))
+		#pywikibot.output(u'\03{lightblue}Reading Wiki at %s...\03{default}' % page.title(asLink=True))
+		pywikibot.output(u'\03{lightblue}Reading Wiki%s at %s...\03{default}' % (info, page.title(asLink=True)))
 		try:
 			#content = page.get()
 			content = page.get(mode=mode)
 			#if url in content:		# durch history schon gegeben! (achtung dann bei multithreading... wobei ist ja thread per user...)
-			#	wikipedia.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.title(asLink=True))
+			#	pywikibot.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.title(asLink=True))
 			#	continue
-		except (wikipedia.NoPage, wikipedia.IsRedirectPage):
+		except (pywikibot.NoPage, pywikibot.IsRedirectPage):
 			content = u''
 		return content
 
@@ -367,7 +363,7 @@ class PageDiscRobot:
 		returns:  (appends data to page on the wiki, nothing else)
 		'''
 
-		wikipedia.output(u'\03{lightblue}Appending to Wiki section %i on %s...\03{default}' % (section, page.title(asLink=True)))
+		pywikibot.output(u'\03{lightblue}Appending to Wiki section %i on %s...\03{default}' % (section, page.title(asLink=True)))
 
 		try:
 			# get token needed to send a mail
@@ -378,7 +374,7 @@ class PageDiscRobot:
 			    'intoken'	: 'edit',
 			    'titles'	: 'User:%s' % 'DrTrigonBot',
 			    }
-			wikipedia.get_throttle()
+			pywikibot.get_throttle()
 			buf = dtbext.query.GetProcessedData(request,
 								'page',
 								'',
@@ -391,7 +387,7 @@ class PageDiscRobot:
 			# as it showed up, the framework was changed, to handle such problems (compare 'dtbext_query.py/GetData' with 'query.py/GetData')
 			# and thus the creation of 'path' for 'postForm' call has to be adapted... this could also solve the mailing restriction (and make
 			# the long mailer support obsolete...?!?)
-			#wikipedia.verbose = True
+			#pywikibot.verbose = True
 
 			# send mail by POST request
 			request = {
@@ -402,8 +398,8 @@ class PageDiscRobot:
 			    #'text'		: text,
 			    'appendtext'	: page._encodeArg(data, 'text'),
 			    'token'		: edittoken,
-			    #'summary'		: wikipedia.action.encode(config.textfile_encoding),
-			    'summary'		: page._encodeArg(wikipedia.action, 'summary'),
+			    #'summary'		: pywikibot.action.encode(config.textfile_encoding),
+			    'summary'		: page._encodeArg(pywikibot.action, 'summary'),
 			    'bot'		: 1,
 			    }
 			if minorEdit:	request['minor'] = 1
@@ -413,8 +409,8 @@ class PageDiscRobot:
 								'',
 								[],
 								post = True )
-		except wikipedia.SpamfilterError, error:
-			wikipedia.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.title(asLink=True), "error.url"))
+		except pywikibot.SpamfilterError, error:
+			pywikibot.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.title(asLink=True), "error.url"))
 
 		return (buf[u'result'] == u'Success')
 
@@ -426,7 +422,7 @@ class PageDiscRobot:
 		input:  self._news_list [dict]
                         self._oth_list [dict] (same format as self._news_list)
                         self._readPage() (with 'full=' and without)
-                        dtbext.wikipedia-objects
+                        dtbext.pywikibot-objects
                         self-objects (such as self._getThContent(), self._checkThData(), ...)
 		returns:  self._news_list [dict]
 		          keys are:  page titles [string (unicode)]
@@ -436,7 +432,7 @@ class PageDiscRobot:
 		'''
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 29, 17)
 
-		#def test(timerobj): wikipedia.output(u'\03{lightaqua}progress: %.1f%s (%i of %i) ...\03{default}' % (((100.*timerobj.kwargs['u'])/timerobj.kwargs['size']), u'%', timerobj.kwargs['u'], timerobj.kwargs['size']))
+		#def test(timerobj): pywikibot.output(u'\03{lightaqua}progress: %.1f%s (%i of %i) ...\03{default}' % (((100.*timerobj.kwargs['u'])/timerobj.kwargs['size']), u'%', timerobj.kwargs['u'], timerobj.kwargs['size']))
 		#t = Timer(conf['timeout'], test, size = len(self._work_list.keys()), u = 0)
 
 		# self._news_list contents all 'self._PS_changed' and 'self._PS_new'
@@ -460,7 +456,7 @@ class PageDiscRobot:
 
 					## THIS IS VERY UNEFFICIENT AND SLOW, SLOW, SLOW!!! (BUT EASY TO CODE) SHOULD BE DONE AS IN THE sum_disc.py BUT IS MORE PROBLEMATIC!!
 					## WRITE ONE SINGLE CODE TO SPLIT A PAGE INTO SECTIONS, USE HEADING LINE NUMBER... MAYBE ALREADY IN MEDIAWIKI API FRAMEWORK IMPLEMENTED...?!??!!
-					#wikipedia.output(u"\03{lightblue}Reading Wiki page section '%s'...\03{default}"%key)
+					#pywikibot.output(u"\03{lightblue}Reading Wiki page section '%s'...\03{default}"%key)
 					#
 					#item = site.get(section=j+1)
 
@@ -478,7 +474,7 @@ class PageDiscRobot:
 							self._hist_list[key] = self._news_list[key]
 						else:						# is unchanged
 							del self._news_list[key]
-			except wikipedia.SectionError:	# is typically raised by ????????
+			except pywikibot.SectionError:	# is typically raised by ????????
 				pass
 
 			#t.kwargs['u'] += 1
@@ -488,7 +484,7 @@ class PageDiscRobot:
 		#t.cancel()
 		#del t
 
-		wikipedia.output(u'*** Relevancy of threads checked')
+		pywikibot.output(u'*** Relevancy of threads checked')
 
 	def _getThContent(self, page, buf):
 		'''
@@ -509,13 +505,13 @@ class PageDiscRobot:
 		#(sections, verify) = siteAPI.getSections(minLevel=1, getter=site.get)
 		(sections, verify) = site.getSections(minLevel=1, pagewikitext=buf)
 		if not verify:
-			#wikipedia.output(u'!!! WARNING: Have to use "getFull"...')
-			wikipedia.output(u"\03{lightblue}Re-Reading Wiki page (mode='full') at %s...\03{default}" % site.title(asLink=True))
+			#pywikibot.output(u'!!! WARNING: Have to use "getFull"...')
+			pywikibot.output(u"\03{lightblue}Re-Reading Wiki page (mode='full') at %s...\03{default}" % site.title(asLink=True))
 			buf = site.get(mode='full')
 			#buf = self._readPage( site, full=True )
 			(sections, verify) = site.getSections(minLevel=1, pagewikitext=buf)
 			if not verify:
-				wikipedia.output(u"\03{lightblue}Re-Reading Wiki page (mode='parse') at %s...\03{default}" % site.title(asLink=True))
+				pywikibot.output(u"\03{lightblue}Re-Reading Wiki page (mode='parse') at %s...\03{default}" % site.title(asLink=True))
 				parse_buf = site.get(mode='parse')
 				if self._reftag_err_regex.search(parse_buf):
 					#self._oth_list[site.title()] = (	u'was not able to get Sections properly, because of missing <references /> tag!', 
@@ -524,7 +520,7 @@ class PageDiscRobot:
 					#				None, 
 					#				None, 
 					#				self._PS_warning )
-					wikipedia.output(u'was not able to get Sections properly, because of missing <references /> tag!')
+					pywikibot.output(u'was not able to get Sections properly, because of missing <references /> tag!')
 				else:
 					#self._oth_list[site.title()] = (	u'was not able to get Sections properly!', 
 					#				site, 
@@ -532,7 +528,7 @@ class PageDiscRobot:
 					#				None, 
 					#				None, 
 					#				self._PS_warning )
-					wikipedia.output(u'was not able to get Sections properly!')
+					pywikibot.output(u'was not able to get Sections properly!')
 		if len(sections) == 0:
 			head = [('','')]
 			body = [buf]
@@ -645,10 +641,10 @@ class PageDiscRobot:
 					subkey = data[1][1][2]					# link
 					item = (subkey,) + (data[4], True, data[1][1][3])	# actual_head = (link, ..., ..., wikitext)
 					if not item[2]: continue		# is this heading relevant?
-					#renderitem = dtbext.wikipedia.getParsedString(item[3], plaintext=True)	# replaces '_renderWiki()'
+					#renderitem = dtbext.pywikibot.getParsedString(item[3], plaintext=True)	# replaces '_renderWiki()'
 					# try without 'plaintext', gives full html result but we want wikitext which is only some
 					# parts of the html tags striped, thus use 'removeHTMLParts' with 'keep_wikitags' (NOT USED IN 'sum_disc.py'... WHY?!???)
-					renderitem = dtbext.pywikibot.removeHTMLParts(dtbext.wikipedia.getParsedString(item[3], plaintext=False)).strip()
+					renderitem = dtbext.pywikibot.removeHTMLParts(dtbext.pywikibot.getParsedString(item[3], plaintext=False)).strip()
 					subitem = item[0]
 					subitem = dtbext.pywikibot.removeHTMLParts(subitem, tags = [])	# remove any remainig html tags (NOT USED IN 'sum_disc.py'... WHY ARE THERE NO REMAINING TAGS?!???)
 					subitem = self._bracketopen_regex.sub(u'.5B', subitem)	# urllib.quote(...) sets '%' instead of '.'
@@ -726,8 +722,8 @@ class Timer(threading.Thread):
 
 def main():
 	bot = PageDiscRobot()#conf['userlist'])	# for several user's, but what about complete automation (continous running...)
-	if len(wikipedia.handleArgs()) > 0:
-		for arg in wikipedia.handleArgs():
+	if len(pywikibot.handleArgs()) > 0:
+		for arg in pywikibot.handleArgs():
 			if arg[:2] == "u'": arg = eval(arg)		# for 'runbotrun.py' and unicode compatibility
 			if 	arg[:17] == "-compress_history":
 			#if 	arg[:17] == "-compress_history":
@@ -742,7 +738,7 @@ def main():
 			#elif	(arg == "-test_run"):
 			#	debug = ...
 			else:
-				wikipedia.showHelp()
+				pywikibot.showHelp()
 				return
 	bot.run()
 
@@ -750,5 +746,5 @@ if __name__ == "__main__":
     try:
         main()
     finally:
-        wikipedia.stopme()
+        pywikibot.stopme()
 

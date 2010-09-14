@@ -4,10 +4,11 @@ import time
 
 import test_utils
 
-#import wikipedia, wikipediaAPI
-import wikipedia, pagegenerators
+import pagegenerators
 import dtbext
 import userlib
+# Splitting the bot into library parts
+import wikipedia as pywikibot
 
 
 #TESTPAGE = u'Benutzer:DrTrigonBot/ToDo-Liste'
@@ -54,23 +55,23 @@ TESTPAGE = u'Benutzer_Diskussion:DrTrigon'
 
 
 def TEST_getSections():
-	#print "\nTest of 'dtbext.wikipedia.Page.getSections()' on page '%s'..." % TESTPAGE
+	#print "\nTest of 'dtbext.pywikibot.Page.getSections()' on page '%s'..." % TESTPAGE
 	#
-	##site = wikipedia.Page(wikipedia.getSite(), TESTPAGE)
-	site = dtbext.wikipedia.Page(wikipedia.getSite(), TESTPAGE)
+	##site = pywikibot.Page(pywikibot.getSite(), TESTPAGE)
+	site = dtbext.pywikibot.Page(pywikibot.getSite(), TESTPAGE)
 	buf = site.get()
 	#buf = site.get(mode='full')
 	##buf = site.getFullB()[:1000]
 	#print buf
 
-	print "\nTest of 'dtbext.wikipedia.Pages.getSections()' on page '%s'..." % TESTPAGE
+	print "\nTest of 'dtbext.pywikibot.Pages.getSections()' on page '%s'..." % TESTPAGE
 
-	#site = dtbext.wikipedia.Pages(wikipedia.getSite(), [TESTPAGE])
+	#site = dtbext.pywikibot.Pages(pywikibot.getSite(), [TESTPAGE])
 	##buf = site.get()
 	#buf = [data for (site, data) in site.get(mode='full')][0]
 	##buf = [data for (site, data) in site.get()][0]
 
-	#siteAPI = dtbext.wikipedia.Page(wikipedia.getSite(), TESTPAGE)
+	#siteAPI = dtbext.pywikibot.Page(pywikibot.getSite(), TESTPAGE)
 	#(sections, test) = siteAPI.getSections(minLevel=1)
 	#(sections, test) = site.getSections(minLevel=1, getter=site.get)
 	#(sections, test) = site.getSections(minLevel=1, getter=site._getFullContent)
@@ -108,46 +109,46 @@ def TEST_getSections():
 
 	#print "\n'Pages.getSections()' self-test: %s" % test
 	#
-	#site = dtbext.wikipedia.Page(wikipedia.getSite(), TESTPAGE)
+	#site = dtbext.pywikibot.Page(pywikibot.getSite(), TESTPAGE)
 	#print site.getSections()
-	##sites = dtbext.wikipedia.Pages(wikipedia.getSite(), TESTPAGES*5)
+	##sites = dtbext.pywikibot.Pages(pywikibot.getSite(), TESTPAGES*5)
 	##a = sites.getSections()
 	##print len(TESTPAGES*5), len(a), a
 
 def TEST_getParsedContent():
-	print "\nTest of 'dtbext.wikipedia.Page.getParsedContent()' on page '%s'..." % TESTPAGE
+	print "\nTest of 'dtbext.pywikibot.Page.getParsedContent()' on page '%s'..." % TESTPAGE
 
-	#print dtbext.wikipedia.Page(wikipedia.getSite(), TESTPAGE).get(mode='parse')
-	#print dtbext.wikipedia.Page(wikipedia.getSite(), TESTPAGE).get(mode='parse', plaintext=True)
+	#print dtbext.pywikibot.Page(pywikibot.getSite(), TESTPAGE).get(mode='parse')
+	#print dtbext.pywikibot.Page(pywikibot.getSite(), TESTPAGE).get(mode='parse', plaintext=True)
 
-	site = wikipedia.getSite()
-	dtbext.wikipedia.addAttributes( site )
+	site = pywikibot.getSite()
+	dtbext.pywikibot.addAttributes( site )
 	print "*", site.getParsedString(u'Erweiterung für [[Wikipedia:Bots/Bot-Info]]', keeptags = []), "*"
 
 def TEST_purgeCache():
-	print "\nTest of 'dtbext.wikipedia.Page.purgeCache()' on page '%s'..." % TESTPAGE
+	print "\nTest of 'dtbext.pywikibot.Page.purgeCache()' on page '%s'..." % TESTPAGE
 	
-	print dtbext.wikipedia.Page(wikipedia.getSite(), TESTPAGE).purgeCache()
+	print dtbext.pywikibot.Page(pywikibot.getSite(), TESTPAGE).purgeCache()
 
 def TEST_GlobalWikiNotificationsGen():
-	print "\nTest of 'dtbext.wikipedia.GlobalWikiNotificationsGen()' on page '%s'..." % TESTPAGE
+	print "\nTest of 'dtbext.pywikibot.GlobalWikiNotificationsGen()' on page '%s'..." % TESTPAGE
 
-	for item in dtbext.wikipedia.GlobalWikiNotificationsGen(u'DrTrigon'):
+	for item in dtbext.pywikibot.GlobalWikiNotificationsGen(u'DrTrigon'):
 		print item[0]
 
 def TEST_getVersionHistory():
-	#print "\nTest of 'wikipedia.Page.getVersionHistory()' on page '%s'..." % TESTPAGE
+	#print "\nTest of 'pywikibot.Page.getVersionHistory()' on page '%s'..." % TESTPAGE
 	#
 	#for item in TESTPAGES:	
-	#	site = wikipedia.Page(wikipedia.getSite(), item)
+	#	site = pywikibot.Page(pywikibot.getSite(), item)
 	#	print site.getVersionHistory(revCount=1)
 	#
-	#print "\nTest of 'dtbext.wikipedia.Page.getVersionHistory()' on page '%s'..." % TESTPAGE
+	#print "\nTest of 'dtbext.pywikibot.Page.getVersionHistory()' on page '%s'..." % TESTPAGE
 
 	#for item in TESTPAGES:	
-	#	site = dtbext.wikipedia.Page(wikipedia.getSite(), item)
+	#	site = dtbext.pywikibot.Page(pywikibot.getSite(), item)
 	#	print site.getVersionHistory(revCount=1)
-	site = dtbext.wikipedia.Page(wikipedia.getSite(), TESTPAGE)
+	site = dtbext.pywikibot.Page(pywikibot.getSite(), TESTPAGE)
 	print site.getVersionHistory(revCount=1)
 	print site.isRedirectPage()
 
@@ -160,7 +161,7 @@ def TEST_VersionHistoryGenerator():
 		#print item, a[item], ('redirect' in a[item][0])
 
 def TEST_get():
-	#print "\nTest of 'dtbext.wikipedia.Pages.get()' on '%i' page(s)..." % len(TESTPAGES)
+	#print "\nTest of 'dtbext.pywikibot.Pages.get()' on '%i' page(s)..." % len(TESTPAGES)
 	print "\nTest of sequence:"
 	print "   PagesFromTitlesGenerator ->"
 	print "   (PageTitleFilterPageGenerator) ->"
@@ -168,10 +169,10 @@ def TEST_get():
 	print "   [output]"
 	print
 
-	ignore_list = { wikipedia.getSite().family.name: { wikipedia.getSite().lang: [u'Benutzer Diskussion:DrTrigonBo'] }}
-	#ignore_list = { wikipedia.getSite().family.name: { wikipedia.getSite().lang: [] }}
+	ignore_list = { pywikibot.getSite().family.name: { pywikibot.getSite().lang: [u'Benutzer Diskussion:DrTrigonBo'] }}
+	#ignore_list = { pywikibot.getSite().family.name: { pywikibot.getSite().lang: [] }}
 
-	wikipedia.debug = True		# to enable the use of the API here
+	pywikibot.debug = True		# to enable the use of the API here
 	gen        = pagegenerators.PagesFromTitlesGenerator(TESTPAGES)
 	filter_gen = pagegenerators.PageTitleFilterPageGenerator(gen, ignore_list)	# or RegexFilterPageGenerator
 	prload_gen = pagegenerators.PreloadingGenerator(filter_gen)			# ThreadedGenerator would be nice!
@@ -200,47 +201,47 @@ def TEST_get():
 
 		print "GET; buffered:", buffd, "\t", "unbuffered:", unbuffd
 		print "GETVERSIONHISTORY; buffered:", buffd2, "\t", "unbuffered:", unbuffd2
-	wikipedia.debug = False
+	pywikibot.debug = False
 
 def TEST_addAttributes():
-	page = wikipedia.Page(wikipedia.getSite(), TESTPAGE)
+	page = pywikibot.Page(pywikibot.getSite(), TESTPAGE)
 	#print page.getSections()
-	dtbext.wikipedia.addAttributes( page )
+	dtbext.pywikibot.addAttributes( page )
 	print page.getSections()
 
-	page2 = wikipedia.Page(wikipedia.getSite(), u'Benutzer Diskussion:Karsten11')
+	page2 = pywikibot.Page(pywikibot.getSite(), u'Benutzer Diskussion:Karsten11')
 	#print page.getSections()
-	dtbext.wikipedia.addAttributes( page2 )
+	dtbext.pywikibot.addAttributes( page2 )
 	print page2.getSections()
 	print page.getSections()
 
 
 # wikipedia.py
-TEST_getVersionHistory()
+#TEST_getVersionHistory()
 #TEST_getSections()
 #TEST_purgeCache()
-#TEST_get()
+TEST_get()
 #TEST_getParsedContent()
-#print wikipedia.getSite().getUrl('/w/api.php?action=query&meta=userinfo&uiprop=blockinfo|hasmsg|groups|rights|options|preferencestoken|editcount|ratelimits|email&formal=xml')
+#print pywikibot.getSite().getUrl('/w/api.php?action=query&meta=userinfo&uiprop=blockinfo|hasmsg|groups|rights|options|preferencestoken|editcount|ratelimits|email&formal=xml')
 #TEST_GlobalWikiNotificationsGen()
 
 #TEST_addAttributes()
 
-TEST_VersionHistoryGenerator()
+#TEST_VersionHistoryGenerator()
 
 
 #a_str = r'<strong class="error">Referenz-Fehler: Einzelnachweisfehler: <code>&lt;ref&gt;</code>-Tags existieren, jedoch wurde kein <code>&lt;references&#160;/&gt;</code>-Tag gefunden.</strong>'
-#site = dtbext.wikipedia.Page(wikipedia.getSite(), TESTPAGE)
+#site = dtbext.pywikibot.Page(pywikibot.getSite(), TESTPAGE)
 #buf = site.get(mode='parse')
 #import re
 #if re.search(a_str, buf): print "<references />-Tag Fehler"
 
 
-#page = wikipedia.Page(wikipedia.getSite(), TESTPAGE)
+#page = pywikibot.Page(pywikibot.getSite(), TESTPAGE)
 #page.extradata = "hallo"
 #print page.title(), page.extradata
 
-#dtbext.wikipedia.Pages(None, None)
+#dtbext.pywikibot.Pages(None, None)
 
 
 print "done."

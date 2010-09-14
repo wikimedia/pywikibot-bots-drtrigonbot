@@ -1,34 +1,18 @@
-
+# -*- coding: utf-8  -*-
 """
 This is a part of pywikipedia framework, it is a deviation of wikipedia.py and mainly subclasses
 the page class from there.
 
 ...
 """
-
-# ====================================================================================================
 #
-# ToDo-Liste (Bugs, Features, usw.):
-# http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste
+# (C) Dr. Trigon, 2009-2010
 #
-# READ THE *DOGMAS* FIRST!
-# 
-# ====================================================================================================
-
-#
-# (C) Dr. Trigon, 2009
+# DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
 # Distributed under the terms of the MIT license.
-# (is part of DrTrigonBot-"framework")
 #
-# keep the version of 'clean_sandbox2.py', 'new_user.py', 'runbotrun.py', 'replace_tmpl.py', 'sum_disc-conf.py', ...
-# up to date with this:
-# Versioning scheme: A.B.CCCC
-#  CCCC: beta, minor/dev relases, bugfixes, daily stuff, ...
-#  B: bigger relases with tidy code and nice comments
-#  A: really big release with multi lang. and toolserver support, ready
-#     to use in pywikipedia framework, should also be contributed to it
-__version__='$Id: dtbext/wikipedia.py 0.2.0019 2009-11-13 00:07 drtrigon $'
+__version__='$Id: dtbext_wikipedia.py 0.2.0020 2009-11-14 11:50 drtrigon $'
 #
 
 # Standard library imports
@@ -36,11 +20,12 @@ import StringIO
 import re, sets
 import difflib
 # Splitting the bot into library parts
-from pywikibot import *
+from dtbext_pywikibot import *
 
 # Application specific imports
+import wikipedia as pywikibot
 import config, query
-import dtbext_date, dtbext_pywikibot
+import dtbext_date
 
 
 # needed by 'getSectionsOldApi'
@@ -77,7 +62,7 @@ def addAttributes(obj):
 
 # MODIFIED
 # REASON: (look below)
-class Page(wikipedia.Page):
+class Page(pywikibot.Page):
 	"""Page: A MediaWiki page
 
 	   look at wikipedia.py for more information!
@@ -91,7 +76,7 @@ class Page(wikipedia.Page):
 		"""
 
 		# was there already a call? already some info available?
-		if hasattr(self, '_getexception') and (self._getexception == wikipedia.IsRedirectPage):
+		if hasattr(self, '_getexception') and (self._getexception == pywikibot.IsRedirectPage):
 			return True
 
 		if hasattr(self, '_redir'):	# prevent multiple execute of code below,
@@ -105,8 +90,8 @@ class Page(wikipedia.Page):
 			u'rvlimit'	: 1,
 		}
 
-		wikipedia.get_throttle()
-		wikipedia.output(u"Reading redirect info from %s." % self.title(asLink=True))
+		pywikibot.get_throttle()
+		pywikibot.output(u"Reading redirect info from %s." % self.title(asLink=True))
 
 		result = query.GetData(params, self.site())
 		r = result[u'query'][u'pages'].values()[0]
@@ -114,7 +99,7 @@ class Page(wikipedia.Page):
 		# store and return info
 		self._redir = (u'redirect' in r)
 		if self._redir:
-			self._getexception == wikipedia.IsRedirectPage
+			self._getexception == pywikibot.IsRedirectPage
 
 		return self._redir
 
@@ -160,7 +145,7 @@ class Page(wikipedia.Page):
 		#			  'sections',
 		#			  's',
 		#			  ['toclevel', 'level', 'line'] )
-			wikipedia.get_throttle()
+			pywikibot.get_throttle()
 			old_sections = sections
 			# look at revisions older than r18 for this code or replace with query.GetData()
 			sections = dtbext_query.GetProcessedData(item,
@@ -233,8 +218,8 @@ class Page(wikipedia.Page):
 		v2 = not REGEX_wikiSection.search( self._wikisectionpatch(u'\n'.join(wikitext[first:])) )
 		verify = (v1 and v2)
 		if not verify:
-			#raise wikipedia.SectionError('Was not able to get Sections of %s properly!' % self.title(asLink=True))
-			#wikipedia.output(u'!!! WARNING [[%s]]: was not able to get Sections properly!' % self.title())
+			#raise pywikibot.SectionError('Was not able to get Sections of %s properly!' % self.title(asLink=True))
+			#pywikibot.output(u'!!! WARNING [[%s]]: was not able to get Sections properly!' % self.title())
 			raise Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.title(asLink=True))
 
 		# check min. level
@@ -327,8 +312,8 @@ class Page(wikipedia.Page):
 			u'prop'		: u'sections',
 		}
 
-		wikipedia.get_throttle()
-		wikipedia.output(u"Reading section info from %s." % self.title(asLink=True))
+		pywikibot.get_throttle()
+		pywikibot.output(u"Reading section info from %s." % self.title(asLink=True))
 
 		result = query.GetData(params, self.site())
 		r = result[u'parse'][u'sections']
@@ -336,7 +321,7 @@ class Page(wikipedia.Page):
 
 		if not sectionsonly:
 			# assign sections with wiki text and section byteoffset
-			wikipedia.output(u"\tReading wiki page text from %s (if not already done)." % self.title(asLink=True))
+			pywikibot.output(u"\tReading wiki page text from %s (if not already done)." % self.title(asLink=True))
 			self.get()
 			for i, item in enumerate(r):
 				l = int(item[u'level'])
@@ -403,12 +388,12 @@ class Page(wikipedia.Page):
 			#	u'rvprop'	: u'content',
 			#	u'rvsection'	: section[u'number'],
 			#}
-			#wikipedia.get_throttle()
-			#wikipedia.output(u"\tReading section %i from %s." % (section[u'number'], self.title(asLink=True)))
+			#pywikibot.get_throttle()
+			#pywikibot.output(u"\tReading section %i from %s." % (section[u'number'], self.title(asLink=True)))
 			# if not successfull too, report error/problem
 			#page._getexception = ...
 			#raise Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.title(asLink=True))
-			#wikipedia.output(...)
+			#pywikibot.output(...)
 
 		# find the most probable match for heading
 		best_match = (0.0, None)
@@ -452,16 +437,16 @@ class Page(wikipedia.Page):
 			u'titles'	: self.title(),
 		}
 
-		wikipedia.get_throttle()
-		wikipedia.output(u"Purging page cache for %s." % self.title(asLink=True))
+		pywikibot.get_throttle()
+		pywikibot.output(u"Purging page cache for %s." % self.title(asLink=True))
 
 		result = query.GetData(params, self.site())
 		r = result[u'purge'][0]
 
 		# store and return info
 		if (u'missing' in r):
-		        self._getexception = wikipedia.NoPage
-		        raise wikipedia.NoPage(self.site(), self.title(asLink=True),"Page does not exist. Was not able to purge cache!" )
+		        self._getexception = pywikibot.NoPage
+		        raise pywikibot.NoPage(self.site(), self.title(asLink=True),"Page does not exist. Was not able to purge cache!" )
 
 		return (u'purged' in r)
 
@@ -487,8 +472,8 @@ class Page(wikipedia.Page):
 		    }
 		if expandtemplates: params[u'rvexpandtemplates'] = u''
 
-		wikipedia.get_throttle()
-		wikipedia.output(u"Purging page cache for %s." % self.title(asLink=True))
+		pywikibot.get_throttle()
+		pywikibot.output(u"Purging page cache for %s." % self.title(asLink=True))
 
 		result = query.GetData(params, self.site())
 		r = result[u'query'][u'pages'].values()[0]
@@ -529,8 +514,8 @@ class Site(object):
 			u'text'		: string,
 		}
 
-		wikipedia.get_throttle()
-		wikipedia.output(u"Parsing string through the wiki parser.")
+		pywikibot.get_throttle()
+		pywikibot.output(u"Parsing string through the wiki parser.")
 
 		result = query.GetData(params, self)
 		r = result[u'parse'][u'text'][u'*']
@@ -538,7 +523,7 @@ class Site(object):
 		r = pywikibot.removeDisabledParts(r, tags = ['comments']).strip()		# disable/remove comments
 
 		if not (keeptags == [u'*']):							# disable/remove ALL tags
-			r = dtbext_pywikibot.removeHTMLParts(r, keeptags = keeptags).strip()	#
+			r = removeHTMLParts(r, keeptags = keeptags).strip()	#
 
 		return r
 
@@ -599,7 +584,7 @@ class Pages():
 		diff_list = [item for item in inlist if not item in outdict.keys()]
 		for i, item in enumerate(diff_list):
 			outdict[item] = set_item
-			wikipedia.output( u"WARNING: Page [[%s]] gave no API result." % item )
+			pywikibot.output( u"WARNING: Page [[%s]] gave no API result." % item )
 
 		return outdict
 
@@ -638,63 +623,5 @@ class Pages():
 		result.append( Pages(self._site, titles) )	# append the not filtered pages at the end
 
 		return result
-
-	def getVersionHistory(self, revCount=500):
-		"""
-		...
-		"""
-
-		## according to Page.getVersionHistory()
-		(bundle, joined_bundle) = self._bundle_list(self._titles, size=self._max_request)
-		#result = {}
-		result = []
-		self._requesting_data = True
-		for item in joined_bundle:
-			# es kommt PRO PAGE/TITLE GENAU 1 RESULTAT zurueck, deshalb ist Zuordnung einfach
-			#request = REQUEST_getVersionHistory_s % (urllib.quote(item.encode(config.textfile_encoding)))
-			request = {
-			    'action'	: 'query',
-			    'titles'	: item,
-			    'rvprop'	: 'ids|timestamp|flagged|user|flags|comment',
-			    'prop'	: 'revisions|info',
-			    }
-			#buf = APIRequest( self._site,
-			#		  request,
-			#		  'revisions',
-			#		  'rev',
-			#		  ['revid', 'user', 'timestamp', 'comment'], 
-			#		  pages = 'page' )
-			wikipedia.get_throttle()
-			buf = dtbext_query.GetProcessedData(request,
-								'revisions',
-								'rev',
-								#['revid', 'user', 'timestamp', 'comment', 'title'],
-								['revid', 'user', 'timestamp', 'comment', 'title', 'redirect'],
-								pages = 'pages' )
-			#result.update( buf )
-			result += buf
-		self._requesting_data = False
-		buf = result
-
-		# change time/date format
-		#for item in result.keys():
-		result = {}
-		self._isRedirectPage = []
-		for item in buf:
-			#try: result[item] = [(result[item][0][0], dtbext_date.GetTime(result[item][0][2]), result[item][0][1], result[item][0][3])]
-			#except: pass
-			#if ('missing' in item): raise wikipedia.NoPage(self._site, item[4], "Page does not exist." )
-			if ('missing' in item):
-				result[item[4]] = None
-				wikipedia.output( u"WARNING: Page [[%s]] does not exist." % item[4] )
-			elif ('redirect' in item):
-				result[item[4]] = [(u'%s'%item[0], dtbext_date.GetTime(item[2]), item[1], item[3])]
-				self._isRedirectPage.append( item[4] )
-				wikipedia.output( u"WARNING: Page [[%s]] is a redirect." % item[4] )
-			else:
-				result[item[4]] = [(u'%s'%item[0], dtbext_date.GetTime(item[2]), item[1], item[3])]
-
-		# validity check, append omitted pages (because the list should be complete)
-		return self._append_missing_pages(result, self._titles, set_item=None)		# 'None' like 'missing' page
 
 
