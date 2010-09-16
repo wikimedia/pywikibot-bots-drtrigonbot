@@ -12,7 +12,7 @@ the page class from there.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_wikipedia.py 0.2.0021 2009-11-14 22:50 drtrigon $'
+__version__='$Id: dtbext_wikipedia.py 0.2.0022 2009-11-15 16:01 drtrigon $'
 #
 
 # Standard library imports
@@ -279,41 +279,6 @@ class Page(pywikibot.Page):
 		        raise pywikibot.NoPage(self.site(), self.title(asLink=True),"Page does not exist. Was not able to purge cache!" )
 
 		return (u'purged' in r)
-
-# ADDED
-# REASON: ...
-#         [ look at DRTRIGON-54 and remove it then ]
-	def getEnh(self, expandtemplates=True):
-		"""Return the wiki text of the page in various formats.
-		   ADDED METHOD: ...
-
-		   force   is ignored; the page is NOT cached
-		   ......
-		"""
-
-		raise NotImplementedError('This should be implemented into \'wikipedia.get()\' directly, patch submitted to maillist!!')
-		# -> JIRA ticket
-
-		params = {
-		    u'action'		: u'query',
-		    u'prop'		: u'revisions',
-		    u'titles'		: self.title(),
-		    u'rvprop'		: u'content',
-		    }
-		if expandtemplates: params[u'rvexpandtemplates'] = u''
-
-		pywikibot.get_throttle()
-		pywikibot.output(u"Purging page cache for %s." % self.title(asLink=True))
-
-		result = query.GetData(params, self.site())
-		r = result[u'query'][u'pages'].values()[0]
-
-		missing = (u'missing' in r)
-
-		#contents = r[u'revisions'][0][u'*']
-
-		# and a lot of more code, raise exceptions, ... look at wikipedia.get() and it's sub methods
-		# preferrably to be included into wikipedia.get(), request was placed on maillist...
 
 
 # ADDED: new (r19)

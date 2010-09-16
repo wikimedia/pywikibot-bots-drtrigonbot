@@ -186,8 +186,8 @@ def TEST_get(debug=False):
 		buffd = stop-start
 
 		start = time.time()
-		u = page.getVersionHistory()
-		print u
+		u = page.getVersionHistory(revCount=1)
+		#print u
 		stop = time.time()
 		buffd2 = stop-start
 
@@ -197,8 +197,8 @@ def TEST_get(debug=False):
 		unbuffd = stop-start
 
 		start = time.time()
-		u = page.getVersionHistory(forceReload=True)
-		print u[0:3]
+		u = page.getVersionHistory(revCount=1, forceReload=True)
+		#print u
 		stop = time.time()
 		unbuffd2 = stop-start
 
@@ -223,7 +223,7 @@ def TEST_addAttributes():
 #TEST_getVersionHistory()
 #TEST_getSections()
 #TEST_purgeCache()
-TEST_get()
+#TEST_get()
 #TEST_get(debug=True)
 #TEST_getParsedContent()
 #print pywikibot.getSite().getUrl('/w/api.php?action=query&meta=userinfo&uiprop=blockinfo|hasmsg|groups|rights|options|preferencestoken|editcount|ratelimits|email&formal=xml')

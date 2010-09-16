@@ -11,7 +11,7 @@ This is a part of pywikipedia framework, it is a deviation of date.py.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_date.py 0.2.0020 2009-11-14 11:55 drtrigon $'
+__version__='$Id: dtbext_date.py 0.2.0022 2009-11-15 21:13 drtrigon $'
 #
 
 # Standard library imports
@@ -25,6 +25,7 @@ import wikipedia as pywikibot
 # ADDED
 # REASON: need for some standard timestamp formats
 def getTimeStmpNow(full = False, humanreadable = False, local = False):
+#def getTimeStmpNow(full = True, humanreadable = False, local = False):	# framework default
 	"""Produce different timestamp formats."""
 
 	format = "%Y%m%d"

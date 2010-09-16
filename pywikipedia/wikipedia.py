@@ -120,7 +120,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 8539 2010-09-12 17:06:21Z xqt $'
+__version__ = '$Id: wikipedia.py 8562 2010-09-15 12:54:46Z xqt $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -585,7 +585,7 @@ not supported by PyWikipediaBot!"""
         return self.autoFormat()[0] is not None
 
     def get(self, force=False, get_redirect=False, throttle=True,
-            sysop=False, change_edit_time=True):
+            sysop=False, change_edit_time=True, expandtemplates=False):
         """Return the wiki-text of the page.
 
         This will retrieve the page from the server if it has not been
@@ -604,6 +604,8 @@ not supported by PyWikipediaBot!"""
         If change_edit_time is False, do not check this version for changes
         before saving. This should be used only if the page has been loaded
         previously.
+        If expandtemplates is True, all templates in the page content are
+        fully resolved too (if API is used).
 
         """
         # NOTE: The following few NoPage exceptions could already be thrown at
@@ -622,7 +624,7 @@ not supported by PyWikipediaBot!"""
         if self.site().isInterwikiLink(self.title()):
             raise NoPage('%s is not a local page on %s!'
                          % (self.aslink(), self.site()))
-        if force:
+        if force or expandtemplates:
             # When forcing, we retry the page no matter what. Old exceptions
             # and contents do not apply any more.
             for attr in ['_redirarg', '_getexception', '_contents']:
@@ -640,7 +642,8 @@ not supported by PyWikipediaBot!"""
         # Make sure we did try to get the contents once
         if not hasattr(self, '_contents'):
             try:
-                self._contents = self._getEditPage(get_redirect = get_redirect, throttle = throttle, sysop = sysop)
+                self._contents = self._getEditPage(get_redirect=get_redirect, throttle=throttle, sysop=sysop,
+                                                   expandtemplates = expandtemplates)
                 hn = self.section()
                 if hn:
                     m = re.search("=+ *%s *=+" % hn, self._contents)
@@ -669,7 +672,7 @@ not supported by PyWikipediaBot!"""
         return self._contents
 
     def _getEditPage(self, get_redirect=False, throttle=True, sysop=False,
-                     oldid=None, change_edit_time=True):
+                     oldid=None, change_edit_time=True, expandtemplates=False):
         """Get the contents of the Page via API query
 
         Do not use this directly, use get() instead.
@@ -677,6 +680,8 @@ not supported by PyWikipediaBot!"""
         Arguments:
             oldid - Retrieve an old revision (by id), not the current one
             get_redirect  - Get the contents, even if it is a redirect page
+        expandtemplates - Fully resolve templates within page content
+                          (if API is used)
 
         This method returns the raw wiki text as a unicode string.
         """
@@ -694,6 +699,8 @@ not supported by PyWikipediaBot!"""
         }
         if oldid:
             params['rvstartid'] = oldid
+        if expandtemplates:
+            params[u'rvexpandtemplates'] = u''
 
         if throttle:
             get_throttle()
@@ -2525,9 +2532,10 @@ not supported by PyWikipediaBot!"""
         Return value is a list of tuples, where each tuple represents one
         edit and is built of revision id, edit date/time, user name, and
         edit summary. Starts with the most current revision, unless
-        reverseOrder is True. Defaults to getting the first revCount edits,
-        unless getAll is True.
+        reverseOrder is True.
+        Defaults to getting the first revCount edits, unless getAll is True.
 
+        @param revCount: iterate no more than this number of revisions in total
         """
 
         # regular expression matching one edit in the version history.
@@ -2551,8 +2559,11 @@ not supported by PyWikipediaBot!"""
                 dataQuery = self._versionhistoryearliest
             else:
                 thisHistoryDone = True
-        elif not hasattr(self, '_versionhistory') or forceReload:
+        elif not hasattr(self, '_versionhistory') or forceReload or \
+             len(self._versionhistory) < revCount:
             self._versionhistory = []
+        # ?? does not load if len(self._versionhistory) > revCount
+        # shouldn't it
         elif getAll and len(self._versionhistory) == revCount:
             # Cause a reload, or at least make the loop run
             thisHistoryDone = False
@@ -2581,8 +2592,8 @@ not supported by PyWikipediaBot!"""
             return self._versionhistory[:revCount]
         return self._versionhistory
 
-    def _getVersionHistory(self, getAll = False, skipFirst = False, reverseOrder = False,
-                               revCount=500):
+    def _getVersionHistory(self, getAll=False, skipFirst=False, reverseOrder=False,
+                           revCount=500):
         """Load history informations by API query.
            Internal use for self.getVersionHistory(), don't use this function directly.
         """
@@ -2594,8 +2605,8 @@ not supported by PyWikipediaBot!"""
             'action': 'query',
             'prop': 'revisions',
             'titles': self.title(),
+            'rvprop': 'ids|timestamp|flags|comment|user|size|tags',
             'rvlimit': revCount,
-            #'': '',
         }
         while not thisHistoryDone:
             if reverseOrder:
@@ -2625,11 +2636,15 @@ not supported by PyWikipediaBot!"""
                         timestampStrr = r['timestamp']
                     if 'user' in r:
                         userStrr = r['user']
-                    dataQ.append((revidStrr, timestampStrr, userStrr, c))
-            
+                    s=-1 #Will return -1 if not found
+                    if 'size' in r:
+                        s = r['size']
+                    tags=[]
+                    if 'tags' in r:
+                        tags = r['tags']
+                    dataQ.append((revidStrr, timestampStrr, userStrr, c, s, tags))
                 if len(result['query']['pages'].values()[0]['revisions']) < revCount:
                     thisHistoryDone = True
-
         return dataQ
     
     def _getVersionHistoryOld(self, getAll = False, skipFirst = False, 
@@ -2697,26 +2712,30 @@ not supported by PyWikipediaBot!"""
                 dataQ.extend(edits)
                 if len(edits) < revCount:
                     thisHistoryDone = True
-        
         return dataQ
 
     def getVersionHistoryTable(self, forceReload=False, reverseOrder=False,
                                getAll=False, revCount=500):
         """Return the version history as a wiki table."""
+
         result = '{| class="wikitable"\n'
-        result += '! oldid || date/time || username || edit summary\n'
-        for oldid, time, username, summary in self.getVersionHistory(forceReload = forceReload, reverseOrder = reverseOrder, getAll = getAll, revCount = revCount):
+        result += '! oldid || date/time || size || username || edit summary\n'
+        for oldid, time, username, summary, size, tags \
+                in self.getVersionHistory(forceReload=forceReload,
+                                          reverseOrder=reverseOrder,
+                                          getAll=getAll, revCount=revCount):
             result += '|----\n'
-            result += '| %s || %s || %s || <nowiki>%s</nowiki>\n' % (oldid, time, username, summary)
+            result += '| %s || %s || %d || %s || <nowiki>%s</nowiki>\n' \
+                      % (oldid, time, size, username, summary)
         result += '|}\n'
         return result
 
     def fullVersionHistory(self):
-        """
-        Return all previous versions including wikitext.
+        """Iterate previous versions including wikitext.
 
         Gives a list of tuples consisting of revision ID, edit date/time, user name and
         content
+
         """
         address = self.site().export_address()
         predata = {
@@ -2738,9 +2757,17 @@ not supported by PyWikipediaBot!"""
                    unescape(match.group('content')))
                 for match in r.finditer(data)  ]
 
-    def contributingUsers(self):
-        """Return a set of usernames (or IPs) of users who edited this page."""
-        edits = self.getVersionHistory()
+    def contributingUsers(self, step=None, total=None):
+        """Return a set of usernames (or IPs) of users who edited this page.
+
+        @param step: limit each API call to this number of revisions
+                     - not used yet, only in rewrite branch -
+        @param total: iterate no more than this number of revisions in total
+
+        """
+        if total == None:
+            total = 500 #set to default of getVersionHistory
+        edits = self.getVersionHistory(revCount=total)
         users = set([edit[2] for edit in edits])
         return users
 
@@ -2749,7 +2776,17 @@ not supported by PyWikipediaBot!"""
         """Move this page to new title given by newtitle. If safe, don't try
         to move and delete if not directly requested.
 
-        * fixredirects has no effect in MW < 1.13"""
+        * fixredirects has no effect in MW < 1.13
+
+        @param newtitle: The new page title.
+        @param reason: The edit summary for the move.
+        @param movetalkpage: If true, move this page's talk page (if it exists)
+        @param sysop: Try to move using sysop account, if available
+        @param deleteAndMove: if move succeeds, delete the old page
+            (usually requires sysop privileges, depending on wiki settings)
+        @param safe: If false, attempt to delete existing page at newtitle
+            (if there is one) and then move this page to that title
+        """
         if not self.site().has_api() or self.site().versionnumber() < 12:
             return self._moveOld(newtitle, reason, movetalkpage, sysop,
               throttle, deleteAndMove, safe, fixredirects, leaveRedirect)
@@ -2769,6 +2806,8 @@ not supported by PyWikipediaBot!"""
         if throttle:
             put_throttle()
         if reason is None:
+            pywikibot.output(u'Moving %s to [[%s]].'
+                             % (self.title(asLink=True), newtitle))
             reason = input(u'Please enter a reason for the move:')
         if self.isTalkPage():
             movetalkpage = False
@@ -2779,7 +2818,6 @@ not supported by PyWikipediaBot!"""
             'to': newtitle,
             'token': self.site().getToken(sysop=sysop),
             'reason': reason,
-            #'': '',
         }
         if movesubpages:
             params['movesubpages'] = 1
@@ -3872,7 +3910,7 @@ class _GetAll(object):
         successful = False
         for page2 in self.pages:
             if page2.sectionFreeTitle() == page.sectionFreeTitle():
-                if not (hasattr(page2,'_contents') or hasattr(page2,'_getexception')) or self.force:
+                if not (hasattr(page2,'_contents') or hasattr(page2, '_getexception')) or self.force:
                     page2.editRestriction = entry.editRestriction
                     page2.moveRestriction = entry.moveRestriction
                     if editRestriction == 'autoconfirmed':
@@ -3882,6 +3920,7 @@ class _GetAll(object):
                     page2._ipedit = ipedit
                     page2._revisionId = revisionId
                     page2._editTime = timestamp
+                    page2._versionhistory = [(revisionId, str(Timestamp.fromtimestampformat(timestamp)), username, entry.comment)]
                     section = page2.section()
                     # Store the content
                     page2._contents = text
@@ -6420,20 +6459,24 @@ u"""WARNING: Could not open '%s'. Maybe the server or\n your connection is down.
             params['apfilterredir'] = 'redirects'
 
         while True:
-
             if throttle:
                 get_throttle()
             data = query.GetData(params, self)
+            if verbose:
+                print 'DEBUG allpages>>> data.keys()', data.keys()
             if 'warnings' in data:
                 warning = data['warnings']['allpages']['*']
                 raise str(warning)
+            if 'error' in data:
+                raise RuntimeError("API query error: %s" % data)
+            if not 'allpages' in data['query']:
+                raise RuntimeError("API query error, no pages found: %s" % data)
             count = 0
             for p in data['query']['allpages']:
                 count += 1
                 yield Page(self, p['title'])
                 if count >= config.special_page_limit:
                     break
-
             if 'query-continue' in data and count < params['aplimit']:
                 params['apfrom'] = data['query-continue']['allpages']['apfrom']
             else:

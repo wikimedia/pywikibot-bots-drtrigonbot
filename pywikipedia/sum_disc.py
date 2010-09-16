@@ -80,7 +80,7 @@ import sets, string, datetime, hashlib
 
 import config, pagegenerators, userlib
 #import config, pagegenerators, userlib
-import dtbext, dtbext_basic
+import dtbext
 # Splitting the bot into library parts
 import wikipedia as pywikibot
 
@@ -210,7 +210,7 @@ docuReplacements = {
 }
 
 
-class SumDiscBot(dtbext_basic.BasicBot):
+class SumDiscBot(dtbext.basic.BasicBot):
 	'''
 	Robot which will check your latest edits for discussions and your old
 	discussions against recent changes, pages to check are provided by a
@@ -245,18 +245,20 @@ class SumDiscBot(dtbext_basic.BasicBot):
 		'''
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 28, 30, 17)
 
-		dtbext_basic.BasicBot.__init__(self, bot_config)
+		pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
+
+		dtbext.basic.BasicBot.__init__(self, bot_config)
 
 		# init constants
-        	self._userListPage = dtbext.pywikibot.Page(self.site, userListPage)
-		#print [item[0] for item in self._getUsers()]		#enhance 'ignorepage_list'
+        	self._userListPage = pywikibot.Page(self.site, userListPage)
+		#print [item[0] for item in self._getUsers()]		# enhance 'ignorepage_list'
 
-		pywikibot.output(u'** Receiving User List (wishes): %s' % self._userListPage)
-		self._user_list = dtbext.config.getUsersConfig(self._userListPage)
+		pywikibot.output(u'\03{lightred}** Receiving User List (wishes): %s\03{default}' % self._userListPage)
+		self._user_list = self.loadUsersConfig(self._userListPage)
 
-		pywikibot.output(u'** Receiving Job Queue (Maintenance Messages)')
-		page = dtbext.pywikibot.Page(self.site, bot_config['maintenance_queue'])
-		self.maintenance_msg = dtbext.config.getJobQueue(page, bot_config['queue_security'], debug = debug['write2wiki'])
+		pywikibot.output(u'\03{lightred}** Receiving Job Queue (Maintenance Messages)\03{default}')
+		page = pywikibot.Page(self.site, bot_config['maintenance_queue'])
+		self.maintenance_msg = self.loadJobQueue(page, bot_config['queue_security'], debug = debug['write2wiki'])
 
 		# init variable/dynamic objects
 
@@ -270,25 +272,21 @@ class SumDiscBot(dtbext_basic.BasicBot):
 		#pywikibot.output(u'\03{lightgreen}* Processing User List (wishes): %s\03{default}' % self._userListPage)
 		pywikibot.output(u'\03{lightgreen}* Processing User List (wishes):\03{default}')
 
-		if debug['user']: pywikibot.output(u'\03{lightred}=== ! DEBUG MODE USERS WILL BE SKIPPED ! ===\03{default}')
+		if debug['user']: pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE USERS WILL BE SKIPPED ! ===\03{default}')
 
 		for user in self._user_list:					# may be try with PreloadingGenerator?!
-			if (debug['user'] and (user[0] != 'DrTrigon')):	continue
+# DOES THE NEW USER SCHEME WORK WITH, e.g. 'wikipedia:de:\xba_the_Bench_\xba' ???
+			if (debug['user'] and (user.name() != 'DrTrigon')): continue
 
 			self._setUser(user)					# set user and init params
 
-			pywikibot.output(u'\03{lightgreen}** Processing User: %s\03{default}' % self._user)
+			pywikibot.output(u'\03{lightred}** Processing User: %s\03{default}' % self._user.name())
 
 			self.loadMode(self._userPage)				# get operating mode
 			self._work_list = {}
 
-			#self._getHistory()					# get history entries
-			self.getHistoryPYF(rollback=self.rollback)
+			self.getHistoryPYF(rollback=self.rollback)		# get history entries
 			self._work_list.update( self._hist_list )
-
-			# JUST A TEMPORARY PATCH FOR HISTORY			# SHOULD BE REMOVED LATER!
-			# e.g. 'dewiki:...' --> 'de:...'
-			self._work_list = dict([ (key.replace(u'wiki:', u':'), self._work_list[key]) for key in self._work_list.keys() ])
 
 			addition = self.checkRecentEdits()			# check special pages for latest contributions
 			self._work_list.update( addition )			#
@@ -296,9 +294,8 @@ class SumDiscBot(dtbext_basic.BasicBot):
 			if self._param['getbacklinks_switch']:			# get the backlinks to user disc page
 				addition = self.getUserBacklinks()		#
 				self._work_list.update( addition )		#
-				# all pages served from here ARE CURRENTLY SIGNED (have a Signature at the moment)
-
-			# (history war bisher HIER)
+				# all pages served from here ARE CURRENTLY
+				# SIGNED (have a Signature at the moment)
 
 			if self._param['globwikinotify_switch']:		# [F38] get global wiki notifications (toolserver/merl)
 				addition = self.getGlobalWikiNotifications()	#
@@ -311,6 +308,9 @@ class SumDiscBot(dtbext_basic.BasicBot):
 # debug here ^^^
 			self._checkRelevancyTh()				# check self._news_list on relevancy, disc-thread oriented version...
 
+			#print self._work_list
+			continue
+# debug here ^^^
 			self._AddMaintenanceMsg()				# gehen auch in jede history... werden aber bei compress entfernt
 
 			self._postDiscSum()					# post results to users Discussion page (with comments for history)
@@ -341,7 +341,9 @@ class SumDiscBot(dtbext_basic.BasicBot):
 			import shutil
 
 		for user in users:
-			self._setUser((user,{}))
+			u = userlib.User(self.site, user)
+			u.extradata = {}
+			self._setUser(u)
 
 			try:
 				begin = float(os.path.getsize(self._datfilename))
@@ -362,7 +364,7 @@ class SumDiscBot(dtbext_basic.BasicBot):
 
 			end = float(os.path.getsize(self._datfilename))
 
-			pywikibot.output(u'** History of %s compressed and written. (%s %%)' % (user, (end/begin)*100))
+			pywikibot.output(u'\03{lightred}** History of %s compressed and written. (%s %%)\03{default}' % (user, (end/begin)*100))
 
 	def getHistoryPYF(self, rollback = 0):
 		buf = self.loadFile()
@@ -380,9 +382,8 @@ class SumDiscBot(dtbext_basic.BasicBot):
 			news_item = eval(item)
 			#news.update( news_item )
 			# news.update BUT APPEND the heading data in the last tuple arg
-			# additionally provide backwards support and convert all formats to v5 (longer v3 / with dict)
 			for key in news_item.keys():
-				if (len(news_item[key]) == 5):				# old history format
+				if (len(news_item[key]) == 5):			# old history format
 					news_item[key] += (self._PS_unchanged,)
 					usage['old history'] = True
 				if key in news:		# APPEND the heading data in the last tuple arg
@@ -391,7 +392,7 @@ class SumDiscBot(dtbext_basic.BasicBot):
 					else:
 						heads = news[key][4]
 						heads.update( news_item[key][4] )
-						news[key] = (news_item[key][0], news_item[key][1], news_item[key][2], news_item[key][3], heads)
+						news[key] = (news_item[key][0], news_item[key][1], news_item[key][2], news_item[key][3], heads, news_item[key][5])
 				else:
 					news[key] = news_item[key]
 			rollback_buf.append( copy.deepcopy(news) )
@@ -402,7 +403,23 @@ class SumDiscBot(dtbext_basic.BasicBot):
 			del rollback_buf
 			usage['rollback'] = i
 
-		pywikibot.output(u'*** History recieved %s' % str(usage))
+		# create page list
+		new = {}
+		for key in self._hist_list.keys():
+			name = key
+			# JUST A TEMPORARY PATCH FOR HISTORY; SHOULD BE REMOVED LATER!
+			# e.g. 'Dewiki:...' --> 'de:...'
+			if self._hist_list[key][5] == self._PS_notify:
+				name = name[0].lower() + name[1:]
+				name = dtbext.pagegenerators._convert_interwiki_link(self.site, name)
+
+			page = pywikibot.Page(self.site, name)
+			page.sum_disc_data = self._hist_list[key]
+			new[name] = page
+		self._hist_list = new
+		print self._hist_list
+
+		pywikibot.output(u'\03{lightpurple}*** History recieved %s\03{default}' % str(usage))
 
 	def getLatestNews(self):
 		'''
@@ -417,113 +434,131 @@ class SumDiscBot(dtbext_basic.BasicBot):
 		'''
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 30, 28, 17)
 
-		#switch = self._param['reportchanged_switch']
-
-		localinterwiki = self.site.dbName().replace('_p', '').lower() + ':'	# better than http://toolserver.org/~vvv/wikis.php
-		localinterwiki_len = len(localinterwiki)
+		# sort pages according to language/wiki, to speed up/help the PreloadingGenerator
+		page_titles = self._work_list.keys()
+		page_titles_sorted = []
+		used_langs = []
+		for i, key in enumerate(page_titles):
+			lang = self._work_list[key].site().language()
+			if (lang in used_langs):
+				continue
+			else:
+				used_langs.append( lang )
+				for k in page_titles:
+					if lang == self._work_list[k].site().language():
+						page_titles_sorted.append( k )
+			if len(page_titles) == len(page_titles_sorted): break	# done
 
 		# check for news to report
 		self._news_list = {}
 		self._oth_list = {}
 		size = len(self._work_list)
 		j = 0
-		#sites = dtbext.pywikibot.Pages(self.site, self._work_list.keys())
-		#actual_dict = sites.getVersionHistory()
-#gen1 = pagegenerators.PagesFromTitlesGenerator(self._user_list)
-## Preloads _contents and _versionhistory
-## (DOES NOT USE API YET! / ThreadedGenerator would be nice!)
-#gen2 = pagegenerators.PreloadingGenerator(gen)
-		actual_dict = list(dtbext.pagegenerators.VersionHistoryGenerator(self._work_list.keys()))
-		print len(actual_dict), len(self._work_list.keys())
-		return
-		#for item in self._work_list:
-		for keys in self._work_list.keys():
-			item = self._work_list[keys]
+		jj = 0
+		gen1 = pagegenerators.PagesFromTitlesGenerator(page_titles_sorted)
+		# PageTitleFilterPageGenerator; or use RegexFilterPageGenerator (look ignorelist)
+		#gen2 = pagegenerators.PageTitleFilterPageGenerator(gen1, ignore_list)
+		# Preloads _contents and _versionhistory
+		# [ DOES NOT USE API YET! / ThreadedGenerator would be nice! / JIRA ticket? ]
+		gen3 = pagegenerators.PreloadingGenerator(gen1)
+		#for keys in self._work_list.keys():
+		for page in gen3:
+			print page
+			print page.title()
+			print page.title(asLink=True)
+			print
+			# count page number (for debug not to loose pages)
+			jj+=1
 
-			if (len(item) >= 6) and (item[5] == self._PS_notify):		# global wiki notifications
-				if (keys in self._hist_list.keys()) and (item[3] == self._hist_list[keys][3]): continue
-				if (keys[:localinterwiki_len].lower() == localinterwiki):					# SKIP local global wiki notify
-					pywikibot.output(u'INFO: skipping global wiki notify to local wiki [[%s]]' % keys)	#
-					continue										#
+			# find and assign additional data
+			for t in page_titles:
+				if self._work_list[t] == page:
+					page.sum_disc_data = self._work_list[t].sum_disc_data
+					page.sum_disc_desc = t
+					if not (page.title(asLink=True)[2:-2] == page.sum_disc_desc):
+						raise pywikibot.Error(u'Problems with page titles/names!')
+# should always be the same as 'page.title(asLink=True)[2:-2]'
+					break
+			#item = self._work_list[keys]
+			keys = page.sum_disc_desc
+			item = page.sum_disc_data
 
-				self._oth_list[keys] = item
-				continue
-
-			page = dtbext.pywikibot.Page(self.site, keys)		# oder auch 'dtbext.pywikibot.PageFromPage(page)' ...
+			# ignorelist
+			# [ RegexFilterPageGenerator; but has to be modified and a patch sent upstream for this / JIRA ticket? ]
 			#if (self._transPage(page).title() == self._userPage.title()):	continue
 			skip = False
-			for check in self._param['ignorepage_list']:			# ignorelist
+			for check in self._param['ignorepage_list']:
 				#if (page.title()[-len(check):] == check):
 				if check.search(page.title()):
 					skip = True
 					break
 			if skip: continue
-			if len(re.split('#', keys)) > 1:						# SKIP old BOT MESSAGES
-				pywikibot.output(u'INFO: skipping old bot message at [[%s]]' % keys)	# (code BECOMES OBSOLETE !!!)
-				continue								#
 
-			actual = actual_dict[page.sectionFreeTitle()]
+			# get history (was preloaded)
+			#actual = actual_dict[page.sectionFreeTitle()]
+			# use preloaded with revCount=1
+			print page.title(asLink=True)
+			page.get()
+# everything preloaded speed ok ???
+			actual = page.getVersionHistory(revCount=1)
 
-			if sites.isRedirectPage(keys):
-				pywikibot.output(u'INFO: skipping redirect at [[%s]]' % keys)		#
+			# check redirect (was preloaded)
+			if page.isRedirectPage():
+				pywikibot.output(u'\03{lightaqua}INFO: skipping redirect at [[%s]]\03{default}' % keys)
 				continue
 
-			#try:	actual = page.getVersionHistory(revCount=1)[0]
-			#except:	continue
-			if not actual:			# no version history found, page deleted?
+			# no version history found, page deleted?
+			if not actual:
 				#if (page.title() in self._hist_list) and (self._hist_list[page.title()][5] == self._PS_warning):
 				#	pass
 				#else:
-				self._oth_list[page.title()] = (	u'no version history found, page deleted!', 
-								page, 
-								None, 
-								None, 
-								None, 
-								self._PS_warning )
-				#pywikibot.output(u'INFO: skipping [[%s]], no version history/page deleted/missing' % keys)
+				page.sum_disc_data = (	u'no version history found, page deleted!', 
+							None, # obsolete (and recursive)
+							None, 
+							None, 
+							None, 
+							self._PS_warning )
+				self._oth_list[page.sum_disc_desc] = page				
+				#pywikibot.output(u'\03{lightaqua}INFO: skipping [[%s]], no version history/page deleted/missing\03{default}' % keys)
 				continue
 
+			# actual/new status of page, has something changed?
 			actual = actual[0]
 			j += 1
-			if page.title() in self._hist_list:
-				#if (not (self._hist_list[page.title()][3] == actual[1])) and switch:	# discussion has changed, some news?
-				if (not (self._hist_list[page.title()][3] == actual[1])):		# discussion has changed, some news?
-					self._news_list[page.title()] = (	u'Discussion changed', 
-									page, 
-									actual[2], 
-									actual[1], 
-									self._hist_list[page.title()][4], 
-									self._PS_changed )
-				else:									# nothing new to report (but keep for history and update it)
-					self._oth_list[page.title()] = (	self._hist_list[page.title()][0], 
-									page, 
-									actual[2], 
-									actual[1], 
-									self._hist_list[page.title()][4], 
-									self._PS_unchanged )
-			else:										# new discussion, some news?
-				self._news_list[page.title()] = (	u'New Discussion', 
-								page, 
+			#if page.title() in self._hist_list:
+			if page.sum_disc_desc in self._hist_list:
+				if (not (self._hist_list[page.sum_disc_desc].sum_disc_data[3] == actual[1])):
+					# discussion has changed, some news?
+					page.sum_disc_data = (	u'Discussion changed', 
+								None, # obsolete (and recursive)
 								actual[2], 
 								actual[1], 
-								{},
-								self._PS_new )
-
-		# time patch not needed anymore, the checksum in relevancy check will save you!! :)
-		if ( (len(self._news_list) == j) and (j != 0) ):
-			if self.silent:
-				#pywikibot.output(u'!!! WARNING: POSSIBLE Time problem ignored!')
-				self._oth_list[self._userPage.title()] = (	u'POSSIBLE Time problem ignored!', 
-									self._userPage, 
-									None, 
-									None, 
-									None, 
-									self._PS_warning )
+								self._hist_list[page.sum_disc_desc].sum_disc_data[4], 
+								self._PS_changed )
+					self._news_list[page.sum_disc_desc] = page
+				else:
+					# nothing new to report (but keep for history and update it)
+					page.sum_disc_data = (	self._hist_list[page.sum_disc_desc].sum_disc_data[0], 
+								None, # obsolete (and recursive)
+								actual[2], 
+								actual[1], 
+								self._hist_list[page.sum_disc_desc].sum_disc_data[4], 
+								self._PS_unchanged )
+					self._oth_list[page.sum_disc_desc] = page
 			else:
-				choice = pywikibot.inputChoice('!!! WARNING: EVERYTHING (%i) seems to be new!? Time problem?? Continue anyway?' % j, ['Yes', 'No'], ['y', 'n'])
-				if choice == 'n': sys.exit()
+				# new discussion, some news?
+				page.sum_disc_data = (	u'New Discussion', 
+							None, # obsolete (and recursive)
+							actual[2], 
+							actual[1], 
+							{},
+							self._PS_new )
+				self._news_list[page.sum_disc_desc] = page
+		if not (len(self._work_list.keys()) == jj):
+			raise pywikibot.Error(u'PreloadingGenerator has lost some pages!')
+# DOES THE PreloadingGenerator WORK ???
 
-		pywikibot.output(u'*** Latest News searched')
+		pywikibot.output(u'\03{lightpurple}*** Latest News searched\03{default}')
 
 	def checkRecentEdits(self):
 		'''
@@ -538,10 +573,12 @@ class SumDiscBot(dtbext_basic.BasicBot):
 		check_list = self._param['checkedit_list']
 		count = self._param['checkedit_count']
 
-		pywikibot.output(u'Getting latest contributions from user "%s" via API...' % self._user)	# should be done in framework
+		# [ should be done in framework / JIRA ticket? ]
+		pywikibot.output(u'Getting latest contributions from user "%s" via API...' % self._user.name())
 
 		# thanks to http://www.amk.ca/python/howto/regex/ and http://bytes.com/forum/thread24382.html
-		usersumList = [p.title() for p in pagegenerators.UserContributionsGenerator(self._user, number = count)]
+		#usersumList = [p.title() for p in pagegenerators.UserContributionsGenerator(self._user.name(), number = count)]
+		usersumList = [p[0].title() for p in self._user.contributions(limit = count)]
 
 		work_list = {}
 		for item in usersumList:
@@ -549,10 +586,14 @@ class SumDiscBot(dtbext_basic.BasicBot):
 			for check in check_list:
 				match = check.search(item)
 				if match:
-					work_list[match.group(1)] = ()
+					#work_list[match.group(1)] = ()
+					name = match.group(1)
+					page = pywikibot.Page(self.site, name)
+					page.sum_disc_data = ()
+					work_list[name] = page
 					break		# should only match one of the possibilities, anyway just add it once!
 
-		pywikibot.output(u'*** Latest %i Contributions checked' % len(usersumList))
+		pywikibot.output(u'\03{lightpurple}*** Latest %i Contributions checked\03{default}' % len(usersumList))
 
 		return work_list
 
@@ -567,13 +608,13 @@ class SumDiscBot(dtbext_basic.BasicBot):
 		'''
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 17)
 
-		# according to 'checkRecentEdits(...)'
 		check_list = self._param['checkedit_list']
 
 		userbacklicksList = []
 		for item in self._param['backlinks_list']:
-			page = dtbext.pywikibot.Page(self.site, item)		# important for the generator to use the API
-			userbacklicksList += [p.title() for p in pagegenerators.ReferringPageGenerator(page, withTemplateInclusion=False)]	# DOES THIS PRESERVE THE ORDER?!?!??
+			page = pywikibot.Page(self.site, item)		# important for the generator to use the API
+			#userbacklicksList += [p.title() for p in pagegenerators.ReferringPageGenerator(page, withTemplateInclusion=False)]
+			userbacklicksList += [p.title() for p in page.getReferences(withTemplateInclusion=False)]
 		userbacklicksList = list(sets.Set(userbacklicksList))			# drop duplicates
 
 		work_list = {}
@@ -582,10 +623,14 @@ class SumDiscBot(dtbext_basic.BasicBot):
 			for check in check_list:
 				match = check.search(item)
 				if match:
-					work_list[match.group(1)] = ()
+					#work_list[match.group(1)] = ()
+					name = match.group(1)
+					page = pywikibot.Page(self.site, name)
+					page.sum_disc_data = ()
+					work_list[name] = page
 					break		# should only match one of the possibilities, anyway just add it once!
 
-		pywikibot.output(u'*** %i Backlinks to user checked' % len(userbacklicksList))
+		pywikibot.output(u'\03{lightpurple}*** %i Backlinks to user checked\03{default}' % len(userbacklicksList))
 
 		return work_list
 
@@ -601,18 +646,25 @@ class SumDiscBot(dtbext_basic.BasicBot):
 		'''
 
 		if debug['toolserver']:
-			pywikibot.output(u'\03{lightred}=== ! DEBUG MODE TOOLSERVER ACCESS WILL BE SKIPPED ! ===\03{default}')
+			pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE TOOLSERVER ACCESS WILL BE SKIPPED ! ===\03{default}')
 			return
 
-		# according to '_AddMaintenanceMsg(...)', 'getUserBacklinks'
+		localinterwiki = self.site.language()
+
 		work_list = {}
-		for page in dtbext.pagegenerators.GlobalWikiNotificationsGenerator(self._user):
-			data = page.extradata
+		for page in dtbext.pagegenerators.GlobalWikiNotificationsGenerator(self._user.name()):
+			# skip to local disc page, since this is the only page the user should watch itself
+			if page.site().language() == localinterwiki:
+				pywikibot.output(u'\03{lightaqua}INFO: skipping global wiki notify to local wiki %s\03{default}' % page.title(asLink=True))
+				continue
+
+			data = page.globalwikinotify
 			#work_list[page.title()] = (bot_config['globwiki_notify'], page, data['user'], data['timestamp'], {u'':('',True,u'')}, self._PS_notify)
-			work_list[data[u'link']] = (bot_config['globwiki_notify'], page, data['user'], data['timestamp'], {u'':('',True,u'')}, self._PS_notify)
+			page.sum_disc_data = (bot_config['globwiki_notify'], page, data['user'], data['timestamp'], {u'':('',True,u'')}, self._PS_notify)
+			work_list[data[u'link']] = page
 			#self._hist_list[page.title()] = self._news_list[page.title()]
 
-		pywikibot.output(u'*** %i Global wiki notifications added' % len(work_list))
+		pywikibot.output(u'\03{lightpurple}*** %i Global wiki notifications added\03{default}' % len(work_list))
 
 		return work_list
 
@@ -649,20 +701,20 @@ class SumDiscBot(dtbext_basic.BasicBot):
 					self._appendPage(tmplsite, buf)
 				purge = dtbext.pywikibot.PageFromPage(self._userPage).purgeCache()	# I hope (!) this works now, but is it still needed?!??
 
-				pywikibot.output(u'*** Discussion updates added to: %s (purge: %s)' % (self._userPage.title(asLink=True), purge))
+				pywikibot.output(u'\03{lightpurple}*** Discussion updates added to: %s (purge: %s)\03{default}' % (self._userPage.title(asLink=True), purge))
 			else:
-				pywikibot.output(u'\03{lightred}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
+				pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
 
 			if debug['write2hist']:
 				#self._appendFile( str(self._news_list).decode('latin-1') )
 				self._appendFile( str(self._hist_list).decode('latin-1') )
 				#self._appendFile( str(self._hist_list).encode('zlib') )
 				#self._appendFile( zlib.compress(str(self._hist_list).decode('latin-1'), 9) )
-				pywikibot.output(u'*** History updated')
+				pywikibot.output(u'\03{lightpurple}*** History updated\03{default}')
 			else:
-				pywikibot.output(u'\03{lightred}=== ! DEBUG MODE NOTHING WRITTEN TO HISTORY ! ===\03{default}')
+				pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO HISTORY ! ===\03{default}')
 		else:
-			pywikibot.output(u'*** Discussion up to date: NOTHING TO DO')
+			pywikibot.output(u'\03{lightpurple}*** Discussion up to date: NOTHING TO DO\03{default}')
 
 	# look into (pywikibot.)textlib.translate()
 	#
@@ -703,7 +755,7 @@ class SumDiscBot(dtbext_basic.BasicBot):
 			if minorEdit:	page.put(content)
 			else:		page.put(content, minorEdit = False)
 		except pywikibot.SpamfilterError, error:
-			pywikibot.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.title(asLink=True), "error.url"))
+			pywikibot.output(u'\03{lightyellow}SpamfilterError while trying to change %s: %s\03{default}' % (page.title(asLink=True), "error.url"))
 
 	def _checkRelevancyTh(self):
 		'''
@@ -723,21 +775,24 @@ class SumDiscBot(dtbext_basic.BasicBot):
 		'''
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 29, 17)
 
-		def test(timerobj): pywikibot.output(u'\03{lightaqua}progress: %.1f%s (%i of %i) ...\03{default}' % (((100.*timerobj.kwargs['u'])/timerobj.kwargs['size']), u'%', timerobj.kwargs['u'], timerobj.kwargs['size']))
-		t = Timer(bot_config['timeout'], test, size = len(self._news_list.keys()), u = 0)
+#		def test(timerobj): pywikibot.output(u'\03{lightaqua}progress: %.1f%s (%i of %i) ...\03{default}' % (((100.*timerobj.kwargs['u'])/timerobj.kwargs['size']), u'%', timerobj.kwargs['u'], timerobj.kwargs['size']))
+#		t = Timer(bot_config['timeout'], test, size = len(self._news_list.keys()), u = 0)
 
 		# self._news_list contents all 'self._PS_changed' and 'self._PS_new'
 		self._hist_list = copy.deepcopy(self._news_list)
-		pages = dtbext.pywikibot.Pages(self.site, self._news_list.keys())
-		# kleiner speed-up patch, als option/parameter aktivierbar
-		if self._param['directgetfull_list']: issues = ( self._param['directgetfull_list'], ['full']*len(self._param['directgetfull_list']) )
-		else:	issues = None
-		if (t.kwargs['size'] != 0): t.run()
-		for (site, buf) in self.loadPages( pages, issues=issues ):
+#		# kleiner speed-up patch, als option/parameter aktivierbar
+#		if self._param['directgetfull_list']: issues = ( self._param['directgetfull_list'], ['full']*len(self._param['directgetfull_list']) )
+#		else:	issues = None
+#		if (t.kwargs['size'] != 0): t.run()
+		#for (site, buf) in self.loadPages( pages, issues=issues ):
+		for page in self._news_list:
+# ^^^ here we are !!!
+# ---
+# idea: may be create a class for storage of sum_disc_data and for easy save load (history) and else... ?!???
 			#(site, buf) = page
 			keys = site.title()
 
-			t.kwargs['u'] += 1
+#			t.kwargs['u'] += 1
 			#keys = re.split('#', keys)[0]		# Seiten mit Unterabschnitten (falls Abschn. weg aber Seite noch da)
 								# (eigentlich nur für bot maint. messages)
 
@@ -796,8 +851,8 @@ class SumDiscBot(dtbext_basic.BasicBot):
 					#del self._hist_list[keys]
 					self._hist_list[keys] = self._news_list[keys]
 
-		t.cancel()
-		del t
+#		t.cancel()
+#		del t
 
 		# self._oth_list contents all 'self._PS_unchanged' and warnings 'self._PS_warning'
 		for keys in self._oth_list.keys():
@@ -810,7 +865,7 @@ class SumDiscBot(dtbext_basic.BasicBot):
 			else:							# warnings: 'self._PS_warning', ...
 				self._news_list[keys] = self._oth_list[keys]
 
-		pywikibot.output(u'*** Relevancy of threads checked')
+		pywikibot.output(u'\03{lightpurple}*** Relevancy of threads checked\03{default}')
 
 	def _getThContent(self, page, buf):
 		'''
@@ -942,28 +997,27 @@ class SumDiscBot(dtbext_basic.BasicBot):
 		# defaults settings
 		# thanks to http://mail.python.org/pipermail/python-list/2005-September/339147.html
 		# and http://docs.python.org/library/copy.html
-		self._user  = user[0]
-		#self._userPage = pywikibot.Page(self.site, "User_Discussion:%s" % self._user)		# LANG. PROB. HERE??? (...also? to be causious)
-		self._userPage = dtbext.pywikibot.Page(self.site, u'Benutzer_Diskussion:%s' % self._user)	#
+		self._user  = user
+		#self._userPage = pywikibot.Page(self.site, "User_Discussion:%s" % self._user.name())		# LANG. PROB. HERE??? (...also? to be causious)
+		self._userPage = pywikibot.Page(self.site, u'Benutzer_Diskussion:%s' % self._user.name())	#
 		userdiscpage = self._userPage.title()
 		#self._param = dict(self._param_default)
 		self._param = copy.deepcopy(self._param_default)
 
 		# user settings
 		# (wenn nötig smooth update: alle keys mit namen '_list' einzeln updaten, dann werden sie ergänzt statt überschrieben)
-		self._param.update(user[1])
+		self._param.update(user.param)
 		# re-add defaults to lists in self._param else they are overwritten
 		for key in bot_config['default_keep']:
-			if key in user[1]: self._param[key] += copy.deepcopy(self._param_default[key])
-		user = user[0]
+			if key in user.param: self._param[key] += copy.deepcopy(self._param_default[key])
 		self._param['ignorepage_list'].append( self._userPage.title() )	# disc-seite von user IMMER ausschliessen
 		if 'userResultPage' in self._param:				# user with extended info (extra page to use)
-			self._userPage = dtbext.pywikibot.Page(self.site, u'Benutzer:%s' % self._param['userResultPage'])
+			self._userPage = pywikibot.Page(self.site, u'Benutzer:%s' % self._param['userResultPage'])
 			self._param['ignorepage_list'].append( self._userPage.title() )
-		self._datfilename = '%slogs/sum_disc-%s-%s-%s.dat' % (bot_config['script_path'], 'wikipedia', 'de', self._user)
+		self._datfilename = '%slogs/sum_disc-%s-%s-%s.dat' % (bot_config['script_path'], 'wikipedia', 'de', self._user.name())
 
 		# substitute variables for use in user defined parameters/options
-		param_vars = {	'username':	self._user,
+		param_vars = {	'username':	self._user.name(),
 				'userdiscpage':	userdiscpage,
 				}
 		for item in bot_config['vars_subst']:
@@ -1020,7 +1074,7 @@ class SumDiscBot(dtbext_basic.BasicBot):
 				elif data[5] in [self._PS_warning]:
 					data = (data[1].title(), data[0])
 					data = u'*Bot warning message: [[%s]] "\'\'%s\'\'"' % data
-					self._global_warn.append( (self._user, data) )
+					self._global_warn.append( (self._user.name(), data) )
 					if not self._param['reportwarn_switch']: continue
 				elif data[5] in [self._PS_notify]:
 					data = (data[0], data[1].extradata['url'], data[1].title(), data[2], self.localizeDateTime(data[3]))
@@ -1064,7 +1118,7 @@ class SumDiscBot(dtbext_basic.BasicBot):
 							{ pywikibot.sectionencode(item,config.textfile_encoding):('',True,item) }, self._PS_maintmsg )
 			self._hist_list[page.title()] = self._news_list[page.title()]
 
-		pywikibot.output(u'*** Bot maintenance messages added')
+		pywikibot.output(u'\03{lightpurple}*** Bot maintenance messages added\03{default}')
 
 	#def _SearchForSignature(self, text, user = None):
 	# (to get this version back, simply remove 'checksign_list' from 'regex_compile' and it is like it was before)
@@ -1078,14 +1132,14 @@ class SumDiscBot(dtbext_basic.BasicBot):
 		          format:    (relevant [bool], info [list], user [string (unicode)], check [string]) [tuple]
 		'''
 
-		#if not user: user = self._user
+		#if not user: user = self._user.name()
 
 		sign_list  = self._param['altsign_list']
 		check_list = self._param['checksign_list']
 
 		relevant = False
 		info_len = 2*len(text)
-		result = (relevant, '', self._user, '')
+		result = (relevant, '', self._user.name(), '')
 		for user in sign_list:
 			for check in check_list:
 				#print user, check
@@ -1098,7 +1152,7 @@ class SumDiscBot(dtbext_basic.BasicBot):
 			if ((len(info) > 1) and (len(info[-1]) < info_len)):	# get and return last/most recent sign.
 				info_len = len(info[-1])			#
 				result = (relevant, info, user, check)		#
-		#return (relevant, info, self._user, check)
+		#return (relevant, info, self._user.name(), check)
 		return result
 
 	def _getLastHumanEditor(self, username):

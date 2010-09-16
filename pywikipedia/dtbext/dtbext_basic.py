@@ -13,7 +13,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_basic.py 0.2.0020 2009-11-14 12:24 drtrigon $'
+__version__='$Id: dtbext_basic.py 0.2.0022 2009-11-15 16:52 drtrigon $'
 #
 
 
@@ -36,19 +36,21 @@ class BasicBot(basic.BasicBot):
 	#silent		= False
 	#rollback	= 0
 
+	_REGEX_eol		= re.compile('\n')
+	#REGEX_subster_tag	= '<!--SUBSTER-%(var)s-->%(cont)s<!--SUBSTER-%(var)s-->'	# from 'subster.py'
+	_REGEX_subster_tag	= '<!--SUBSTER-%(var)s-->'					#
+
 	def __init__(self, bot_config):
 		'''Constructor of BasicBot(); setup environment, initialize needed consts and objects.
 		'''
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 28, 30, 17)
-
-		pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
 
 		#basic.BasicBot.__init__(self, generator, dry)
 
 		# modification of timezone to be in sync with wiki
 		os.environ['TZ'] = 'Europe/Amsterdam'
 		time.tzset()
-		pywikibot.output(u'** Set TZ: %s' % str(time.tzname))	# ('CET', 'CEST')
+		pywikibot.output(u'Setting process TimeZone (TZ): %s' % str(time.tzname))	# ('CET', 'CEST')
 
 		# init constants
 		self._bot_config = bot_config
@@ -89,6 +91,90 @@ class BasicBot(basic.BasicBot):
 				tmpl_pos  = self._template_regex.search(page_buf)
 				self._content = page_buf[:tmpl_pos.start()] + tmpl_text + page_buf[tmpl_pos.end():]
 				break
+
+	# ADDED
+	# REASON: common interface to bot user settings on wiki
+	def loadUsersConfig(self, page):
+		"""Get user list from wiki page, e.g. [[Benutzer:DrTrigonBot/Diene_Mir!]].
+		   ADDED METHOD: common interface to bot user settings on wiki
+
+		   @param page: Wiki page containing user list and config.
+		   @type  page: page
+
+		   Returns a list with entries: (user, param)
+		   This list may be empty.
+		"""
+
+		#users = {}
+		final_users = []
+		for item in self._REGEX_eol.split(page.get()):
+			item = re.split(',', item, maxsplit=1)
+			#print "A"
+			if (len(item) > 1):	# for compatibility with 'subster.py' (if needed)
+				#item[1] = re.compile((self._REGEX_subster_tag%{'var':'.*?','cont':'.*?'}), re.S | re.I).sub(u'', item[1])
+				item[1] = re.compile((self._REGEX_subster_tag%{'var':'.*?'}), re.S | re.I).sub(u'', item[1])
+			#print item
+			try:	param = eval(item[1])
+			except:	param = {}
+			item = item[0]
+			try:
+				if not (item[0] == u'*'):	continue
+			except:	continue
+			item = item[1:]
+			item = re.sub(u'\[', u'', item)
+			item = re.sub(u'\]', u'', item)
+			item = re.sub(u'Benutzer:', u'', item)
+			subitem = re.split('\/', item)		# recognize extended user entries with ".../..."
+			if len(subitem) > 1:			#  "
+				param['userResultPage'] = item	# save extended user info (without duplicates)
+				item = subitem[0]
+			#users[item] = param			# drop duplicates directly
+			user = userlib.User(self.site, item.encode('unicode_escape'))
+			user.param = param
+			final_users.append( user )
+
+		return final_users
+
+	# ADDED
+	# REASON: common interface to bot job queue on wiki
+	def loadJobQueue(self, page, queue_security, debug = False):
+		"""Check if the data queue security is ok to execute the jobs,
+		   if so read the jobs and reset the queue.
+		   ADDED METHOD: common interface to bot job queue on wiki
+
+		   @param page: Wiki page containing job queue.
+		   @type  page: page
+		   @param queue_security: This string must match the last edit
+			                  comment, or else nothing is done.
+		   @type  queue_security: string
+		   @param debug: Parameter to prevent writing to wiki in debug mode.
+		   @type  debug: bool
+
+		   Returns a list of jobs. This list may be empty.
+		"""
+
+		try:	actual = page.getVersionHistory(revCount=1)[0]
+		except:	pass
+
+		secure = False
+		for item in queue_security[0]:
+		    secure = secure or (actual[2] == item)
+
+		secure = secure and (actual[3] == queue_security[1])
+
+		if not secure: return []
+
+		data = self._REGEX_eol.split(page.get())
+		if debug:
+			pywikibot.setAction(u'reset job queue')
+			page.put(u'', minorEdit = True)
+		else:
+			pywikibot.output(u'\03{lightred}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
+
+		queue = []
+		for line in data:
+			queue.append( line[1:].strip() )
+		return queue
 
 	def load(self, page, full=False):
 		'''

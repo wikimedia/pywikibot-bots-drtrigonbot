@@ -12,7 +12,7 @@ the same functions but enhanced.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_pagegenerators.py 0.2.0021 2009-11-15 00:37 drtrigon $'
+__version__='$Id: dtbext_pagegenerators.py 0.2.0022 2009-11-16 02:31 drtrigon $'
 #
 
 # Standard library imports
@@ -29,62 +29,9 @@ import dtbext_wikipedia as dtbext_pywikibot
 REQUEST_getGlobalWikiNotifys	= 'http://toolserver.org/~merl/UserPages/query.php?user=%s&format=xml'
 
 
-# ADDED: new (r19)
-# REASON: needed by various bots BUT SHOULD BE ALSO DONE BY THE PreloadingGenerator
-#         [ look at DRTRIGON-55 and remove it then ]
-def VersionHistoryGenerator(iterable, site=pywikibot.Site(config.mylang), number=5000):
-	"""Provides a list of page names with VersionHistory for the pages.
-	   ADDED METHOD: needed by various bots BUT SHOULD BE DONE BY PreloadingGenerator
-
-	    If you need a full list of referring pages, use this:
-	        pages = [page for page in GlobalWikiNotificationsGenerator()]
-
-	   @param iterable: The page title list to retrieve VersionHistory of.
-	   @type  iterable: list
-	   @param site: The default Site from which data should be retrieved.
-	   @param number: Number of pages per request.
-	   @type  number: int
-
-	   Returns a list with entries: (title, revid, timestamp, user, comment)
-	"""
-
-	il = list(iterable)
-	for i in range(0, len(il), number):	# split into pakets of len = len(number)
-		item = il[i:(i+len(il))]
-
-		# call the wiki to get info
-		params = {
-			u'action'	: u'query',
-			u'titles'	: item,
-			u'rvprop'	: [u'ids', u'timestamp', u'flagged', u'user', u'flags', u'comment'],
-			u'prop'		: [u'revisions', u'info'],
-		}
-		if number > config.special_page_limit:
-			if number > 5000:
-				params[u'rvlimit'] = 5000
-
-		pywikibot.get_throttle()
-		pywikibot.output(u"Reading a set of %i pages." % len(item))
-
-		result = query.GetData(params, site)		# 1 result per page
-		r = result[u'query'][u'pages'].values()
-
-		print item
-		for subitem in r:
-			print subitem
-			if u'missing' in subitem:
-#				page = pywikibot.Page(site, item)
-#				print page
-                		#raise NoPage(site, subitem[u'title'],"Page does not exist." )
-				pywikibot.output( str(pywikibot.NoPage(site, subitem[u'title'],u"Page does not exist." )) )
-			else:
-				entry = subitem[u'revisions'][0]
-				yield (subitem[u'title'], entry[u'revid'], entry[u'timestamp'], entry[u'user'], entry.get(u'comment', u''))
-		return
-
-
 # ADDED
 # REASON: due to http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 38)
+#         (MAY BE MOVE THIS INTO dtbext_userlib.py AND dtbext_pagegenerators.py ANALOG TO UserContributionsGenerator)
 def GlobalWikiNotificationsGenerator(username, site=pywikibot.Site(config.mylang)):
 	"""Provides a list of results using the toolserver Merlissimo API, can also
 	   be used as Generator for 'SimplePageGenerator'
@@ -100,14 +47,10 @@ def GlobalWikiNotificationsGenerator(username, site=pywikibot.Site(config.mylang
 	   Returns a page-objects with extradata dict in 'page.extradata'
 	"""
 
-#	import family
-#	print family.Family().get_known_families(site)['trwiki']
-#	raise
-
 	request = REQUEST_getGlobalWikiNotifys % urllib.quote(username.encode(config.textfile_encoding))
 
 	pywikibot.get_throttle()
-	pywikibot.output(u"Reading GlobalWikiNotifications from toolserver.")
+	pywikibot.output(u"Reading GlobalWikiNotifications from toolserver (via 'API')...")
 
 	buf = site.getUrl( request, no_hostname = True )
 
@@ -126,13 +69,16 @@ def GlobalWikiNotificationsGenerator(username, site=pywikibot.Site(config.mylang
 
 		# [u'revid', u'user', u'timestamp', u'comment', u'redirect'],
 		#yield (data[u'revid'], data[u'user'], data[u'timestamp'], data[u'comment'], data[u'link'], data[u'url'], data[u'pageid'])
-		data[u'link'] = data[u'link'].replace(u'wiki:', u':')	# e.g. 'dewiki:...' --> 'de:...'
+
+		data[u'link'] = _convert_interwiki_link(site, data[u'link'])
+
 		page = pywikibot.Page(site, data[u'link'])
-		page.extradata = data
+		page.globalwikinotify = data
 		yield page
 
 # ADDED
 # REASON: needed by 'GlobalWikiNotificationsGenerator' (due to http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 38))
+#         [ into 'dtbext.xmlreader' ?! ]
 def _GetDataXML(data, root):
 	#pywikibot.get_throttle()
 	#APIdata = site.getUrl( request )
@@ -151,6 +97,7 @@ def _GetDataXML(data, root):
 
 # ADDED
 # REASON: needed by 'GlobalWikiNotificationsGenerator' (thanks to http://pyxml.sourceforge.net/topics/howto/xml-howto.html)
+#         [ into 'dtbext.xmlreader' ?! ]
 class _GetGenericData(saxutils.DefaultHandler):
 	"""Parse XML output of wiki API interface."""
 	def __init__(self, root):
@@ -175,4 +122,17 @@ class _GetGenericData(saxutils.DefaultHandler):
 		self._path.reverse()
 		self._path.remove( name )
 		self._path.reverse()
+
+# ADDED: (r22)
+# REASON: needed also by 'getHistoryPYF' in sum_disc, BUT ONLY TEMPORARY
+def _convert_interwiki_link(site, link):
+	"""Try to convert Merlissimos format of links to other languages and projects."""
+	new_link = link
+	for family in site.fam().get_known_families(site).values():
+		title = link.replace(u'%s:' % family.decode('unicode_escape'), u':')	# e.g. 'dewiki:...' --> 'de:...'
+		if not (title == link):
+			new_link = u'%s:%s' % (family, title)
+			# [ framework claims to know 'wiki' but does not / JIRA ticket? ]
+			new_link = new_link.replace(u'wiki:', u'')
+	return new_link
 
