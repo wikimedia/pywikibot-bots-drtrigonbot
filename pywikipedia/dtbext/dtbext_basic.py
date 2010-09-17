@@ -13,7 +13,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_basic.py 0.2.0022 2009-11-15 16:52 drtrigon $'
+__version__='$Id: dtbext_basic.py 0.2.0023 2009-11-17 02:14 drtrigon $'
 #
 
 
@@ -37,13 +37,17 @@ class BasicBot(basic.BasicBot):
 	#rollback	= 0
 
 	_REGEX_eol		= re.compile('\n')
-	#REGEX_subster_tag	= '<!--SUBSTER-%(var)s-->%(cont)s<!--SUBSTER-%(var)s-->'	# from 'subster.py'
-	_REGEX_subster_tag	= '<!--SUBSTER-%(var)s-->'					#
+	_REGEX_subster_tag	= '<!--SUBSTER-%(var)s-->'
 
+	# MODIFIED
+	# REASON: needed by various bots
 	def __init__(self, bot_config):
-		'''Constructor of BasicBot(); setup environment, initialize needed consts and objects.
-		'''
-		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 28, 30, 17)
+		"""Constructor of BasicBot(); setup environment, initialize needed consts and objects.
+		   MODIFIED METHOD: needed by various bots
+
+		   @param bot_config: The configuration of the running bot.
+		   @type  bot_config: dict
+		"""
 
 		#basic.BasicBot.__init__(self, generator, dry)
 
@@ -51,6 +55,9 @@ class BasicBot(basic.BasicBot):
 		os.environ['TZ'] = 'Europe/Amsterdam'
 		time.tzset()
 		pywikibot.output(u'Setting process TimeZone (TZ): %s' % str(time.tzname))	# ('CET', 'CEST')
+
+		# Default action
+		pywikibot.setAction('Wikipedia python library / dtbext (DrTrigonBot extensions)')
 
 		# init constants
 		self._bot_config = bot_config
@@ -60,17 +67,18 @@ class BasicBot(basic.BasicBot):
 		self.site = pywikibot.getSite()
 		dtbext.pywikibot.addAttributes( self.site )		# enhance to dtbext.pywikibot.Site
 
+	# ADDED
+	# REASON: needed by various bots
 	def loadMode(self, page):
-		'''Get operating mode from user's disc page by searching for the template.
+		"""Get operating mode from user's disc page by searching for the template.
+		   ADDED METHOD: needed by various bots
 
-		   input:  page [page]
-                           self.load()
-                           self-objects
-		   returns:  self._mode [bool]
-                             self._tmpl_data [string (unicode)]
-                             self._param['ignorepage_list'] (with appended excludes)
-		'''
-		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 28, 17)
+		   @param page: The user (page) for which the data should be retrieved.
+
+		   Sets self._mode and self._tmpl_data which represent the settings how
+		   to report news to the user. Sets self._content also which is the touched
+		   page content to notify the user. The self._param is modified too.
+		"""
 
 		self._mode = False
 		self._tmpl_data = u''
@@ -109,11 +117,9 @@ class BasicBot(basic.BasicBot):
 		final_users = []
 		for item in self._REGEX_eol.split(page.get()):
 			item = re.split(',', item, maxsplit=1)
-			#print "A"
 			if (len(item) > 1):	# for compatibility with 'subster.py' (if needed)
 				#item[1] = re.compile((self._REGEX_subster_tag%{'var':'.*?','cont':'.*?'}), re.S | re.I).sub(u'', item[1])
 				item[1] = re.compile((self._REGEX_subster_tag%{'var':'.*?'}), re.S | re.I).sub(u'', item[1])
-			#print item
 			try:	param = eval(item[1])
 			except:	param = {}
 			item = item[0]
@@ -176,114 +182,41 @@ class BasicBot(basic.BasicBot):
 			queue.append( line[1:].strip() )
 		return queue
 
-	def load(self, page, full=False):
-		'''
-		load wiki page
+	# MODIFIED
+	# REASON: needed by various bots
+	def save(self, page, text, comment=None, minorEdit=True):
+		pywikibot.output(u'\03{lightblue}Writing to wiki on %s...\03{default}' % page.title(asLink=True))
 
-		input:  page
-		returns:  page content [string (unicode)]
-		'''
-		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 28)
+		comment_output = comment or pywikibot.action
+		pywikibot.output(u'\03{lightblue}Comment: %s\03{default}' % comment_output)
 
-		if full:	(mode, info) = ('full', ' using "getFull()" mode')
-		else:		(mode, info) = ('default', '')
+		#pywikibot.showDiff(page.get(), text)
 
-		#pywikibot.output(u'\03{lightblue}Reading Wiki at %s...\03{default}' % page.title(asLink=True))
-		pywikibot.output(u'\03{lightblue}Reading Wiki%s at %s...\03{default}' % (info, page.title(asLink=True)))
-		try:
-			content = page.get()
-			#content = page.get(mode=mode)
-			#if url in content:		# durch history schon gegeben! (achtung dann bei multithreading... wobei ist ja thread per user...)
-			#	pywikibot.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.title(asLink=True))
-			#	continue
-		except (pywikibot.NoPage, pywikibot.IsRedirectPage):
-			content = u''
-		return content
+		for i in range(3): # try max. 3 times
+			try:
+				# Save the page
+				page.put(text, comment=comment, minorEdit=minorEdit)
+			except pywikibot.LockedPage:
+				pywikibot.output(u"\03{lightblue}Page %s is locked; skipping.\03{default}" % page.aslink())
+			except pywikibot.EditConflict:
+				pywikibot.output(u'\03{lightblue}Skipping %s because of edit conflict\03{default}' % (page.title()))
+			except pywikibot.SpamfilterError, error:
+				pywikibot.output(u'\03{lightblue}Cannot change %s because of spam blacklist entry %s\03{default}' % (page.title(), error.url))
+			else:
+				return True
+		return False
 
-	def loadPages(self, pages, issues=None):
-		'''
-		load wiki pages (as generator no exceptions but saves memory)
+	# ADDED
+	# REASON: needed by various bots
+	def append(self, page, text, comment=None, minorEdit=True):
+		#pywikibot.output(u'\03{lightblue}Appending to wiki on %s...\03{default}' % page.title(asLink=True))
 
-		input:  pages
-                        issues = (regex, modes)   for handling of known prolematic pages
-		returns:  (page, content) [tuple]
-		'''
-		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 28)
+		content = self.load( page )
 
-		pages.drop_dups()
-		if issues:
-			(regex, modes) = issues
-			modes.append('default')			# because of len(pages_list) = len(regex)+1
-			pages_list = pages.filterPages(regex)	# (one entry form not filtered items)
-		else:
-			modes = 'default'
-			pages_list = [pages]
+		content += u'\n\n'
+		content += text
 
-		for i, pages in enumerate(pages_list):
-			for (page, content) in pages.get(mode=modes[i]):
-				if pages._requesting_data: pywikibot.output(u"\03{lightblue}Reading a set of Wiki pages (mode='%s')...\03{default}"%modes[i])
-				pywikibot.output(u'\03{lightblue}Got Wiki at %s...\03{default}' % page.title(asLink=True))
-
-				#except (pywikibot.NoPage, pywikibot.IsRedirectPage):
-				#	content = u''
-				if not content: 
-					content = u''
-
-				#keys = content.title()
-
-				#if url in content:		# durch history schon gegeben! (achtung dann bei multithreading... wobei ist ja thread per user...)
-				#	pywikibot.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.title(asLink=True))
-				#	continue
-
-				yield (page, content)
-
-	def _appendPage(self, page, data, minorEdit = True):
-		'''
-		append to wiki page
-
-		input:  page
-                        data [string (unicode)]
-		returns:  (appends data to page on the wiki, nothing else)
-		'''
-
-		pywikibot.output(u'\03{lightblue}Appending to Wiki on %s...\03{default}' % page.title(asLink=True))
-		try:
-			content = page.get() + u'\n\n'
-			#if url in content:		# durch history schon gegeben! (achtung dann bei multithreading... wobei ist ja thread per user...)
-			#	pywikibot.output(u'\03{lightaqua}** Dead link seems to have already been reported on %s\03{default}' % page.title(asLink=True))
-			#	continue
-		except (pywikibot.NoPage, pywikibot.IsRedirectPage):
-			content = u''
-
-		#if archiveURL:
-		#	archiveMsg = pywikibot.translate(self.site, talk_report_archive) % archiveURL
-		#else:
-		#	archiveMsg = u''
-		#content += pywikibot.translate(self.site, talk_report) % (errorReport, archiveMsg)
-		content += data
-		try:
-			if minorEdit:	page.put(content)
-			else:		page.put(content, minorEdit = False)
-		except pywikibot.SpamfilterError, error:
-			pywikibot.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.title(asLink=True), "error.url"))
-
-	def save(self, page, data, minorEdit = True):
-		'''
-		save wiki page
-
-		input:  page
-                        data [string (unicode)]
-		returns:  (saves data to page on the wiki, nothing else)
-		'''
-
-		pywikibot.output(u'\03{lightblue}Writing to Wiki on %s...\03{default}' % page.title(asLink=True))
-
-		content = data
-		try:
-			if minorEdit:	page.put(content)
-			else:		page.put(content, minorEdit = False)
-		except pywikibot.SpamfilterError, error:
-			pywikibot.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.title(asLink=True), "error.url"))
+		content = self.save(page, text, comment=comment, minorEdit=minorEdit)
 
 	def loadFile(self):
 		'''
@@ -303,7 +236,7 @@ class BasicBot(basic.BasicBot):
 			return buf
 		except:	return u''
 
-	def _appendFile(self, data):
+	def appendFile(self, data):
 		'''
 		append data (history) to file
 

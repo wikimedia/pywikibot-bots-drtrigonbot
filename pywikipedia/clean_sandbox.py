@@ -24,7 +24,7 @@ This script understands the following command-line arguments:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: clean_sandbox.py 8551 2010-09-13 15:49:35Z xqt $'
+__version__ = '$Id: clean_sandbox.py 8564 2010-09-15 17:16:53Z xqt $'
 #
 
 import time
@@ -131,9 +131,9 @@ class SandboxBot:
     def run(self):
         
         def minutesDiff(time1, time2):
-            if type(time1) is long:
+            if type(time1) in [long, int]:
                 time1 = str(time1)
-            if type(time2) is long:
+            if type(time2) in [long, int]:
                 time2 = str(time2)
             t1 = (((int(time1[0:4]) * 12 + int(time1[4:6])) * 30 +
                    int(time1[6:8])) * 24 + int(time1[8:10])) * 60 + \
@@ -168,6 +168,8 @@ class SandboxBot:
                         pywikibot.output(u'Standard content was changed, sandbox cleaned.')
                     else:
                         diff = minutesDiff(sandboxPage.editTime(), time.strftime("%Y%m%d%H%M%S", time.gmtime()))
+                        if pywikibot.verbose:
+                            print sandboxPage.editTime(), time.strftime("%Y%m%d%H%M%S", time.gmtime())
                         #Is the last edit more than 5 minutes ago?
                         if diff >= self.delay:
                             sandboxPage.put(translatedContent, translatedMsg)

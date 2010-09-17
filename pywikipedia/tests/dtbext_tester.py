@@ -52,6 +52,7 @@ TESTPAGE = u'Benutzer Diskussion:GregorHelms'
 TESTPAGE = u'Wikipedia:WikiProjekt Vorlagen/Werkstatt'
 #TESTPAGE = u'Benutzer_Diskussion:DrTrigonBot'
 TESTPAGE = u'Benutzer_Diskussion:DrTrigon'
+TESTPAGE = u'Wikipedia Diskussion:WikiProjekt Portale/Baustelle/Portal:Biochemie'
 
 
 def TEST_getSections():
@@ -160,7 +161,7 @@ def TEST_VersionHistoryGenerator():
 		print item[1:]
 		#print item, a[item], ('redirect' in a[item][0])
 
-def TEST_get(debug=False):
+def TEST_PreloadingGenerator(debug=False):
 	#print "\nTest of 'dtbext.pywikibot.Pages.get()' on '%i' page(s)..." % len(TESTPAGES)
 	print "\nTest of sequence:"
 	print "   PagesFromTitlesGenerator ->"
@@ -218,19 +219,33 @@ def TEST_addAttributes():
 	print page2.getSections()
 	print page.getSections()
 
+def TEST_get():
+	print "\nTest of 'dtbext.pywikibot.Page.get()' on [[%s]]..." % TESTPAGE
+
+	page = pywikibot.Page(pywikibot.getSite(), TESTPAGE)
+	#page.getVersionHistory()
+
+	page.extradata = "hallo"
+	print page.title()
+	print page.extradata
+	#page.get()
+	#page.getVersionHistory(revCount=1)
+	#page.isRedirectPage()
+
 
 # wikipedia.py
 #TEST_getVersionHistory()
 #TEST_getSections()
 #TEST_purgeCache()
-#TEST_get()
-#TEST_get(debug=True)
+TEST_get()
 #TEST_getParsedContent()
 #print pywikibot.getSite().getUrl('/w/api.php?action=query&meta=userinfo&uiprop=blockinfo|hasmsg|groups|rights|options|preferencestoken|editcount|ratelimits|email&formal=xml')
 #TEST_GlobalWikiNotificationsGen()
 
 #TEST_addAttributes()
 
+#TEST_PreloadingGenerator()
+#TEST_PreloadingGenerator(debug=True)
 #TEST_VersionHistoryGenerator()
 
 
@@ -239,13 +254,6 @@ def TEST_addAttributes():
 #buf = site.get(mode='parse')
 #import re
 #if re.search(a_str, buf): print "<references />-Tag Fehler"
-
-
-#page = pywikibot.Page(pywikibot.getSite(), TESTPAGE)
-#page.extradata = "hallo"
-#print page.title(), page.extradata
-
-#dtbext.pywikibot.Pages(None, None)
 
 
 print "done."
