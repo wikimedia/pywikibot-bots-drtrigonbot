@@ -12,7 +12,7 @@ the page class from there.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_wikipedia.py 0.2.0022 2009-11-15 16:01 drtrigon $'
+__version__='$Id: dtbext_wikipedia.py 0.2.0024 2009-11-18 02:04 drtrigon $'
 #
 
 # Standard library imports
@@ -24,7 +24,7 @@ from dtbext_pywikibot import *
 
 # Application specific imports
 import wikipedia as pywikibot
-import config, query
+import config, query, userlib
 import dtbext_date
 
 
@@ -105,7 +105,7 @@ class Page(pywikibot.Page):
 
 	# ADDED: new (r18)
 	# REASON: needed by various bots
-	def getSections(self, minLevel=2, sectionsonly=False, getter=None, pagewikitext=None):
+	def getSections(self, minLevel=2, sectionsonly=False):
 		"""Parses the page with API and return section information.
 		   ADDED METHOD: needed by various bots
 
@@ -121,7 +121,8 @@ class Page(pywikibot.Page):
 
 		   Returns a list with entries: (byteoffset, level, wikiline, line, anchor)
 		   This list may be empty and if sections are embedded by template, the according
-		   byteoffset and wikiline entries are None.
+		   byteoffset and wikiline entries are None. The wikiline is the wiki text,
+		   line is the parsed text and anchor ist the (unique) link label.
 		"""
 # - check calling params
 
@@ -279,6 +280,50 @@ class Page(pywikibot.Page):
 		        raise pywikibot.NoPage(self.site(), self.title(asLink=True),"Page does not exist. Was not able to purge cache!" )
 
 		return (u'purged' in r)
+
+	# ADDED: new (r24)
+	# REASON: needed by various bots
+	def userNameHuman(self):
+		"""Return name or IP address of last human/non-bot user to edit page.
+		   ADDED METHOD: needed by various bots
+
+		   Returns the most recent human editor out of the last revisions
+		   (optimal used with getAll()). If it was not able to retrieve a
+		   human user returns None.
+		"""
+
+		# was there already a call? already some info available?
+		if hasattr(self, '_userNameHuman'):
+			return self._userNameHuman
+
+		# get history (use preloaded if available)
+		(revid, timestmp, username, comment) = self.getVersionHistory(revCount=1)[0][:4]
+
+		# is the last/actual editor already a human?
+		site = self.site()
+		if not (u'bot' in userlib.User(site, username).groups()):
+			self._userNameHuman = username
+			return username
+
+		# search the last human
+		result = None
+		bots = [] # cache the bot users (prevent multiple identical requests)
+		for vh in self.getVersionHistory()[1:]:
+			(revid, timestmp, username, comment) = vh[:4]
+
+			if username not in bots:
+				# user unknown, request info
+				if (u'bot' in userlib.User(site, username).groups()):
+					# user is a bot
+					bots.append(username)
+				else:
+					# user is a human
+					result = username
+					break
+
+		# store and return info
+		self._userNameHuman = username
+		return result
 
 
 # ADDED: new (r19)

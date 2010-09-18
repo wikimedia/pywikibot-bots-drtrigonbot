@@ -12,7 +12,7 @@ the same functions but enhanced.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_pagegenerators.py 0.2.0022 2009-11-16 02:31 drtrigon $'
+__version__='$Id: dtbext_pagegenerators.py 0.2.0024 2009-11-18 01:38 drtrigon $'
 #
 
 # Standard library imports
@@ -32,6 +32,7 @@ REQUEST_getGlobalWikiNotifys	= 'http://toolserver.org/~merl/UserPages/query.php?
 # ADDED
 # REASON: due to http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 38)
 #         (MAY BE MOVE THIS INTO dtbext_userlib.py AND dtbext_pagegenerators.py ANALOG TO UserContributionsGenerator)
+# !!!	  [ use 'BeautifulSoup' for this ]
 def GlobalWikiNotificationsGenerator(username, site=pywikibot.Site(config.mylang)):
 	"""Provides a list of results using the toolserver Merlissimo API, can also
 	   be used as Generator for 'SimplePageGenerator'

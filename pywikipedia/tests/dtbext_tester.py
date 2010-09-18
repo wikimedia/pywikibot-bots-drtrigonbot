@@ -54,6 +54,23 @@ TESTPAGE = u'Wikipedia:WikiProjekt Vorlagen/Werkstatt'
 TESTPAGE = u'Benutzer_Diskussion:DrTrigon'
 TESTPAGE = u'Wikipedia Diskussion:WikiProjekt Portale/Baustelle/Portal:Biochemie'
 
+TESTBUFFER = u"""
+{{Archiv|Wikipedia Diskussion:WikiProjekt Einsatzorganisationen}}
+
+== {{Vorlage|BW-EO}} ==
+
+Auf [[Wikipedia:Redaktion Bilder/Arbeitsliste]] gibt es eine sehr lange Liste von so markieren Bildern. Aber auf [[Wikipedia:WikiProjekt Einsatzorganisationen/Bilderwerkstatt]] findet sich die Bilder nicht wieder. Zudem scheint die Seite inaktiv. Sollte man den Baustein nicht besser löschen, da er nicht mehr genutzt wird? [[Benutzer:Merlissimo/Sig|Merl]][[Benutzer Diskussion:Merlissimo/Sig|issimo]] 14:53, 17. Jan. 2010 (CET)
+:Ja, Bapperl kann weg - zusammen mit der Werkstatt-Seite. Kümmert sich ja keiner drum. [[Benutzer:Jiver|Jiver]] 00:22, 18. Jan. 2010 (CET)
+:: Da würde ich mich anschließen, da sie sowieso nicht genutzt wird. -- [[Benutzer:Apfel3748|Apfel3748]] <sup>[[Benutzer Diskussion:Apfel3748|Diskussion]]</sup> 16:29, 18. Jan. 2010 (CET)
+:::jepp --[[Benutzer:Schmendrik881|Schmendi]] [[Benutzer_Diskussion:Schmendrik881|sprich]] 16:31, 18. Jan. 2010 (CET)
+::::Ok, ich markiere die Vorlage als veraltet und kümmere mich morgen um die Entlinkung. Ist ja ein eindeutiges Portalvortum. [[Benutzer:Merlissimo/Sig|Merl]][[Benutzer Diskussion:Merlissimo/Sig|issimo]] 16:47, 18. Jan. 2010 (CET)
+:::::{{erl.}} entlinkt, WL {{Vorlage|Projekt BEO}} ebenfalls --&nbsp;<small>[[Benutzer Diskussion:Xqt|@]]</small>[[Benutzer:Xqt|xqt]] 06:39, 19. Jan. 2010 (CET)
+== Artikel [[Einsatzorganisation]] ==
+
+fällt mir auf, dass es diesen artikel noch gar nicht gibt und dennoch schmeisst ihr bereits ein ganzes projekt ;-) -- [[Benutzer:Saltose|Saltose]] 18:34, 4. Feb. 2010 (CET)
+:Das ist eine lange Geschichte.... :-) Gruß --[[Benutzer:Schmendrik881|Schmendi]] [[Benutzer_Diskussion:Schmendrik881|sprich]] 18:37, 4. Feb. 2010 (CET)
+"""
+
 
 def TEST_getSections():
 	#print "\nTest of 'dtbext.pywikibot.Page.getSections()' on page '%s'..." % TESTPAGE
@@ -208,6 +225,10 @@ def TEST_PreloadingGenerator(debug=False):
 	pywikibot.debug = False
 
 def TEST_addAttributes():
+	site = pywikibot.getSite()
+	dtbext.pywikibot.addAttributes( site )
+	print site.getParsedString(TESTBUFFER)
+
 	page = pywikibot.Page(pywikibot.getSite(), TESTPAGE)
 	#print page.getSections()
 	dtbext.pywikibot.addAttributes( page )
@@ -237,12 +258,12 @@ def TEST_get():
 #TEST_getVersionHistory()
 #TEST_getSections()
 #TEST_purgeCache()
-TEST_get()
+#TEST_get()
 #TEST_getParsedContent()
 #print pywikibot.getSite().getUrl('/w/api.php?action=query&meta=userinfo&uiprop=blockinfo|hasmsg|groups|rights|options|preferencestoken|editcount|ratelimits|email&formal=xml')
 #TEST_GlobalWikiNotificationsGen()
 
-#TEST_addAttributes()
+TEST_addAttributes()
 
 #TEST_PreloadingGenerator()
 #TEST_PreloadingGenerator(debug=True)

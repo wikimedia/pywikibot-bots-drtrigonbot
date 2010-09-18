@@ -68,7 +68,7 @@ Syntax example:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: sum_disc.py 0.2.0023 2009-11-17 02:01 drtrigon $'
+__version__='$Id: sum_disc.py 0.2.0024 2009-11-18 02:14 drtrigon $'
 #
 
 
@@ -159,10 +159,10 @@ bot_config = {	# unicode values
 					# liefert leider aber auch falsch positive treffer... wobei seiten, die mal die aufmerksamkeit geweckt
 					# haben (auf RecentChanges-Liste waren) und links in user-namensraum enthalten, sind auch interessant!!
 					# (und eher selten, etwa 1 pro user bei ca. 100 in history)
-					'checksign_list':	[ '\[\[Benutzer:%(usersig)s[\]\|/]',			
-								'\[\[Benutzer[ _]Diskussion:%(usersig)s[\]\|/]',
-								'\[\[User:%(usersig)s[\]\|/]',			
-								'\[\[User[ _]talk:%(usersig)s[\]\|/]', ],
+					'checksign_list':	[ '--\s?\[\[Benutzer:%(usersig)s[\]\|/]',			
+								'--\s?\[\[Benutzer[ _]Diskussion:%(usersig)s[\]\|/]',
+								'--\s?\[\[User:%(usersig)s[\]\|/]',			
+								'--\s?\[\[User[ _]talk:%(usersig)s[\]\|/]', ],
 					# LIST of SIGNATUREs to USE, a LIST
 					'altsign_list':		[ '%(username)s' ],
 					# LIST of PAGEs to IGNORE, a LIST
@@ -224,8 +224,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 	_param_default		= bot_config['param_default']			# same ref, no copy
 	_eol_regex		= re.compile('\n')
-	_bracketopen_regex	= re.compile('\[')
-	_bracketclose_regex	= re.compile('\]')
 	_reftag_err_regex	= re.compile(r'<strong class="error">Referenz-Fehler: Einzelnachweisfehler: <code>&lt;ref&gt;</code>-Tags existieren, jedoch wurde kein <code>&lt;references&#160;/&gt;</code>-Tag gefunden.</strong>')
 	_timestamp_regex	= re.compile('--(.*?)\(CEST\)')
 
@@ -266,8 +264,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		'''
 		run SumDiscBot()
 		'''
-		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 24, 38, 17)
-
 
 		#pywikibot.output(u'\03{lightgreen}* Processing User List (wishes): %s\03{default}' % self._userListPage)
 		pywikibot.output(u'\03{lightgreen}* Processing User List (wishes):\03{default}')
@@ -309,7 +305,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 # debug here ^^^
 
 # idea: may be create a class for storage of sum_disc_data and for easy save load (history) and else... ?!???
-			self._checkRelevancyTh()				# check self._news_list on relevancy, disc-thread oriented version...
+			self.checkRelevancy()				# check self._news_list on relevancy, disc-thread oriented version...
 
 			#print self._work_list
 			continue
@@ -695,7 +691,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 	#		title = re.sub(item, trans_str[item], title)
 	#	return pywikibot.Page(self.site, title)
 
-	def _checkRelevancyTh(self):
+	def checkRelevancy(self):
 		"""Check relevancy of page by splitting it into sections and searching
 		   each for specific users signature.
 
@@ -727,57 +723,75 @@ class SumDiscBot(dtbext.basic.BasicBot):
 #			t.kwargs['u'] += 1
 
 #			try:
-			(head, body) = self.splitIntoSections(page)
-#sections = page.getSections(minLevel=1, pagewikitext=buf)
+			strt = time.time()
+			entries = self.splitIntoSections(page)
+			end = time.time()
+			diff1 = end-strt
+			strt = time.time()
+			page.getSections()
+			end = time.time()
+			diff2 = end-strt
+			print diff1, diff2
 #should be loaded now, make speed check here!!!
-# ^^^ here we are !!!
 
-			relevant = False
-			sign_rel = False
-			try:	checksum = self._news_list[keys][4]
+			# iterate over all sections in page and check their relevancy
+			page_rel    = False
+			page_signed = False
+			#try:	checksum = self._news_list[keys][4]
+			try:	checksum = page.sum_disc_data[4]
 			except:	checksum = None
 			#print keys, checksum
 			checksum_new = {}
-			for i, item in enumerate(head):		# iterate over all headings/sub sections
-				item = body[i]
-				heading = head[i][0].strip()
+			for i, (head, body) in enumerate(entries): # iterate over all headings/sub sections
+				# wikiline is wiki text, line is parsed and anchor is the unique link label
+				(wikiline, line, anchor) = head[:3]
 
-				skip = False								# ignorelist for headings
-				for check in self._param['ignorehead_list']:				#
-					if check.search(heading):					#
-						skip = True						#
-						break							#
-				if skip: continue							#
+				# ignorelist for headings
+				skip = False								
+				for check in self._param['ignorehead_list']:
+					if check.search(wikiline):
+						skip = True
+						break
+				if skip: continue
 
-				(probable, checksum_cur, hires_probable) = self._checkThData(item, checksum, heading)
+				# check relevancy of section
+				(rel, checksum_cur, checks) = self.checkSectionRelevancy(body, checksum, anchor)
 
-				sign_rel = sign_rel or hires_probable['sign']	# signature check
+				# is page signed?
+				page_signed = page_signed or checks['signed'] # signature check
 
-				if not probable: continue	# we just want checksums for headings where user is parcitipating
+				# is page relevant?
+				if not rel: continue
 
-				#relevant = relevant or probable					# is this page relevant?
-				relevant = True								#
-				checksum_new[heading] = (checksum_cur, probable, head[i][1].strip())	# is this heading relevant?
-			d = self._news_list[keys]
-			self._news_list[keys] = d[0:4] + (checksum_new,) + d[5:]
-			self._hist_list[keys] = self._news_list[keys]
+				# page IS relevant, update checksum
+				page_rel = True
+				checksum_new[anchor] = (checksum_cur, rel, line)
+
+			# update sum_disc_data in page (checksums, relevancies, ...)
+			#d = self._news_list[keys]
+			#self._news_list[keys] = d[0:4] + (checksum_new,) + d[5:]
+			page.sum_disc_data = page.sum_disc_data[:4] + (checksum_new,) + page.sum_disc_data[5:]
+			self._news_list[keys] = page
+			#self._hist_list[keys] = self._news_list[keys]
+			self._hist_list[keys] = page
 #			except pywikibot.SectionError:	# is typically raised by ????????
-#				relevant = False
+#				page_rel = False
 
-			# if no signature exists, don't list discussion because it's irrelevant
-			if not relevant:
-				entry = self._news_list[keys]
+			# if page is not relevant, don't list discussion
+			if not page_rel:
+				#entry = self._news_list[keys]
+				entry = page.sum_disc_data
 
 				del self._news_list[keys]
 				if (entry[5] == self._PS_new): del self._hist_list[keys]
 
-				if (not sign_rel) and (entry[5] == self._PS_changed):	# discussion closed (no signature on page anymore)
+				if (not page_signed) and (entry[5] == self._PS_changed):	# discussion closed (no signature on page anymore)
 					self._news_list[keys] = (	u'Discussion closed', 
-								None, 
-								entry[2], 
-								entry[3], 
-								{}, 
-								self._PS_closed )
+									None, 
+									entry[2], 
+									entry[3], 
+									{}, 
+									self._PS_closed )
 					#del self._hist_list[keys]
 					self._hist_list[keys] = self._news_list[keys]
 
@@ -799,7 +813,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 	def splitIntoSections(self, page):
 		'''
-		helper for '_checkRelevancyTh' ('check relevancy of page by
+		helper for 'checkRelevancy' ('check relevancy of page by
 		searching specific users signature')
 
 		retrieves the page content and splits it to headings and bodies
@@ -812,99 +826,75 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 26, 17)
 
 		# enhance to dtbext.pywikibot.Page
-		dtbext.pywikibot.addAttributes( page )
+		dtbext.pywikibot.addAttributes(page)
 		#try:
-		sections = page.getSections(minLevel=1, pagewikitext=buf)
+		# get sections and content (content was preloaded earlier)
+		sections = page.getSections(minLevel=1)
 		#except pywikibot.Error:
 		#	pass	# sections could not be resoled, process the whole page at once
 
-		# get content (was preloaded earlier)
-		buf = self.load(page)
-
 		if len(sections) == 0:
-			head = [(u'',u'',u'')]
-			body = [buf]
+			entries = [ ((u'',u'',u''), buf) ]
 		else:
 			# append 'EOF' to sections list
 			# (byteoffset, level, wikiline, line, anchor)
 			sections.append( (len(buf) + 1, None, None, None, None) )
 
-			head = []
-			body = []
+			entries = []
 			for i, s in enumerate(sections[:-1]):
 				bo_start = s[0]
 				bo_end   = sections[i+1][0] - 1
 
-				head.append( s[2:] )
-				body.append( buf[bo_start:bo_end] )
+				entries.append( (s[2:], buf[bo_start:bo_end]) )
 
-#			head = []
-#			body = []
-#			body_part = []
-#			actual_head = sections.pop(0)
-#			buf_list = buf.split('\n')
-#			for i, item in enumerate(buf_list):
-#				if (i == actual_head[0]):	# actual_head = (line, level, link, wikitext)
-#					body.append( u'\n'.join(body_part) )
-#					body_part = []
-#					head.append( actual_head[2:4] )
-#					try:	actual_head = sections.pop(0)
-#					except:	actual_head = (len(buf_list)+1,)
-#				else:
-#					body_part.append( item )
-#			body.append( u'\n'.join(body_part) )
-#			body.pop(0)
+		return entries
 
-		return (head, body)
-
-	def _checkThData(self, data, checksum, heading):
+	def checkSectionRelevancy(self, data, checksum, anchor):
 		'''
-		helper for '_checkRelevancyTh' ('check relevancy of page by
+		helper for 'checkRelevancy' ('check relevancy of page by
 		searching specific users signature')
 
 		checks the relevancy of single body data by performing different tests
 
 		input:  data [string (unicode)]
                         checksum
-                        heading
+                        anchor
                         self-objects
 		returns:  [tuple]
-		          format:    (probable, checksum) [tuple]
+		          format:    (relevancy, checksum, checks) [tuple]
                 (but checksum is updated)
 		'''
-		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 27, 28)
 
-		item = data
-		check_dict = {}
+		checks = {}
 
-		# search for signature in every thread on page
-		(probable, info, user, check) = self._SearchForSignature(item)
-		check_dict['sign'] = probable
-		if not probable: return (probable, None, check_dict)	# we just want checksums for headings where user is parcitipating
-		#if not probable: return (False, None, check_dict)	#
+		# check if thread has changed
+		checks['changed'] = True
+		checksum_cur = hashlib.md5(data.encode('utf8').strip()).hexdigest()
+		if ((checksum and (len(checksum) > 0)) and (anchor in checksum)):
+			checks['changed'] = (not (checksum[anchor][0] == checksum_cur))
 
-		# check if thread has not changed (because user can be not last but thread has also not changed)
-		# (introduce checksum with backwards compatibility)
-		# converting of different data formats is now done in 'getHistoryPYF()'
-		checksum_cur = hashlib.md5(item.encode('utf8').strip()).hexdigest()
-		if ((checksum and (len(checksum) > 0)) and (heading in checksum)):
-			# CHKSUM v5
-			#probable = probable and (not (checksum.pop(heading)[0] == checksum_cur))
-			probable = probable and (not (checksum[heading][0] == checksum_cur))
-			check_dict['chksum'] = probable
+		if not checks['changed']:
+			return (False, checksum_cur, checks)
+
+		# search for signature in section/thread
+		(signs_pos, signs) = self.searchForSignature(data)
+		checks['signed'] = (len(signs_pos) > 0) # are signatures present
+		info = signs[signs_pos[-1]]
+
+		if not checks['signed']:
+			return (False, checksum_cur, checks)
 
 		# check if user was last editor
-		# if signature found check part after '\n', after each signature is at least one '\n'
-		c = info[-1]
-		#c = info[1]
-		c = self._eol_regex.split(c + '\n', 1)[1]
-		#print re.split('',c)
-		#c = re.sub(u'\|\}',u'',c,1)						# [B40.2] for signatures at the end of tables (welcome templates, a.o.)
-		#(relevant, info, user, check) = self._SearchForSignature(c, '')	# check for other signature
-		probable = probable and (len(c.strip()) > 0)				# just check for add. text (more paranoid)
-		check_dict['lastword'] = probable
+		# look at part after '\n', after each signature is at least one '\n'
+		#c = info[-1]
+		data = data[signs_pos[-1]:] + u'\n'
+		data = self._eol_regex.split(data, maxsplit=1)[1]
+		checks['lasteditor'] = not (len(c.strip(u' \n')) > 0) # just check for add. text (more paranoid)
 
-		return (probable, checksum_cur, check_dict)				# is this body data relevant?
+		if checks['lasteditor']:
+			return (False, checksum_cur, checks)
+
+		return (True, checksum_cur, checks)
 
 	def _setUser(self, user):
 		'''
@@ -975,41 +965,51 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		ps_types = (ps_types_a, ps_types_b)
 
 		buf = []
-		if (len(self._news_list.keys()) > 0):
-			for keys in self._news_list.keys():
-				data = self._news_list[keys]
-				if   data[5] in ps_types[0]:
-					headings = []
-					#for item in data[4]:
-					for subkey in data[4].keys():
-						item = (subkey,) + data[4][subkey]
-						if not item[2]: continue		# is this heading relevant?
-						renderitem = dtbext.pywikibot.getParsedString(item[3], plaintext=True)	# replaces '_renderWiki()'
-						subitem = item[0]
-						subitem = self._bracketopen_regex.sub(u'.5B', subitem)	# urllib.quote(...) sets '%' instead of '.'
-						subitem = self._bracketclose_regex.sub(u'.5D', subitem)	#
-						if not (item[0] == ""):
-							headings.append( u'[[%s#%s|%s]]' % (data[1].title(), subitem, renderitem) )
-					if (len(headings) == 0):			# no subsections on page...
-						data = (data[0], data[1].title(), self._getLastHumanEditor(data[2]), self.localizeDateTime(data[3]))
-						data = u'*%s: [[%s]] - last edit by %s (%s)' % data
-					else:
-						data = (data[0], data[1].title(), string.join(headings, u', '), self._getLastHumanEditor(data[2]), self.localizeDateTime(data[3]))
-						data = u'*%s: [[%s]] at %s - last edit by %s (%s)' % data
-				elif data[5] in ps_types[1]:
-					data = (data[0], data[1].title(), self._getLastHumanEditor(data[2]), self.localizeDateTime(data[3]))
-					data = u'*%s: [[%s]] all discussions have finished (surveillance stopped) - last edit by %s (%s)' % data
-				elif data[5] in [self._PS_warning]:
-					data = (data[1].title(), data[0])
-					data = u'*Bot warning message: [[%s]] "\'\'%s\'\'"' % data
-					self._global_warn.append( (self._user.name(), data) )
-					if not self._param['reportwarn_switch']: continue
-				elif data[5] in [self._PS_notify]:
-					data = (data[0], data[1].extradata['url'], data[1].title(), data[2], self.localizeDateTime(data[3]))
-					data = u'*%s: <span class="plainlinks">[%s %s]</span> - last edit by [[User:%s]] (%s)' % data
+		for name in self._news_list.keys():
+			page = self._news_list[name]
+			#data = self._news_list[name]
+			data = page.sum_disc_data
+			if data[5] in ps_types[0]:
+				# new and changed
+				report = []
+				for anchor in data[4].keys(): # iter over sections/checksum
+					(checksum_cur, rel, line) = data[4][anchor]
+
+					# is this section/heading relevant?
+					if not rel: continue
+
+					# were we able to divide the page into subsections?
+					if not anchor: continue
+
+					# append relevant sections
+					report.append( u'[[%s#%s|%s]]' % (page.title(), anchor, line) )
+
+				if report:
+					# subsections on page
+					data = (data[0], page.title(), string.join(report, u', '), self.getLastEditor(page, data[2]), self.localizeDateTime(data[3]))
+					data = u'*%s: [[%s]] at %s - last edit by %s (%s)' % data
 				else:
-					continue	# skip append
-				buf.append( data )
+					# no subsections on page
+					data = (data[0], page.title(), self.getLastEditor(page, data[2]), self.localizeDateTime(data[3]))
+					data = u'*%s: [[%s]] - last edit by %s (%s)' % data
+			elif data[5] in ps_types[1]:
+				# closed
+				data = (data[0], page.title(), self.getLastEditor(page, data[2]), self.localizeDateTime(data[3]))
+				data = u'*%s: [[%s]] all discussions have finished (surveillance stopped) - last edit by %s (%s)' % data
+			elif data[5] in [self._PS_warning]:
+				# warnings
+				data = (page.title(), data[0])
+				data = u'*Bot warning message: [[%s]] "\'\'%s\'\'"' % data
+				self._global_warn.append( (self._user.name(), data) )
+				if not self._param['reportwarn_switch']: continue
+			elif data[5] in [self._PS_notify]:
+				# global wiki notifications
+				data = (data[0], data[1].extradata['url'], page.title(), data[2], self.localizeDateTime(data[3]))
+				data = u'*%s: <span class="plainlinks">[%s %s]</span> - last edit by [[User:%s]] (%s)' % data
+# debug here ^^^
+			else:
+				continue # skip append
+			buf.append( data )
 
 		count = len(buf)
 		if (count > 0):
@@ -1020,6 +1020,23 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			buf = u''
 
 		return (buf, count)
+
+	def getLastEditor(self, page, lastuser):
+#		'''
+#		search the last 10 edits/revisions for the most recent human editor and replaces that
+#		one. (the non-human/bot)
+#
+#		input:  user [text]
+#                        self-objects
+#		returns:  last human user name [string]
+#		'''
+
+		humaneditor = page.userNameHuman()
+		if humaneditor:
+			return u'[[User:%s]]/[[User:%s]]' % (humaneditor, lastuser)
+		else:
+			# no human editor found; use last editor
+			return u'[[User:%s]] (no human editor found)' % lastuser
 
 	def _AddMaintenanceMsg(self):
 		'''
@@ -1048,9 +1065,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 		pywikibot.output(u'\03{lightpurple}*** Bot maintenance messages added\03{default}')
 
-	#def _SearchForSignature(self, text, user = None):
-	# (to get this version back, simply remove 'checksign_list' from 'regex_compile' and it is like it was before)
-	def _SearchForSignature(self, text):
+	def searchForSignature(self, text):
 		'''
 		check if there are (any or) a specific user signature resp. link to user page in text
 
@@ -1060,56 +1075,18 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		          format:    (relevant [bool], info [list], user [string (unicode)], check [string]) [tuple]
 		'''
 
-		#if not user: user = self._user.name()
-
 		sign_list  = self._param['altsign_list']
 		check_list = self._param['checksign_list']
 
-		relevant = False
-		info_len = 2*len(text)
-		result = (relevant, '', self._user.name(), '')
+		signs = {}
 		for user in sign_list:
 			for check in check_list:
-				#print user, check
-				#info = check.split(text)
-				info = re.split(check % {'usersig':user}, text)
-				#print info
-				relevant = relevant or (len(info) > 1)
-				if relevant: break	# to get the most recent 'info' and speed up
-			#if relevant: break		# (but check for all possible sign.)
-			if ((len(info) > 1) and (len(info[-1]) < info_len)):	# get and return last/most recent sign.
-				info_len = len(info[-1])			#
-				result = (relevant, info, user, check)		#
-		#return (relevant, info, self._user.name(), check)
-		return result
+				for m in re.finditer(check % {'usersig':user}, text):
+					signs[m.start()] = m
+		signs_pos = signs.keys()
+		signs_pos.sort()
 
-	def _getLastHumanEditor(self, username):
-		'''
-		search the last 10 edits/revisions for the most recent human editor and replaces that
-		one. (the non-human/bot)
-
-		input:  user [text]
-                        self-objects
-		returns:  last human user name [string]
-		'''
-
-		if not (u'bot' in userlib.User(self.site, username).groups()):
-			return username
-
-		result = ''
-		for info in page.getVersionHistory(revCount=10)[1:]:
-			groups = userlib.User(self.site, info[2]).groups()
-			#print info[2], groups
-			if not (u'bot' in groups):
-				result = info[2]
-				break
-
-		if (result == ''):
-			return '?/[[User:%s]]' % username
-		else:
-			#return '[[User:%s]]' % result
-			return '[[User:%s]]/[[User:%s]]' % (result, username)
-			#return '[[User:%s]] <small>([[User:%s]])</small>' % (result, username)
+		return (signs_pos, signs)
 
 
 class Timer(threading.Thread):
