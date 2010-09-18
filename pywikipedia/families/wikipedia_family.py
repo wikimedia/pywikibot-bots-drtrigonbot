@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikipedia_family.py 8558 2010-09-15 08:58:27Z xqt $'
+__version__ = '$Id: wikipedia_family.py 8569 2010-09-17 05:37:39Z xqt $'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 
@@ -18,7 +18,7 @@ class Family(family.Family):
             'roa-rup', 'nn', 'eu', 'hi', 'el', 'ht', 'te', 'la', 'ka', 'mk',
             'ceb', 'az', 'tl', 'br', 'sh', 'mr', 'lb', 'jv', 'lv', 'bs', 'is',
             'cy', 'pms', 'be-x-old', 'sq', 'bpy', 'ta', 'be', 'an', 'oc', 'bn',
-            'sw', 'io', 'fy', 'gu', 'nds', 'lmo', 'af', 'scn', 'qu', 'ku', 'su',
+            'sw', 'io', 'fy', 'gu', 'lmo', 'nds', 'af', 'scn', 'qu', 'ku', 'su',
             'ur', 'zh-yue', 'ml', 'ast', 'nap', 'bat-smg', 'wa', 'ga', 'cv',
             'ksh', 'hy', 'yo', 'kn', 'tg', 'roa-tara', 'vec', 'gd', 'yi', 'pnb',
             'zh-min-nan', 'uz', 'pam', 'tt', 'os', 'sah', 'ne', 'als', 'mi',
@@ -30,8 +30,8 @@ class Family(family.Family):
             'ang', 'cbk-zam', 'frp', 'bo', 'hif', 'hak', 'pa', 'kw', 'ps',
             'xal', 'pdc', 'szl', 'haw', 'ie', 'stq', 'ee', 'crh', 'fj', 'kv',
             'to', 'ace', 'so', 'nv', 'myv', 'gn', 'ky', 'ln', 'krc', 'ext',
-            'mhr', 'arc', 'jbo', 'eml', 'wo', 'pcd', 'ay', 'kab', 'ty', 'tpi',
-            'pap', 'ba', 'frr', 'zea', 'srn', 'kl', 'udm', 'ig', 'ce', 'or',
+            'mhr', 'arc', 'jbo', 'eml', 'wo', 'ay', 'pcd', 'kab', 'ty', 'tpi',
+            'pap', 'ba', 'frr', 'zea', 'srn', 'kl', 'udm', 'ce', 'ig', 'or',
             'dsb', 'kg', 'lo', 'ab', 'rmy', 'cu', 'mwl', 'mdf', 'kaa', 'sm',
             'av', 'ks', 'tet', 'got', 'sd', 'na', 'bm', 'pih', 'pnt', 'iu',
             'ik', 'as', 'chr', 'cdo', 'bi', 'bug', 'om', 'ss', 'za', 'ti', 'ts',

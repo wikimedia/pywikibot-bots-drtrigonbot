@@ -12,7 +12,7 @@ the same functions but enhanced.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_pagegenerators.py 0.2.0024 2009-11-18 01:38 drtrigon $'
+__version__='$Id: dtbext_pagegenerators.py 0.2.0025 2009-11-18 23:42 drtrigon $'
 #
 
 # Standard library imports

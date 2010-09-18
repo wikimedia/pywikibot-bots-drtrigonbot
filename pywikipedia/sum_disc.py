@@ -68,7 +68,7 @@ Syntax example:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: sum_disc.py 0.2.0024 2009-11-18 02:14 drtrigon $'
+__version__='$Id: sum_disc.py 0.2.0025 2009-11-18 23:42 drtrigon $'
 #
 
 
@@ -275,30 +275,52 @@ class SumDiscBot(dtbext.basic.BasicBot):
 # does not look so ...
 			if (debug['user'] and (user.name() != 'DrTrigon')): continue
 
-			self._setUser(user)					# set user and init params
+			# set user and init params
+			self._setUser(user)
 
 			pywikibot.output(u'\03{lightred}** Processing User: %s\03{default}' % self._user.name())
 
-			self.loadMode(self._userPage)				# get operating mode
+			# get operating mode
+			self.loadMode(self._userPage)
 			self._work_list = {}
 
-			self.getHistoryPYF(rollback=self.rollback)		# get history entries
+			# get history entries
+			self.getHistoryPYF(rollback=self.rollback)
 			self._work_list.update( self._hist_list )
+			# (HistoryPageGenerator)
 
-			addition = self.checkRecentEdits()			# check special pages for latest contributions
-			self._work_list.update( addition )			#
+			# check special pages for latest contributions
+			addition = self.checkRecentEdits()
+			self._work_list.update( addition )
+			# RecentEditsPageGenerator
 
-			if self._param['getbacklinks_switch']:			# get the backlinks to user disc page
-				addition = self.getUserBacklinks()		#
-				self._work_list.update( addition )		#
+			# get the backlinks to user disc page
+			if self._param['getbacklinks_switch']:
+				addition = self.getUserBacklinks()
+				self._work_list.update( addition )
 				# all pages served from here ARE CURRENTLY
 				# SIGNED (have a Signature at the moment)
+				# UserBacklinksPageGenerator
 
-#			if self._param['globwikinotify_switch']:		# [F38] get global wiki notifications (toolserver/merl)
-#				addition = self.getGlobalWikiNotifications()	#
-#				self._work_list.update( addition )		#
+			# check for news to report
+			if self._param['globwikinotify_switch']:
+				# get global wiki notifications (toolserver/merl)		
+				if debug['toolserver']:
+					pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE TOOLSERVER ACCESS WILL BE SKIPPED ! ===\03{default}')
+					addition_gen = []
+				else:
+					#pywikibot.output(u'\03{lightpurple}*** %i Global wiki notifications added\03{default}' % len(work_list))
+					addition_gen = dtbext.pagegenerators.GlobalWikiNotificationsGenerator(self._user.name())
 
-			self.getLatestNews()					# check for news to report
+				self.getLatestNews(globalwikinotify=addition_gen)
+			else:
+				self.getLatestNews()
+			# CombinedPageGenerator from previous 2 (or 3) generators
+			# feed this generator into a DuplicateFilterPageGenerator
+			# and pass this with GlobalWikiNotificationsPageGen to
+			# getLatestNews
+
+
 
 			#print self._work_list
 			continue
@@ -310,11 +332,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			#print self._work_list
 			continue
 # debug here ^^^
-			if self._param['globwikinotify_switch']:		# [F38] get global wiki notifications (toolserver/merl)
-				addition = self.getGlobalWikiNotifications()	#
-				#self._work_list.update( addition )		#
-				self._news_list.update( addition )		#
-
 			self._AddMaintenanceMsg()				# gehen auch in jede history... werden aber bei compress entfernt
 
 			self._postDiscSum()					# post results to users Discussion page (with comments for history)
@@ -426,10 +443,11 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 		pywikibot.output(u'\03{lightpurple}*** History recieved %s\03{default}' % str(usage))
 
-	def getLatestNews(self):
+	def getLatestNews(self, globalwikinotify=[]):
 		"""Check latest contributions on recent news.
 
-		   Returns nothing but adds self._news_list filled with new/changed entries.
+		   Returns nothing but adds self._news_list and self._oth_list filled
+		   with new/changed entries.
 		"""
 
 		f = open('/home/ursin/debug.txt', 'w')
@@ -446,7 +464,9 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		#gen2 = pagegenerators.PageTitleFilterPageGenerator(gen1, ignore_list)
 		# Preloads _contents and _versionhistory
 		# [ DOES NOT USE API YET! / ThreadedGenerator would be nice! / JIRA ticket? ]
+		# WithoutInterwikiPageGenerator, 
 		gen3 = pagegenerators.PreloadingGenerator(gen1)
+		#gen4 = pagegenerators.RedirectFilterPageGenerator(gen3)
 		for page in gen3:
 			# count page number (for debug not to loose pages)
 			jj+=1
@@ -465,15 +485,16 @@ class SumDiscBot(dtbext.basic.BasicBot):
 					break
 			if skip: continue
 
-			# check page exceptions
-			# [ because 'getVersionHistory' is not able to do this and crashes; 'get' could do it / JIRA ticket? ]
-			if hasattr(page, u'_getexception'):
-				if page._getexception == pywikibot.NoPage:
-					pywikibot.output(u'\03{lightaqua}INFO: skipping not available (deleted) page at [[%s]]\03{default}' % name)
-					continue
-				elif page._getexception == pywikibot.IsRedirectPage:
-					pywikibot.output(u'\03{lightaqua}INFO: skipping redirect page at [[%s]]\03{default}' % name)
-					continue
+# r8571 (does this work?)
+#			# check page exceptions
+#			# [ because 'getVersionHistory' is not able to do this and crashes; 'get' could do it / JIRA ticket? ]
+#			if hasattr(page, u'_getexception'):
+#				if page._getexception == pywikibot.NoPage:
+#					pywikibot.output(u'\03{lightaqua}INFO: skipping not available (deleted) page at [[%s]]\03{default}' % name)
+#					continue
+#				elif page._getexception == pywikibot.IsRedirectPage:
+#					pywikibot.output(u'\03{lightaqua}INFO: skipping redirect page at [[%s]]\03{default}' % name)
+#					continue
 
 			## check redirect (was preloaded)
 			#if page.isRedirectPage():
@@ -483,7 +504,15 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			# get history (was preloaded)
 			#actual = actual_dict[page.sectionFreeTitle()]
 			# use preloaded with revCount=1
-			actual = page.getVersionHistory(revCount=1)
+# r8571 (does this work? comment on maillist...)
+			try:
+				actual = page.getVersionHistory(revCount=1)
+			except pywikibot.NoPage:
+				pywikibot.output(u'\03{lightaqua}INFO: skipping not available (deleted) page at [[%s]]\03{default}' % name)
+				continue
+#			except pywikibot.IsRedirectPage:
+#				pywikibot.output(u'\03{lightaqua}INFO: skipping redirect page at [[%s]]\03{default}' % name)
+#				continue
 
 			## no version history found, page deleted?
 			#if not actual:
@@ -533,6 +562,24 @@ class SumDiscBot(dtbext.basic.BasicBot):
 # DOES THE PreloadingGenerator WORK ???
 		if not (len(self._work_list.keys()) == jj):
 			raise pywikibot.Error(u'PreloadingGenerator has lost some pages!')
+
+		# check for GlobalWikiNotifications to report
+		localinterwiki = self.site.language()
+		for page in globalwikinotify:
+			# skip to local disc page, since this is the only page the user should watch itself
+			if page.site().language() == localinterwiki:
+				pywikibot.output(u'\03{lightaqua}INFO: skipping global wiki notify to local wiki %s\03{default}' % page.title(asLink=True))
+				continue
+
+			data = page.globalwikinotify
+			page.sum_disc_data = (	bot_config['globwiki_notify'], 
+						None, 
+						data['user'], 
+						data['timestamp'], 
+						{u'':('',True,u'')}, 
+						self._PS_notify )
+			self._oth_list[data[u'link']] = page
+			#self._hist_list[page.title()] = self._news_list[page.title()]
 
 		pywikibot.output(u'\03{lightpurple}*** Latest News searched\03{default}')
 
@@ -599,36 +646,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 					break		# should only match one of the possibilities, anyway just add it once!
 
 		pywikibot.output(u'\03{lightpurple}*** %i Backlinks to user checked\03{default}' % len(userbacklicksList))
-
-		return work_list
-
-	# created due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 38)
-	def getGlobalWikiNotifications(self):
-		"""Check if there are any (global) messages on a other wiki for same user.
-
-		   Returns list with results formatted like self._news_list.
-		"""
-
-		if debug['toolserver']:
-			pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE TOOLSERVER ACCESS WILL BE SKIPPED ! ===\03{default}')
-			return
-
-		localinterwiki = self.site.language()
-
-		work_list = {}
-		for page in dtbext.pagegenerators.GlobalWikiNotificationsGenerator(self._user.name()):
-			# skip to local disc page, since this is the only page the user should watch itself
-			if page.site().language() == localinterwiki:
-				pywikibot.output(u'\03{lightaqua}INFO: skipping global wiki notify to local wiki %s\03{default}' % page.title(asLink=True))
-				continue
-
-			data = page.globalwikinotify
-			#work_list[page.title()] = (bot_config['globwiki_notify'], page, data['user'], data['timestamp'], {u'':('',True,u'')}, self._PS_notify)
-			page.sum_disc_data = (bot_config['globwiki_notify'], page, data['user'], data['timestamp'], {u'':('',True,u'')}, self._PS_notify)
-			work_list[data[u'link']] = page
-			#self._hist_list[page.title()] = self._news_list[page.title()]
-
-		pywikibot.output(u'\03{lightpurple}*** %i Global wiki notifications added\03{default}' % len(work_list))
 
 		return work_list
 
