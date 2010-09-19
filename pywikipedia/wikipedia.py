@@ -120,7 +120,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 8571 2010-09-17 09:20:40Z xqt $'
+__version__ = '$Id: wikipedia.py 8573 2010-09-19 12:30:58Z xqt $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -6484,7 +6484,7 @@ u"""WARNING: Could not open '%s'. Maybe the server or\n your connection is down.
                 print 'DEBUG allpages>>> data.keys()', data.keys()
             if 'warnings' in data:
                 warning = data['warnings']['allpages']['*']
-                raise str(warning)
+                raise RuntimeError("API query warning: %s" % warning)
             if 'error' in data:
                 raise RuntimeError("API query error: %s" % data)
             if not 'allpages' in data['query']:

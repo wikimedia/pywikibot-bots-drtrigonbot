@@ -392,13 +392,13 @@ class PageDiscRobot:
 			# send mail by POST request
 			request = {
 			    'action'		: 'edit',
-			    #'title'		: page.title().encode(config.textfile_encoding),
+			    #'title'		: page.title().encode(pywikibot.getSite().encoding()),
 			    'title'		: page.title(),
 			    'section'		: '%i' % section,	# Section number. 0 for the top section, 'new' for a new section
 			    #'text'		: text,
 			    'appendtext'	: page._encodeArg(data, 'text'),
 			    'token'		: edittoken,
-			    #'summary'		: pywikibot.action.encode(config.textfile_encoding),
+			    #'summary'		: pywikibot.action.encode(pywikibot.getSite().encoding()),
 			    'summary'		: page._encodeArg(pywikibot.action, 'summary'),
 			    'bot'		: 1,
 			    }
@@ -574,7 +574,7 @@ class PageDiscRobot:
 		# check if thread has not changed (because user can be not last but thread has also not changed)
 		# (introduce checksum with backwards compatibility)
 		# converting of different data formats is now done in '_getHistoryPYF()'
-		checksum_cur = hashlib.md5(item.encode(config.textfile_encoding).strip()).hexdigest()
+		checksum_cur = hashlib.md5(item.encode(pywikibot.getSite().encoding()).strip()).hexdigest()
 		return (not (checksum_cur == checksum), checksum_cur)				# is this body data relevant?
 
 	def _readFile(self):
@@ -678,7 +678,9 @@ class PageDiscRobot:
 				buf.append( data )
 
 		count = len(buf)
-		if not (count > 0):
+		if (count > 0):
+			buf = string.join(buf, u'\n')
+		else:
 			buf = u''
 
 		return (buf, count)
@@ -693,9 +695,9 @@ class PageDiscRobot:
 		# see also in 'dtbext/dtbext_wikipedia.py', 'GetTime' ...
 		# is localized to the actual date/time settings, cannot localize timestamps that are
 		#    half of a year in the past or future!
-		timestamp = time.strptime(timestamp.encode(config.textfile_encoding), '%H:%M, %d. %b. %Y')
+		timestamp = time.strptime(timestamp.encode(pywikibot.getSite().encoding()), '%H:%M, %d. %b. %Y')
 		secs = calendar.timegm(timestamp)
-		return time.strftime('%H:%M, %d. %b. %Y', time.localtime(secs)).decode(config.textfile_encoding)
+		return time.strftime('%H:%M, %d. %b. %Y', time.localtime(secs)).decode(pywikibot.getSite().encoding())
 
 class Timer(threading.Thread):
 	'''

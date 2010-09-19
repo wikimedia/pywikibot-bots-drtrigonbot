@@ -123,7 +123,7 @@ class MailerRobot:
 
 				mail_content = content
 				if ( ('expandtemplates' in item) and eval(item['expandtemplates']) ): mail_content = self._readPage(page, full=True)
-				mail_content = mail_content.encode(config.textfile_encoding)
+				mail_content = mail_content.encode(pywikibot.getSite().encoding())
 
 				url = "http://" + page.site().hostname() + page.site().nice_get_address(page.title(underscore = True))
 				mail_content = url + "\n\n" + mail_content
@@ -134,7 +134,7 @@ class MailerRobot:
 					pywikibot.output(u"\03{lightblue}*** Sending mail through toolserver (long-mail) ... \03{default}")
 
 					p = {	'email':   self._user_longmail[item['Benutzer']],
-						'subject': page.title().encode(config.textfile_encoding),
+						'subject': page.title().encode(pywikibot.getSite().encoding()),
 						'content': mail_content,  }
 					success = local_sendmail(p)
 					pywikibot.output(u"\03{lightblue}*** Mail '%s' sent. \03{default}" % page.title())
@@ -152,7 +152,7 @@ class MailerRobot:
 						if not debug['sendmail']:
 							pywikibot.output(u'\03{lightred}=== ! DEBUG MODE NO MAILS SENT ! ===\03{default}')
 							continue
-						success = success and usr.sendMail(subject=title.encode(config.textfile_encoding), text=text)
+						success = success and usr.sendMail(subject=title.encode(pywikibot.getSite().encoding()), text=text)
 						j += 1
 						pywikibot.output(u"\03{lightblue}*** Mail '%s' sent. \03{default}" % title)
 

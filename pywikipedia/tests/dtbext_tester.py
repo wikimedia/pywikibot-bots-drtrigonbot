@@ -148,11 +148,15 @@ def TEST_purgeCache():
 	
 	print dtbext.pywikibot.Page(pywikibot.getSite(), TESTPAGE).purgeCache()
 
-def TEST_GlobalWikiNotificationsGen():
-	print "\nTest of 'dtbext.pywikibot.GlobalWikiNotificationsGen()' on page '%s'..." % TESTPAGE
+def TEST_globalnotifications():
+	print "\nTest of 'dtbext.userlib.globalnotifications()' on page '%s'..." % TESTPAGE
 
-	for item in dtbext.pywikibot.GlobalWikiNotificationsGen(u'DrTrigon'):
-		print item[0]
+	user = userlib.User(pywikibot.getSite(), u'DrTrigon')
+	dtbext.userlib.addAttributes(user)
+	for item in user.globalnotifications():
+		print item
+		#print item.globalwikinotify
+		print
 
 def TEST_getVersionHistory():
 	#print "\nTest of 'pywikibot.Page.getVersionHistory()' on page '%s'..." % TESTPAGE
@@ -261,9 +265,9 @@ def TEST_get():
 #TEST_get()
 #TEST_getParsedContent()
 #print pywikibot.getSite().getUrl('/w/api.php?action=query&meta=userinfo&uiprop=blockinfo|hasmsg|groups|rights|options|preferencestoken|editcount|ratelimits|email&formal=xml')
-#TEST_GlobalWikiNotificationsGen()
+TEST_globalnotifications()
 
-TEST_addAttributes()
+#TEST_addAttributes()
 
 #TEST_PreloadingGenerator()
 #TEST_PreloadingGenerator(debug=True)

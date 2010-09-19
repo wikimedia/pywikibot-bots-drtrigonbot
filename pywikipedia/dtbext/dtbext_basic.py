@@ -13,7 +13,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_basic.py 0.2.0023 2009-11-17 02:14 drtrigon $'
+__version__='$Id: dtbext_basic.py 0.2.0026 2009-11-19 14:37 drtrigon $'
 #
 
 
@@ -36,8 +36,8 @@ class BasicBot(basic.BasicBot):
 	#silent		= False
 	#rollback	= 0
 
-	_REGEX_eol		= re.compile('\n')
-	_REGEX_subster_tag	= '<!--SUBSTER-%(var)s-->'
+	_REGEX_eol		= re.compile(u'\n')
+	_REGEX_subster_tag	= u'<!--SUBSTER-%(var)s-->'
 
 	# MODIFIED
 	# REASON: needed by various bots
@@ -115,11 +115,12 @@ class BasicBot(basic.BasicBot):
 
 		#users = {}
 		final_users = []
-		for item in self._REGEX_eol.split(page.get()):
-			item = re.split(',', item, maxsplit=1)
+		#for item in self._REGEX_eol.split(page.get()):
+		for item in self._REGEX_eol.split(self.load(page)):
+			item = re.split(u',', item, maxsplit=1)
 			if (len(item) > 1):	# for compatibility with 'subster.py' (if needed)
 				#item[1] = re.compile((self._REGEX_subster_tag%{'var':'.*?','cont':'.*?'}), re.S | re.I).sub(u'', item[1])
-				item[1] = re.compile((self._REGEX_subster_tag%{'var':'.*?'}), re.S | re.I).sub(u'', item[1])
+				item[1] = re.compile((self._REGEX_subster_tag%{u'var':u'.*?'}), re.S | re.I).sub(u'', item[1])
 			try:	param = eval(item[1])
 			except:	param = {}
 			item = item[0]
@@ -130,12 +131,12 @@ class BasicBot(basic.BasicBot):
 			item = re.sub(u'\[', u'', item)
 			item = re.sub(u'\]', u'', item)
 			item = re.sub(u'Benutzer:', u'', item)
-			subitem = re.split('\/', item)		# recognize extended user entries with ".../..."
+			subitem = re.split(u'\/', item)		# recognize extended user entries with ".../..."
 			if len(subitem) > 1:			#  "
-				param['userResultPage'] = item	# save extended user info (without duplicates)
+				param[u'userResultPage'] = item	# save extended user info (without duplicates)
 				item = subitem[0]
 			#users[item] = param			# drop duplicates directly
-			user = userlib.User(self.site, item.encode('unicode_escape'))
+			user = userlib.User(self.site, item)
 			user.param = param
 			final_users.append( user )
 
@@ -263,9 +264,9 @@ class BasicBot(basic.BasicBot):
 		# see also in 'dtbext/dtbext_wikipedia.py', 'GetTime' ...
 		# is localized to the actual date/time settings, cannot localize timestamps that are
 		#    half of a year in the past or future!
-		timestamp = time.strptime(timestamp.encode(config.textfile_encoding), '%H:%M, %d. %b. %Y')
+		timestamp = time.strptime(timestamp.encode(pywikibot.getSite().encoding()), '%H:%M, %d. %b. %Y')
 		secs = calendar.timegm(timestamp)
-		return time.strftime('%H:%M, %d. %b. %Y', time.localtime(secs)).decode(config.textfile_encoding)
+		return time.strftime('%H:%M, %d. %b. %Y', time.localtime(secs)).decode(pywikibot.getSite().encoding())
 
 
 #def main():
