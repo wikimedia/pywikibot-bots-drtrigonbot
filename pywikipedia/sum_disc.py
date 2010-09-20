@@ -68,7 +68,7 @@ Syntax example:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: sum_disc.py 0.2.0026 2009-11-19 18:29 drtrigon $'
+__version__='$Id: sum_disc.py 0.2.0027 2009-11-20 01:36 drtrigon $'
 #
 
 
@@ -76,7 +76,7 @@ import re, sys
 import time, codecs, os, calendar
 import threading
 import copy #, zlib
-import sets, string, datetime, hashlib
+import string, datetime, hashlib
 
 import config, pagegenerators, userlib
 import dtbext
@@ -283,8 +283,8 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			self._work_list = {}
 
 			# get history entries
-			self.loadHistory(rollback=self.rollback)
-			self._work_list.update( self._hist_list )
+			addition = self.loadHistory(rollback=self.rollback)
+			self._work_list.update( addition )
 			# (HistoryPageGenerator)
 
 			# check special pages for latest contributions
@@ -305,13 +305,13 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				# get global wiki notifications (toolserver/merl)		
 				if debug['toolserver']:
 					pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE TOOLSERVER ACCESS WILL BE SKIPPED ! ===\03{default}')
-					globalwikinotify = []
+					globalnotify = []
 				else:
 					#pywikibot.output(u'\03{lightpurple}*** %i Global wiki notifications added\03{default}' % len(work_list))
 					dtbext.userlib.addAttributes(self._user)
-					globalwikinotify = self._user.globalnotifications()
+					globalnotify = self._user.globalnotifications()
 
-				self.getLatestNews(globalwikinotify=globalwikinotify)
+				self.getLatestNews(globalnotify=globalnotify)
 			else:
 				self.getLatestNews()
 			# CombinedPageGenerator from previous 2 (or 3) generators
@@ -319,18 +319,9 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			# and pass this with GlobalWikiNotificationsPageGen to
 			# getLatestNews
 
-
-
-			#print self._work_list
-			continue
-# debug here ^^^
-
 # idea: may be create a class for storage of sum_disc_data and for easy save load (history) and else... ?!???
 			self.checkRelevancy()				# check self._news_list on relevancy, disc-thread oriented version...
 
-			#print self._work_list
-			continue
-# debug here ^^^
 			self.AddMaintenanceMsg()				# gehen auch in jede history... werden aber bei compress entfernt
 
 			self.postDiscSum()					# post results to users Discussion page (with comments for history)
@@ -391,7 +382,8 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		   @param rollback: Number of history entries to go back (re-use older history).
 		   @type  rollback: int
 
-		   Returns nothing but adds self._hist_list filled with archived entries.
+		   Returns all entries to work on (without globalnotify) and adds self._hist_list
+		   filled with archived entries.
 		"""
 
 		buf = self.loadFile()
@@ -413,8 +405,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				if (len(news_item[key]) == 5):			# old history format
 					news_item[key] += (self._PS_unchanged,)
 					usage['old history'] = True
-				if news_item[key][5] in [self._PS_notify]:
-					continue # skip
 				if key in news:	# APPEND the heading data in the last tuple arg
 					if news_item[key][5] in [self._PS_closed]:
 						del news[key]
@@ -437,10 +427,15 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		for name in self._hist_list.keys():
 			page = pywikibot.Page(self.site, name)
 			page.sum_disc_data = self._hist_list[name]
-			new[name] = page
-		self._hist_list = new
+			self._hist_list[name] = page
+
+			# worklist (skip globalnotify)
+			if page.sum_disc_data[5] not in [self._PS_notify]:
+				new[name] = page
 
 		pywikibot.output(u'\03{lightpurple}*** History recieved %s\03{default}' % str(usage))
+
+		return new
 
 	def putHistory(self, data_dict):
 		"""Write history.
@@ -460,16 +455,12 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 		pywikibot.output(u'\03{lightpurple}*** History updated\03{default}')
 
-	def getLatestNews(self, globalwikinotify=[]):
+	def getLatestNews(self, globalnotify=[]):
 		"""Check latest contributions on recent news.
 
 		   Returns nothing but adds self._news_list and self._oth_list filled
 		   with new/changed entries.
 		"""
-
-		f = open('/home/ursin/debug.txt', 'w')
-		f.write( str(self._work_list.keys()) )
-		f.close()
 
 		# check for news to report
 		self._news_list = {}
@@ -489,7 +480,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			jj+=1
 
 			name = page.title()
-			print name
+			#print name
 			page.sum_disc_data = self._work_list[name].sum_disc_data
 
 			# ignorelist
@@ -557,10 +548,15 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 		# check for GlobalWikiNotifications to report
 		localinterwiki = self.site.language()
-		for (page, data) in globalwikinotify:
+		for (page, data) in globalnotify:
 			# skip to local disc page, since this is the only page the user should watch itself
 			if page.site().language() == localinterwiki:
 				pywikibot.output(u'\03{lightaqua}INFO: skipping global wiki notify to local wiki %s\03{default}' % page.title(asLink=True))
+				continue
+
+			# actual/new status of page, has something changed?
+			if (data[u'link'] in self._hist_list.keys()) and \
+			   (data[u'timestamp'] == self._hist_list[data[u'link']][3]):
 				continue
 
 			#data = page.globalwikinotify
@@ -622,7 +618,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			page = pywikibot.Page(self.site, item)		# important for the generator to use the API
 			#userbacklicksList += [p.title() for p in pagegenerators.ReferringPageGenerator(page, withTemplateInclusion=False)]
 			userbacklicksList += [p.title() for p in page.getReferences(withTemplateInclusion=False)]
-		userbacklicksList = list(sets.Set(userbacklicksList))			# drop duplicates
+		userbacklicksList = list(set(userbacklicksList))	# drop duplicates
 
 		work_list = {}
 		for item in userbacklicksList:
@@ -711,7 +707,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 #		else:	issues = None
 #		if (t.kwargs['size'] != 0): t.run()
 		#for (page, buf) in self.loadPages( pages, issues=issues ):
-		for page in self._news_list:
+		for page in self._news_list.values():
 			keys = page.title()
 			# get content (was preloaded)
 			#buf = self.load(page)
@@ -743,12 +739,13 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				(wikiline, line, anchor) = head[:3]
 
 				# ignorelist for headings
-				skip = False								
-				for check in self._param['ignorehead_list']:
-					if check.search(wikiline):
-						skip = True
-						break
-				if skip: continue
+				if wikiline:
+					skip = False
+					for check in self._param['ignorehead_list']:
+						if check.search(wikiline):
+							skip = True
+							break
+					if skip: continue
 
 				# check relevancy of section
 				(rel, checksum_cur, checks) = self.checkSectionRelevancy(body, checksum, anchor)
@@ -782,12 +779,13 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				if (entry[5] == self._PS_new): del self._hist_list[keys]
 
 				if (not page_signed) and (entry[5] == self._PS_changed):	# discussion closed (no signature on page anymore)
-					self._news_list[keys] = (	u'Discussion closed', 
-									None, 
-									entry[2], 
-									entry[3], 
-									{}, 
-									self._PS_closed )
+					page.sum_disc_data = (	u'Discussion closed', 
+								None, 
+								entry[2], 
+								entry[3], 
+								{}, 
+								self._PS_closed )
+					self._news_list[keys] = page
 					#del self._hist_list[keys]
 					self._hist_list[keys] = self._news_list[keys]
 
@@ -796,13 +794,16 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 		# self._oth_list contents all 'self._PS_unchanged' and warnings 'self._PS_warning'
 		for keys in self._oth_list.keys():
-			if (self._oth_list[keys][5] == self._PS_unchanged):	# 'self._PS_unchanged'
+			if (self._oth_list[keys].sum_disc_data[5] == self._PS_unchanged):
+				# 'self._PS_unchanged'
 				#self._hist_list[keys] = self._oth_list[keys]
 				pass
-			elif (self._oth_list[keys][5] == self._PS_notify):	# 'self._PS_notify'
+			elif (self._oth_list[keys].sum_disc_data[5] == self._PS_notify):
+				# 'self._PS_notify'
 				self._news_list[keys] = self._oth_list[keys]
 				self._hist_list[keys] = self._oth_list[keys]
-			else:							# warnings: 'self._PS_warning', ...
+			else:
+				# warnings: 'self._PS_warning', ...
 				self._news_list[keys] = self._oth_list[keys]
 
 		pywikibot.output(u'\03{lightpurple}*** Relevancy of threads checked\03{default}')
@@ -820,9 +821,13 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		dtbext.pywikibot.addAttributes(page)
 		#try:
 		# get sections and content (content was preloaded earlier)
+		buf = self.load(page)
 		sections = page.getSections(minLevel=1)
 		#except pywikibot.Error:
 		#	pass	# sections could not be resoled, process the whole page at once
+
+		# drop from templates included headings (are None)
+		sections = [ s for s in sections if s[0] ]
 
 		if len(sections) == 0:
 			entries = [ ((u'',u'',u''), buf) ]
@@ -869,17 +874,15 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		# search for signature in section/thread
 		(signs_pos, signs) = self.searchForSignature(data)
 		checks['signed'] = (len(signs_pos) > 0) # are signatures present
-		info = signs[signs_pos[-1]]
 
 		if not checks['signed']:
 			return (False, checksum_cur, checks)
 
 		# check if user was last editor
 		# look at part after '\n', after each signature is at least one '\n'
-		#c = info[-1]
 		data = data[signs_pos[-1]:] + u'\n'
 		data = self._eol_regex.split(data, maxsplit=1)[1]
-		checks['lasteditor'] = not (len(c.strip(u' \n')) > 0) # just check for add. text (more paranoid)
+		checks['lasteditor'] = not (len(data.strip(u' \n')) > 0) # just check for add. text (more paranoid)
 
 		if checks['lasteditor']:
 			return (False, checksum_cur, checks)
@@ -952,6 +955,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 		buf = []
 		for name in self._news_list.keys():
+			print name
 			page = self._news_list[name]
 			#data = self._news_list[name]
 			data = page.sum_disc_data
@@ -972,15 +976,18 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 				if report:
 					# subsections on page
-					data = (data[0], page.title(), string.join(report, u', '), self.getLastEditor(page, data[2]), self.localizeDateTime(data[3]))
+#					data = (data[0], page.title(), string.join(report, u', '), self.getLastEditor(page, data[2]), self.localizeDateTime(data[3]))
+# time and date correct localized?!??
+					data = (data[0], page.title(), string.join(report, u', '), self.getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
 					data = u'*%s: [[%s]] at %s - last edit by %s (%s)' % data
 				else:
 					# no subsections on page
-					data = (data[0], page.title(), self.getLastEditor(page, data[2]), self.localizeDateTime(data[3]))
+					data = (data[0], page.title(), self.getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
 					data = u'*%s: [[%s]] - last edit by %s (%s)' % data
 			elif data[5] in ps_types[1]:
 				# closed
-				data = (data[0], page.title(), self.getLastEditor(page, data[2]), self.localizeDateTime(data[3]))
+				data = (data[0], page.title(), self.getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
+				print data
 				data = u'*%s: [[%s]] all discussions have finished (surveillance stopped) - last edit by %s (%s)' % data
 			elif data[5] in [self._PS_warning]:
 				# warnings
@@ -990,7 +997,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				if not self._param['reportwarn_switch']: continue
 			elif data[5] in [self._PS_notify]:
 				# global wiki notifications
-				data = (data[0], data[1].extradata['url'], page.title(), data[2], self.localizeDateTime(data[3]))
+				data = (data[0], page.globalwikinotify['url'], page.title(), data[2], dtbext.date.getTime(data[3]))
 				data = u'*%s: <span class="plainlinks">[%s %s]</span> - last edit by [[User:%s]] (%s)' % data
 			else:
 				continue # skip append

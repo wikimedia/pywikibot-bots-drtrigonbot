@@ -11,7 +11,7 @@ This is a part of pywikipedia framework, it is a deviation of date.py.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_date.py 0.2.0022 2009-11-15 21:13 drtrigon $'
+__version__='$Id: dtbext_date.py 0.2.0027 2009-11-20 02:16 drtrigon $'
 #
 
 # Standard library imports
@@ -28,14 +28,14 @@ def getTimeStmpNow(full = False, humanreadable = False, local = False):
 #def getTimeStmpNow(full = True, humanreadable = False, local = False):	# framework default
 	"""Produce different timestamp formats."""
 
-	format = "%Y%m%d"
+	format = u"%Y%m%d"
 	getter = time.gmtime
 
-	if full: format += "%H%M%S"
+	if full: format += u"%H%M%S"
 
 	if humanreadable:
-		format = format.replace("%Y%m%d", "%Y/%m/%d")
-		format = format.replace("%H%M%S", " %H:%M:%S")
+		format = format.replace(u"%Y%m%d", u"%Y/%m/%d")
+		format = format.replace(u"%H%M%S", u" %H:%M:%S")
 
 	if local: getter = time.localtime
 
@@ -52,5 +52,5 @@ def getTime(timestamp):
 	# http://pytz.sourceforge.net/
 	# use only UTC for internal timestamps
 	# could also be used as given by the API, but is converted here for compatibility
-	return pywikibot.Timestamp.fromISOformat(timestamp).strftime('%H:%M, %d. %b. %Y')
+	return pywikibot.Timestamp.fromISOformat(timestamp).strftime(u'%H:%M, %d. %b. %Y').decode(pywikibot.getSite().encoding())
 

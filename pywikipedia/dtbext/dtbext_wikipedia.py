@@ -12,34 +12,17 @@ the page class from there.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_wikipedia.py 0.2.0024 2009-11-18 02:04 drtrigon $'
+__version__='$Id: dtbext_wikipedia.py 0.2.0027 2009-11-20 02:26 drtrigon $'
 #
 
 # Standard library imports
-import StringIO
-import re, sets
 import difflib
 # Splitting the bot into library parts
 from dtbext_pywikibot import *
 
 # Application specific imports
 import wikipedia as pywikibot
-import config, query, userlib
-import dtbext_date
-
-
-# needed by 'getSectionsOldApi'
-REGEX_hTagOpen			= re.compile('<h(\d).*?>')
-REGEX_hTagClose			= re.compile('</h(\d).*?>')
-REGEX_nowikiTag			= re.compile('<nowiki>(.*?)</nowiki>', re.S | re.I)
-REGEX_preTag			= re.compile('<pre>(.*?)</pre>', re.S | re.I)
-REGEX_sourceTag			= re.compile('<source.*?>(.*?)</source>', re.S | re.I)
-REGEX_noincludeTag		= re.compile('<noinclude>(.*?)</noinclude>', re.S | re.I)
-REGEX_onlyincludeTag		= re.compile('(</?onlyinclude>)', re.S | re.I)
-REGEX_eqChar			= re.compile('=')
-#REGEX_wikiSection		= re.compile('(?<=\n)==([^=].*?)==(?=\s)')
-#REGEX_wikiSection		= re.compile('(?<=\n)(=+)(.*?)(=+)(?=\s)')
-REGEX_wikiSection		= re.compile('^(=+)(.*?)(=+)(?=\s)', re.M)
+import query, userlib
 
 
 # ADDED: new (r19)
@@ -56,6 +39,7 @@ def addAttributes(obj):
 		obj.__dict__['_getSectionByteOffset']	= lambda *args, **kwds: Page.__dict__['_getSectionByteOffset'](obj, *args, **kwds)
 		obj.__dict__['_findSection']		= lambda *args, **kwds: Page.__dict__['_findSection'](obj, *args, **kwds)
 		obj.__dict__['purgeCache']		= lambda *args, **kwds: Page.__dict__['purgeCache'](obj, *args, **kwds)
+		obj.__dict__['userNameHuman']		= lambda *args, **kwds: Page.__dict__['userNameHuman'](obj, *args, **kwds)
 	elif "class 'wikipedia.Site'" in str(type(obj)):
 		obj.__dict__['getParsedString']		= lambda *args, **kwds: Site.__dict__['getParsedString'](obj, *args, **kwds)
 
@@ -143,7 +127,7 @@ class Page(pywikibot.Page):
 		}
 
 		pywikibot.get_throttle()
-		pywikibot.output(u"Reading section info from %s." % self.title(asLink=True))
+		pywikibot.output(u"Reading section info from %s via API..." % self.title(asLink=True))
 
 		result = query.GetData(params, self.site())
 		r = result[u'parse'][u'sections']
@@ -151,8 +135,13 @@ class Page(pywikibot.Page):
 
 		if not sectionsonly:
 			# assign sections with wiki text and section byteoffset
-			pywikibot.output(u"\tReading wiki page text from %s (if not already done)." % self.title(asLink=True))
+			pywikibot.output(u"    Reading wiki page text from %s (if not already done)." % self.title(asLink=True))
+
 			self.get()
+
+			# [ patch needed by '_findSection' for some pages / JIRA ticket? ]
+			self._contents = self._contents.replace(u'\r\n', u'\n')
+
 			for i, item in enumerate(r):
 				l = int(item[u'level'])
 				if item[u'byteoffset']:
@@ -219,7 +208,7 @@ class Page(pywikibot.Page):
 			#	u'rvsection'	: section[u'number'],
 			#}
 			#pywikibot.get_throttle()
-			#pywikibot.output(u"\tReading section %i from %s." % (section[u'number'], self.title(asLink=True)))
+			#pywikibot.output(u"    Reading section %i from %s." % (section[u'number'], self.title(asLink=True)))
 			# if not successfull too, report error/problem
 			#page._getexception = ...
 			#raise pywikibot.Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.title(asLink=True))
@@ -229,10 +218,10 @@ class Page(pywikibot.Page):
 		# find the most probable match for heading
 		best_match = (0.0, None)
 		for (ph, header) in possible_headers:
-			#print u'\t', difflib.SequenceMatcher(None, header, ph).ratio(), ph
+			#print u'    ', difflib.SequenceMatcher(None, header, ph).ratio(), ph
 			mr = difflib.SequenceMatcher(None, header, ph).ratio()
 			if mr > best_match[0]: best_match = (mr, ph)
-		#print u'\t', best_match
+		#print u'    ', best_match
 
 		# prepare resulting data
 		section[u'wikiline']    = best_match[1]
@@ -301,9 +290,13 @@ class Page(pywikibot.Page):
 
 		# is the last/actual editor already a human?
 		site = self.site()
-		if not (u'bot' in userlib.User(site, username).groups()):
-			self._userNameHuman = username
-			return username
+		try:
+			groups = userlib.User(site, username).groups()
+			if not (u'bot' in groups):
+				self._userNameHuman = username
+				return username
+		except userlib.InvalidUser:
+			pass
 
 		# search the last human
 		result = None
@@ -313,7 +306,12 @@ class Page(pywikibot.Page):
 
 			if username not in bots:
 				# user unknown, request info
-				if (u'bot' in userlib.User(site, username).groups()):
+				try:
+					groups = userlib.User(site, username).groups()
+				except userlib.InvalidUser:
+					continue
+
+				if (u'bot' in groups):
 					# user is a bot
 					bots.append(username)
 				else:
@@ -440,7 +438,7 @@ class Pages():
 		...
 		"""
 
-		self._titles = list(sets.Set(self._titles))	# drop duplicates (wiki drops it too!)
+		self._titles = list(set(self._titles))		# drop duplicates (wiki drops it too!)
 		self._pages = [ Page(self._site, title, insite=self._insite, defaultNamespace=self._defaultNamespace) for title in self._titles ]
 
 		return (self._titles, self._pages)

@@ -53,6 +53,7 @@ TESTPAGE = u'Wikipedia:WikiProjekt Vorlagen/Werkstatt'
 #TESTPAGE = u'Benutzer_Diskussion:DrTrigonBot'
 TESTPAGE = u'Benutzer_Diskussion:DrTrigon'
 TESTPAGE = u'Wikipedia Diskussion:WikiProjekt Portale/Baustelle/Portal:Biochemie'
+TESTPAGE = u'Portal:Serbien/Artikelwunsch'
 
 TESTBUFFER = u"""
 {{Archiv|Wikipedia Diskussion:WikiProjekt Einsatzorganisationen}}
@@ -76,7 +77,8 @@ def TEST_getSections():
 	#print "\nTest of 'dtbext.pywikibot.Page.getSections()' on page '%s'..." % TESTPAGE
 	#
 	##site = pywikibot.Page(pywikibot.getSite(), TESTPAGE)
-	site = dtbext.pywikibot.Page(pywikibot.getSite(), TESTPAGE)
+	site = pywikibot.Page(pywikibot.getSite(), TESTPAGE)
+	dtbext.pywikibot.addAttributes(site)
 	buf = site.get()
 	#buf = site.get(mode='full')
 	##buf = site.getFullB()[:1000]
@@ -93,7 +95,7 @@ def TEST_getSections():
 	#(sections, test) = siteAPI.getSections(minLevel=1)
 	#(sections, test) = site.getSections(minLevel=1, getter=site.get)
 	#(sections, test) = site.getSections(minLevel=1, getter=site._getFullContent)
-	sections = site.getSections(minLevel=1, pagewikitext=buf)
+	sections = site.getSections(minLevel=1)
 	#(sections, test) = site.getSections()
 
 	#print "*"
@@ -260,12 +262,12 @@ def TEST_get():
 
 # wikipedia.py
 #TEST_getVersionHistory()
-#TEST_getSections()
+TEST_getSections()
 #TEST_purgeCache()
 #TEST_get()
 #TEST_getParsedContent()
 #print pywikibot.getSite().getUrl('/w/api.php?action=query&meta=userinfo&uiprop=blockinfo|hasmsg|groups|rights|options|preferencestoken|editcount|ratelimits|email&formal=xml')
-TEST_globalnotifications()
+#TEST_globalnotifications()
 
 #TEST_addAttributes()
 

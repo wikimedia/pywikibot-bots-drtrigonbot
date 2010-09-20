@@ -12,7 +12,7 @@ the same functions but enhanced.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_userlib.py 0.2.0026 2009-11-19 18:19 drtrigon $'
+__version__='$Id: dtbext_userlib.py 0.2.0027 2009-11-20 02:08 drtrigon $'
 #
 
 # Standard library imports
@@ -83,7 +83,7 @@ class User(userlib.User):
 			if data[u'user'] in [self.name()]: continue
 
 			# process timestamp
-			data[u'timestamp'] =  time.strftime(u'%H:%M, %d. %b. %Y', time.strptime(data[u'timestamp'], u'%Y%m%d%H%M%S')).decode(self.site().encoding())
+			data[u'timestamp'] =  str(pywikibot.Timestamp.fromtimestampformat(data[u'timestamp']))
 
 			# convert link to valid interwiki link
 			link = data[u'link']
@@ -96,6 +96,6 @@ class User(userlib.User):
 
 			# return page object with additional data
 			page = pywikibot.Page(self.site(), data[u'link'])
-			#page.globalwikinotify = data
+			page.globalwikinotify = data
 			yield (page, data)
 

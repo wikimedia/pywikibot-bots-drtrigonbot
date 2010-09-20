@@ -170,7 +170,7 @@ class BasicBot:
                 if cont:
                     actuserList.append( (user, disc) )
             except:	pass
-        #self.actuserList = list(sets.Set(actuserList))		# drop duplicates
+        #self.actuserList = list(set(actuserList))		# drop duplicates
         self.actuserList = actuserList
 
         wikipedia.output(u'*** New Users checked')

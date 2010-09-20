@@ -13,17 +13,14 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_basic.py 0.2.0026 2009-11-19 14:37 drtrigon $'
+__version__='$Id: dtbext_basic.py 0.2.0027 2009-11-19 19:36 drtrigon $'
 #
 
 
 import re, sys
 import time, codecs, os, calendar
-import threading
-import copy #, zlib
-import sets, string, datetime, hashlib
 
-import config, pagegenerators, userlib, basic
+import config, userlib, basic
 import dtbext
 # Splitting the bot into library parts
 import wikipedia as pywikibot
