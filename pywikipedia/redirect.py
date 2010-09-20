@@ -60,7 +60,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: redirect.py 8582 2010-09-19 20:53:14Z xqt $'
+__version__='$Id: redirect.py 8583 2010-09-20 07:05:21Z xqt $'
 #
 import re, sys, datetime
 import wikipedia as pywikibot
@@ -186,7 +186,7 @@ sd_template = {
     'ja': u'{{即時削除|壊れたリダイレクト}}',
     'ksh':u'{{Schmieß fott}}Di Ömlëijdong jeiht noh nörjendwoh hen.<br />--~~~~~\n\n',
     'nds':u'{{delete}}Kaputte Wiederleiden, wat nich brukt ward.<br />--~~~~\n\n',
-    'pdc':u'{{lösche|Defekte Weiterleitung --~~~~}}',
+    'pdc':u'{{lesche|Kaputte Weiderleiding --~~~~}}',
     'ru': u'{{db-redirnone}}',
     'war':u'{{delete}}Nautod o nagbinalikbalik nga redirek.--~~~~\n\n',
     'zh': u'{{delete|R1}}',
@@ -710,11 +710,13 @@ class RedirectRobot:
                     pywikibot.output(
                         u'   Links to: %s.'
                         % targetPage.title(asLink=True))
-                    if targetPage.site().sitename() == 'wikipedia:en' \
-                       and targetPage.title() == 'Target page name':
-                        pywikibot.output(
-                            u"Skipping: Redirect source is vandalized.")
-                        break
+                    if targetPage.site().sitename() == 'wikipedia:en':
+                        mw_msg = targetPage.site().mediawiki_message(
+                                     'Wikieditor-toolbar-tool-redirect-example')
+                        if targetPage.title() == mw_msg:
+                            pywikibot.output(
+                                u"Skipping toolbar example: Redirect source is potentially vandalized.")
+                            break
                     if targetPage.site() != self.site:
                         pywikibot.output(
                             u'Warning: redirect target (%s) is on a different site.'
