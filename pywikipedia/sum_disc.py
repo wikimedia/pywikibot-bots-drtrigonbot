@@ -68,7 +68,7 @@ Syntax example:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: sum_disc.py 0.2.0028 2009-11-20 16:39 drtrigon $'
+__version__='$Id: sum_disc.py 0.2.0029 2009-11-20 22:33 drtrigon $'
 #
 
 
@@ -152,7 +152,8 @@ bot_config = {	# unicode values
 								u'^(Wikipedia:Grafikwerkstatt)',			#
 								u'^(Wikipedia:Grafikwerkstatt/Grafikwünsche)',		#
 								u'^(Wikipedia:Kartenwerkstatt)',			#
-								u'^(Wikipedia:Kartenwerkstatt/Kartenwünsche)', ],	#
+								u'^(Wikipedia:Kartenwerkstatt/Kartenwünsche)',		#
+								u'^(Wikipedia:Bots/.*)', ],				# DRTRIGON-11
 					# (not published yet)
 					# ev. sogar [\]\|/#] statt nur [\]\|/] ...?! dann kann Signatur auch links auf Unterabschn. enth.
 					# liefert leider aber auch falsch positive treffer... wobei seiten, die mal die aufmerksamkeit geweckt
@@ -169,7 +170,8 @@ bot_config = {	# unicode values
 					# und der Bot muss sich nicht mit so großen Seiten rumschlagen. -- Merlissimo 14:03, 31. Jan. 2009 (CET)
 					# (sofern auf diesen Seiten nichts geändert wird, tauchen sie gar nicht auf...)
 					'ignorepage_list':	[ u'(.*?)/Archiv', ],		# + weitere 
-					# (not published yet)
+					# LIST of SIGNATUREs to USE, a LIST
+# 'backlinks_list' HAS TO BE PUBLISHED TO Benutzer:DrTrigonBot ON BOT RELEASE !!!
 					'backlinks_list':	[ u'%(userdiscpage)s',
 								u'Benutzer:%(username)s', ],
 					# (hidden)
@@ -501,7 +503,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		check_list = self._param['checkedit_list']
 		count = self._param['checkedit_count']
 
-		# [ should be done in framework / JIRA ticket? ]
+		# [ should be done in framework / JIRA: DRTRIGON-59 ]
 		pywikibot.output(u'Getting latest contributions from user "%s" via API...' % self._user.name())
 
 		# thanks to http://www.amk.ca/python/howto/regex/ and http://bytes.com/forum/thread24382.html
@@ -587,7 +589,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			page.sum_disc_data = work[name].sum_disc_data
 
 			# ignorelist
-			# [ RegexFilterPageGenerator; but has to be modified and a patch sent upstream for this / JIRA ticket? ]
+			# [ RegexFilterPageGenerator; but has to be modified and a patch sent upstream for this / JIRA: DRTRIGON-62 ]
 			#if (self._transPage(page).title() == self._userPage.title()):	continue
 			skip = False
 			for check in self._param['ignorepage_list']:
@@ -612,6 +614,10 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				pywikibot.output(u'\03{lightaqua}INFO: skipping not available (deleted) page at [[%s]]\03{default}' % name)
 				continue
 			except pywikibot.IsRedirectPage:
+				f = open('/home/ursin/debug.txt', 'a')
+				f.write( name.encoding('latin-1') + '\n' )
+				f.close()
+
 				pywikibot.output(u'\03{lightaqua}INFO: skipping redirect page at [[%s]]\03{default}' % name)
 				continue
 

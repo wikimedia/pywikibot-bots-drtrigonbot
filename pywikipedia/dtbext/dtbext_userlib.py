@@ -12,7 +12,7 @@ the same functions but enhanced.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_userlib.py 0.2.0027 2009-11-20 02:08 drtrigon $'
+__version__='$Id: dtbext_userlib.py 0.2.0029 2009-11-20 22:29 drtrigon $'
 #
 
 # Standard library imports
@@ -91,7 +91,7 @@ class User(userlib.User):
 				title = link.replace(u'%s:' % family.decode('unicode_escape'), u':')	# e.g. 'dewiki:...' --> 'de:...'
 				if not (title == link):
 					data[u'link'] = u'%s:%s' % (family, title)
-					# [ framework claims to know 'wiki' but does not / JIRA ticket? ]
+					# [ framework claims to know 'wiki' but does not / JIRA: DRTRIGON-60 ]
 					data[u'link'] = data[u'link'].replace(u'wiki:', u'')
 
 			# return page object with additional data

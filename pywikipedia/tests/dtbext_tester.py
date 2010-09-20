@@ -54,6 +54,7 @@ TESTPAGE = u'Wikipedia:WikiProjekt Vorlagen/Werkstatt'
 TESTPAGE = u'Benutzer_Diskussion:DrTrigon'
 TESTPAGE = u'Wikipedia Diskussion:WikiProjekt Portale/Baustelle/Portal:Biochemie'
 TESTPAGE = u'Portal:Serbien/Artikelwunsch'
+TESTPAGE = u'Wikipedia:Auskunft'
 
 TESTBUFFER = u"""
 {{Archiv|Wikipedia Diskussion:WikiProjekt Einsatzorganisationen}}
@@ -193,6 +194,8 @@ def TEST_PreloadingGenerator(debug=False):
 	print "   [output]"
 	print
 
+	TESTPAGES.append( TESTPAGE )
+
 	ignore_list = { pywikibot.getSite().family.name: { pywikibot.getSite().lang: [u'Benutzer Diskussion:DrTrigonBo'] }}
 	#ignore_list = { pywikibot.getSite().family.name: { pywikibot.getSite().lang: [] }}
 
@@ -211,6 +214,8 @@ def TEST_PreloadingGenerator(debug=False):
 
 		start = time.time()
 		u = page.getVersionHistory(revCount=1)
+		dtbext.pywikibot.addAttributes(page)
+		print page.getSections(minLevel=1)
 		#print u
 		stop = time.time()
 		buffd2 = stop-start
@@ -262,7 +267,7 @@ def TEST_get():
 
 # wikipedia.py
 #TEST_getVersionHistory()
-TEST_getSections()
+#TEST_getSections()
 #TEST_purgeCache()
 #TEST_get()
 #TEST_getParsedContent()
@@ -271,7 +276,7 @@ TEST_getSections()
 
 #TEST_addAttributes()
 
-#TEST_PreloadingGenerator()
+TEST_PreloadingGenerator()
 #TEST_PreloadingGenerator(debug=True)
 #TEST_VersionHistoryGenerator()
 

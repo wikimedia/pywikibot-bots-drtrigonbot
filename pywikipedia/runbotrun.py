@@ -97,7 +97,7 @@ For tests its sometimes better to use:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: runbotrun.py 0.2.0020 2009-11-14 17:53 drtrigon $'
+__version__='$Id: runbotrun.py 0.2.0029 2009-11-20 17:28 drtrigon $'
 __revision__='8072'
 #
 
@@ -187,6 +187,17 @@ def gettraceback(exc_info):
     #exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
     return (exc_info[0], exc_info[1], result)
 
+def getversion_svn():
+    # framework revision?
+    pywikibot.output(u'LATEST FRAMEWORK REVISION:')
+    buf = pywikibot.getSite().getUrl( 'http://svn.wikimedia.org/viewvc/pywikipedia/trunk/pywikipedia/', no_hostname = True, retry = False )
+    match = re.search('<td>Directory revision:</td>\n<td><a (.*?)>(.*?)</a> \(of <a (.*?)>(.*?)</a>\)</td>', buf)
+    if match and (len(match.groups()) > 0):
+        info = {True: '=', False: '>'}        
+        pywikibot.output(u'  Directory revision: %s (%s %s)' % (match.groups()[-1], info[(match.groups()[-1]==__revision__)], __revision__))
+    else:
+        pywikibot.output(u'  WARNING: could not retrieve information!')
+
 def main():
     global logfile, out_stream, err_stream, error_buffer
     global do_subster		# alle anderen NICHT noetig, warum diese hier ?!?????
@@ -206,15 +217,7 @@ def main():
     for item in infolist: pywikibot.output(u'  %s' % item)
 
     # new framework revision?
-    pywikibot.output(u'LATEST FRAMEWORK REVISION:')
-    #buf = pywikibot.getSite().getUrl( 'http://svn.wikimedia.org/viewvc/pywikipedia/trunk/pywikipedia/', no_hostname = True )
-    buf = pywikibot.getSite().getUrl( 'http://svn.wikimedia.org/viewvc/pywikipedia/trunk/pywikipedia/', no_hostname = True, retry = False )
-    match = re.search('<td>Directory revision:</td>\n<td><a (.*?)>(.*?)</a> \(of <a (.*?)>(.*?)</a>\)</td>', buf)
-    if match and (len(match.groups()) > 0):
-        info = {True: '=', False: '>'}        
-        pywikibot.output(u'  Directory revision: %s (%s %s)' % (match.groups()[-1], info[(match.groups()[-1]==__revision__)], __revision__))
-    else:
-        pywikibot.output(u'  WARNING: could not retrieve information!')
+    getversion_svn()
 
     # processing of messages on bot discussion page
     if pywikibot.getSite().messages():

@@ -12,7 +12,7 @@ the page class from there.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_wikipedia.py 0.2.0027 2009-11-20 02:26 drtrigon $'
+__version__='$Id: dtbext_wikipedia.py 0.2.0029 2009-11-20 22:31 drtrigon $'
 #
 
 # Standard library imports
@@ -131,13 +131,15 @@ class Page(pywikibot.Page):
 
 		result = query.GetData(params, self.site())
 		r = result[u'parse'][u'sections']
-		#print r
+		print r
 
 		if not sectionsonly:
 			# assign sections with wiki text and section byteoffset
 			pywikibot.output(u"    Reading wiki page text from %s (if not already done)." % self.title(asLink=True))
 
+			print "***", len(self._contents)
 			self.get()
+			print "***", len(self.get())
 
 			# [ patch needed by '_findSection' for some pages / JIRA ticket? ]
 			self._contents = self._contents.replace(u'\r\n', u'\n')
@@ -364,102 +366,5 @@ class Site(object):
 			r = removeHTMLParts(r, keeptags = keeptags).strip()	#
 
 		return r
-
-
-# ADDED
-# REASON: faster and less traffic intense big pageset processing
-#         (this here is just a patch, should be done in framework)
-class Pages():
-	"""Pages: A set of MediaWiki pages
-	"""
-
-	_max_request = 50
-	_min_request = 10
-
-	_requesting_data = False
-
-	def __init__(self, site, titles, insite=None, defaultNamespace=0):
-		"""
-		...
-		"""
-
-		raise NotImplementedError('Use PreloadingGenerator for get and the same for getVersionHistory is requested on maillist!!')
-		# -> JIRA ticket
-
-		self._site, self._insite, self._defaultNamespace = site, insite, defaultNamespace
-		self._titles = titles
-
-		#self._titles_str = "|".join(self._titles)
-		self._pages = [ Page(self._site, title, insite=self._insite, defaultNamespace=self._defaultNamespace) for title in self._titles ]
-		#self._pages = [ Page(self._site, title, insite=self._insite, defaultNamespace=self._defaultNamespace) for title in titles ]
-		#self._titles = [ page.sectionFreeTitle() for page in self._pages ]
-
-	def _bundle_list(self, inlist, joiner="|", size=None):
-		"""
-		...
-		"""
-
-		if not size: size = self._min_request
-
-		bundle = []
-		pack = []
-		joined_bundle = []
-		max_i = len(inlist) - 1
-		for i, item in enumerate(inlist):
-			pack.append( inlist[i] )
-			if (((i+1)%size) == 0) or (i == max_i):
-				bundle.append( pack )
-				if joiner: joined_bundle.append( joiner.join(pack) )
-				pack = []
-		return (bundle, joined_bundle)
-
-	# thanks to: http://www.daniweb.com/forums/thread40718.html
-	def _append_missing_pages(self, outdict, inlist, set_item=None):
-		"""
-		...
-		"""
-
-		diff_list = [item for item in inlist if not item in outdict.keys()]
-		for i, item in enumerate(diff_list):
-			outdict[item] = set_item
-			pywikibot.output( u"WARNING: Page [[%s]] gave no API result." % item )
-
-		return outdict
-
-	def has_dups(self):
-		"""
-		...
-		"""
-
-		return not (len(self._titles) == len(self.drop_dups()[0]))
-
-	def drop_dups(self):
-		"""
-		...
-		"""
-
-		self._titles = list(set(self._titles))		# drop duplicates (wiki drops it too!)
-		self._pages = [ Page(self._site, title, insite=self._insite, defaultNamespace=self._defaultNamespace) for title in self._titles ]
-
-		return (self._titles, self._pages)
-
-	def filterPages(self, regex):
-		"""
-		...
-		"""
-
-		titles = list(self._titles)
-		result = []
-		for item in regex:
-			page_list = []
-			i = 0
-			while (i<len(titles)):
-				if item.search(titles[i]):
-					page_list.append( titles.pop(i) )
-				else: 	i += 1
-			result.append( Pages(self._site, page_list) )
-		result.append( Pages(self._site, titles) )	# append the not filtered pages at the end
-
-		return result
 
 
