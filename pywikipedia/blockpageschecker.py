@@ -60,7 +60,7 @@ python blockpageschecker.py -show -protectedpages:4
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: blockpageschecker.py 8512 2010-09-09 23:07:09Z xqt $'
+__version__ = '$Id: blockpageschecker.py 8589 2010-09-22 05:07:29Z xqt $'
 #
 
 import re, webbrowser
@@ -269,7 +269,7 @@ def main():
     # Main Loop
     preloadingGen = pagegenerators.PreloadingGenerator(generator, pageNumber = 60)
     for page in preloadingGen:
-        pagename = page.aslink()
+        pagename = page.title(asLink=True)
         pywikibot.output('Loading %s...' % pagename)
         try:
             text = page.get()

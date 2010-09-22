@@ -20,13 +20,13 @@ to the older method using regular expressions.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: xmlreader.py 8404 2010-08-14 22:02:23Z xqt $'
+__version__='$Id: xmlreader.py 8589 2010-09-22 05:07:29Z xqt $'
 #
 
 import threading
 import xml.sax
 import codecs, re
-import wikipedia
+import wikipedia as pywikibot
 
 try:
     from xml.etree.cElementTree import iterparse
@@ -282,7 +282,7 @@ class XmlDump(object):
         """Return a generator that will yield XmlEntry objects"""
         print 'Reading XML dump...'
         if not 'iterparse' in globals():
-            wikipedia.output(
+            pywikibot.output(
 u'''WARNING: cElementTree not found. Using slower fallback solution.
 Consider installing the python-celementtree package.''')
             return self.regex_parse()
@@ -397,7 +397,7 @@ Consider installing the python-celementtree package.''')
             '</revision>\s*'+
             '</page>',
                 re.DOTALL)
-        f = codecs.open(self.filename, 'r', encoding = wikipedia.getSite().encoding(),
+        f = codecs.open(self.filename, 'r', encoding = pywikibot.getSite().encoding(),
                         errors='replace')
         eof = False
         lines = u''

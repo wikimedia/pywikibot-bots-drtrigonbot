@@ -287,6 +287,8 @@ TEST_PreloadingGenerator()
 #import re
 #if re.search(a_str, buf): print "<references />-Tag Fehler"
 
+#print userlib.User(pywikibot.getSite(), u'º_the_Bench_º')
+
 
 print "done."
 

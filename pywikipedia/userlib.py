@@ -7,11 +7,11 @@ Library to work with users, their pages and talk pages.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: userlib.py 8527 2010-09-11 22:50:52Z xqt $'
+__version__ = '$Id: userlib.py 8588 2010-09-22 04:53:21Z xqt $'
 
 import re
 import wikipedia as pywikibot
-import query
+import query, config
 
 class AutoblockUser(pywikibot.Error):
     """
@@ -85,7 +85,9 @@ class User(object):
         return ip_regexp.match(self.username) is not None
 
     def __str__(self):
-        return u'%s:%s' % (self.site() , self.name())
+        return (u'%s:%s'
+                % (self.site(), self.name())).encode(config.console_encoding,
+                                                     'replace')
 
     def __repr__(self):
         return self.__str__()

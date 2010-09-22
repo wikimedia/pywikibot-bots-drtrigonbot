@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: incubator_family.py 8066 2010-04-09 07:55:32Z xqt $'
+__version__ = '$Id: incubator_family.py 8591 2010-09-22 15:15:06Z xqt $'
 
 import family
 
@@ -17,7 +17,7 @@ class Family(family.Family):
             self.langs['incubator'] = None
 
         self.namespaces[4] = {
-            '_default': [u'Incubator', self.namespaces[4]['_default']],
+            '_default': [u'Incubator', u'I', self.namespaces[4]['_default']],
         }
         self.namespaces[5] = {
             '_default': [u'Incubator talk', self.namespaces[5]['_default']],

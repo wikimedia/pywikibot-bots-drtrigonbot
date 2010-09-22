@@ -23,7 +23,7 @@ Example: "python capitalize_redirects.py -start:B -always"
 #
 # Class licensed under terms of the MIT license
 #
-__version__ = '$Id: capitalize_redirects.py 8369 2010-07-29 07:22:06Z xqt $'
+__version__ = '$Id: capitalize_redirects.py 8589 2010-09-22 05:07:29Z xqt $'
 #
 
 import time, sys, re
@@ -77,7 +77,7 @@ class CapitalizeBot:
             page_cap = pywikibot.Page(self.site, page_t.capitalize())
         if page_cap.exists():
             pywikibot.output(u'%s already exists, skipping...\n'
-                             % page_cap.aslink())
+                             % page_cap.title(asLink=True))
         else:
             pywikibot.output(u'[[%s]] doesn\'t exist' % page_cap.title())
             if not self.acceptall:

@@ -60,7 +60,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: redirect.py 8583 2010-09-20 07:05:21Z xqt $'
+__version__='$Id: redirect.py 8587 2010-09-21 16:47:03Z xqt $'
 #
 import re, sys, datetime
 import wikipedia as pywikibot
@@ -183,7 +183,7 @@ sd_template = {
     'ga': u'{{scrios|Athsheoladh briste}}',
     'hu': u'{{azonnali|Hibás átirányítás|~~~~}}',
     'it': u'{{Cancella subito|9}}',
-    'ja': u'{{即時削除|壊れたリダイレクト}}',
+##    'ja': u'{{即時削除|壊れたリダイレクト}}', ## tracker no 3072733
     'ksh':u'{{Schmieß fott}}Di Ömlëijdong jeiht noh nörjendwoh hen.<br />--~~~~~\n\n',
     'nds':u'{{delete}}Kaputte Wiederleiden, wat nich brukt ward.<br />--~~~~\n\n',
     'pdc':u'{{lesche|Kaputte Weiderleiding --~~~~}}',

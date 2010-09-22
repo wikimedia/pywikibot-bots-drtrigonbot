@@ -20,7 +20,7 @@ and the bot will only work on that single page.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: basic.py 8435 2010-08-23 07:10:44Z purodha $'
+__version__ = '$Id: basic.py 8589 2010-09-22 05:07:29Z xqt $'
 #
 
 import wikipedia as pywikibot
@@ -86,7 +86,7 @@ class BasicBot:
         text = 'Test ' + text
 
         if not self.save(text, page, self.summary):
-            pywikibot.output(u'Page %s not saved.' % page.aslink())
+            pywikibot.output(u'Page %s not saved.' % page.title(asLink=True))
 
     def load(self, page):
         """
@@ -97,10 +97,10 @@ class BasicBot:
             text = page.get()
         except pywikibot.NoPage:
             pywikibot.output(u"Page %s does not exist; skipping."
-                             % page.aslink())
+                             % page.title(asLink=True))
         except pywikibot.IsRedirectPage:
             pywikibot.output(u"Page %s is a redirect; skipping."
-                             % page.aslink())
+                             % page.title(asLink=True))
         else:
             return text
         return None
@@ -126,7 +126,7 @@ class BasicBot:
                                  minorEdit=minorEdit, botflag=botflag)
                     except pywikibot.LockedPage:
                         pywikibot.output(u"Page %s is locked; skipping."
-                                         % page.aslink())
+                                         % page.title(asLink=True))
                     except pywikibot.EditConflict:
                         pywikibot.output(
                             u'Skipping %s because of edit conflict'

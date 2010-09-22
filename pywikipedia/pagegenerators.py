@@ -18,7 +18,7 @@ These parameters are supported to specify which pages titles to print:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: pagegenerators.py 8335 2010-06-26 10:07:01Z xqt $'
+__version__='$Id: pagegenerators.py 8589 2010-09-22 05:07:29Z xqt $'
 
 import wikipedia as pywikibot
 import config
@@ -1087,7 +1087,7 @@ def DayPageGenerator(startMonth = 1, endMonth = 12, site = None):
         site = pywikibot.getSite()
     fd = date.FormatDate(site)
     firstPage = pywikibot.Page(site, fd(startMonth, 1))
-    pywikibot.output(u"Starting with %s" % firstPage.aslink())
+    pywikibot.output(u"Starting with %s" % firstPage.title(asLink=True))
     for month in xrange(startMonth, endMonth+1):
         for day in xrange(1, date.getNumberOfDaysInMonth(month)+1):
             yield pywikibot.Page(site, fd(month, day))
