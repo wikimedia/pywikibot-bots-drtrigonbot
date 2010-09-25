@@ -49,7 +49,7 @@ your user-config.py:
 
     cosmetic_changes_disable['wikipedia'] = ('de', 'en', 'fr')
 """
-__version__ = '$Id: cosmetic_changes.py 8577 2010-09-19 17:12:24Z xqt $'
+__version__ = '$Id: cosmetic_changes.py 8593 2010-09-23 16:46:30Z xqt $'
 import wikipedia as pywikibot
 import isbn
 import pagegenerators
@@ -727,8 +727,9 @@ class CosmeticChangesToolkit:
             # do not change digits inside html-tags
             pattern = re.compile(u'<[/]*?[^</]+?[/]*?>', re.UNICODE)
             exceptions.append(pattern)
-            for i in range(0,10):
-                text = pywikibot.replaceExcept(text, str(i), u'٠١٢٣٤٥٦٧٨٩'[i], exceptions)
+## disabled for now: some problems with wring picture size
+##            for i in range(0,10):
+##                text = pywikibot.replaceExcept(text, str(i), u'٠١٢٣٤٥٦٧٨٩'[i], exceptions)
         return text
 
     # Retrieved from "http://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup"

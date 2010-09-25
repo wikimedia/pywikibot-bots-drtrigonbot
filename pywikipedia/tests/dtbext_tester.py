@@ -56,6 +56,8 @@ TESTPAGE = u'Wikipedia Diskussion:WikiProjekt Portale/Baustelle/Portal:Biochemie
 TESTPAGE = u'Portal:Serbien/Artikelwunsch'
 TESTPAGE = u'Wikipedia:Auskunft'
 TESTPAGE = u'Benutzer Diskussion:MerlBot/Vermutlich verstorben'
+TESTPAGE = u'Benutzer Diskussion:Euku/2010/II. Quartal'
+TESTPAGE = u'Wikipedia:Fragen zur Wikipedia'
 
 TESTBUFFER = u"""
 {{Archiv|Wikipedia Diskussion:WikiProjekt Einsatzorganisationen}}
@@ -266,11 +268,13 @@ def TEST_get():
 	#page.isRedirectPage()
 
 
+dtbext.pywikibot.debug = True
+
 # wikipedia.py
 #TEST_getVersionHistory()
-#TEST_getSections()
+TEST_getSections()
 #TEST_purgeCache()
-TEST_get()
+#TEST_get()
 #TEST_getParsedContent()
 #print pywikibot.getSite().getUrl('/w/api.php?action=query&meta=userinfo&uiprop=blockinfo|hasmsg|groups|rights|options|preferencestoken|editcount|ratelimits|email&formal=xml')
 #TEST_globalnotifications()

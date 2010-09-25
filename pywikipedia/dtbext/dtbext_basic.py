@@ -13,12 +13,12 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_basic.py 0.2.0027 2009-11-19 19:36 drtrigon $'
+__version__='$Id: dtbext_basic.py 0.2.0032 2009-11-25 17:55 drtrigon $'
 #
 
 
 import re, sys
-import time, codecs, os, calendar
+import time, codecs, os
 
 import config, userlib, basic
 import dtbext
@@ -250,20 +250,6 @@ class BasicBot(basic.BasicBot):
 		datfile.write(u'\n\n' + data)
 		#datfile.write(data)
 		datfile.close()
-
-	def localizeDateTime(self, timestamp):
-		'''
-		returns a localized datetime
-
-		input:  timestamp
-		returns:  localized time [time]
-		'''
-		# see also in 'dtbext/dtbext_wikipedia.py', 'GetTime' ...
-		# is localized to the actual date/time settings, cannot localize timestamps that are
-		#    half of a year in the past or future!
-		timestamp = time.strptime(timestamp.encode(pywikibot.getSite().encoding()), '%H:%M, %d. %b. %Y')
-		secs = calendar.timegm(timestamp)
-		return time.strftime('%H:%M, %d. %b. %Y', time.localtime(secs)).decode(pywikibot.getSite().encoding())
 
 
 #def main():

@@ -68,7 +68,7 @@ Syntax example:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: sum_disc.py 0.2.0031 2009-11-25 03:04 drtrigon $'
+__version__='$Id: sum_disc.py 0.2.0032 2009-11-25 18:57 drtrigon $'
 #
 
 
@@ -195,7 +195,7 @@ debug = []				# no write, all users
 #debug.append( 'user' )			# skip users
 ##debug.append( 'write2hist' )		# write history
 #debug.append( 'toolserver' )		# toolserver down
-debug.append( 'code' )			# code debugging
+#debug.append( 'code' )			# code debugging
 
 #trans_str = {		# from wikilanguage to 'en'
 #	# translations for 'User'
@@ -323,13 +323,11 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			# and pass this with GlobalWikiNotificationsPageGen to
 			# getLatestNews
 
-# idea: may be create a class for storage of sum_disc_data and for easy save load (history) and else... ?!???
 			self.checkRelevancy()					# check self.pages on relevancy, disc-thread oriented version...
 
 			self.AddMaintenanceMsg()				# gehen auch in jede history... werden aber bei compress entfernt
 
 			self.postDiscSum()					# post results to users Discussion page (with comments for history)
-			return
 
 		pywikibot.output(u'\03{lightgreen}* Processing Warnings:\03{default}')
 
@@ -350,7 +348,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		pywikibot.output(u'* Compressing of histories:')
 
 		if bot_config['backup_hist']:
-			timestmp = dtbext.date.getTimeStmp()
+			timestmp = dtbext.date.getTimeStmpNow()
 			pathname = '%slogs/%s/' % (bot_config['script_path'], timestmp)	# according to 'setUser'
 			os.mkdir(pathname)
 			import shutil
@@ -495,8 +493,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 		# write new history
 		self.appendFile( str(buf).decode('latin-1') )
-		#self.appendFile( str(buf).encode('zlib') )
-		#self.appendFile( zlib.compress(str(buf).decode('latin-1'), 9) )
 
 		pywikibot.output(u'\03{lightpurple}*** History updated\03{default}')
 
@@ -616,17 +612,10 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				if hasattr(page, u'_getexception'):
 					raise page._getexception
 			except pywikibot.NoPage:
-			#	page.sum_disc_data = (	u'no version history found, page deleted!', 
-			#				None, # obsolete (and recursive)
-			#				None, 
-			#				None, 
-			#				None, 
-			#				_PS_warning )
-			#	self._oth_list[name] = page				
-				pywikibot.output(u'\03{lightaqua}INFO: skipping not available (deleted) page at [[%s]]\03{default}' % name)
+				pywikibot.output(u'\03{lightaqua}WARNING: skipping not available (deleted) page at [[%s]]\03{default}' % name)
 				continue
 			except pywikibot.IsRedirectPage:
-				pywikibot.output(u'\03{lightaqua}INFO: skipping redirect page at [[%s]]\03{default}' % name)
+				pywikibot.output(u'\03{lightaqua}WARNING: skipping redirect page at [[%s]]\03{default}' % name)
 				continue
 
 			# actual/new status of page, has something changed?
@@ -665,7 +654,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		for (page, data) in globalnotify:
 			# skip to local disc page, since this is the only page the user should watch itself
 			if page.site().language() == localinterwiki:
-				pywikibot.output(u'\03{lightaqua}INFO: skipping global wiki notify to local wiki %s\03{default}' % page.title(asLink=True))
+				pywikibot.output(u'\03{lightaqua}WARNING: skipping global wiki notify to local wiki %s\03{default}' % page.title(asLink=True))
 				continue
 
 			# actual/new status of page, has something changed?
@@ -692,22 +681,9 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		   Returns nothing, but feeds to self.pages class instance.
 		"""
 
-#		def test(timerobj): pywikibot.output(u'\03{lightaqua}progress: %.1f%s (%i of %i) ...\03{default}' % (((100.*timerobj.kwargs['u'])/timerobj.kwargs['size']), u'%', timerobj.kwargs['u'], timerobj.kwargs['size']))
-#		t = Timer(bot_config['timeout'], test, size = len(self._news_list.keys()), u = 0)
-
-		# self._news_list contents all '_PS_changed' and '_PS_new'
 		self.pages.start_promotion()
-#		# kleiner speed-up patch, als option/parameter aktivierbar
-#		if self._param['directgetfull_list']: issues = ( self._param['directgetfull_list'], ['full']*len(self._param['directgetfull_list']) )
-#		else:	issues = None
-#		if (t.kwargs['size'] != 0): t.run()
-		#for (page, buf) in self.loadPages( pages, issues=issues ):
 		for page in self.pages.news.values():
 			keys = page.title()
-			# get content (was preloaded)
-			#buf = self.load(page)
-
-#			t.kwargs['u'] += 1
 
 			strt = time.time()
 			entries = PageSections(page, self._param)
@@ -729,9 +705,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			# if page is not relevant, don't list discussion
 			if not page_rel:
 				self.pages.promote_irrel(page, page_signed)
-
-#		t.cancel()
-#		del t
 
 		self.pages.end_promotion()
 
@@ -774,7 +747,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			pywikibot.output(u'[%i entries]' % count )
 
 			if 'write2wiki' in debug:
-				self.loadMode()			# get operating mode and contend AGAIN to be ACTUAL !!!
 				#comment = u'Diskussions Zusammenfassung hinzugefügt: %i neue und %i veränderte' % (3, 7)
 				if not self._mode:
 					# default: write direct to user disc page
@@ -953,15 +925,11 @@ class SumDiscPages(object):
 		else:		ps_types_b = [_PS_closed]
 		ps_types = (ps_types_a, ps_types_b)
 
-		print self._news_list
 		buf = []
 		for name in self._news_list.keys():
-#			print name
 			page = self._news_list[name]
 			#data = self._news_list[name]
 			data = page.sum_disc_data
-			print page
-			print data
 			if data[5] in ps_types[0]:
 				# new and changed
 				report = []
@@ -979,8 +947,6 @@ class SumDiscPages(object):
 
 				if report:
 					# subsections on page
-#					data = (data[0], page.title(), string.join(report, u', '), self._getLastEditor(page, data[2]), self.localizeDateTime(data[3]))
-# time and date correct localized?!??
 					data = (data[0], page.title(), string.join(report, u', '), self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
 					data = u'*%s: [[%s]] at %s - last edit by %s (%s)' % data
 				else:
@@ -990,7 +956,6 @@ class SumDiscPages(object):
 			elif data[5] in ps_types[1]:
 				# closed
 				data = (data[0], page.title(), self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
-#				print data
 				data = u'*%s: [[%s]] all discussions have finished (surveillance stopped) - last edit by %s (%s)' % data
 			elif data[5] in [_PS_warning]:
 				# warnings
@@ -1030,7 +995,10 @@ class SumDiscPages(object):
 
 		humaneditor = page.userNameHuman()
 		if humaneditor:
-			return u'[[User:%s]]/[[User:%s]]' % (humaneditor, lastuser)
+			if humaneditor == lastuser:
+				return u'[[User:%s]]' % humaneditor
+			else:
+				return u'[[User:%s]]/[[User:%s]]' % (humaneditor, lastuser)
 		else:
 			# no human editor found; use last editor
 			return u'[[User:%s]] (no human editor found)' % lastuser
@@ -1086,7 +1054,6 @@ class PageSections(object):
 				bo_end   = sections[i+1][0] - 1
 
 				self._entries.append( (s[2:], buf[bo_start:bo_end]) )
-		print self._entries
 
 	def check_rel(self):
 		# iterate over all sections in page and check their relevancy
@@ -1095,15 +1062,13 @@ class PageSections(object):
 
 		page_rel    = False
 		page_signed = False
-		#try:	checksum = self._news_list[keys][4]
 		try:	checksum = page.sum_disc_data[4]
 		except:	checksum = None
-		#print keys, checksum
 		checksum_new = {}
+
 		for i, (head, body) in enumerate(self._entries): # iterate over all headings/sub sections
 			# wikiline is wiki text, line is parsed and anchor is the unique link label
 			(wikiline, line, anchor) = head[:3]
-			print (wikiline, line, anchor)
 
 			# ignorelist for headings
 			if wikiline:
@@ -1127,10 +1092,8 @@ class PageSections(object):
 			page_rel = True
 			checksum_new[anchor] = (checksum_cur, rel, line)
 
-		print checksum_new
 		# update sum_disc_data in page (checksums, relevancies, ...)
 		page.sum_disc_data = page.sum_disc_data[:4] + (checksum_new,) + page.sum_disc_data[5:]
-		print page.sum_disc_data
 #		except pywikibot.SectionError:	# is typically raised by ????????
 #			page_rel = False
 
@@ -1207,32 +1170,8 @@ class PageSections(object):
 		return (signs_pos, signs)
 
 
-#class Timer(threading.Thread):
-#	'''
-#	Timer thread that runs completely stand-alone in sperate thread and continous until 'cancel' is called.
-#	Variables to use in 'func' have to be stored internally in 'kwargs'.
-#	'''
-#
-#	def __init__(self, sec, func, **kwargs):
-#		threading.Thread.__init__(self)
-#		self.seconds = sec
-#		self.function = func
-#		self.kwargs = kwargs
-#		self._t = threading.Timer(self.seconds, self._action)
-#		self._watchdog = [None]*5
-#	def _action(self):
-#		self._watchdog = self._watchdog.append(self.kwargs)		# watchdog (for security)
-#		self._watchdog.pop(0)						#
-#		if (self._watchdog[0] == self._watchdog[-1]): self.cancel()	#
-#		self.function(self)
-#		del self._t
-#		self._t = threading.Timer(self.seconds, self._action)
-#		self._t.start()
-#	def run(self):
-#		#self._t.start()
-#		self._action()
-#	def cancel(self):
-#		self._t.cancel()
+# idea: may be create a class for storage of sum_disc_data and for easy save load (history) and else... ?!???
+
 
 def main():
 	bot = SumDiscBot(bot_config['userlist'])	# for several user's, but what about complete automation (continous running...)

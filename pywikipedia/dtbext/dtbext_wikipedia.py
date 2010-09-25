@@ -12,7 +12,7 @@ the page class from there.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_wikipedia.py 0.2.0031 2009-11-25 01:23 drtrigon $'
+__version__='$Id: dtbext_wikipedia.py 0.2.0032 2009-11-25 18:05 drtrigon $'
 #
 
 # Standard library imports
@@ -101,17 +101,12 @@ class Page(pywikibot.Page):
 		   @param sectionsonly: Report only the result from API call, do not assign
                                         the headings to wiki text (for compression e.g.).
 		   @type  sectionsonly: bool
-#		   getter: because get() in API version and default dont give the same
-#		            results (html comments are stripped or not ...) you can choose
-#		            here which function to use. default is the API version.
-#		   pagewikitext: if content is already known, you can use this shortcut!
 
 		   Returns a list with entries: (byteoffset, level, wikiline, line, anchor)
 		   This list may be empty and if sections are embedded by template, the according
 		   byteoffset and wikiline entries are None. The wikiline is the wiki text,
 		   line is the parsed text and anchor ist the (unique) link label.
 		"""
-# - check calling params
 
 		# was there already a call? already some info available?
 		if hasattr(self, '_sections'):
@@ -138,11 +133,12 @@ class Page(pywikibot.Page):
 
 		if not sectionsonly:
 			# assign sections with wiki text and section byteoffset
-			pywikibot.output(u"    Reading wiki page text from %s (if not already done)." % self.title(asLink=True))
+			pywikibot.output(u"  Reading wiki page text (if not already done).")
 
 			debug_data += str(len(self._contents)) + '\n'
 			self.get()
 			debug_data += str(len(self._contents)) + '\n'
+			debug_data += self._contents + '\n'
 
 			# code debugging
 			if debug:
@@ -157,16 +153,17 @@ class Page(pywikibot.Page):
 
 			for i, item in enumerate(r):
 				l = int(item[u'level'])
-				if item[u'byteoffset']:
-					# section on this page (index in format u"%i")
+				if item[u'byteoffset'] and item[u'index']:
+					# section on this page and index in format u"%i"
 					item[u'wikiline'] = self._findSection(item)
-
 					if (len(item[u'wikiline']) == 0) and (len(item[u'line'].strip()) > 0):
 						self._getSectionByteOffset(item)		# raises 'Error' if not sucessfull !
 						item[u'byteoffset'] = item[u'wikiline_bo']
 						item[u'wikiline']   = self._findSection(item)
 				else:
-					# section ebemdded from template (index in format u"T-%i")
+					# section ebemdded from template (index in format u"T-%i") or the
+					# parser was not able to recongnize section correct (e.g. html) at all
+					# (the byteoffset and index may be correct or not...)
 					item[u'wikiline'] = None
 
 				item[u'level'] = l
@@ -205,9 +202,9 @@ class Page(pywikibot.Page):
 		# (http://mwh.geek.nz/2009/04/26/python-damerau-levenshtein-distance/)
 		possible_headers = []
 		for h in headers:
-			ph = difflib.get_close_matches(h, wikitextlines)
+			ph = difflib.get_close_matches(h, wikitextlines)	# cutoff=0.6
 			possible_headers += [ (p, h) for p in ph ]
-		#print header, possible_headers
+			#print h, possible_headers
 
 		if len(possible_headers) == 0:		# nothing found, try 'prop=revisions (rv)' or else report/raise error !
 			raise NotImplementedError('The call to API to get exact matching section heading is not implemented yet!')

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikibooks_family.py 8569 2010-09-17 05:37:39Z xqt $'
+__version__ = '$Id: wikibooks_family.py 8594 2010-09-24 04:20:50Z xqt $'
 
 # The Wikimedia family that is known as Wikibooks
 
@@ -13,12 +13,12 @@ class Family(family.Family):
         self.languages_by_size = [
             'en', 'de', 'fr', 'ja', 'pt', 'hu', 'nl', 'es', 'pl', 'it', 'he',
             'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'hr', 'zh', 'sv', 'da', 'tr',
-            'th', 'mk', 'ko', 'id', 'sr', 'fa', 'tl', 'ar', 'gl', 'is', 'no',
+            'th', 'mk', 'id', 'ko', 'sr', 'fa', 'tl', 'ar', 'gl', 'is', 'no',
             'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'si', 'la', 'uk',
             'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'az', 'ur', 'ml', 'oc', 'ms',
-            'eu', 'hi', 'fy', 'ie', 'af', 'tg', 'bn', 'tt', 'hy', 'pa', 'te',
-            'sa', 'bs', 'ky', 'be', 'ne', 'ast', 'zh-min-nan', 'mg', 'cy', 'ku',
-            'co', 'sw', 'tk', 'als', 'su', 'vo', 'uz', 'na', 'mn', 'kk', 'nds',
+            'eu', 'hi', 'fy', 'ie', 'af', 'tt', 'tg', 'bn', 'hy', 'pa', 'te',
+            'sa', 'bs', 'ky', 'be', 'ne', 'ast', 'zh-min-nan', 'cy', 'mg', 'ku',
+            'co', 'sw', 'tk', 'su', 'als', 'vo', 'uz', 'na', 'kk', 'mn', 'nds',
             'zu', 'my',
         ]
 

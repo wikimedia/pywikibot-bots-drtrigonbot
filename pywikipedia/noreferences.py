@@ -31,7 +31,7 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 
-__version__='$Id: noreferences.py 8586 2010-09-21 04:56:05Z xqt $'
+__version__='$Id: noreferences.py 8592 2010-09-23 15:18:04Z xqt $'
 
 import re, sys
 import wikipedia as pywikibot
@@ -85,10 +85,10 @@ placeBeforeSections = {
         u'Poznámky',
     ],
     'de': [              # no explicit policy on where to put the references
-        u'Literatur',
-        u'Weblinks',
-        u'Siehe auch',
-        u'Weblink',      # bad, but common singular form of Weblinks
+##        u'Literatur',
+##        u'Weblinks',
+##        u'Siehe auch',
+##        u'Weblink',      # bad, but common singular form of Weblinks
     ],
     'en': [              # no explicit policy on where to put the references
         u'Further reading',
