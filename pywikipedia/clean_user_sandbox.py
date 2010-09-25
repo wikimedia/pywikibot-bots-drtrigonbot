@@ -6,136 +6,120 @@ text.
 This script understands the following command-line arguments:
 
     -hours:#       Use this parameter if to make the script repeat itself
-                   after # hours. Hours can be defined as a decimal. 0.001
-                   hours is one second.
+                   after # hours. Hours can be defined as a decimal. 0.01
+                   hours are 36 seconds; 0.1 are 6 minutes.
+
+    -delay:#       Use this parameter for a wait time after the last edit
+                   was made. If no parameter is given it takes it from
+                   hours and limits it between 5 and 15 minutes.
+                   The minimum delay time is 5 minutes.
 
 """
 #
-# (C) Leogregianin, 2006
-# (C) Wikipedian, 2006-2007
-# (C) Andre Engels, 2007
-# (C) Siebrand Mazeland, 2007
-# (C) DrTrigon, 2008
+# (C) Dr. Trigon, 2008-2010
+#
+# DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
 # Distributed under the terms of the MIT license.
-# (is part of DrTrigonBot-"framework")
 #
-# keep the version of 'clean_user_sandbox.py', 'new_user.py', 'runbotrun.py', 'replace_tmpl.py', 'sum_disc-conf.py', ...
-# up to date with this:
-# Versioning scheme: A.B.CCCC
-#  CCCC: beta, minor/dev relases, bugfixes, daily stuff, ...
-#  B: bigger relases with tidy code and nice comments
-#  A: really big release with multi lang. and toolserver support, ready
-#     to use in pywikipedia framework, should also be contributed to it
-__version__ = '$Id: clean_user_sandbox.py 0.2.0000/3968 2009-06-06 15:01:00Z drtrigon $'
+__version__ = '$Id: clean_user_sandbox.py 0.2.0033 2009-11-25 23:50 drtrigon $'
 #
 
-import wikipedia
-import time
 import re
+import clean_sandbox
 import dtbext
+import wikipedia as pywikibot
 
-content = {
-    'ar': u'{{من فضلك اترك هذا السطر ولا تعدله (عنوان ساحة اللعب)}}\n <!-- مرحبا! خذ راحتك في تجربة مهارتك في التنسيق والتحرير أسفل هذا السطر. هذه الصفحة لتجارب التعديل ، سيتم تفريغ هذه الصفحة كل 6 ساعات. -->',
-    'de': u'{{Bitte erst NACH dieser Zeile schreiben! (Begrüßungskasten)}}\r\n',
-    'en': u'{{Please leave this line alone (sandbox heading)}}\n <!-- Hello! Feel free to try your formatting and editing skills below this line. As this page is for editing experiments, this page will automatically be cleaned every 12 hours. -->',
-    'nl': u'{{subst:Wikipedia:Zandbak/schoon zand}}',
-    'pl': u'{{Prosimy - NIE ZMIENIAJ, NIE KASUJ, NIE PRZENOŚ tej linijki - pisz niżej}}',
-    'pt': u'<!--não apague esta linha-->{{página de testes}}<!--não apagar-->\r\n',
-    'commons': u'{{Sandbox}}\n<!-- Please edit only below this line. -->'
-    }
+clean_sandbox.content = {
+	'de': u'{{Benutzer:DrTrigon/Entwurf/Vorlage:Spielwiese}}\n',
+	}
 
-msg = {
-    'ar': u'روبوت: هذه الصفحة سيتم تفريغها تلقائياً',
-    'de': u'Bot: Setze Seite zurück.',
-    'en': u'Robot: This page will automatically be cleaned.',
-    'nl': u'Robot: Automatisch voorzien van schoon zand.',
-    'pl': u'Robot czyści brudnopis',
-    'pt': u'Bot: Limpeza da página de testes',
-    }
+#clean_sandbox.msg = {
+#	'de': u'RESET (Spielwiese gemäht)',
+#	}
 
-sandboxTitle = {
-    'ar': u'ويكيبيديا:ساحة اللعب',
-    'de': u'Wikipedia:Spielwiese',
-    'en': u'Wikipedia:Sandbox',
-    'nl': u'Wikipedia:Zandbak',
-    'pl': u'Wikipedia:Brudnopis',
-    'pt': u'Wikipedia:Página de testes',
-    'commons': u'Commons:Sandbox'
-    }
+clean_sandbox.sandboxTitle = {
+	'de': u'Benutzer:%s/Spielwiese',
+	}
 
-userlist = u'Benutzer:DrTrigonBot/Diene_Mir!'
+bot_config = {	# unicode values
+		'userlist':		u'Benutzer:DrTrigonBot/Diene_Mir!',
+		'TemplateName':		u'',
+# 'TemplateName' is just a dummy for 'dtbext.basic.BasicBot'
+}
 
-class SandboxBot:
-    def __init__(self, hours, no_repeat, userListPage):
-        self.hours = hours
-        self.no_repeat = no_repeat
-        self.userListPage = wikipedia.Page(wikipedia.getSite(), userListPage)
+class UserSandboxBot(dtbext.basic.BasicBot, clean_sandbox.SandboxBot):
+	def __init__(self, hours, no_repeat, delay, userListPage):
+		'''Constructor of UserSandboxBot(); setup environment, initialize needed consts and objects.
+		'''
 
-    def run(self):
-        wikipedia.setAction(u'RESET (Spielwiese gemäht)')
+		pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
 
-        wikipedia.output(u'\03{lightgreen}* Processing User List (wishes): %s\03{default}' % self.userListPage)
+		dtbext.basic.BasicBot.__init__(self, bot_config)
+		clean_sandbox.SandboxBot.__init__(self, hours, no_repeat, delay)
 
-        for user in dtbext.config.getUsersConfig(self.userListPage):
-        #for user in [u'DrTrigon',]:
-            user = user[0]
-            wikipedia.output(u'\03{lightgreen}** Processing User: %s\03{default}' % user)
+		# init constants
+		self._userListPage = pywikibot.Page(self.site, userListPage)
 
-            mySite = wikipedia.getSite()
-            while True:
-                now = time.strftime("%d %b %Y %H:%M:%S (UTC)", time.gmtime())
-                #localSandboxTitle = wikipedia.translate(mySite, sandboxTitle)
-                #sandboxPage = wikipedia.Page(mySite, localSandboxTitle)
-                sandboxPage = wikipedia.Page(mySite, u'Benutzer:%s/Spielwiese' % user)
-                if not sandboxPage.exists():
-                    wikipedia.output(u'The sandbox [[%s]] is not existent, skipping.' % sandboxPage.title())
-                    break
-                try:
-                    text = sandboxPage.get(get_redirect=True)
-                    #content = re.search(u'(.*?{{Bitte erst NACH dieser Zeile schreiben\! \(Begrüßungskasten\)}}\n)(.*)', text, re.S)
-                    content = re.search(u'(.*?{{Benutzer\:DrTrigon\/Entwurf\/Vorlage\:Spielwiese}}\n)(.*)', text, re.S)
-                    #translatedContent = wikipedia.translate(mySite, content)
-                    #if text.strip() == translatedContent.strip():
-                    if content == None:
-                        wikipedia.output(u'The sandbox [[%s]] is still clean (or not set up), no change necessary.' % sandboxPage.title())
-                    else:
-                        #translatedMsg = wikipedia.translate(mySite, msg)
-                        #sandboxPage.put(translatedContent, translatedMsg)
-                        wikipedia.output(u'The sandbox [[%s]] is cleaned up.' % sandboxPage.title())
-                        sandboxPage.put(content.group(1))
-                except wikipedia.EditConflict:
-                    wikipedia.output(u'*** Loading again because of edit conflict.')
-                if self.no_repeat:
-                    #wikipedia.output(u'Done.')
-                    wikipedia.stopme()
-                    #return
-                    break
-                else:
-                    wikipedia.output(u'\nSleeping %s hours, now %s' % (self.hours, now))
-                    time.sleep(self.hours * 60 * 60)
+		pywikibot.output(u'\03{lightred}** Receiving User List (wishes): %s\03{default}' % self._userListPage)
+		self._user_list = self.loadUsersConfig(self._userListPage)
+
+		# init variable/dynamic objects
+
+	def run(self):
+
+		#for user in self._user_list:
+		import userlib
+		for user in [userlib.User(self.site, u'DrTrigon')]:
+			pywikibot.output(u'\03{lightgreen}** Processing User: %s\03{default}' % user)
+
+			clean_sandbox.sandboxTitle['de'] = clean_sandbox.sandboxTitle['de'] % user.name()
+
+			sandboxPage = pywikibot.Page(self.site, clean_sandbox.sandboxTitle['de'])
+			if not sandboxPage.exists():
+				pywikibot.output(u'The sandbox %s is not existent, skipping.' % sandboxPage.title(asLink=True))
+				break
+
+# try to implement this also with 'clean_sandbox.SandboxBot'  vvv
+			#try:
+			#	text = sandboxPage.get(get_redirect=True)
+			#	content = re.search(u'(.*?{{Benutzer\:DrTrigon\/Entwurf\/Vorlage\:Spielwiese}}\n)(.*)', text, re.S)
+			#	if content == None:
+			#		pywikibot.output(u'The sandbox [[%s]] is still clean (or not set up), no change necessary.' % sandboxPage.title())
+			#	else:
+			#		pywikibot.output(u'The sandbox [[%s]] is cleaned up.' % sandboxPage.title())
+			#		sandboxPage.put(content.group(1))
+			#except pywikibot.EditConflict:
+			#	pywikibot.output(u'*** Loading again because of edit conflict.')
+
+			clean_sandbox.SandboxBot.run(self)
 
 def main():
     hours = 1
+    delay = None
     no_repeat = True
-    for arg in wikipedia.handleArgs():
-        if	arg.startswith('-hours:'):
+    for arg in pywikibot.handleArgs():
+        if arg.startswith('-hours:'):
             hours = float(arg[7:])
             no_repeat = False
         elif	(arg[:5] == "-auto") or (arg[:5] == "-cron"):
             pass
         elif	(arg == "-all") or ("-clean_user_sandbox" in arg):
             pass
+        elif arg.startswith('-delay:'):
+            delay = int(arg[7:])
         else:
-            wikipedia.showHelp('clean_sandbox')
-            wikipedia.stopme()
+            pywikibot.showHelp('clean_sandbox')
             return
 
-    bot = SandboxBot(hours, no_repeat, userlist)
-    bot.run()
+    bot = UserSandboxBot(hours, no_repeat, delay, bot_config['userlist'])
+    try:
+        bot.run()
+    except KeyboardInterrupt:
+        pywikibot.output('\nQuitting program...')
 
 if __name__ == "__main__":
     try:
         main()
     finally:
-        wikipedia.stopme()
+        pywikibot.stopme()

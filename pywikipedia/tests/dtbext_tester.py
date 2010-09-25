@@ -57,7 +57,7 @@ TESTPAGE = u'Portal:Serbien/Artikelwunsch'
 TESTPAGE = u'Wikipedia:Auskunft'
 TESTPAGE = u'Benutzer Diskussion:MerlBot/Vermutlich verstorben'
 TESTPAGE = u'Benutzer Diskussion:Euku/2010/II. Quartal'
-TESTPAGE = u'Wikipedia:Fragen zur Wikipedia'
+TESTPAGE = u'Wikipedia:Qualitätssicherung/25. September 2010'
 
 TESTBUFFER = u"""
 {{Archiv|Wikipedia Diskussion:WikiProjekt Einsatzorganisationen}}

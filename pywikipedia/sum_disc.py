@@ -68,7 +68,7 @@ Syntax example:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: sum_disc.py 0.2.0032 2009-11-25 18:57 drtrigon $'
+__version__='$Id: sum_disc.py 0.2.0033 2009-11-25 22:54 drtrigon $'
 #
 
 
@@ -193,7 +193,7 @@ bot_config = {	# unicode values
 debug = []				# no write, all users
 #debug.append( 'write2wiki' )		# write to wiki (operational mode)
 #debug.append( 'user' )			# skip users
-##debug.append( 'write2hist' )		# write history
+debug.append( 'write2hist' )		# write history
 #debug.append( 'toolserver' )		# toolserver down
 #debug.append( 'code' )			# code debugging
 
@@ -271,7 +271,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		run SumDiscBot()
 		'''
 
-		#pywikibot.output(u'\03{lightgreen}* Processing User List (wishes): %s\03{default}' % self._userListPage)
 		pywikibot.output(u'\03{lightgreen}* Processing User List (wishes):\03{default}')
 
 		if 'user' in debug: pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE USERS WILL BE SKIPPED ! ===\03{default}')
@@ -283,7 +282,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			self.setUser(user)
 			self.pages = SumDiscPages(self.site)
 
-			#pywikibot.output(u'\03{lightred}** Processing User: %s\03{default}' % self._user.name())
 			pywikibot.output(u'\03{lightred}** Processing User: %s\03{default}' % self._user)
 
 			# get operating mode
@@ -311,7 +309,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 					pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE TOOLSERVER ACCESS WILL BE SKIPPED ! ===\03{default}')
 					globalnotify = []
 				else:
-					#pywikibot.output(u'\03{lightpurple}*** %i Global wiki notifications added\03{default}' % len(work_list))
 					dtbext.userlib.addAttributes(self._user)
 					globalnotify = self._user.globalnotifications()
 
@@ -492,7 +489,9 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			buf[key] = data_dict[key].sum_disc_data
 
 		# write new history
-		self.appendFile( str(buf).decode('latin-1') )
+		#self.appendFile( str(buf).decode('latin-1') )
+		#self.appendFile( str(buf).decode('utf8') )
+		self.appendFile( unicode(buf).decode('latin-1') )
 
 		pywikibot.output(u'\03{lightpurple}*** History updated\03{default}')
 
@@ -612,10 +611,10 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				if hasattr(page, u'_getexception'):
 					raise page._getexception
 			except pywikibot.NoPage:
-				pywikibot.output(u'\03{lightaqua}WARNING: skipping not available (deleted) page at [[%s]]\03{default}' % name)
+				pywikibot.output(u'\03{lightaqua}WARNING: skipping not available (deleted) page at %s\03{default}' % page.title(asLink=True))
 				continue
 			except pywikibot.IsRedirectPage:
-				pywikibot.output(u'\03{lightaqua}WARNING: skipping redirect page at [[%s]]\03{default}' % name)
+				pywikibot.output(u'\03{lightaqua}WARNING: skipping redirect page at %s\03{default}' % page.title(asLink=True))
 				continue
 
 			# actual/new status of page, has something changed?
@@ -649,6 +648,8 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		if not (len(work.keys()) == jj):
 			raise pywikibot.Error(u'PreloadingGenerator has lost some pages!')
 
+		pywikibot.output(u'\03{lightpurple}*** Latest News searched\03{default}')
+
 		# check for GlobalWikiNotifications to report
 		localinterwiki = self.site.language()
 		for (page, data) in globalnotify:
@@ -672,7 +673,8 @@ class SumDiscBot(dtbext.basic.BasicBot):
 						 title=data[u'link'])
 			#self.pages.edit_hist(self._news_list[page.title()])
 
-		pywikibot.output(u'\03{lightpurple}*** Latest News searched\03{default}')
+		if globalnotify:
+			pywikibot.output(u'\03{lightpurple}*** Global wiki notifications added\03{default}')
 
 	def checkRelevancy(self):
 		"""Check relevancy of page by splitting it into sections and searching
@@ -689,11 +691,14 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			entries = PageSections(page, self._param)
 			end = time.time()
 			diff1 = end-strt
-			strt = time.time()
-			page.getSections()
-			end = time.time()
-			diff2 = end-strt
-			print "speed check:", diff1, diff2
+			try:
+				strt = time.time()
+				page.getSections()
+				end = time.time()
+				diff2 = end-strt
+				print "speed check:", diff1, diff2
+			except:
+				print "no speed check done."
 #should be loaded now, make speed check here!!!
 
 			(page, page_rel, page_signed) = entries.check_rel()
@@ -755,7 +760,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				else:
 					# enhanced (with template): update user disc page and write to user specified page
 					tmplsite = pywikibot.Page(self.site, self._tmpl_data)
-					comment = u'Diskussions-Zusammenfassung aktualisiert: %i Einträge in [[%s]]' % (count, tmplsite.title())
+					comment = u'Diskussions-Zusammenfassung aktualisiert: %i Einträge in %s' % (count, tmplsite.title(asLink=True))
 					self.save(self._userPage, self._content, comment=comment, minorEdit=False)
 					comment = u'Diskussions-Zusammenfassung hinzugefügt: %i Einträge' % count
 					self.append(tmplsite, buf, comment=comment)
@@ -947,20 +952,20 @@ class SumDiscPages(object):
 
 				if report:
 					# subsections on page
-					data = (data[0], page.title(), string.join(report, u', '), self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
-					data = u'*%s: [[%s]] at %s - last edit by %s (%s)' % data
+					data = (data[0], page.title(asLink=True), string.join(report, u', '), self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
+					data = u'*%s: %s at %s - last edit by %s (%s)' % data
 				else:
 					# no subsections on page
-					data = (data[0], page.title(), self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
-					data = u'*%s: [[%s]] - last edit by %s (%s)' % data
+					data = (data[0], page.title(asLink=True), self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
+					data = u'*%s: %s - last edit by %s (%s)' % data
 			elif data[5] in ps_types[1]:
 				# closed
-				data = (data[0], page.title(), self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
-				data = u'*%s: [[%s]] all discussions have finished (surveillance stopped) - last edit by %s (%s)' % data
+				data = (data[0], page.title(asLink=True), self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
+				data = u'*%s: %s all discussions have finished (surveillance stopped) - last edit by %s (%s)' % data
 			elif data[5] in [_PS_warning]:
 				# warnings
-				data = (page.title(), data[0])
-				data = u'*Bot warning message: [[%s]] "\'\'%s\'\'"' % data
+				data = (page.title(asLink=True), data[0])
+				data = u'*Bot warning message: %s "\'\'%s\'\'"' % data
 				self._global_warn.append( (self._user.name(), data) )
 				if not self._param['reportwarn_switch']: continue
 			elif data[5] in [_PS_notify]:
@@ -1031,13 +1036,24 @@ class PageSections(object):
 
 		# enhance to dtbext.pywikibot.Page
 		dtbext.pywikibot.addAttributes(page)
-		#try:
-		# get sections and content (content was preloaded earlier)
-		#buf = self.load(page)
-		buf = page.get()
-		sections = page.getSections(minLevel=1)
-		#except pywikibot.Error:
-		#	pass	# sections could not be resoled, process the whole page at once
+
+		# get content and sections (content was preloaded earlier)
+		force = False
+		retries = 0
+		while retries < 3:
+			try:
+				#buf = self.load(page)
+				buf = page.get(force=force)
+				sections = page.getSections(minLevel=1)
+				break
+			except NotImplementedError:
+				# sections could not be resoled, try again by forcing (3 tries max.)
+				# or else process the whole page at once
+				sections = []
+				force = True
+				retries += 1
+
+				pywikibot.output(u'\03{lightaqua}WARNING: problem trying to retrieve section data for %s\03{default}' % page.title(asLink=True))
 
 		# drop from templates included headings (are None)
 		sections = [ s for s in sections if s[0] ]

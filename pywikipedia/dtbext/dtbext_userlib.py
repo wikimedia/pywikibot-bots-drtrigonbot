@@ -12,7 +12,7 @@ the same functions but enhanced.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_userlib.py 0.2.0029 2009-11-20 22:29 drtrigon $'
+__version__='$Id: dtbext_userlib.py 0.2.0033 2009-11-25 21:18 drtrigon $'
 #
 
 # Standard library imports
@@ -61,7 +61,7 @@ class User(userlib.User):
 		request = REQUEST_getGlobalWikiNotifys % urllib.quote(self.name().encode(self.site().encoding()))
 
 		pywikibot.get_throttle()
-		pywikibot.output(u"Reading GlobalWikiNotifications from toolserver (via 'API')...")
+		pywikibot.output(u"Reading global wiki notifications from toolserver (via 'API')...")
 
 		buf = self.site().getUrl( request, no_hostname = True )
 

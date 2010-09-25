@@ -12,7 +12,7 @@ the page class from there.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_wikipedia.py 0.2.0032 2009-11-25 18:05 drtrigon $'
+__version__='$Id: dtbext_wikipedia.py 0.2.0033 2009-11-25 22:10 drtrigon $'
 #
 
 # Standard library imports
@@ -89,6 +89,21 @@ class Page(pywikibot.Page):
 			self._getexception == pywikibot.IsRedirectPage
 
 		return self._redir
+
+	# MODIFIED: new (r33)
+	# REASON: to support 'force' with 'getSections'
+	def get(self, *args, **kwds):
+		"""Return the wiki-text of the page.
+		   MODIFIED METHOD: to support 'force' with 'getSections'
+		"""
+
+		if kwds.get('force', False):
+			# Old exceptions and contents do not apply any more.
+			for attr in ['_sections']:
+				if hasattr(self, attr):
+					delattr(self,attr)
+
+		return pywikibot.Page.get(self, *args, **kwds)
 
 	# ADDED: new (r18)
 	# REASON: needed by various bots
