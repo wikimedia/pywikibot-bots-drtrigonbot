@@ -68,7 +68,7 @@ Syntax example:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: sum_disc.py 0.2.0029 2009-11-20 22:33 drtrigon $'
+__version__='$Id: sum_disc.py 0.2.0031 2009-11-25 03:04 drtrigon $'
 #
 
 
@@ -183,17 +183,19 @@ bot_config = {	# unicode values
 }
 
 # debug tools
-#debug = { 'write2wiki': True,				# operational mode (default)
-#	  'user':	False,
-#	  'write2hist': True,
-#	  'toolserver': False, }
-debug = { 'write2wiki': False, 'user': True, 'write2hist': False, 'toolserver': False, }	# no write, skip users
-##debug = { 'write2wiki': False, 'user': True, 'write2hist': True, 'toolserver': False, }	# write only history, skip users
-##debug = { 'write2wiki': False, 'user': False, 'write2hist': False, 'toolserver': False, }	# no write, all users
-##debug = { 'write2wiki': True, 'user': True, 'write2hist': True, 'toolserver': False, }	# write, skip users
-debug = { 'write2wiki': False, 'user': False, 'write2hist': True, 'toolserver': False, }	# write only history (for code changes and smooth update)
-##debug = { 'write2wiki': True, 'user': True, 'write2hist': False, 'toolserver': False, }	# write wiki, skip users
-##debug = { 'write2wiki': False, 'user': False, 'write2hist': True, 'toolserver': True, }	# write only history (for code changes and smooth update), toolserver down
+# 'write2wiki', 'write2hist'		# operational mode (default)
+# 'user'				# no write, skip users
+# 'user', 'write2hist'			# write only history, skip users
+# 'write2wiki', 'user', 'write2hist'	# write, skip users
+# 'write2hist'				# write only history (for code changes and smooth update)
+# 'write2wiki', 'user'			# write wiki, skip users
+# 'write2hist', 'toolserver'		# write only history (for code changes and smooth update), toolserver down
+debug = []				# no write, all users
+#debug.append( 'write2wiki' )		# write to wiki (operational mode)
+#debug.append( 'user' )			# skip users
+##debug.append( 'write2hist' )		# write history
+#debug.append( 'toolserver' )		# toolserver down
+debug.append( 'code' )			# code debugging
 
 #trans_str = {		# from wikilanguage to 'en'
 #	# translations for 'User'
@@ -257,9 +259,12 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 		pywikibot.output(u'\03{lightred}** Receiving Job Queue (Maintenance Messages)\03{default}')
 		page = pywikibot.Page(self.site, bot_config['maintenance_queue'])
-		self.maintenance_msg = self.loadJobQueue(page, bot_config['queue_security'], debug = debug['write2wiki'])
+		self.maintenance_msg = self.loadJobQueue(page, bot_config['queue_security'], debug = ('write2wiki' in debug))
 
 		# init variable/dynamic objects
+
+		# code debugging
+		dtbext.pywikibot.debug = ('code' in debug)
 
 	def run(self):
 		'''
@@ -269,10 +274,10 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		#pywikibot.output(u'\03{lightgreen}* Processing User List (wishes): %s\03{default}' % self._userListPage)
 		pywikibot.output(u'\03{lightgreen}* Processing User List (wishes):\03{default}')
 
-		if debug['user']: pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE USERS WILL BE SKIPPED ! ===\03{default}')
+		if 'user' in debug: pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE USERS WILL BE SKIPPED ! ===\03{default}')
 
 		for user in self._user_list:					# may be try with PreloadingGenerator?!
-			if (debug['user'] and (user.name() != 'DrTrigon')): continue
+			if (('user' in debug) and (user.name() != u'DrTrigon')): continue
 
 			# set user and init params
 			self.setUser(user)
@@ -302,7 +307,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			# check for news to report
 			if self._param['globwikinotify_switch']:
 				# get global wiki notifications (toolserver/merl)		
-				if debug['toolserver']:
+				if 'toolserver' in debug:
 					pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE TOOLSERVER ACCESS WILL BE SKIPPED ! ===\03{default}')
 					globalnotify = []
 				else:
@@ -324,6 +329,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			self.AddMaintenanceMsg()				# gehen auch in jede history... werden aber bei compress entfernt
 
 			self.postDiscSum()					# post results to users Discussion page (with comments for history)
+			return
 
 		pywikibot.output(u'\03{lightgreen}* Processing Warnings:\03{default}')
 
@@ -576,7 +582,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		# PageTitleFilterPageGenerator; or use RegexFilterPageGenerator (look ignorelist)
 		#gen2 = pagegenerators.PageTitleFilterPageGenerator(gen1, ignore_list)
 		# Preloads _contents and _versionhistory
-		# [ DOES NOT USE API YET! / ThreadedGenerator would be nice! / JIRA ticket? ]
+		# [ DOES NOT USE API YET! / ThreadedGenerator would be nice! / JIRA: ticket? ]
 		# WithoutInterwikiPageGenerator, 
 		gen3 = pagegenerators.PreloadingGenerator(gen1)
 		#gen4 = pagegenerators.RedirectFilterPageGenerator(gen3)
@@ -603,6 +609,12 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			# use preloaded with revCount=1
 			try:
 				actual = page.getVersionHistory(revCount=1)
+
+				# check page exceptions
+				# [ because 'getVersionHistory' is not able to do this and crashes, 
+				#   e.g. for u'Benutzer Diskussion:MerlBot' / JIRA: ticket? ]
+				if hasattr(page, u'_getexception'):
+					raise page._getexception
 			except pywikibot.NoPage:
 			#	page.sum_disc_data = (	u'no version history found, page deleted!', 
 			#				None, # obsolete (and recursive)
@@ -614,10 +626,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				pywikibot.output(u'\03{lightaqua}INFO: skipping not available (deleted) page at [[%s]]\03{default}' % name)
 				continue
 			except pywikibot.IsRedirectPage:
-				f = open('/home/ursin/debug.txt', 'a')
-				f.write( name.encoding('latin-1') + '\n' )
-				f.close()
-
 				pywikibot.output(u'\03{lightaqua}INFO: skipping redirect page at [[%s]]\03{default}' % name)
 				continue
 
@@ -765,7 +773,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			pywikibot.output(u'='*50 + u'\n' + buf + u'\n' + u'='*50)
 			pywikibot.output(u'[%i entries]' % count )
 
-			if debug['write2wiki']:
+			if 'write2wiki' in debug:
 				self.loadMode()			# get operating mode and contend AGAIN to be ACTUAL !!!
 				#comment = u'Diskussions Zusammenfassung hinzugefügt: %i neue und %i veränderte' % (3, 7)
 				if not self._mode:
@@ -786,7 +794,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			else:
 				pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
 
-			if debug['write2hist']:
+			if 'write2hist' in debug:
 				self.putHistory(self.pages.hist)
 			else:
 				pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO HISTORY ! ===\03{default}')
@@ -810,12 +818,12 @@ class SumDiscPages(object):
 
 	"""
 
-	_hist_list = {}		# archived pages from history
-	_work_list = {}		# pages to check for news
-	_news_list = {}		# news to check for relevancy and report afterwards
-	_oth_list = {}		# ...?
-
 	def __init__(self, site):
+		self._hist_list = {}		# archived pages from history
+		self._work_list = {}		# pages to check for news
+		self._news_list = {}		# news to check for relevancy and report afterwards
+		self._oth_list = {}		# ...?
+
 		self.site = site
 
 	def set_hist(self, hist):
@@ -878,6 +886,14 @@ class SumDiscPages(object):
 			title = othpage.title()
 		self._oth_list[title] = othpage
 
+	def exists(self, page):
+		fulldict = {}
+		fulldict.update( self._hist_list )
+		fulldict.update( self._work_list )
+		fulldict.update( self._news_list )
+		fulldict.update( self._oth_list )
+		return (page.title() in fulldict.keys())
+
 	def start_promotion(self):
 		# start relevancy check page promotion to news
 		# and re-create an actual history
@@ -937,12 +953,15 @@ class SumDiscPages(object):
 		else:		ps_types_b = [_PS_closed]
 		ps_types = (ps_types_a, ps_types_b)
 
+		print self._news_list
 		buf = []
 		for name in self._news_list.keys():
 #			print name
 			page = self._news_list[name]
 			#data = self._news_list[name]
 			data = page.sum_disc_data
+			print page
+			print data
 			if data[5] in ps_types[0]:
 				# new and changed
 				report = []
@@ -971,7 +990,7 @@ class SumDiscPages(object):
 			elif data[5] in ps_types[1]:
 				# closed
 				data = (data[0], page.title(), self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
-				print data
+#				print data
 				data = u'*%s: [[%s]] all discussions have finished (surveillance stopped) - last edit by %s (%s)' % data
 			elif data[5] in [_PS_warning]:
 				# warnings
@@ -1022,8 +1041,6 @@ class PageSections(object):
 
 	"""
 
-	_entries = []
-
 	def __init__(self, page, param):
 		"""Retrieves the page content and splits it to headings and bodies ('check relevancy
 		   of page by searching specific users signature').
@@ -1035,8 +1052,14 @@ class PageSections(object):
 		   Returns a list of tuples containing the sections with info and wiki text.
 		"""
 
+		self._entries = []
+
 		self._page = page
 		self._param = param
+
+		# code debugging
+		if 'code' in debug:
+			pywikibot.output(page.title())
 
 		# enhance to dtbext.pywikibot.Page
 		dtbext.pywikibot.addAttributes(page)
@@ -1063,6 +1086,7 @@ class PageSections(object):
 				bo_end   = sections[i+1][0] - 1
 
 				self._entries.append( (s[2:], buf[bo_start:bo_end]) )
+		print self._entries
 
 	def check_rel(self):
 		# iterate over all sections in page and check their relevancy
@@ -1079,6 +1103,7 @@ class PageSections(object):
 		for i, (head, body) in enumerate(self._entries): # iterate over all headings/sub sections
 			# wikiline is wiki text, line is parsed and anchor is the unique link label
 			(wikiline, line, anchor) = head[:3]
+			print (wikiline, line, anchor)
 
 			# ignorelist for headings
 			if wikiline:
@@ -1102,8 +1127,10 @@ class PageSections(object):
 			page_rel = True
 			checksum_new[anchor] = (checksum_cur, rel, line)
 
+		print checksum_new
 		# update sum_disc_data in page (checksums, relevancies, ...)
 		page.sum_disc_data = page.sum_disc_data[:4] + (checksum_new,) + page.sum_disc_data[5:]
+		print page.sum_disc_data
 #		except pywikibot.SectionError:	# is typically raised by ????????
 #			page_rel = False
 
@@ -1124,10 +1151,12 @@ class PageSections(object):
 		   Returns a tuple (True, checksum_cur, checks).
 		"""
 
-		checks = {}
+		# per default assume relevancy
+		checks = { 'changed':    True,
+			   'signed':     True,
+			   'lasteditor': False, }
 
 		# check if thread has changed
-		checks['changed'] = True
 		checksum_cur = hashlib.md5(data.encode('utf8').strip()).hexdigest()
 		if ((checksum and (len(checksum) > 0)) and (anchor in checksum)):
 			checks['changed'] = (not (checksum[anchor][0] == checksum_cur))

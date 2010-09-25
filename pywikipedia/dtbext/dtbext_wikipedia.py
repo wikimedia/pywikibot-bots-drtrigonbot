@@ -12,7 +12,7 @@ the page class from there.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_wikipedia.py 0.2.0029 2009-11-20 22:31 drtrigon $'
+__version__='$Id: dtbext_wikipedia.py 0.2.0031 2009-11-25 01:23 drtrigon $'
 #
 
 # Standard library imports
@@ -22,7 +22,10 @@ from dtbext_pywikibot import *
 
 # Application specific imports
 import wikipedia as pywikibot
-import query, userlib
+import query, userlib, config
+
+
+debug = False
 
 
 # ADDED: new (r19)
@@ -53,7 +56,7 @@ class Page(pywikibot.Page):
 	"""
 
 	# MODIFIED
-	# REASON: should be faster than original
+	# REASON: should be faster than original (look into re-write for something similar!)
 	def isRedirectPage(self):
 		"""Return True if this is a redirect, False if not or not existing.
 		   MODIFIED METHOD: should be faster than original
@@ -131,15 +134,23 @@ class Page(pywikibot.Page):
 
 		result = query.GetData(params, self.site())
 		r = result[u'parse'][u'sections']
-		print r
+		debug_data = str(r) + '\n'
 
 		if not sectionsonly:
 			# assign sections with wiki text and section byteoffset
 			pywikibot.output(u"    Reading wiki page text from %s (if not already done)." % self.title(asLink=True))
 
-			print "***", len(self._contents)
+			debug_data += str(len(self._contents)) + '\n'
 			self.get()
-			print "***", len(self.get())
+			debug_data += str(len(self._contents)) + '\n'
+
+			# code debugging
+			if debug:
+				#err = ''
+				#pywikibot.debugDump( 'dtbext.Page.getSections', self.site, err, debug_data.decode(config.textfile_encoding) )
+				f = open('debug.txt', 'a')
+				f.write( debug_data.encode('utf8') + '\n' )
+				f.close()
 
 			# [ patch needed by '_findSection' for some pages / JIRA ticket? ]
 			self._contents = self._contents.replace(u'\r\n', u'\n')

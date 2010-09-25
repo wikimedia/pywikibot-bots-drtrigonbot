@@ -55,6 +55,7 @@ TESTPAGE = u'Benutzer_Diskussion:DrTrigon'
 TESTPAGE = u'Wikipedia Diskussion:WikiProjekt Portale/Baustelle/Portal:Biochemie'
 TESTPAGE = u'Portal:Serbien/Artikelwunsch'
 TESTPAGE = u'Wikipedia:Auskunft'
+TESTPAGE = u'Benutzer Diskussion:MerlBot/Vermutlich verstorben'
 
 TESTBUFFER = u"""
 {{Archiv|Wikipedia Diskussion:WikiProjekt Einsatzorganisationen}}
@@ -269,14 +270,14 @@ def TEST_get():
 #TEST_getVersionHistory()
 #TEST_getSections()
 #TEST_purgeCache()
-#TEST_get()
+TEST_get()
 #TEST_getParsedContent()
 #print pywikibot.getSite().getUrl('/w/api.php?action=query&meta=userinfo&uiprop=blockinfo|hasmsg|groups|rights|options|preferencestoken|editcount|ratelimits|email&formal=xml')
 #TEST_globalnotifications()
 
 #TEST_addAttributes()
 
-TEST_PreloadingGenerator()
+#TEST_PreloadingGenerator()
 #TEST_PreloadingGenerator(debug=True)
 #TEST_VersionHistoryGenerator()
 
