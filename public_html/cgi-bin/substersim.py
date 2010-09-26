@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Test CGI python script
+"""(Test) CGI python script
 
 to make it usable from server, use: 'chmod 755 test.py', which results in
 '-rwxr-xr-x 1 drtrigon users 447 2009-04-16 19:13 test.py'
@@ -8,19 +8,14 @@ to make it usable from server, use: 'chmod 755 test.py', which results in
 # http://www.gpcom.de/support/python
 
 #
-# (C) Dr. Trigon, 2008, 2009
+#
+# (C) Dr. Trigon, 2009-2010
+#
+# DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
 # Distributed under the terms of the MIT license.
-# (is part of DrTrigonBot-"framework")
 #
-# keep the version of 'clean_sandbox2.py', 'new_user.py', 'runbotrun.py', 'replace_tmpl.py', ... (and others)
-# up to date with this:
-# Versioning scheme: A.B.CCCC
-#  CCCC: beta, minor/dev relases, bugfixes, daily stuff, ...
-#  B: bigger relases with tidy code and nice comments
-#  A: really big release with multi lang. and toolserver support, ready
-#     to use in pywikipedia framework, should also be contributed to it
-__version__='$Id: substersim.py 0.2.0000 2009-12-29 20:49:00Z drtrigon $'
+__version__='$Id: substersim.py 0.2.0034 2009-11-26 18:55 drtrigon $'
 #
 
 
@@ -153,7 +148,7 @@ def timeout_handler(signum, frame):
 
 
 def maindisplay():
-	param_default = subster_beta.SubsterRobot._param_default
+	param_default = subster_beta.SubsterBot._param_default
 	param_default['postproc'] = re.sub('"', '\'', param_default['postproc'])	# hack: wegen unsauberer def. in 'subster_beta.py'
 	param_default.update(sim_param_default)
 	params = {}
@@ -177,7 +172,7 @@ def maindisplay():
 		signal.alarm(timeout)
 
 		try:
-			params['content'] = subster_beta.SubsterRobot().run(sim=params)
+			params['content'] = subster_beta.SubsterBot().run(sim=params)
 		except:
 			#params['content'] = "ERROR OCCURRED DURING BOT SIMULATION"
 			bot_output.append(gettraceback(sys.exc_info())[2])

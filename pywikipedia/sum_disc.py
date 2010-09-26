@@ -68,7 +68,7 @@ Syntax example:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: sum_disc.py 0.2.0033 2009-11-25 22:54 drtrigon $'
+__version__='$Id: sum_disc.py 0.2.0034 2009-11-26 23:57 drtrigon $'
 #
 
 
@@ -232,26 +232,21 @@ class SumDiscBot(dtbext.basic.BasicBot):
 	#http://de.wikipedia.org/w/index.php?limit=50&title=Spezial:Beiträge&contribs=user&target=DrTrigon&namespace=3&year=&month=-1
 	#http://de.wikipedia.org/wiki/Spezial:Beiträge/DrTrigon
 
-	silent		= False
 	rollback	= 0
 
-	_param_default		= bot_config['param_default']			# same ref, no copy
-	_reftag_err_regex	= re.compile(r'<strong class="error">Referenz-Fehler: Einzelnachweisfehler: <code>&lt;ref&gt;</code>-Tags existieren, jedoch wurde kein <code>&lt;references&#160;/&gt;</code>-Tag gefunden.</strong>')
-	_timestamp_regex	= re.compile('--(.*?)\(CEST\)')
+	_param_default	= bot_config['param_default']	# same ref, no copy
 
 	_global_warn	= []
 
-	def __init__(self, userListPage):
-		'''Constructor of SumDiscBot(); setup environment, initialize needed consts and objects.
-		'''
-		# modified due: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 28, 30, 17)
+	def __init__(self):
+		'''Constructor of SumDiscBot(); setup environment, initialize needed consts and objects.'''
 
 		pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
 
 		dtbext.basic.BasicBot.__init__(self, bot_config)
 
 		# init constants
-        	self._userListPage = pywikibot.Page(self.site, userListPage)
+        	self._userListPage = pywikibot.Page(self.site, bot_config['userlist'])
 		#print [item[0] for item in self._getUsers()]		# enhance 'ignorepage_list'
 
 		pywikibot.output(u'\03{lightred}** Receiving User List (wishes): %s\03{default}' % self._userListPage)
@@ -267,9 +262,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		dtbext.pywikibot.debug = ('code' in debug)
 
 	def run(self):
-		'''
-		run SumDiscBot()
-		'''
+		'''Run SumDiscBot().'''
 
 		pywikibot.output(u'\03{lightgreen}* Processing User List (wishes):\03{default}')
 
@@ -282,7 +275,10 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			self.setUser(user)
 			self.pages = SumDiscPages(self.site)
 
-			pywikibot.output(u'\03{lightred}** Processing User: %s\03{default}' % self._user)
+			# [ should be done in framework / JIRA: ticket? (related to DRTRIGON-63) ]
+			#print self._user
+			#pywikibot.output('\03{lightred}** Processing User: %s\03{default}' % self._user)
+			pywikibot.output(u'\03{lightred}** Processing User: %s\03{default}' % self._user.name())
 
 			# get operating mode
 			self.loadMode(self._userPage)
@@ -295,6 +291,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			self.checkRecentEdits()
 			# RecentEditsPageGenerator
 
+# some user return a lot more than 500 backlinks!
 			# get the backlinks to user disc page
 			if self._param['getbacklinks_switch']:
 				self.getUserBacklinks()
@@ -320,14 +317,22 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			# and pass this with GlobalWikiNotificationsPageGen to
 			# getLatestNews
 
-			self.checkRelevancy()					# check self.pages on relevancy, disc-thread oriented version...
+			# check self.pages on relevancy, disc-thread oriented version...
+			self.checkRelevancy()
 
-			self.AddMaintenanceMsg()				# gehen auch in jede history... werden aber bei compress entfernt
+			# gehen auch in jede history... werden aber bei compress entfernt
+			self.AddMaintenanceMsg()
 
-			self.postDiscSum()					# post results to users Discussion page (with comments for history)
+			# post results to users Discussion page (with comments for history)
+			self.postDiscSum()
+
+			# free the memory again
+			del self.pages
 
 		pywikibot.output(u'\03{lightgreen}* Processing Warnings:\03{default}')
 
+# handling of warnings?!? are printed to log, could be get by panel.py from log!
+# ...or is it better to have a separate and explicit warning handling here?
 		for warning in self._global_warn:		# output all warnings to log (what about a special wiki page?)
 			pywikibot.output( "%s: %s" % warning )	
 
@@ -489,9 +494,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			buf[key] = data_dict[key].sum_disc_data
 
 		# write new history
-		#self.appendFile( str(buf).decode('latin-1') )
-		#self.appendFile( str(buf).decode('utf8') )
-		self.appendFile( unicode(buf).decode('latin-1') )
+		self.appendFile( str(buf).decode('latin-1') )
 
 		pywikibot.output(u'\03{lightpurple}*** History updated\03{default}')
 
@@ -710,6 +713,9 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			# if page is not relevant, don't list discussion
 			if not page_rel:
 				self.pages.promote_irrel(page, page_signed)
+
+			# free the memory again
+			del entries
 
 		self.pages.end_promotion()
 
@@ -1110,8 +1116,6 @@ class PageSections(object):
 
 		# update sum_disc_data in page (checksums, relevancies, ...)
 		page.sum_disc_data = page.sum_disc_data[:4] + (checksum_new,) + page.sum_disc_data[5:]
-#		except pywikibot.SectionError:	# is typically raised by ????????
-#			page_rel = False
 
 		return (page, page_rel, page_signed)
 
@@ -1186,11 +1190,12 @@ class PageSections(object):
 		return (signs_pos, signs)
 
 
-# idea: may be create a class for storage of sum_disc_data and for easy save load (history) and else... ?!???
+# idea: may be create a class for storage of sum_disc_data and for
+# easy save load (history) and else... ?!???
 
 
 def main():
-	bot = SumDiscBot(bot_config['userlist'])	# for several user's, but what about complete automation (continous running...)
+	bot = SumDiscBot()
 	if len(pywikibot.handleArgs()) > 0:
 		for arg in pywikibot.handleArgs():
 			if arg[:2] == "u'": arg = eval(arg)		# for 'runbotrun.py' and unicode compatibility
@@ -1201,7 +1206,7 @@ def main():
 			elif	(arg[:17] == "-rollback_history"):
 				bot.rollback = int( arg[18:] )
 			elif	(arg[:5] == "-auto") or (arg[:5] == "-cron"):
-				bot.silent = True
+				pass
 			elif	(arg == "-all") or ("-sum_disc" in arg):
 				pass
 			#elif	(arg == "-test_run"):

@@ -13,7 +13,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_basic.py 0.2.0032 2009-11-25 17:55 drtrigon $'
+__version__='$Id: dtbext_basic.py 0.2.0034 2009-11-26 17:13 drtrigon $'
 #
 
 
@@ -65,10 +65,10 @@ class BasicBot(basic.BasicBot):
 		dtbext.pywikibot.addAttributes( self.site )		# enhance to dtbext.pywikibot.Site
 
 	# ADDED
-	# REASON: needed by various bots
+	# REASON: needed by SumDiscBot
 	def loadMode(self, page):
 		"""Get operating mode from user's disc page by searching for the template.
-		   ADDED METHOD: needed by various bots
+		   ADDED METHOD: needed by SumDiscBot
 
 		   @param page: The user (page) for which the data should be retrieved.
 
@@ -77,25 +77,46 @@ class BasicBot(basic.BasicBot):
 		   page content to notify the user. The self._param is modified too.
 		"""
 
+		templates = self.loadTemplates(page)
+
 		self._mode = False
 		self._tmpl_data = u''
 
-		page_buf = self.load(page)
-		self._content = page_buf
+		if templates:
+			tmpl = templates[0]
 
-		for tmpl in pywikibot.extract_templates_and_params(page_buf):
+			# enhanced: with template
+			self._mode = True
+			self._tmpl_data = tmpl[u'data']
+			self._param['ignorepage_list'].append( re.compile(self._tmpl_data) )
+
+			# update template and content
+			tmpl[u'timestamp'] = u'--~~~~'
+			tmpl_text = dtbext.pywikibot.glue_template_and_params( (self._bot_config['TemplateName'], tmpl) )
+			tmpl_pos  = self._template_regex.search(self._content)
+			self._content = self._content[:tmpl_pos.start()] + tmpl_text + self._content[tmpl_pos.end():]
+
+	# ADDED
+	# REASON: needed by various bots
+	def loadTemplates(self, page, default={}):
+		"""Get operating mode from page with template by searching the template.
+		   ADDED METHOD: needed by various bots
+
+		   @param page: The user (page) for which the data should be retrieved.
+
+		   Returns a list of dict with the templates parameters found.
+		"""
+
+		self._content = self.load(page)
+
+		templates = []
+		for tmpl in pywikibot.extract_templates_and_params(self._content):
 			if tmpl[0] == self._bot_config['TemplateName']:
-				# enhanced: with template
-				self._mode = True
-				self._tmpl_data = tmpl[1][u'data']
-				self._param['ignorepage_list'].append( re.compile(self._tmpl_data) )
-
-				# update template and content
-				tmpl[1][u'timestamp'] = u'--~~~~'
-				tmpl_text = dtbext.pywikibot.glue_template_and_params( tmpl )
-				tmpl_pos  = self._template_regex.search(page_buf)
-				self._content = page_buf[:tmpl_pos.start()] + tmpl_text + page_buf[tmpl_pos.end():]
-				break
+				param_default = {}
+				param_default.update(default)
+				param_default.update(tmpl[1])
+				templates.append( param_default )
+		return templates
 
 	# ADDED
 	# REASON: common interface to bot user settings on wiki

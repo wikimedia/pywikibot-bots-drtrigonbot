@@ -12,7 +12,7 @@ the same functions but enhanced.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_userlib.py 0.2.0033 2009-11-25 21:18 drtrigon $'
+__version__='$Id: dtbext_userlib.py 0.2.0034 2009-11-26 17:01 drtrigon $'
 #
 
 # Standard library imports
@@ -95,7 +95,10 @@ class User(userlib.User):
 					data[u'link'] = data[u'link'].replace(u'wiki:', u'')
 
 			# return page object with additional data
-			page = pywikibot.Page(self.site(), data[u'link'])
-			page.globalwikinotify = data
-			yield (page, data)
+			try:
+				page = pywikibot.Page(self.site(), data[u'link'])
+				page.globalwikinotify = data
+				yield (page, data)
+			except pywikibot.exceptions.NoPage, e:
+				pywikibot.output(u'%s' %e)
 

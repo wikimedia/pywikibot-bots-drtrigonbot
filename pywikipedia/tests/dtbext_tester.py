@@ -57,7 +57,9 @@ TESTPAGE = u'Portal:Serbien/Artikelwunsch'
 TESTPAGE = u'Wikipedia:Auskunft'
 TESTPAGE = u'Benutzer Diskussion:MerlBot/Vermutlich verstorben'
 TESTPAGE = u'Benutzer Diskussion:Euku/2010/II. Quartal'
-TESTPAGE = u'Wikipedia:Qualitätssicherung/25. September 2010'
+TESTPAGE = u'Benutzer Diskussion:Mo4jolo/Archiv/2008'
+# ^^^  problem/issue in getSections with this page!!  ^^^
+# debug this !!!!
 
 TESTBUFFER = u"""
 {{Archiv|Wikipedia Diskussion:WikiProjekt Einsatzorganisationen}}

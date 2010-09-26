@@ -22,7 +22,7 @@ This script understands the following command-line arguments:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: clean_user_sandbox.py 0.2.0033 2009-11-25 23:50 drtrigon $'
+__version__ = '$Id: clean_user_sandbox.py 0.2.0034 2009-11-26 18:26 drtrigon $'
 #
 
 import re
@@ -49,9 +49,12 @@ bot_config = {	# unicode values
 }
 
 class UserSandboxBot(dtbext.basic.BasicBot, clean_sandbox.SandboxBot):
+	'''
+	Robot which will clean per user sandbox pages.
+	'''
+
 	def __init__(self, hours, no_repeat, delay, userListPage):
-		'''Constructor of UserSandboxBot(); setup environment, initialize needed consts and objects.
-		'''
+		'''Constructor of UserSandboxBot(); setup environment, initialize needed consts and objects.'''
 
 		pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
 
@@ -67,6 +70,7 @@ class UserSandboxBot(dtbext.basic.BasicBot, clean_sandbox.SandboxBot):
 		# init variable/dynamic objects
 
 	def run(self):
+		'''Run UserSandboxBot().'''
 
 		#for user in self._user_list:
 		import userlib
@@ -81,6 +85,7 @@ class UserSandboxBot(dtbext.basic.BasicBot, clean_sandbox.SandboxBot):
 				break
 
 # try to implement this also with 'clean_sandbox.SandboxBot'  vvv
+# [ should be done in framework / JIRA: ticket? ]
 			#try:
 			#	text = sandboxPage.get(get_redirect=True)
 			#	content = re.search(u'(.*?{{Benutzer\:DrTrigon\/Entwurf\/Vorlage\:Spielwiese}}\n)(.*)', text, re.S)
