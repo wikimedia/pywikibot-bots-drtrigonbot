@@ -12,7 +12,7 @@ the page class from there.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_wikipedia.py 0.2.0034 2009-11-27 00:56 drtrigon $'
+__version__='$Id: dtbext_wikipedia.py 0.2.0035 2009-11-27 23:14 drtrigon $'
 #
 
 # Standard library imports
@@ -221,24 +221,30 @@ class Page(pywikibot.Page):
 			possible_headers += [ (p, h) for p in ph ]
 			#print h, possible_headers
 
-		if len(possible_headers) == 0:		# nothing found, try 'prop=revisions (rv)' or else report/raise error !
-			raise NotImplementedError('The call to API to get exact matching section heading is not implemented yet!')
-			# ?action=query&prop=revisions&titles=Benutzer_Diskussion:DrTrigon&rvprop=content&rvsection=1
-			# section[u'number'] for 'rvsection'
-			#params = {
-			#	u'action'	: u'query',
-			#	u'titles'	: self.title(),
-			#	u'prop'		: u'revisions',
-			#	u'rvprop'	: u'content',
-			#	u'rvsection'	: section[u'number'],
-			#}
-			#pywikibot.get_throttle()
-			#pywikibot.output(u"    Reading section %i from %s." % (section[u'number'], self.title(asLink=True)))
-			# if not successfull too, report error/problem
-			#page._getexception = ...
-			#raise pywikibot.Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.title(asLink=True))
-			#pywikibot.output(...)
-			# (or create a own error, e.g. look into interwiki.py)
+		if len(possible_headers) == 0:		# nothing found, try 'prop=revisions (rv)'
+			# call the wiki to get info
+			params = {
+				u'action'	: u'query',
+				u'titles'	: self.title(),
+				u'prop'		: u'revisions',
+				u'rvprop'	: u'content',
+				u'rvsection'	: section[u'index'],
+			}
+
+			pywikibot.get_throttle()
+			pywikibot.output(u"  Reading section %s from %s." % (section[u'index'], self.title(asLink=True)))
+
+			result = query.GetData(params, self.site())
+			r = result[u'query'][u'pages'].values()[0]
+			pl = r[u'revisions'][0][u'*'].splitlines()
+
+			if len(pl) == 0:		# nothing found, report/raise error !
+				#page._getexception = ...
+				raise pywikibot.Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.title(asLink=True))
+				#pywikibot.output(...)
+				# (or create a own error, e.g. look into interwiki.py)
+			else:
+				possible_headers = [ (pl[0], pl[0]) ]
 
 		# find the most probable match for heading
 		best_match = (0.0, None)
