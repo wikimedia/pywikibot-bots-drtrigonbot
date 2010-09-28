@@ -68,7 +68,7 @@ Syntax example:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: sum_disc.py 0.2.0034 2009-11-26 23:57 drtrigon $'
+__version__='$Id: sum_disc.py 0.2.0036 2009-11-28 22:11 drtrigon $'
 #
 
 
@@ -593,8 +593,10 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			page.sum_disc_data = work[name].sum_disc_data
 
 			# ignorelist
-			# [ RegexFilterPageGenerator; but has to be modified and a patch sent upstream for this / JIRA: DRTRIGON-62 ]
+# [ RegexFilterPageGenerator; but has to be modified and a patch sent upstream for this / JIRA: DRTRIGON-62 ]
 			#if (self._transPage(page).title() == self._userPage.title()):	continue
+# -IN ANY CASE THE IGNORELIST HAS TO BE CHECKED BEFORE PRELOADING ALL PAGES!!!!
+# -SPEEDUP EVEN MORE BY CACHING ALL PAGES TO DISK USED THE SAME DAY?!? (JIRA ticket??? think about it!)
 			skip = False
 			for check in self._param['ignorepage_list']:
 				if check.search(name):
@@ -1052,7 +1054,7 @@ class PageSections(object):
 				buf = page.get(force=force)
 				sections = page.getSections(minLevel=1)
 				break
-			except NotImplementedError:
+			except pywikibot.Error:
 				# sections could not be resoled, try again by forcing (3 tries max.)
 				# or else process the whole page at once
 				sections = []
