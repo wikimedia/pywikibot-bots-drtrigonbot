@@ -12,7 +12,7 @@ the page class from there.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_wikipedia.py 0.2.0036 2009-11-28 23:02 drtrigon $'
+__version__='$Id: dtbext_wikipedia.py 0.2.0037 2009-11-30 09:38 drtrigon $'
 #
 
 # Standard library imports
@@ -334,6 +334,10 @@ class Page(pywikibot.Page):
 		bots = [username] # cache the bot users (prevent multiple identical requests)
 # WHAT ABOUT CACHING ALL THE BOTS ONCE IN THE BEGIN OF THE RUN
 # AND STORE (FOR ONE DAY - UNTIL NEXT RUN), LIKE WATCHLIST, TO DISK
+# create a 'dtbext_userlist.py' similar to 'watchlist.py' and import
+# it here for use in THIS method (reload the list once a day)
+# http://de.wikipedia.org/w/api.php?action=query&list=allusers&augroup=bot&auwitheditsonly
+# look also at 'wikipedia.py'
 		for vh in self.getVersionHistory()[1:]:
 			(revid, timestmp, username, comment) = vh[:4]
 

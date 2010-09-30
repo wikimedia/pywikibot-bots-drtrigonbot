@@ -68,7 +68,7 @@ Syntax example:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: sum_disc.py 0.2.0036 2009-11-28 22:11 drtrigon $'
+__version__='$Id: sum_disc.py 0.2.0037 2009-11-30 13:20 drtrigon $'
 #
 
 
@@ -292,6 +292,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			# RecentEditsPageGenerator
 
 # some user return a lot more than 500 backlinks!
+# (maybe check the backlinks only once a week...?!?)
 			# get the backlinks to user disc page
 			if self._param['getbacklinks_switch']:
 				self.getUserBacklinks()
@@ -571,6 +572,18 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		   Returns nothing, but feeds to self.pages class instance.
 		"""
 
+# [ RegexFilterPageGenerator; but has to be modified and a patch sent upstream for this / JIRA: DRTRIGON-62 ]
+		def RegexFilterPageGenerator(generator):
+			for page in generator:
+				skip = False
+				for check in self._param['ignorepage_list']:
+					if check.search(page.title()):
+						skip = True
+						break
+				if skip: continue
+				yield page
+		# -SPEEDUP EVEN MORE BY CACHING ALL PAGES TO DISK USED THE SAME DAY?!? (JIRA ticket??? think about it!)
+
 		# check for news to report
 		hist = self.pages.hist
 		work = self.pages.work
@@ -579,30 +592,19 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		gen1 = pagegenerators.PagesFromTitlesGenerator(work.keys())
 		# PageTitleFilterPageGenerator; or use RegexFilterPageGenerator (look ignorelist)
 		#gen2 = pagegenerators.PageTitleFilterPageGenerator(gen1, ignore_list)
+		gen2 = RegexFilterPageGenerator(gen1)
 		# Preloads _contents and _versionhistory
 		# [ DOES NOT USE API YET! / ThreadedGenerator would be nice! / JIRA: ticket? ]
 		# WithoutInterwikiPageGenerator, 
-		gen3 = pagegenerators.PreloadingGenerator(gen1)
+		gen3 = pagegenerators.PreloadingGenerator(gen2)
 		#gen4 = pagegenerators.RedirectFilterPageGenerator(gen3)
 		for page in gen3:
-			# count page number (for debug not to loose pages)
-			jj+=1
+# count page number (for debug not to loose pages)
+#			jj+=1
 
 			name = page.title()
 			#print name
 			page.sum_disc_data = work[name].sum_disc_data
-
-			# ignorelist
-# [ RegexFilterPageGenerator; but has to be modified and a patch sent upstream for this / JIRA: DRTRIGON-62 ]
-			#if (self._transPage(page).title() == self._userPage.title()):	continue
-# -IN ANY CASE THE IGNORELIST HAS TO BE CHECKED BEFORE PRELOADING ALL PAGES!!!!
-# -SPEEDUP EVEN MORE BY CACHING ALL PAGES TO DISK USED THE SAME DAY?!? (JIRA ticket??? think about it!)
-			skip = False
-			for check in self._param['ignorepage_list']:
-				if check.search(name):
-					skip = True
-					break
-			if skip: continue
 
 			# get history (was preloaded)
 			#actual = actual_dict[page.sectionFreeTitle()]
@@ -611,7 +613,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				actual = page.getVersionHistory(revCount=1)
 
 				# check page exceptions
-				# [ because 'getVersionHistory' is not able to do this and crashes, 
+				# [ because 'getVersionHistory' is not able to do this and crashes sometimes, 
 				#   e.g. for u'Benutzer Diskussion:MerlBot' / JIRA: ticket? ]
 				if hasattr(page, u'_getexception'):
 					raise page._getexception
@@ -650,8 +652,8 @@ class SumDiscBot(dtbext.basic.BasicBot):
 									  _PS_new ) )
 
 # DOES THE PreloadingGenerator WORK ???
-		if not (len(work.keys()) == jj):
-			raise pywikibot.Error(u'PreloadingGenerator has lost some pages!')
+#		if not (len(work.keys()) == jj):
+#			raise pywikibot.Error(u'PreloadingGenerator has lost some pages!')
 
 		pywikibot.output(u'\03{lightpurple}*** Latest News searched\03{default}')
 
