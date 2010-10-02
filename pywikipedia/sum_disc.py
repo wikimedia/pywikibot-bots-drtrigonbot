@@ -99,6 +99,7 @@ bot_config = {	# unicode values
 		'logger_path':		"logs/%s.log",						#
 #		'script_path':		os.environ['HOME'] + '/pywikipedia/',			# on toolserver
 #		'logger_path':		os.environ['HOME'] + "/public_html/DrTrigonBot/%s.log",	# ('/home/drtrigon' + ...)
+#wikipedia.config.datafilepath('botlists', 'botlist-%s-%s.dat' % (site.family.name, site.lang))
 		'logger_tmsp':		True,
 		'backup_hist':		True,
 

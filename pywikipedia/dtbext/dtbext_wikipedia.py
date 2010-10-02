@@ -12,7 +12,7 @@ the page class from there.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_wikipedia.py 0.2.0037 2009-11-30 09:38 drtrigon $'
+__version__='$Id: dtbext_wikipedia.py 0.2.0038 2010-10-02 12:23 drtrigon $'
 #
 
 # Standard library imports
@@ -320,41 +320,20 @@ class Page(pywikibot.Page):
 		(revid, timestmp, username, comment) = self.getVersionHistory(revCount=1)[0][:4]
 
 		# is the last/actual editor already a human?
-		site = self.site()
-		try:
-			groups = userlib.User(site, username).groups()
-			if not (u'bot' in groups):
-				self._userNameHuman = username
-				return username
-		except userlib.InvalidUser:
-			pass
+		import dtbext_botlist # like watchlist
+		if not dtbext_botlist.isBot(username):
+			self._userNameHuman = username
+			return username
 
 		# search the last human
 		self._userNameHuman = None
-		bots = [username] # cache the bot users (prevent multiple identical requests)
-# WHAT ABOUT CACHING ALL THE BOTS ONCE IN THE BEGIN OF THE RUN
-# AND STORE (FOR ONE DAY - UNTIL NEXT RUN), LIKE WATCHLIST, TO DISK
-# create a 'dtbext_userlist.py' similar to 'watchlist.py' and import
-# it here for use in THIS method (reload the list once a day)
-# http://de.wikipedia.org/w/api.php?action=query&list=allusers&augroup=bot&auwitheditsonly
-# look also at 'wikipedia.py'
 		for vh in self.getVersionHistory()[1:]:
 			(revid, timestmp, username, comment) = vh[:4]
 
-			if username and username not in bots:
-				# user unknown, request info
-				try:
-					groups = userlib.User(site, username).groups()
-				except userlib.InvalidUser:
-					continue
-
-				if (u'bot' in groups):
-					# user is a bot
-					bots.append(username)
-				else:
-					# user is a human
-					self._userNameHuman = username
-					break
+			if username and (not dtbext_botlist.isBot(username)):
+				# user is a human (not a bot)
+				self._userNameHuman = username
+				break
 
 		# store and return info
 		return self._userNameHuman

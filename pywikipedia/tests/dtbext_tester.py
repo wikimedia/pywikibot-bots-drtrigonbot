@@ -272,7 +272,7 @@ dtbext.pywikibot.debug = True
 
 # wikipedia.py
 #TEST_getVersionHistory()
-TEST_getSections()
+#TEST_getSections()
 #TEST_purgeCache()
 #TEST_get()
 #TEST_getParsedContent()
@@ -293,6 +293,10 @@ TEST_getSections()
 #if re.search(a_str, buf): print "<references />-Tag Fehler"
 
 #print userlib.User(pywikibot.getSite(), u'º_the_Bench_º')
+
+
+#bots = dtbext.botlist.get()
+#print bots
 
 
 print "done."

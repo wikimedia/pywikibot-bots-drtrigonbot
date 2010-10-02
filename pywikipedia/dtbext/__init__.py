@@ -9,7 +9,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: __init__.py 0.2.0026 2009-11-19 17:17 drtrigon $'
+__version__='$Id: __init__.py 0.2.0038 2010-10-01 16:19 drtrigon $'
 #
 
 # Expose definitions from modules in this package.
@@ -20,4 +20,6 @@ import dtbext_date as date
 #import dtbext_pywikibot as pywikibot
 
 import dtbext_basic as basic
+
+import dtbext_botlist as botlist
 
