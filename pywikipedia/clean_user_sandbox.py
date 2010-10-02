@@ -22,7 +22,7 @@ This script understands the following command-line arguments:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: clean_user_sandbox.py 0.2.0034 2009-11-26 18:26 drtrigon $'
+__version__ = '$Id: clean_user_sandbox.py 0.3.0040 2010-10-02 20:13 drtrigon $'
 #
 
 import re

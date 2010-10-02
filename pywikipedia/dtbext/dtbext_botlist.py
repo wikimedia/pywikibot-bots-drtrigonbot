@@ -14,7 +14,7 @@ data.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_botlist.py 0.2.0038 2010-10-02 12:24 drtrigon $'
+__version__='$Id: dtbext_botlist.py 0.3.0040 2010-10-02 20:13 drtrigon $'
 #
 
 import re, sys, pickle

@@ -12,7 +12,7 @@ the page class from there.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_wikipedia.py 0.2.0038 2010-10-02 12:23 drtrigon $'
+__version__='$Id: dtbext_wikipedia.py 0.3.0040 2010-10-02 20:13 drtrigon $'
 #
 
 # Standard library imports

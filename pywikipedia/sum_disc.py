@@ -68,7 +68,7 @@ Syntax example:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: sum_disc.py 0.2.0037 2009-11-30 13:20 drtrigon $'
+__version__='$Id: sum_disc.py 0.3.0040 2010-10-02 20:22 drtrigon $'
 #
 
 
@@ -84,22 +84,27 @@ import dtbext
 import wikipedia as pywikibot
 
 
+_PS_warning	= 1	# serious or no classified warnings/errors that should be reported
+_PS_changed	= 2	# changed page   (if closed, will be removed)
+_PS_unchanged	= 3	# unchanged page
+_PS_new		= 4	# new page
+_PS_closed	= 5	# closed page (remove it from history)
+_PS_maintmsg	= 6	# maintenance message
+_PS_notify	= 7	# global wiki notification
+
+
+_REGEX_eol		= re.compile('\n')
+
+
 bot_config = {	# unicode values
 		'TemplateName':		u'Benutzer:DrTrigon/Entwurf/Vorlage:SumDisc',
 		'userlist':		u'Benutzer:DrTrigonBot/Diene_Mir!',
 		'maintenance_queue':	u'Benutzer:DrTrigonBot/Maintenance',
 		'maintenance_page':	u'Benutzer Diskussion:DrTrigon#%s',
-		'maintenance_mesg':	u'BOT MESSAGE',
-		'globwiki_notify':	u'Notification',
 
 		'queue_security':	([u'DrTrigon'], u'Bot: exec'),
 
 		# NON (!) unicode values
-		'script_path':		'',							# local on a PC
-		'logger_path':		"logs/%s.log",						#
-#		'script_path':		os.environ['HOME'] + '/pywikipedia/',			# on toolserver
-#		'logger_path':		os.environ['HOME'] + "/public_html/DrTrigonBot/%s.log",	# ('/home/drtrigon' + ...)
-#wikipedia.config.datafilepath('botlists', 'botlist-%s-%s.dat' % (site.family.name, site.lang))
 		'logger_tmsp':		True,
 		'backup_hist':		True,
 
@@ -119,6 +124,19 @@ bot_config = {	# unicode values
 		'vars_subst':		[ 'checkedit_list', 'ignorepage_list', 'backlinks_list', 'altsign_list' ],	# + 'ignorehead_list' ?
 		# which lists should preserve/keep their defaults (instead of getting it overwritten by user settings)
 		'default_keep':		[ 'checkedit_list', 'altsign_list' ],
+		# which lists should be translated according to site's lang
+		'translate':		[ 'notify_msg', 'parse_msg' ],
+
+		'msg': {
+			'de':	( u'Bot: ',
+				u'Diskussions-Zusammenfassung hinzugefügt (%i Einträge)',
+				u'Diskussions-Zusammenfassung aktualisiert (%i Einträge in %s)',
+				),
+			'en':	( u'robot ',
+				u'Discussion summary added: %i entries',
+				u'Discussion summary updated: %i entries in %s',
+				),
+		},
 
 		# bot paramater/options (modifiable by user)
 		'param_default':	{ 'checkedit_count':	500,				# CHECK recent EDITs, a COUNT
@@ -180,7 +198,44 @@ bot_config = {	# unicode values
 					#		 thought to be used explicit, it is defined by the page link (implicit).
 					# (not published yet: LIST of HEADs to IGNORE, a LIST)
 					'ignorehead_list':	[ u'(.*?) \(erl.\)', ],
-					}
+
+					# (hidden)
+					'notify_msg': {
+						'de':	{
+							_PS_changed:	u'Diskussion verändert',
+							_PS_new:	u'Neue Diskussion',
+							_PS_closed:	u'Diskussion abgeschlossen', 
+							_PS_maintmsg:	u'BOT MESSAGE',
+							_PS_notify:	u'Benachrichtigung',
+							},
+						'en':	{
+							_PS_changed:	u'Discussion changed',
+							_PS_new:	u'New Discussion',
+							_PS_closed:	u'Discussion closed', 
+							_PS_maintmsg:	u'BOT MESSAGE',
+							_PS_notify:	u'Notification',
+							},
+						},
+					# (hidden)
+					'parse_msg': {
+						'de':	{
+							u'*':		u'*%s: %s - letzte Bearbeitung von %s (%s)',
+							_PS_closed:	u'*%s: %s alle Diskussionen wurden beendet (Überwachung gestoppt) - letzte Bearbeitung von %s (%s)',
+							_PS_notify:	u'*%s: <span class="plainlinks">[%s %s]</span> - letzte Bearbeitung von [[User:%s]] (%s)',
+							_PS_warning:	u'*Bot Warn-Nachricht: %s "\'\'%s\'\'"',
+							u'end':		u'<noinclude>\nZusammenfassung erstellt von und um: ~~~~</noinclude>',
+							u'nonhuman':	u'(keinen menschlichen Bearbeiter gefunden)',
+							},
+						'en':	{
+							u'*':		u'*%s: %s - last edit by %s (%s)',
+							_PS_closed:	u'*%s: %s all discussions have finished (surveillance stopped) - last edit by %s (%s)',
+							_PS_notify:	u'*%s: <span class="plainlinks">[%s %s]</span> - last edit by [[User:%s]] (%s)',
+							_PS_warning:	u'*Bot warning message: %s "\'\'%s\'\'"',
+							u'end':		u'<noinclude>\nSummary generated from and at: ~~~~</noinclude>',
+							u'nonhuman':	u'(no human editor found)',
+							},
+						}
+					},
 }
 
 # debug tools
@@ -198,30 +253,10 @@ debug.append( 'write2hist' )		# write history
 #debug.append( 'toolserver' )		# toolserver down
 #debug.append( 'code' )			# code debugging
 
-#trans_str = {		# from wikilanguage to 'en'
-#	# translations for 'User'
-#	u'Benutzer':	u'User',
-#
-#	# translations for 'Discussion'
-#	u'Diskussion':	u'Discussion',
-#}
-
 docuReplacements = {
 #    '&params;': pagegenerators.parameterHelp
     '&params;': u''
 }
-
-
-_PS_warning	= 1	# serious or no classified warnings/errors that should be reported
-_PS_changed	= 2	# changed page   (if closed, will be removed)
-_PS_unchanged	= 3	# unchanged page
-_PS_new		= 4	# new page
-_PS_closed	= 5	# closed page (remove it from history)
-_PS_maintmsg	= 6	# maintenance message
-_PS_notify	= 7	# global wiki notification
-
-
-_REGEX_eol		= re.compile('\n')
 
 
 class SumDiscBot(dtbext.basic.BasicBot):
@@ -274,7 +309,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 			# set user and init params
 			self.setUser(user)
-			self.pages = SumDiscPages(self.site)
+			self.pages = SumDiscPages(self.site, self._param)
 
 			# [ should be done in framework / JIRA: ticket? (related to DRTRIGON-63) ]
 			#print self._user
@@ -353,7 +388,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 		if bot_config['backup_hist']:
 			timestmp = dtbext.date.getTimeStmpNow()
-			pathname = '%slogs/%s/' % (bot_config['script_path'], timestmp)	# according to 'setUser'
+			pathname = pywikibot.config.datafilepath('logs/%s/' % timestmp, '')	# according to 'setUser'
 			os.mkdir(pathname)
 			import shutil
 
@@ -420,7 +455,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		if 'userResultPage' in self._param:				# user with extended info (extra page to use)
 			self._userPage = pywikibot.Page(self.site, u'Benutzer:%s' % self._param['userResultPage'])
 			self._param['ignorepage_list'].append( self._userPage.title() )
-		self._datfilename = '%slogs/sum_disc-%s-%s-%s.dat' % (bot_config['script_path'], 'wikipedia', 'de', self._user.name())
+		self._datfilename = pywikibot.config.datafilepath('logs', 'sum_disc-%s-%s-%s.dat' % (self.site.family.name, self.site.lang, self._user.name()))
 
 		# substitute variables for use in user defined parameters/options
 		param_vars = {	'username':	self._user.name(),
@@ -433,6 +468,10 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		# (probably try to pre-compile 'self._param_default' once int __init__ and reuse the unchanged ones here)
 		for item in bot_config['regex_compile']:
 			self._param[item] = map(re.compile, self._param[item])
+
+		# translate according to site's lang
+		for item in bot_config['translate']:
+			self._param[item] = pywikibot.translate(self.site.lang, self._param[item])
 
 	def loadHistory(self, rollback = 0):
 		"""Read history, and restore the page objects with sum_disc_data.
@@ -462,6 +501,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				if (len(news_item[key]) == 5):			# old history format
 					news_item[key] += (_PS_unchanged,)
 					usage['old history'] = True
+# why still present??
 				if key in news:	# APPEND the heading data in the last tuple arg
 					if news_item[key][5] in [_PS_closed]:
 						del news[key]
@@ -584,6 +624,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				if skip: continue
 				yield page
 		# -SPEEDUP EVEN MORE BY CACHING ALL PAGES TO DISK USED THE SAME DAY?!? (JIRA ticket??? think about it!)
+		#  look into 'diskcache.py'
 
 		# check for news to report
 		hist = self.pages.hist
@@ -629,7 +670,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			if name in hist:
 				if (not (hist[name].sum_disc_data[3] == actual[0][1])):
 					# discussion has changed, some news?
-					self.pages.edit_news(page, sum_disc_data=( u'Discussion changed', 
+					self.pages.edit_news(page, sum_disc_data=(self._param['notify_msg'][_PS_changed], 
 										  None, # obsolete (and recursive)
 										  actual[0][2], 
 										  actual[0][1], 
@@ -637,7 +678,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 										  _PS_changed ) )
 				else:
 					# nothing new to report (but keep for history and update it)
-					self.pages.edit_oth(page, sum_disc_data=( hist[name].sum_disc_data[0], 
+					self.pages.edit_oth(page, sum_disc_data=(hist[name].sum_disc_data[0], 
 										 None, # obsolete (and recursive)
 										 actual[0][2], 
 										 actual[0][1], 
@@ -645,7 +686,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 										 _PS_unchanged ) )
 			else:
 				# new discussion, some news?
-				self.pages.edit_news(page, sum_disc_data=( u'New Discussion', 
+				self.pages.edit_news(page, sum_disc_data=(self._param['notify_msg'][_PS_new], 
 									  None, # obsolete (and recursive)
 									  actual[0][2], 
 									  actual[0][1], 
@@ -672,7 +713,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				continue
 
 			#data = page.globalwikinotify
-			self.pages.edit_oth(page, sum_disc_data=( bot_config['globwiki_notify'], 
+			self.pages.edit_oth(page, sum_disc_data=(self._param['notify_msg'][_PS_notify], 
 								 None, # obsolete (and recursive)
 								 data['user'], 
 								 data['timestamp'], 
@@ -708,6 +749,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			except:
 				print "no speed check done."
 #should be loaded now, make speed check here!!!
+#speed check should also be done in getSection at get...
 
 			(page, page_rel, page_signed) = entries.check_rel()
 
@@ -738,7 +780,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			page = pywikibot.Page(self.site, bot_config['maintenance_page'] % "")
 			tmst = time.strftime('%H:%M, %d. %b. %Y')
 			tmst = u'%s' % re.sub(' 0', ' ', tmst)
-			page.sum_disc_data = ( bot_config['maintenance_mesg'],
+			page.sum_disc_data = ( self._param['notify_msg'][_PS_maintmsg],
 					       None,
 					       u'DrTrigon',
 					       tmst,
@@ -763,17 +805,17 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			pywikibot.output(u'[%i entries]' % count )
 
 			if 'write2wiki' in debug:
-				#comment = u'Diskussions Zusammenfassung hinzugefügt: %i neue und %i veränderte' % (3, 7)
+				head, add, mod = pywikibot.translate(self.site.lang, bot_config['msg'])
 				if not self._mode:
 					# default: write direct to user disc page
-					comment = u'Diskussions-Zusammenfassung hinzugefügt: %i Einträge' % count
+					comment = head + add % count
 					self.append(self._userPage, buf, comment=comment, minorEdit=False)
 				else:
 					# enhanced (with template): update user disc page and write to user specified page
 					tmplsite = pywikibot.Page(self.site, self._tmpl_data)
-					comment = u'Diskussions-Zusammenfassung aktualisiert: %i Einträge in %s' % (count, tmplsite.title(asLink=True))
+					comment = head + mod % (count, tmplsite.title(asLink=True))
 					self.save(self._userPage, self._content, comment=comment, minorEdit=False)
-					comment = u'Diskussions-Zusammenfassung hinzugefügt: %i Einträge' % count
+					comment = head + add % count
 					self.append(tmplsite, buf, comment=comment)
 				dtbext.pywikibot.addAttributes(self._userPage)
 				purge = self._userPage.purgeCache()
@@ -789,30 +831,21 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		else:
 			pywikibot.output(u'\03{lightpurple}*** Discussion up to date: NOTHING TO DO\03{default}')
 
-	# look into (pywikibot.)textlib.translate()
-	#
-	#def _transPage(self, page):
-	#	'''
-	#	???
-	#	'''
-	#	title = page.title()
-	#	for item in trans_str.keys():
-	#		title = re.sub(item, trans_str[item], title)
-	#	return pywikibot.Page(self.site, title)
-
 
 class SumDiscPages(object):
 	"""An object representing all pages relevant for processing a user.
 
 	"""
 
-	def __init__(self, site):
+	def __init__(self, site, param):
 		self._hist_list = {}		# archived pages from history
 		self._work_list = {}		# pages to check for news
 		self._news_list = {}		# news to check for relevancy and report afterwards
 		self._oth_list = {}		# ...?
 
 		self.site = site
+
+		self.param = param
 
 	def set_hist(self, hist):
 		# set history
@@ -917,7 +950,7 @@ class SumDiscPages(object):
 
 		# discussion closed (no signature on page anymore)
 		if (not signed) and (sum_disc_data[5] == _PS_changed):
-			page.sum_disc_data = ( u'Discussion closed', 
+			page.sum_disc_data = ( self.param['notify_msg'][_PS_closed], 
 					       None, 
 					       sum_disc_data[2], 
 					       sum_disc_data[3], 
@@ -935,11 +968,10 @@ class SumDiscPages(object):
 
 		switch  = param['reportchanged_switch']
 		switch2 = param['reportclosed_switch']
-		if not switch:	ps_types_a = [_PS_new, _PS_maintmsg]
-		else:		ps_types_a = [_PS_new, _PS_changed, _PS_maintmsg]
-		if not switch2:	ps_types_b = []
-		else:		ps_types_b = [_PS_closed]
-		ps_types = (ps_types_a, ps_types_b)
+		if not switch:	ps_types =  ( [_PS_new, _PS_maintmsg], )
+		else:		ps_types =  ( [_PS_new, _PS_changed, _PS_maintmsg], )
+		if not switch2:	ps_types += ( [], )
+		else:		ps_types += ( [_PS_closed], )
 
 		buf = []
 		for name in self._news_list.keys():
@@ -961,37 +993,36 @@ class SumDiscPages(object):
 					# append relevant sections
 					report.append( u'[[%s#%s|%s]]' % (page.title(), anchor, line) )
 
+				# default: if no subsections on page
+				item = page.title(asLink=True)
 				if report:
 					# subsections on page
-					data = (data[0], page.title(asLink=True), string.join(report, u', '), self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
-					data = u'*%s: %s at %s - last edit by %s (%s)' % data
-				else:
-					# no subsections on page
-					data = (data[0], page.title(asLink=True), self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
-					data = u'*%s: %s - last edit by %s (%s)' % data
+					item = u'%s → %s' % (page.title(asLink=True), string.join(report, u', '))
+
+				data = (data[0], item, self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
+				data = self.param['parse_msg'][u'*'] % data
 			elif data[5] in ps_types[1]:
 				# closed
 				data = (data[0], page.title(asLink=True), self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
-				data = u'*%s: %s all discussions have finished (surveillance stopped) - last edit by %s (%s)' % data
+				data = self.param['parse_msg'][_PS_closed] % data
 			elif data[5] in [_PS_warning]:
 				# warnings
 				data = (page.title(asLink=True), data[0])
-				data = u'*Bot warning message: %s "\'\'%s\'\'"' % data
+				data = self.param['parse_msg'][_PS_warning] % data
 				self._global_warn.append( (self._user.name(), data) )
-				if not self._param['reportwarn_switch']: continue
+				if not param['reportwarn_switch']: continue
 			elif data[5] in [_PS_notify]:
 				# global wiki notifications
 				data = (data[0], page.globalwikinotify['url'], page.title(), data[2], dtbext.date.getTime(data[3]))
-				data = u'*%s: <span class="plainlinks">[%s %s]</span> - last edit by [[User:%s]] (%s)' % data
+				data = self.param['parse_msg'][_PS_notify] % data
 			else:
 				continue # skip append
 			buf.append( data )
 
 		count = len(buf)
 		if (count > 0):
-			buf[-1] += u'<noinclude>'
-			buf.append( u'Summary generated from and at: ~~~~</noinclude>' )
-			buf = string.join(buf, u'\n')
+			buf =  string.join(buf, u'\n')
+			buf += self.param['parse_msg'][u'end']
                 else:
 			buf = u''
 
@@ -1017,7 +1048,7 @@ class SumDiscPages(object):
 				return u'[[User:%s]]/[[User:%s]]' % (humaneditor, lastuser)
 		else:
 			# no human editor found; use last editor
-			return u'[[User:%s]] (no human editor found)' % lastuser
+			return (u'[[User:%s]] ' % lastuser) + self.param['parse_msg'][u'nonhuman']
 
 
 class PageSections(object):

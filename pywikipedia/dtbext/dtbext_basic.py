@@ -13,7 +13,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_basic.py 0.2.0034 2009-11-26 17:13 drtrigon $'
+__version__='$Id: dtbext_basic.py 0.3.0040 2010-10-02 20:13 drtrigon $'
 #
 
 

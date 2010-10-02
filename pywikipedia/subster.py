@@ -10,7 +10,7 @@ other wiki text data. Like dynamic text updating.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: subster.py 0.2.0034 2009-11-26 18:53 drtrigon $'
+__version__='$Id: subster.py 0.3.0040 2010-10-02 20:13 drtrigon $'
 #
 
 

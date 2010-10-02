@@ -11,7 +11,7 @@ This is a part of pywikipedia framework, it is a deviation of date.py.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_date.py 0.2.0032 2009-11-25 18:55 drtrigon $'
+__version__='$Id: dtbext_date.py 0.3.0040 2010-10-02 20:13 drtrigon $'
 #
 
 # Standard library imports

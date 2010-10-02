@@ -9,7 +9,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_textlib.py 0.2.0020 2009-11-14 15:56 drtrigon $'
+__version__='$Id: dtbext_textlib.py 0.3.0040 2010-10-02 20:13 drtrigon $'
 #
 
 # Standard library imports

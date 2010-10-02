@@ -9,7 +9,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: __init__.py 0.2.0038 2010-10-01 16:19 drtrigon $'
+__version__='$Id: __init__.py 0.3.0040 2010-10-02 20:13 drtrigon $'
 #
 
 # Expose definitions from modules in this package.
