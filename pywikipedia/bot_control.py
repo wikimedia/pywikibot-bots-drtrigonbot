@@ -56,9 +56,6 @@ CRON (toolserver):
 
 
 others:
-Run all bots in never-ending loop (output to log):
-	python bot_control.py -all -auto
-
 Run the bot 'clean_user_sandbox.py' only:
 	python bot_control.py -clean_user_sandbox
 
@@ -74,30 +71,14 @@ For tests its sometimes better to use:
 	python sum_disc.py
 	python mailer.py
 """
-
-# ====================================================================================================
 #
-# ToDo-Liste (Bugs, Features, usw.):
-# http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste
-#
-# READ THE *DOGMAS* FIRST!
-# 
-# CHANGES on pywikipedia framework:
-#  - after 0.1.0012
-#	wikipedia.py: line 725-728  "make more stable" (+some more...)
-#	IMPORTANT: to merge with most recent pywikipedia trunk and take the
-#			   newest wikipedia.py from there
-#
-# ====================================================================================================
-
-#
-# (C) Dr. Trigon, 2009
+# (C) Dr. Trigon, 2009-2010
 #
 # DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: bot_control.py 0.3.0040 2010-10-03 00:06 drtrigon $'
+__version__='$Id: bot_control.py 0.3.0041 2010-10-03 15:54:26Z drtrigon $'
 __revision__='8601'
 #
 
@@ -121,6 +102,34 @@ error_mail_fromwiki = True				# send error mail from wiki too!
 error_mail          = (u'DrTrigon', u'Bot ERROR')	# error mail via wiki mail interface instead of CRON job
 
 
+# logging of framework info
+infolist = [ pywikibot.__version__, pywikibot.config.__version__,	# framework
+             pywikibot.query.__version__, pagegenerators.__version__,	#
+             dtbext.pywikibot.__version__, dtbext.basic.__version__,	# DrTrigonBot extensions
+             dtbext.date.__version__, dtbext.userlib.__version__,	#
+             dtbext.botlist.__version__,				#
+             __version__, clean_user_sandbox.__version__,		# bots
+             sum_disc.__version__, mailer.__version__,			#
+             subster.__version__, page_disc.__version__, ]		#
+
+# bots to run and control
+bot_list = { 'clean_user_sandbox': (clean_user_sandbox, u'clean userspace Sandboxes'),
+             'sum_disc':           (sum_disc, u'discussion summary'),
+             'compress_history':   (sum_disc, u'compressing discussion summary'),
+             'replace_tmpl':       (replace_tmpl, u'replace_tmpl'),
+             'mailer':             (mailer, u'"MailerBot"'),
+             'subster':            (subster, u'"SubsterBot"'),
+             'page_disc':          (page_disc, u'page_disc (beta test)'), }
+bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'mailer', 'subster', 'page_disc' ]
+
+
+class SubBotError(Exception):
+	def __init__(self, value):
+		self.value = value
+	def __str__(self):
+		return repr(self.value)
+
+
 class Logger:
 	def __init__(self, filename, **param):
 		self.file = codecs.open(filename, **param)
@@ -138,30 +147,56 @@ class Logger:
 		self.file.close()
 		#del self.file
 		self.file = None
-		return
 	def flush(self):
 		self.file.flush()
-		#pass
-	def slow_write(self, string):
-		try:
-			if self.file: return
-			self.__init__(self._filename, **self._param)
-			self.write(string)
-			self.file.close()
-		except:
-			print "DEBUG: slow_write error"
-		return
 
-class SubBotError(Exception):
-	def __init__(self, value):
-		self.value = value
-	def __str__(self):
-		return repr(self.value)
+class OutputLog:
+	def __init__(self, addlogname=None):
+		if addlogname == None:
+			self.logfile = None
+		else:
+			self.logfile = Logger(logname % dtbext.date.getTimeStmp() + addlogname,
+				              encoding=pywikibot.config.textfile_encoding,
+				              mode='a+')
+
+		(self.stdout, self.stderr) = (sys.stdout, sys.stderr)
+
+		if self.logfile:
+			(sys.stdout, sys.stderr) = (self.logfile, self.logfile)
+
+	def close(self):
+		(sys.stdout, sys.stderr) = (self.stdout, self.stderr)
+
+		if self.logfile:
+			self.logfile.close()
+
+	def switch(self, addlogname=""):
+		pywikibot.output(u'switching log to "...%s.log", please look there ...' % addlogname)
+
+		self.close()
+		self.__init__(addlogname=addlogname)
+
 
 class BotController:
-	def __init__(self, bot, desc):
+	def __init__(self, bot, desc, run_bot):
 		self.bot = bot
 		self.desc = desc
+		self.run_bot = run_bot
+		self.error = None
+
+	def trigger(self):
+		if self.run_bot:
+			self.run()
+		else:
+			self.skip()
+
+		if self.error:
+			return [self.error]
+		else:
+			return []
+
+	def skip(self):
+		pywikibot.output(u'SKIPPING: ' + self.desc)
 
 	def run(self):
 		pywikibot.output(u'RUN BOT: ' + self.desc)
@@ -169,33 +204,24 @@ class BotController:
 		try:
 			self.bot.main()
 		except:
-			error = gettraceback(sys.exc_info())
-			if error:
-				pywikibot.output(u'\03{lightred}%s\03{default}' % error[2])
-				error_buffer.append( error )
+			self.error = gettraceback(sys.exc_info())
+			if self.error:
+				pywikibot.output(u'\03{lightred}%s\03{default}' % self.error[2])
 			else:
 				raise
 			#raise sys.exc_info()[0](sys.exc_info()[1])
 
 
-def setlogfile(addlogname = ""):
-	#logfile = Logger(logname % time.strftime("%Y%m%d", time.gmtime()), encoding=config.textfile_encoding, mode='a+')
-	logfile = Logger(logname % dtbext.date.getTimeStmp() + addlogname, encoding=pywikibot.config.textfile_encoding, mode='a+')
-	(out_stream, err_stream) = (sys.stdout, sys.stderr)
-	(sys.stdout, sys.stderr) = (logfile, logfile)
-	return (logfile, out_stream, err_stream)
-
 def gettraceback(exc_info):
 	output = StringIO.StringIO()
 	traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], file=output)
-	#if not ('KeyboardInterrupt\n' in traceback.format_exception_only(exc_info[0], exc_info[1])):
-	#	result = output.getvalue()
 	if ('KeyboardInterrupt\n' in traceback.format_exception_only(exc_info[0], exc_info[1])):
 		return None
 	result = output.getvalue()
 	output.close()
 	#exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
 	return (exc_info[0], exc_info[1], result)
+
 
 def getversion_svn():
 	# framework revision?
@@ -210,23 +236,14 @@ def getversion_svn():
 
 
 def main():
-	global logfile, out_stream, err_stream, error_buffer
-	global do_subster		# alle anderen NICHT noetig, warum diese hier ?!?????
+	global log, error_buffer
+#	global do_dict		# alle anderen NICHT noetig, warum diese hier ?!?????
 
 	# script call
-	#pywikibot.output(u'SCRIPT CALL:')
 	pywikibot.output(u'\nSCRIPT CALL:')
 	pywikibot.output(u'  ' + u' '.join(sys.argv))
 
 	# logging of framework info
-	infolist = [ pywikibot.__version__, pywikibot.config.__version__,		# framework
-		pywikibot.query.__version__, pagegenerators.__version__,	#
-		dtbext.pywikibot.__version__, dtbext.basic.__version__,		# DrTrigonBot extensions
-		dtbext.date.__version__, dtbext.userlib.__version__,		#
-		dtbext.botlist.__version__,					#
-		__version__, clean_user_sandbox.__version__,			# bots
-		sum_disc.__version__, mailer.__version__,			#
-		subster.__version__, page_disc.__version__ ]			#
 	pywikibot.output(u'FRAMEWORK VERSION:')
 	for item in infolist: pywikibot.output(u'  %s' % item)
 
@@ -240,171 +257,91 @@ def main():
 		pywikibot.output(messagesforbot)
 		pywikibot.output(u'==================================================')
 
-	while True:
-		if do_clean_user_sandbox:
-			bot = BotController(clean_user_sandbox, u'clean userspace Sandboxes')
-			bot.run()
-		else:
-			pywikibot.output(u'SKIPPING: clean userspace Sandboxes')
+	for bot_name in bot_order:
+		(bot_module, bot_desc) = bot_list[bot]
 
-		if do_sum_disc or do_compress_history:
-			if do_sum_disc:		pywikibot.output(u'RUN SUB-BOT: discussion summary')
-			elif do_compress_history:	pywikibot.output(u'RUN SUB-BOT: compressing discussion summary')
-			try:
-				sum_disc.main()
-			except:
-				error = gettraceback(sys.exc_info())
-				if error:
-					pywikibot.output(u'\03{lightred}%s\03{default}' % error[2])
-					error_buffer.append( error )
-				else:
-					raise
-		else:
-			pywikibot.output(u'SKIPPING: discussion summary or compressing discussion summary')
+		bot = BotController(bot_module,
+			            bot_desc,
+			            do_dict[bot_name]) )
 
-		#if do_replace_tmpl:
-		#	pywikibot.output(u'RUN SUB-BOT: replace_tmpl')
-		#	try:
-		#		replace_tmpl.main()
-		#	except:
-		#		error = gettraceback(sys.exc_info())
-		#		if error:
-		#			pywikibot.output(u'\03{lightred}%s\03{default}' % error[2])
-		#			error_buffer.append( error )
-		#		else:
-		#			raise
-		#else:
-		#	pywikibot.output(u'SKIPPING: replace_tmpl')
-
-		if do_mailer:
-			bot = BotController(clean_user_sandbox, u'"MailerBot"')
-			bot.run()
-		else:
-			pywikibot.output(u'SKIPPING: "MailerBot"')
-
-		if do_subster:
-			pywikibot.output(u'RUN SUB-BOT: "SubsterBot"')
-
+		#if bot.desc == u'"SubsterBot"':
+		if bot_name == 'subster':
 			if cron:
 				# use another log (for subster because of 'panel.py')
 				logname_enh = "_subster"
-				pywikibot.output(u'switching log to "...%s.log", please look there ...' % logname_enh)
-				(sys.stdout, sys.stderr) = (out_stream, err_stream)
-				logfile.close()
-				(logfile, out_stream, err_stream) = setlogfile(addlogname=logname_enh)
-
-			try:
-				# magic words for subster, look also at 'subster.py' (should be strings, but not needed)
-				if not no_magic_words:
-					subster.magic_words = {'BOTerror':		  str(bool(error_buffer)),
-										   'BOTerrortraceback': str([item[2] for item in error_buffer]),}
-										   #'BOTversion':		'0.2.0000, rev. ' + __revision__,
-										   #'BOTrunningsubbots': '...',}
-				subster.main()
-			except:
-				error = gettraceback(sys.exc_info())
-				if error:
-					pywikibot.output(u'\03{lightred}%s\03{default}' % error[2])
-					error_buffer.append( error )
-				else:
-					raise
-
+				log.switch(addlogname=logname_enh)
+			# magic words for subster, look also at 'subster.py' (should be strings, but not needed)
+			if not no_magic_words:
+				bot.bot.magic_words = {'BOTerror':          str(bool(error_buffer)),
+				                       'BOTerrortraceback': str([item[2] for item in error_buffer]),}
+				                       #'BOTversion':        '0.2.0000, rev. ' + __revision__,
+				                       #'BOTrunningsubbots': '...',}
+			error_buffer += bot.trigger()
 			if cron:
 				# back to default log (for everything else than subster)
 				logname_enh = ""
-				pywikibot.output(u'switching log to "...%s.log", please look there ...' % logname_enh)
-				(sys.stdout, sys.stderr) = (out_stream, err_stream)
-				logfile.close()
-				(logfile, out_stream, err_stream) = setlogfile(addlogname=logname_enh)
+				log.switch(addlogname=logname_enh)
 		else:
-			pywikibot.output(u'SKIPPING: "SubsterBot"')
+			error_buffer += bot.trigger()
 
-		if do_page_disc:
-			pywikibot.output(u'RUN SUB-BOT: page_disc')
-			try:
-				page_disc.main()
-			except:
-				error = gettraceback(sys.exc_info())
-				if error:
-					pywikibot.output(u'\03{lightred}%s\03{default}' % error[2])
-					error_buffer.append( error )
-				else:
-					raise
-		else:
-			pywikibot.output(u'SKIPPING: page_disc')
-
-		if no_repeat:
-			pywikibot.output(u'\nDone.')
-			return
-		else:
-			now = time.strftime("%d %b %Y %H:%M:%S (UTC)", time.gmtime())
-			pywikibot.output(u'\nSleeping %s hours, now %s' % (hours, now))
-			(sys.stdout, sys.stderr) = (out_stream, err_stream)
-			logfile.close()
-			time.sleep(hours * 60 * 60)
-			#time.sleep(5)
-			(logfile, out_stream, err_stream) = setlogfile(addlogname=logname_enh)
+	pywikibot.output(u'\nDone.')
+	return
 
 
 if __name__ == "__main__":
-	hours = 48
-	no_repeat = True
 	arg = pywikibot.handleArgs()
 	if len(arg) > 0:
 		#arg = pywikibot.handleArgs()[0]
 		#print sys.argv[0]	# who am I?
-		#if (arg[:5] == "-auto") or (arg[:5] == "-cron"):
 
-		cron			= ("-cron" in arg)
+		cron = ("-cron" in arg)
 
-		do_clean_user_sandbox	= False
-		do_sum_disc		= False
-		do_compress_history 	= False
-		do_replace_tmpl		= False
-		do_mailer		= False
-		do_subster		= False
-		do_page_disc	= False
+		do_dict = { 'clean_user_sandbox': False,
+		            'sum_disc':           False,
+		            'compress_history':   False,
+		            'replace_tmpl':       False,
+		            'mailer':             False,
+		            'subster':            False,
+		            'page_disc':          False,
+		}
 		logname_enh = ""		
 		if ("-all" in arg):
-			do_clean_user_sandbox	= True
-			do_sum_disc			= True
-			#do_replace_tmpl		= True
-			do_mailer			= True
-			do_subster			= True
-			do_page_disc		= True
+			do_dict.update({ 'clean_user_sandbox': True,
+			                 'sum_disc':           True,
+			                 #'replace_tmpl':       False,
+			                 'mailer':             True,
+			                 'subster':            True,
+			                 'page_disc':          True,
+			})
 		elif ("-default" in arg):
-			do_clean_user_sandbox	= True
-			do_sum_disc			= True
-			#do_replace_tmpl		= True
-			do_mailer			= True
-			#do_subster			= True
-			do_page_disc		= True
+			do_dict.update({ 'clean_user_sandbox': True,
+			                 'sum_disc':           True,
+			                 #'replace_tmpl':       True,
+			                 'mailer':             True,
+			                 #'subster':            True,
+			                 'page_disc':          True,
+			})
 		elif ("-compress_history:[]" in arg):		# muss alleine laufen, sollte aber mit allen 
-			do_compress_history 	= True		# anderen kombiniert werden können (siehe 'else')...!
+			do_dict['compress_history'] = True		# anderen kombiniert werden können (siehe 'else')...!
 		elif ("-subster" in arg):
-			do_subster			= True
+			do_dict['subster'] = True
 			logname_enh = "_subster"			# use another log than usual !!!
 		else:
-			do_clean_user_sandbox	= ("-clean_user_sandbox" in arg)
-			do_sum_disc		= ("-sum_disc" in arg)
-			do_mailer		= ("-mailer" in arg)
-			#do_subster		= ("-subster" in arg)
-			do_page_disc	= ("-page_disc" in arg)
+			do_dict.update({ 'clean_user_sandbox': ("-clean_user_sandbox" in arg),
+			                 'sum_disc':           ("-sum_disc" in arg),
+			                 'mailer':             ("-mailer" in arg),
+			                 #'subster':            ("-subster" in arg),
+			                 'page_disc':          ("-page_disc" in arg),
+			})
 
-		if ("-auto" in arg) or cron:
-			#logfile = file(logname, "w")
-			#(out_stream, err_stream) = (sys.stdout, sys.stderr)
-			#(sys.stdout, sys.stderr) = (logfile, logfile)
-			(logfile, out_stream, err_stream) = setlogfile(addlogname=logname_enh)
-			#no_repeat = False
-			#no_repeat = not (arg[:5] == "-auto")
-			no_repeat = not ("-auto" in arg)
+		if cron:
+			log = OutputLog(addlogname=logname_enh)
 
 		no_magic_words = ("-no_magic_words" in arg)
 
 		error_buffer = []
 	else:
-		(out_stream, err_stream) = (sys.stdout, sys.stderr)
+		log = OutputLog()
 		choice = pywikibot.inputChoice('Do you want to compress the histories?', ['Yes', 'No'], ['y', 'n'])
 		if choice == 'y':
 			logs = os.listdir(u'logs')
@@ -423,30 +360,25 @@ if __name__ == "__main__":
 	except:
 		error = gettraceback(sys.exc_info())
 		if error:				# sub-bot error OR other/unexpected error
-			#pywikibot.output(u'\03{lightred}%s\03{default}' % error[2])
 			error_buffer.append( error )
-		#else:					# Ctrl-C/BREAK/keyb-int
-		#	raise
 
-		if cron:	# if runned as CRON-job mail occuring exception and traceback to bot admin
-			for item in error_buffer:		# if Ctrl-C/BREAK/keyb-int; the 'error_buffer' should be empty
-				item = item[2]
-				if error_mail_fromwiki:
-					pywikibot.output(u'ERROR:\n%s\n' % item)
-					pywikibot.output(u'Sending mail "%s" to "%s" as notification!' % (error_mail[1], error_mail[0]))
-					usr = userlib.User(pywikibot.getSite(), error_mail[0])
-					if not usr.sendMail(subject=error_mail[1], text=item):		# 'item' should be unicode!
-						pywikibot.output(u'!!! WARNING: mail could not be sent!')
+		for item in error_buffer:		# if Ctrl-C/BREAK/keyb-int; the 'error_buffer' should be empty
+			item = item[2]
+			# if runned as CRON-job mail occuring exception and traceback to bot admin
+			if cron and error_mail_fromwiki:
+				pywikibot.output(u'ERROR:\n%s\n' % item)
+				pywikibot.output(u'Sending mail "%s" to "%s" as notification!' % (error_mail[1], error_mail[0]))
+				usr = userlib.User(pywikibot.getSite(), error_mail[0])
+				if not usr.sendMail(subject=error_mail[1], text=item):		# 'item' should be unicode!
+					pywikibot.output(u'!!! WARNING: mail could not be sent!')
 
-				# https://wiki.toolserver.org/view/Cronjob#Output use CRON for error and mail handling, if
-				# something should be mailed/reported just print it to 'out_stream' or 'err_stream'
-				print >> out_stream, item
-		raise
-		#raise sys.exc_info()[0](sys.exc_info()[1])
+			# https://wiki.toolserver.org/view/Cronjob#Output use CRON for error and mail handling, if
+			# something should be mailed/reported just print it to 'log.stdout' or 'log.stderr'
+			print >> log.stdout, item
+
+		raise #sys.exc_info()[0](sys.exc_info()[1])
 	finally:
 		pywikibot.stopme()
 
-	if not no_repeat:
-		(sys.stdout, sys.stderr) = (out_stream, err_stream)
-		logfile.close()
+	log.close()
 
