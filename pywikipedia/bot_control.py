@@ -78,7 +78,7 @@ For tests its sometimes better to use:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: bot_control.py 0.3.0041 2010-10-03 15:54:26Z drtrigon $'
+__version__='$Id: bot_control.py 0.3.0042 2010-10-03 19:29:05Z drtrigon $'
 __revision__='8601'
 #
 
@@ -123,13 +123,77 @@ bot_list = { 'clean_user_sandbox': (clean_user_sandbox, u'clean userspace Sandbo
 bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'mailer', 'subster', 'page_disc' ]
 
 
-class SubBotError(Exception):
+# Bot Error Handling; to prevent bot errors to stop execution of other bots
+class BotError(pywikibot.Error):
 	def __init__(self, value):
 		self.value = value
 	def __str__(self):
 		return repr(self.value)
 
+class BotErrorHandler:
+	def __init__(self):
+		self.error_buffer = []
 
+	def raise_exceptions(self):
+		if self.error_buffer:
+			raise BotError('Exception(s) occured in Bot')
+
+	def handle_exceptions(self, log):
+		self.gettraceback(sys.exc_info())
+
+		for item in self.error_buffer:		# if Ctrl-C/BREAK/keyb-int; the 'error_buffer' should be empty
+			item = item[2]
+			# if runned as CRON-job mail occuring exception and traceback to bot admin
+			if cron and error_mail_fromwiki:
+				pywikibot.output(u'ERROR:\n%s\n' % item)
+				pywikibot.output(u'Sending mail "%s" to "%s" as notification!' % (error_mail[1], error_mail[0]))
+				usr = userlib.User(pywikibot.getSite(), error_mail[0])
+				if not usr.sendMail(subject=error_mail[1], text=item):		# 'item' should be unicode!
+					pywikibot.output(u'!!! WARNING: mail could not be sent!')
+
+			# https://wiki.toolserver.org/view/Cronjob#Output use CRON for error and mail handling, if
+			# something should be mailed/reported just print it to 'log.stdout' or 'log.stderr'
+			print >> log.stdout, item
+
+	def gettraceback(self, exc_info):
+		output = StringIO.StringIO()
+		traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], file=output)
+		if ('KeyboardInterrupt\n' not in traceback.format_exception_only(exc_info[0], exc_info[1])):
+			result = output.getvalue()
+			output.close()
+			#exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
+			#return (exc_info[0], exc_info[1], result)
+			error = (exc_info[0], exc_info[1], result)
+			self.error_buffer.append( error )
+
+			pywikibot.output(u'\03{lightred}%s\03{default}' % error[2])
+
+class BotController:
+	def __init__(self, bot, desc, run_bot, ErrorHandler):
+		self.bot          = bot
+		self.desc         = desc
+		self.run_bot      = run_bot
+		self.ErrorHandler = ErrorHandler
+
+	def trigger(self):
+		if self.run_bot:
+			self.run()
+		else:
+			self.skip()
+
+	def skip(self):
+		pywikibot.output(u'SKIPPING: ' + self.desc)
+
+	def run(self):
+		pywikibot.output(u'RUN BOT: ' + self.desc)
+
+		try:
+			self.bot.main()
+		except:
+			self.ErrorHandler.gettraceback(sys.exc_info())
+
+
+# Bot Output Redirecting And Logging; to assure all output is logged into file
 class Logger:
 	def __init__(self, filename, **param):
 		self.file = codecs.open(filename, **param)
@@ -177,52 +241,7 @@ class OutputLog:
 		self.__init__(addlogname=addlogname)
 
 
-class BotController:
-	def __init__(self, bot, desc, run_bot):
-		self.bot = bot
-		self.desc = desc
-		self.run_bot = run_bot
-		self.error = None
-
-	def trigger(self):
-		if self.run_bot:
-			self.run()
-		else:
-			self.skip()
-
-		if self.error:
-			return [self.error]
-		else:
-			return []
-
-	def skip(self):
-		pywikibot.output(u'SKIPPING: ' + self.desc)
-
-	def run(self):
-		pywikibot.output(u'RUN BOT: ' + self.desc)
-
-		try:
-			self.bot.main()
-		except:
-			self.error = gettraceback(sys.exc_info())
-			if self.error:
-				pywikibot.output(u'\03{lightred}%s\03{default}' % self.error[2])
-			else:
-				raise
-			#raise sys.exc_info()[0](sys.exc_info()[1])
-
-
-def gettraceback(exc_info):
-	output = StringIO.StringIO()
-	traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], file=output)
-	if ('KeyboardInterrupt\n' in traceback.format_exception_only(exc_info[0], exc_info[1])):
-		return None
-	result = output.getvalue()
-	output.close()
-	#exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-	return (exc_info[0], exc_info[1], result)
-
-
+# Retrieve revision number of pywikibedia framework
 def getversion_svn():
 	# framework revision?
 	pywikibot.output(u'LATEST FRAMEWORK REVISION:')
@@ -235,8 +254,9 @@ def getversion_svn():
 		pywikibot.output(u'  WARNING: could not retrieve information!')
 
 
+# main procedure
 def main():
-	global log, error_buffer
+#	global log, error
 #	global do_dict		# alle anderen NICHT noetig, warum diese hier ?!?????
 
 	# script call
@@ -262,7 +282,8 @@ def main():
 
 		bot = BotController(bot_module,
 			            bot_desc,
-			            do_dict[bot_name]) )
+			            do_dict[bot_name],
+		                    error) )
 
 		#if bot.desc == u'"SubsterBot"':
 		if bot_name == 'subster':
@@ -272,17 +293,17 @@ def main():
 				log.switch(addlogname=logname_enh)
 			# magic words for subster, look also at 'subster.py' (should be strings, but not needed)
 			if not no_magic_words:
-				bot.bot.magic_words = {'BOTerror':          str(bool(error_buffer)),
-				                       'BOTerrortraceback': str([item[2] for item in error_buffer]),}
+				bot.bot.magic_words = {'BOTerror':          str(bool(error.error_buffer)),
+				                       'BOTerrortraceback': str([item[2] for item in error.error_buffer]),}
 				                       #'BOTversion':        '0.2.0000, rev. ' + __revision__,
 				                       #'BOTrunningsubbots': '...',}
-			error_buffer += bot.trigger()
+			bot.trigger()
 			if cron:
 				# back to default log (for everything else than subster)
 				logname_enh = ""
 				log.switch(addlogname=logname_enh)
 		else:
-			error_buffer += bot.trigger()
+			bot.trigger()
 
 	pywikibot.output(u'\nDone.')
 	return
@@ -339,7 +360,7 @@ if __name__ == "__main__":
 
 		no_magic_words = ("-no_magic_words" in arg)
 
-		error_buffer = []
+		error = BotErrorHandler()
 	else:
 		log = OutputLog()
 		choice = pywikibot.inputChoice('Do you want to compress the histories?', ['Yes', 'No'], ['y', 'n'])
@@ -355,27 +376,9 @@ if __name__ == "__main__":
 
 	try:
 		main()
-		if error_buffer:	# SubBot error
-			raise SubBotError('exception(s) occured in SubBot')
+		error.raise_exceptions()
 	except:
-		error = gettraceback(sys.exc_info())
-		if error:				# sub-bot error OR other/unexpected error
-			error_buffer.append( error )
-
-		for item in error_buffer:		# if Ctrl-C/BREAK/keyb-int; the 'error_buffer' should be empty
-			item = item[2]
-			# if runned as CRON-job mail occuring exception and traceback to bot admin
-			if cron and error_mail_fromwiki:
-				pywikibot.output(u'ERROR:\n%s\n' % item)
-				pywikibot.output(u'Sending mail "%s" to "%s" as notification!' % (error_mail[1], error_mail[0]))
-				usr = userlib.User(pywikibot.getSite(), error_mail[0])
-				if not usr.sendMail(subject=error_mail[1], text=item):		# 'item' should be unicode!
-					pywikibot.output(u'!!! WARNING: mail could not be sent!')
-
-			# https://wiki.toolserver.org/view/Cronjob#Output use CRON for error and mail handling, if
-			# something should be mailed/reported just print it to 'log.stdout' or 'log.stderr'
-			print >> log.stdout, item
-
+		error.handle_exceptions(log)
 		raise #sys.exc_info()[0](sys.exc_info()[1])
 	finally:
 		pywikibot.stopme()
