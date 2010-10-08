@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wiktionary_family.py 8594 2010-09-24 04:20:50Z xqt $'
+__version__ = '$Id: wiktionary_family.py 8623 2010-10-08 15:28:12Z malafaya $'
 
 # The Wikimedia family that is known as Wiktionary
 
@@ -11,19 +11,19 @@ class Family(family.Family):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'en', 'fr', 'lt', 'zh', 'tr', 'ru', 'vi', 'io', 'pl', 'pt', 'fi',
-            'hu', 'el', 'ko', 'no', 'ta', 'de', 'sv', 'it', 'nl', 'my', 'kn',
-            'li', 'lo', 'ml', 'mg', 'ja', 'es', 'ku', 'ar', 'et', 'ro', 'id',
+            'en', 'fr', 'lt', 'zh', 'tr', 'ru', 'vi', 'pl', 'io', 'pt', 'fi',
+            'hu', 'ko', 'el', 'no', 'de', 'ta', 'sv', 'it', 'nl', 'mg', 'my',
+            'kn', 'li', 'lo', 'ml', 'ja', 'es', 'ku', 'ar', 'et', 'ro', 'id',
             'te', 'gl', 'uk', 'bg', 'ca', 'vo', 'fa', 'is', 'scn', 'cs', 'hr',
             'simple', 'sr', 'af', 'th', 'oc', 'fy', 'sw', 'br', 'he', 'la',
             'sq', 'sl', 'hy', 'tt', 'zh-min-nan', 'da', 'cy', 'wa', 'ne', 'tk',
-            'ast', 'lv', 'ur', 'hsb', 'ka', 'kk', 'eo', 'ky', 'wo', 'ang', 'eu',
-            'co', 'hi', 'az', 'mr', 'ga', 'gn', 'ia', 'sk', 'be', 'ms', 'tl',
+            'lv', 'ast', 'ur', 'hsb', 'ka', 'kk', 'eo', 'ky', 'wo', 'eu', 'ang',
+            'hi', 'co', 'az', 'mr', 'ga', 'gn', 'ia', 'sk', 'be', 'tl', 'ms',
             'csb', 'st', 'nn', 'nds', 'kl', 'sd', 'ug', 'ps', 'ti', 'sh', 'mk',
-            'bn', 'an', 'si', 'zu', 'gu', 'km', 'ss', 'qu', 'ts', 'bs', 'fo',
+            'bn', 'si', 'an', 'zu', 'gu', 'km', 'ss', 'qu', 'ts', 'bs', 'fo',
             'am', 'rw', 'chr', 'om', 'su', 'kw', 'iu', 'mn', 'gv', 'nah', 'lb',
             'yi', 'ie', 'pa', 'mt', 'gd', 'tg', 'tpi', 'dv', 'za', 'ik', 'sg',
-            'so', 'roa-rup', 'uz', 'mi', 'jv', 'ln', 'sm', 'ha', 'ay', 'sa',
+            'so', 'mi', 'roa-rup', 'uz', 'jv', 'ln', 'sm', 'ha', 'ay', 'sa',
             'na', 'jbo', 'tn', 'fj', 'ks', 'dz', 'als',
         ]
 
@@ -472,15 +472,6 @@ class Family(family.Family):
             'zh-cn': 'zh'
         }
 
-        # Order for fy: alphabetical by code, but y counts as i
-        # TODO: This code is duplicated from wikipedia_family.py
-        def fycomp(x,y):
-            x = x.replace("y","i")+x.count("y")*"!"
-            y = y.replace("y","i")+y.count("y")*"!"
-            return cmp(x,y)
-        self.fyinterwiki = self.alphabetic[:]
-        self.fyinterwiki.sort(fycomp)
-
         # Which languages have a special order for putting interlanguage links,
         # and what order is it? If a language is not in interwiki_putfirst,
         # alphabetical order on language code is used. For languages that are in
@@ -489,12 +480,14 @@ class Family(family.Family):
         # after those, in code-alphabetical order.
 
         self.interwiki_putfirst = {
+            'da': self.alphabetic,
             'en': self.alphabetic,
             'et': self.alphabetic,
             'fi': self.alphabetic,
             'fy': self.fyinterwiki,
             'he': ['en'],
             'hu': ['en'],
+            'ms': self.alphabetic_revised,
             'pl': self.alphabetic,
             'simple': self.alphabetic
         }

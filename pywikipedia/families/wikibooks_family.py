@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikibooks_family.py 8598 2010-09-27 09:35:21Z xqt $'
+__version__ = '$Id: wikibooks_family.py 8621 2010-10-08 06:56:59Z xqt $'
 
 # The Wikimedia family that is known as Wikibooks
 
@@ -13,13 +13,12 @@ class Family(family.Family):
         self.languages_by_size = [
             'en', 'de', 'fr', 'ja', 'pt', 'hu', 'nl', 'es', 'pl', 'it', 'he',
             'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'hr', 'zh', 'sv', 'tr', 'da',
-            'th', 'mk', 'id', 'ko', 'sr', 'fa', 'tl', 'ar', 'gl', 'is', 'no',
+            'th', 'id', 'mk', 'ko', 'fa', 'sr', 'tl', 'ar', 'gl', 'is', 'no',
             'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'si', 'la', 'uk',
-            'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'az', 'ur', 'ml', 'oc', 'ms',
-            'eu', 'hi', 'fy', 'ie', 'af', 'tt', 'tg', 'bn', 'hy', 'pa', 'te',
+            'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'az', 'ur', 'oc', 'ml', 'ms',
+            'eu', 'hi', 'fy', 'ie', 'tt', 'af', 'tg', 'bn', 'hy', 'pa', 'te',
             'sa', 'bs', 'ky', 'be', 'ne', 'ast', 'zh-min-nan', 'cy', 'mg', 'ku',
-            'co', 'tk', 'su', 'als', 'vo', 'uz', 'na', 'kk', 'mn', 'nds', 'zu',
-            'my',
+            'co', 'tk', 'su', 'als', 'vo', 'uz', 'na', 'kk', 'mn', 'nds', 'my',
         ]
 
         if family.config.SSL_connection:
@@ -367,7 +366,8 @@ class Family(family.Family):
             'yo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yoruba_Wikibooks
             'za': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=20325
             'zh-tw': 'zh',
-            'zh-cn': 'zh'
+            'zh-cn': 'zh',
+            'zu': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=25425
         }
 
         self.interwiki_putfirst = {

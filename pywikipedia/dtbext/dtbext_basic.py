@@ -13,7 +13,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: dtbext_basic.py 0.3.0040 2010-10-02 20:13 drtrigon $'
+__version__='$Id: dtbext_basic.py 0.3.0043 2010-10-09 00:05:17Z drtrigon $'
 #
 
 
@@ -66,11 +66,13 @@ class BasicBot(basic.BasicBot):
 
 	# ADDED
 	# REASON: needed by SumDiscBot
-	def loadMode(self, page):
+	def loadMode(self, page, regex_compile=False):
 		"""Get operating mode from user's disc page by searching for the template.
 		   ADDED METHOD: needed by SumDiscBot
 
 		   @param page: The user (page) for which the data should be retrieved.
+		   @param regex_compile: If True the value added to the ignore_list will
+                                         be compiled first.
 
 		   Sets self._mode and self._tmpl_data which represent the settings how
 		   to report news to the user. Sets self._content also which is the touched
@@ -88,7 +90,9 @@ class BasicBot(basic.BasicBot):
 			# enhanced: with template
 			self._mode = True
 			self._tmpl_data = tmpl[u'data']
-			self._param['ignorepage_list'].append( re.compile(self._tmpl_data) )
+			if regex_compile:
+				self._tmpl_data = re.compile(self._tmpl_data)
+			self._param['ignorepage_list'].append( self._tmpl_data )
 
 			# update template and content
 			tmpl[u'timestamp'] = u'--~~~~'

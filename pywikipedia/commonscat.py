@@ -50,7 +50,7 @@ TODO:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: commonscat.py 8552 2010-09-14 05:47:44Z xqt $'
+__version__ = '$Id: commonscat.py 8620 2010-10-07 11:56:18Z xqt $'
 #
 
 import wikipedia as pywikibot
@@ -282,7 +282,7 @@ u'Cannot change %s because of spam blacklist entry %s'
                 else:
                     for (inPageTemplate, param) in templatesWithParams:
                         if inPageTemplate == template[0] \
-                           and template[1] in param[0]:
+                           and template[1] in param[0].replace(' ',''):
                             return True
         return False
 

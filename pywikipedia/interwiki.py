@@ -303,7 +303,7 @@ have to break it off, use "-continue" next time.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: interwiki.py 8555 2010-09-14 16:23:48Z xqt $'
+__version__ = '$Id: interwiki.py 8607 2010-10-05 04:20:43Z xqt $'
 #
 
 import sys, copy, re, os
@@ -1840,7 +1840,8 @@ u'NOTE: number of edits are restricted at %s'
                 rmPage = old[rmsite]
                 #put it to new means don't delete it
                 if not globalvar.cleanup or \
-                   rmPage.aslink(forceInterwiki=True) not in globalvar.remove:
+                   rmPage.aslink(forceInterwiki=True) not in globalvar.remove or \
+                   rmPage.site().sitename() == 'wikipedia:hi': #work-arround for bug #3081100 (do not remove hi-pages)
                     new[rmsite] = rmPage
                     pywikibot.output(
                         u"WARNING: %s is either deleted or has a mismatching disambiguation state."

@@ -11,7 +11,7 @@ and return a unicode string.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: textlib.py 8596 2010-09-25 10:15:35Z xqt $'
+__version__ = '$Id: textlib.py 8604 2010-10-04 19:58:47Z xqt $'
 
 
 import wikipedia as pywikibot
@@ -389,7 +389,6 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
                                              separator=separatorstripped)
     s = interwikiFormat(new, insite = site)
     if s:
-        
         if site.language() in site.family.interwiki_attop or \
            u'<!-- interwiki at top -->' in oldtext:
             newtext = s + separator + s2.replace(marker,'').strip()

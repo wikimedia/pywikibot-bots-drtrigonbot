@@ -18,7 +18,7 @@ These parameters are supported to specify which pages titles to print:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: pagegenerators.py 8589 2010-09-22 05:07:29Z xqt $'
+__version__='$Id: pagegenerators.py 8609 2010-10-05 16:21:42Z xqt $'
 
 import wikipedia as pywikibot
 import config
@@ -573,7 +573,7 @@ class GeneratorFactory(object):
                 regex = pywikibot.input(u'What page names are you looking for?')
             else:
                 regex = arg[12:]
-            gen = RegexFilterPageGenerator(site.allpages(), regex)
+            gen = RegexFilterPageGenerator(site.allpages(), [regex])
         elif arg.startswith('-yahoo'):
             gen = YahooSearchPageGenerator(arg[7:])
         elif arg.startswith('-'):
@@ -1160,16 +1160,46 @@ def DuplicateFilterPageGenerator(generator):
             seenPages[_page] = True
             yield page
 
-def RegexFilterPageGenerator(generator, regex):
+def RegexFilterPageGenerator(generator, regex, inverse=False, ignore_namespace=True):
     """
     Wraps around another generator. Yields only those pages, the titles of
-    which are positively matched to regex.
+    which are positively matched to any regex in list. If invert is False,
+    yields all pages matched by any regex, if True, yields all pages matched
+    none of the regex. If ignore_namespace is False, the whole page title
+    is compared.
+
     """
-    reg = re.compile(regex, re.I)
+    # test for backwards compatibility
+    if isinstance(regex, basestring):
+        regex = [regex]
+    # test if regex is already compiled
+    if isinstance(regex[0], basestring):
+        reg = [ re.compile(r, re.I) for r in regex ]
+    else:
+        reg = regex
 
     for page in generator:
-        if reg.match(page.titleWithoutNamespace()):
-            yield page
+        # get the page title
+        if ignore_namespace:
+            title = page.titleWithoutNamespace()
+        else:
+            title = page.title()
+
+        if inverse:
+            # yield page if NOT matched by all regex
+            skip = False
+            for r in reg:
+                if r.match(title):
+                    skip = True
+                    break
+            if not skip:
+                yield page
+        else:
+            # yield page if matched by any regex
+            for r in reg:
+                if r.match(title):
+                    yield page
+                    break
 
 def CombinedPageGenerator(generators):
     """

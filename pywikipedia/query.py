@@ -22,7 +22,7 @@ This module allow you to use the API in a simple and easy way.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: query.py 8305 2010-06-16 17:55:23Z cydeweys $'
+__version__ = '$Id: query.py 8619 2010-10-07 08:51:35Z xqt $'
 #
 
 import wikipedia, time
@@ -195,42 +195,6 @@ def GetLinks(site, titles, extraParams = None ):
     params = CombineParams( params, extraParams )
     return GetData(params, site)
 
-def GetDisambigTemplates(site):
-    """This method will return a set of disambiguation templates.
-    Template:Disambig is always assumed to be default, and will be
-    appended (in localized format) regardless of its existence.
-    The rest will be aquired from the Wikipedia:Disambiguation Templates page.
-    Only links to templates will be used from that page.
-    """
-
-    disambigs = set()
-    disambigName = wikipedia.translate(site, site.family.disambiguationTemplates())
-    disListName = u"Wikipedia:Disambiguation Templates"
-    disListId = 0
-
-    templateNames = GetLinks(site, [disListName, disambigName])
-    for id, page in templateNames['pages'].iteritems():
-        if page['title'] in disambigName:
-            if 'normalizedTitle' in page:
-                disambigs.add(page['normalizedTitle'])
-            elif 'redirect' in page:
-                disambigs.add(page['title'])
-        elif page['title'] == disListName:
-            if 'normalizedTitle' in page:
-                if 'refid' in page:
-                    disListId = page['refid']
-            else:
-                disListId = id
-
-    # Disambig page was found
-    if disListId > 0:
-        page = templateNames['pages'][disListId]
-        if 'links' in page:
-            for l in page['links']:
-                if l['ns'] == 10:
-                    disambigs.add(l['*'])
-
-    return disambigs
 #
 #
 # Helper utilities

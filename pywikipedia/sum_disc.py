@@ -68,7 +68,7 @@ Syntax example:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: sum_disc.py 0.3.0040 2010-10-02 20:22 drtrigon $'
+__version__='$Id: sum_disc.py 0.3.0043 2010-10-09 00:05:17Z drtrigon $'
 #
 
 
@@ -118,7 +118,8 @@ bot_config = {	# unicode values
 		# list values
 		# which lists are regex to compile ('backlinks_list' are no regex)
 		#'regex_compile':	[ 'checkedit_list', 'checksign_list', 'ignorepage_list', ],
-		'regex_compile':	[ 'checkedit_list', 'ignorepage_list', 'ignorehead_list', ],
+		#'regex_compile':	[ 'checkedit_list', 'ignorepage_list', 'ignorehead_list', ],
+		'regex_compile':	[ 'checkedit_list', 'ignorehead_list', ],
 		# which lists may contain variables to substitute
 		#'vars_subst':		[ 'checkedit_list', 'checksign_list', 'ignorepage_list', 'backlinks_list', 'altsign_list' ],
 		'vars_subst':		[ 'checkedit_list', 'ignorepage_list', 'backlinks_list', 'altsign_list' ],	# + 'ignorehead_list' ?
@@ -317,7 +318,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			pywikibot.output(u'\03{lightred}** Processing User: %s\03{default}' % self._user.name())
 
 			# get operating mode
-			self.loadMode(self._userPage)
+			self.loadMode(self._userPage, regex_compile=('ignorepage_list' in bot_config['regex_compile']))
 
 			# get history entries
 			self.loadHistory(rollback=self.rollback)
@@ -328,7 +329,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			# RecentEditsPageGenerator
 
 # some user return a lot more than 500 backlinks!
-# (maybe check the backlinks only once a week...?!?)
+# (maybe check the backlinks only once a week/month...?!?)
 			# get the backlinks to user disc page
 			if self._param['getbacklinks_switch']:
 				self.getUserBacklinks()
@@ -465,7 +466,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			self._param[item] = [ subitem % param_vars for subitem in self._param[item] ]
 
 		# pre-compile regex
-		# (probably try to pre-compile 'self._param_default' once int __init__ and reuse the unchanged ones here)
+		# (probably try to pre-compile 'self._param_default' once in __init__ and reuse the unchanged ones here)
 		for item in bot_config['regex_compile']:
 			self._param[item] = map(re.compile, self._param[item])
 
@@ -613,16 +614,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		   Returns nothing, but feeds to self.pages class instance.
 		"""
 
-# [ RegexFilterPageGenerator; but has to be modified and a patch sent upstream for this / JIRA: DRTRIGON-62 ]
-		def RegexFilterPageGenerator(generator):
-			for page in generator:
-				skip = False
-				for check in self._param['ignorepage_list']:
-					if check.search(page.title()):
-						skip = True
-						break
-				if skip: continue
-				yield page
 		# -SPEEDUP EVEN MORE BY CACHING ALL PAGES TO DISK USED THE SAME DAY?!? (JIRA ticket??? think about it!)
 		#  look into 'diskcache.py'
 
@@ -632,9 +623,10 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		size = len(work)
 		jj = 0
 		gen1 = pagegenerators.PagesFromTitlesGenerator(work.keys())
-		# PageTitleFilterPageGenerator; or use RegexFilterPageGenerator (look ignorelist)
-		#gen2 = pagegenerators.PageTitleFilterPageGenerator(gen1, ignore_list)
-		gen2 = RegexFilterPageGenerator(gen1)
+		gen2 = pagegenerators.RegexFilterPageGenerator(gen1,
+							       self._param['ignorepage_list'], 
+							       inverse = True, 
+							       ignore_namespace = False)
 		# Preloads _contents and _versionhistory
 		# [ DOES NOT USE API YET! / ThreadedGenerator would be nice! / JIRA: ticket? ]
 		# WithoutInterwikiPageGenerator, 
