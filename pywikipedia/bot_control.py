@@ -4,7 +4,6 @@ This bot is the general DrTrigonBot caller. It runs all the different sub tasks,
 that DrTrigonBot does. That are:
 	-sandbox cleaner
 	-sum disc (sum disc hisory compression)
-	-mailer
 	-subster
 	-page disc		[experimental]
 ...
@@ -17,11 +16,11 @@ Options/parameters:
 Run all bots (output to stdout):
 	python bot_control.py
 NEW:	python bot_control.py -all
-(do user_sandbox, sum_disc, mailer, subster)
+(do user_sandbox, sum_disc, subster)
 
 # Run all bots as CRON job (output to log on server, and another one for subster):
 # NEW:	python bot_control.py -all -cron
-# (do user_sandbox, sum_disc, mailer, subster, page_disc / ATTENTION: this mode uses 2 log files !!!)
+# (do user_sandbox, sum_disc, subster, page_disc / ATTENTION: this mode uses 2 log files !!!)
 # CRON (toolserver):
 # # m h  dom mon dow   command
 # 0 2 * * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -all -cron
@@ -32,7 +31,7 @@ NEW:	python bot_control.py -all
 Run default bot set as CRON job (output to log on server):
 	python bot_control.py -cron
 NEW:	python bot_control.py -default -cron
-(do user_sandbox, sum_disc, mailer, page_disc / skip subster)
+(do user_sandbox, sum_disc, page_disc / skip subster)
 CRON (toolserver):
 # m h  dom mon dow   command
 0 2 * * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -default -cron
@@ -40,7 +39,7 @@ CRON (toolserver):
 Run sum_disc.py history compression as CRON job (output to log on server):
 	python bot_control.py -skip_clean_user_sandbox -compress_history:[] -cron
 NEW:	python bot_control.py -compress_history:[] -cron
-(do sum_disc history compression only / skip user_sandbox, sum_disc, mailer, subster)
+(do sum_disc history compression only / skip user_sandbox, sum_disc, subster)
 CRON (toolserver):
 # m h  dom mon dow   command
 0 0 */14 * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -compress_history:[] -cron
@@ -48,7 +47,7 @@ CRON (toolserver):
 Run subster bot only as CRON job (output to own log not to disturb the output of 'panel.py'
 and run stand-alone to catch failed other runs...):
 	python bot_control.py -subster -no_magic_words -cron
-(do subster / skip user_sandbox, sum_disc, mailer / ATTENTION: this mode uses another log than usual !!!)
+(do subster / skip user_sandbox, sum_disc / ATTENTION: this mode uses another log than usual !!!)
 CRON (toolserver):
 # m h  dom mon dow   command
 0 */12 * * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -subster -no_magic_words -cron
@@ -62,14 +61,10 @@ Run the bot 'clean_user_sandbox.py' only:
 Run the bot 'sum_disc.py' only:
 	python bot_control.py -sum_disc
 
-Run the bot 'mailer.py' only:
-	python bot_control.py -mailer
-
 
 For tests its sometimes better to use:
 	python clean_user_sandbox.py
 	python sum_disc.py
-	python mailer.py
 """
 #
 # @copyright Dr. Trigon, 2008-2010
@@ -88,13 +83,13 @@ For tests its sometimes better to use:
 # @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
 __version__  = '$Id$'
-__revision__ = '8601'
+__revision__ = '8640'
 #
 
 # wikipedia-bot imports
 import pagegenerators, userlib
 import sys, os, re, time, codecs
-import clean_user_sandbox, sum_disc, mailer, subster, page_disc
+import clean_user_sandbox, sum_disc, subster, page_disc
 #import clean_user_sandbox, sum_disc, replace_tmpl
 import dtbext
 # Splitting the bot into library parts
@@ -118,18 +113,17 @@ infolist = [ pywikibot.__version__, pywikibot.config.__version__,	# framework
              dtbext.date.__version__, dtbext.userlib.__version__,	#
              dtbext.botlist.__version__,				#
              __version__, clean_user_sandbox.__version__,		# bots
-             sum_disc.__version__, mailer.__version__,			#
-             subster.__version__, page_disc.__version__, ]		#
+             sum_disc.__version__, subster.__version__,			#
+             page_disc.__version__, ]					#
 
 # bots to run and control
 bot_list = { 'clean_user_sandbox': (clean_user_sandbox, u'clean userspace Sandboxes'),
              'sum_disc':           (sum_disc, u'discussion summary'),
              'compress_history':   (sum_disc, u'compressing discussion summary'),
              'replace_tmpl':       (replace_tmpl, u'replace_tmpl'),
-             'mailer':             (mailer, u'"MailerBot"'),
              'subster':            (subster, u'"SubsterBot"'),
              'page_disc':          (page_disc, u'page_disc (beta test)'), }
-bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'mailer', 'subster', 'page_disc' ]
+bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'subster', 'page_disc' ]
 
 
 # Bot Error Handling; to prevent bot errors to stop execution of other bots
@@ -330,7 +324,6 @@ if __name__ == "__main__":
 		            'sum_disc':           False,
 		            'compress_history':   False,
 		            'replace_tmpl':       False,
-		            'mailer':             False,
 		            'subster':            False,
 		            'page_disc':          False,
 		}
@@ -339,7 +332,6 @@ if __name__ == "__main__":
 			do_dict.update({ 'clean_user_sandbox': True,
 			                 'sum_disc':           True,
 			                 #'replace_tmpl':       False,
-			                 'mailer':             True,
 			                 'subster':            True,
 			                 'page_disc':          True,
 			})
@@ -347,7 +339,6 @@ if __name__ == "__main__":
 			do_dict.update({ 'clean_user_sandbox': True,
 			                 'sum_disc':           True,
 			                 #'replace_tmpl':       True,
-			                 'mailer':             True,
 			                 #'subster':            True,
 			                 'page_disc':          True,
 			})
@@ -359,7 +350,6 @@ if __name__ == "__main__":
 		else:
 			do_dict.update({ 'clean_user_sandbox': ("-clean_user_sandbox" in arg),
 			                 'sum_disc':           ("-sum_disc" in arg),
-			                 'mailer':             ("-mailer" in arg),
 			                 #'subster':            ("-subster" in arg),
 			                 'page_disc':          ("-page_disc" in arg),
 			})
