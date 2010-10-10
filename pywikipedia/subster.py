@@ -4,13 +4,22 @@ Robot which will does substitutions of tags within wiki page content with extern
 other wiki text data. Like dynamic text updating.
 """
 #
-# (C) Dr. Trigon, 2009-2010
+# @copyright Dr. Trigon, 2009-2010
 #
-# DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+# @todo      ...
+#
+# @section FRAMEWORK
+#
+# Python wikipedia robot framework, DrTrigonBot.
+# @see http://pywikipediabot.sourceforge.net/
+# @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+#
+# @section LICENSE
 #
 # Distributed under the terms of the MIT license.
+# @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__='$Id: subster.py 0.3.0040 2010-10-02 20:13 drtrigon $'
+__version__ = '$Id$'
 #
 
 

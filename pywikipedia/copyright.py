@@ -87,7 +87,7 @@ import re, codecs, os, time, urllib, urllib2, httplib
 import wikipedia as pywikibot
 import pagegenerators, config
 
-__version__='$Id: copyright.py 8517 2010-09-11 08:32:54Z xqt $'
+__version__='$Id: copyright.py 8629 2010-10-09 16:11:46Z xqt $'
 
 # Search keywords added to all the queries.
 no_result_with_those_words = '-Wikipedia'
@@ -638,7 +638,7 @@ class SearchEngine:
                             consecutive = False
                             continue
                     n_query += 1
-                    #wikipedia.output(search_words)
+                    #pywikibot.output(search_words)
                     if config.copyright_max_query_for_page and n_query > config.copyright_max_query_for_page:
                         warn(u"Max query limit for page reached")
                         return output
@@ -845,7 +845,7 @@ class SearchEngine:
     def get_results(self, query, numresults = 10):
         result_list = list()
         query = re.sub("[()\"<>]", "", query)
-        # wikipedia.output(query)
+        # pywikibot.output(query)
         if config.copyright_google:
             self.soap('google', query, result_list)
         if config.copyright_yahoo:

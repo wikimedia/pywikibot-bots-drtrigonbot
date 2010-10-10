@@ -19,13 +19,22 @@ including all namespaces. It checks several users (at request), sequential
 # ====================================================================================================
 
 #
-# (C) Dr. Trigon, 2008, 2009
+# @copyright Dr. Trigon, 2009-2010
 #
-# DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+# @todo      ...
+#
+# @section FRAMEWORK
+#
+# Python wikipedia robot framework, DrTrigonBot.
+# @see http://pywikipediabot.sourceforge.net/
+# @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+#
+# @section LICENSE
 #
 # Distributed under the terms of the MIT license.
+# @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__='$Id: mailer.py 0.2.0020 2009-11-14 17:54 drtrigon $'
+__version__ = '$Id$'
 #
 
 

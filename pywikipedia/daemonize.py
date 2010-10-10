@@ -1,10 +1,17 @@
-import sys, os
+# -*- coding: utf-8  -*-
+#
+# (C) Pywikipedia bot team, 2007-2008, 2010
+#
+# Distributed under the terms of the MIT license.
+#
+__version__ = '$Id: daemonize.py 8633 2010-10-09 22:37:43Z xqt $'
+#
 
-__version__ = '$Id: daemonize.py 5846 2008-08-24 20:53:27Z siebrand $'
+import sys, os
 
 is_daemon = False
 
-def daemonize(close_fd = True, chdir = True, write_pid = False, redirect_std = None):
+def daemonize(close_fd=True, chdir=True, write_pid=False, redirect_std=None):
     """ Daemonize the current process. Only works on POSIX compatible operating
         systems. The process will fork to the background and return control to
         the terminal.

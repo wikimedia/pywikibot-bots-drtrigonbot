@@ -49,7 +49,7 @@ your user-config.py:
 
     cosmetic_changes_disable['wikipedia'] = ('de', 'en', 'fr')
 """
-__version__ = '$Id: cosmetic_changes.py 8600 2010-09-28 10:31:32Z xqt $'
+__version__ = '$Id: cosmetic_changes.py 8638 2010-10-10 02:06:55Z xqt $'
 import wikipedia as pywikibot
 import isbn
 import pagegenerators
@@ -866,16 +866,16 @@ def main():
         gen = genFactory.getCombinedGenerator()
     if not gen:
         pywikibot.showHelp()
-    elif not always:
-        answer = pywikibot.inputChoice(
-            warning + '\nDo you really want to continue?',
-            ['yes', 'no'], ['y', 'N'], 'N')
-
-    if answer == 'y':
-        preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        bot = CosmeticChangesBot(preloadingGen, acceptall=always,
-                                 comment=editSummary)
-        bot.run()
+    else:
+        if not always:
+            answer = pywikibot.inputChoice(
+                warning + '\nDo you really want to continue?',
+                ['yes', 'no'], ['y', 'N'], 'N')
+        if answer == 'y':
+            preloadingGen = pagegenerators.PreloadingGenerator(gen)
+            bot = CosmeticChangesBot(preloadingGen, acceptall=always,
+                                     comment=editSummary)
+            bot.run()
 
 if __name__ == "__main__":
     try:

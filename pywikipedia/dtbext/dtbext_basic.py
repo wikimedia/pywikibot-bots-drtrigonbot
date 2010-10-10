@@ -7,13 +7,22 @@
 #        Loads old history entry of all Users, e.g. for debuging.
 #"""
 #
-# (C) Dr. Trigon, 2009-2010
+# @copyright Dr. Trigon, 2010
 #
-# DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+# @todo      ...
+#
+# @section FRAMEWORK
+#
+# Python wikipedia robot framework, DrTrigonBot.
+# @see http://pywikipediabot.sourceforge.net/
+# @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+#
+# @section LICENSE
 #
 # Distributed under the terms of the MIT license.
+# @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__='$Id: dtbext_basic.py 0.3.0043 2010-10-09 00:05:17Z drtrigon $'
+__version__ = '$Id$'
 #
 
 
