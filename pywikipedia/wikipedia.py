@@ -120,7 +120,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 8613 2010-10-06 15:08:59Z xqt $'
+__version__ = '$Id: wikipedia.py 8650 2010-10-14 11:37:25Z xqt $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -464,14 +464,14 @@ not supported by PyWikipediaBot!"""
                     colon = ":"
                 if  self._site.family != getSite().family \
                         and self._site.family.name != self._site.lang:
-                    return u'[[%s%s:%s:%s]]' % (colon, self._site.family.name,
+                    title =  u'[[%s%s:%s:%s]]' % (colon, self._site.family.name,
                                                 self._site.lang, title)
                 else:
-                    return u'[[%s%s:%s]]' % (colon, self._site.lang, title)
+                    title = u'[[%s%s:%s]]' % (colon, self._site.lang, title)
             elif textlink and (self.isImage() or self.isCategory()):
-                    return u'[[:%s]]' % title
+                    title = u'[[:%s]]' % title
             else:
-                return u'[[%s]]' % title
+                title = u'[[%s]]' % title
         if decode or asLink:
             begin = title.find('#')
             if begin != -1:
@@ -1190,7 +1190,10 @@ not supported by PyWikipediaBot!"""
         """
         if not hasattr(self, "_isDisambig"):
             if not hasattr(self._site, "_disambigtemplates"):
-                default = set(self._site.family.disambig('_default'))
+                try:
+                    default = set(self._site.family.disambig('_default'))
+                except KeyError:
+                    default = set(u'Disambig')
                 try:
                     distl = self._site.family.disambig(self._site.lang,
                                                        fallback=False)
@@ -3625,16 +3628,13 @@ class ImagePage(Page):
             raise RuntimeError("%s" %data['error'])
         count = 0
         pageInfo = data['query']['pages'].values()[0]
+        self._local = pageInfo["imagerepository"] != "shared"
         if data['query']['pages'].keys()[0] == "-1":
-            if 'missing' in pageInfo:
+            if 'missing' in pageInfo and self._local:
                 raise NoPage(self.site(), self.aslink(forceInterwiki=True),
                              "Page does not exist.")
             elif 'invalid' in pageInfo:
                 raise BadTitle('BadTitle: %s' % self)
-        if pageInfo["imagerepository"] == "shared":
-            self._local = False
-        else:
-            self._local = True
         infos = []
         
         try:

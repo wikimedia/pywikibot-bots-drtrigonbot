@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikibooks_family.py 8621 2010-10-08 06:56:59Z xqt $'
+__version__ = '$Id: wikibooks_family.py 8649 2010-10-14 07:30:15Z xqt $'
 
 # The Wikimedia family that is known as Wikibooks
 
@@ -11,7 +11,7 @@ class Family(family.Family):
         self.name = 'wikibooks'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'ja', 'pt', 'hu', 'nl', 'es', 'pl', 'it', 'he',
+            'en', 'de', 'fr', 'ja', 'hu', 'pt', 'nl', 'es', 'pl', 'it', 'he',
             'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'hr', 'zh', 'sv', 'tr', 'da',
             'th', 'id', 'mk', 'ko', 'fa', 'sr', 'tl', 'ar', 'gl', 'is', 'no',
             'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'si', 'la', 'uk',
@@ -306,6 +306,14 @@ class Family(family.Family):
             'en': u'Subject talk',
             'si': u'විෂයය සාකච්ඡාව',
             'tr': u'Kitaplık tartışma',
+        }
+
+        self.namespaces[114] = {
+            'si': u'කණිෂ්ඨ විකි',
+        }
+
+        self.namespaces[115] = {
+            'si': u'කණිෂ්ඨ විකි සාකච්ඡාව',
         }
 
         # Which languages have a special order for putting interlanguage links,

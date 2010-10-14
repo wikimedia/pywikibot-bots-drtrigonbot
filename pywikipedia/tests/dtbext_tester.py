@@ -296,7 +296,10 @@ dtbext.pywikibot.debug = True
 
 
 #bots = dtbext.botlist.get()
-#print bots
+import botlist
+bots = botlist.get()
+print bots
+print len(bots)
 
 
 print "done."

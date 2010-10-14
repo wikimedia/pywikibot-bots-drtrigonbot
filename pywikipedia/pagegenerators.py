@@ -18,7 +18,7 @@ These parameters are supported to specify which pages titles to print:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: pagegenerators.py 8609 2010-10-05 16:21:42Z xqt $'
+__version__='$Id: pagegenerators.py 8652 2010-10-14 20:44:04Z xqt $'
 
 import wikipedia as pywikibot
 import config
