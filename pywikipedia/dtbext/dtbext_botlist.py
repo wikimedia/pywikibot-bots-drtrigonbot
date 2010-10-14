@@ -94,6 +94,34 @@ def refresh(site, sysop=False, witheditsonly=True):
         else:
             break
 
+    path = '/w/index.php?title=Spezial:Globale_Benutzerliste&offset=%(offset)s&limit=%(limit)s&group=%(group)s'
+    params = {
+        'offset': '',
+        'limit': 500,
+        'group': 'Global_bot',
+    }
+
+    pywikibot.output(u'Retrieving global bot user list for %s.' % repr(site))
+    pywikibot.put_throttle() # It actually is a get, but a heavy one.
+    m1 = True
+    while m1:
+        text = site.getUrl(path % params)
+
+        m1 = re.findall(u'<li>.*?</li>', text)
+        for item in m1:
+            m2 = re.search(u'<li>(.*?)\((.*?),\s(.*?)\)</li>', item)
+            (bot, flag_local, flag_global) = m2.groups()
+
+            bot         = bot[:-2]
+            flag_local  = (flag_local[:2] == u'<a')
+            flag_global = True # since group=Global_bot
+
+            if bot not in botlist:
+	            botlist.append( bot )
+
+        #print len(botlist)
+        params['offset'] = bot.encode(site.encoding())
+
     # Save the botlist to disk
     # The file is stored in the botlists subdir. Create if necessary.
     if sysop:
