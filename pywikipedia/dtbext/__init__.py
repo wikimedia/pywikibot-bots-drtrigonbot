@@ -30,5 +30,3 @@ import dtbext_date as date
 
 import dtbext_basic as basic
 
-import dtbext_botlist as botlist
-

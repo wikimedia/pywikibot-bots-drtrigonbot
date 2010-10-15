@@ -111,7 +111,6 @@ infolist = [ pywikibot.__version__, pywikibot.config.__version__,	# framework
              pywikibot.query.__version__, pagegenerators.__version__,	#
              dtbext.pywikibot.__version__, dtbext.basic.__version__,	# DrTrigonBot extensions
              dtbext.date.__version__, dtbext.userlib.__version__,	#
-             dtbext.botlist.__version__,				#
              __version__, clean_user_sandbox.__version__,		# bots
              sum_disc.__version__, subster.__version__,			#
              page_disc.__version__, ]					#

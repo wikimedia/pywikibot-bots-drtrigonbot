@@ -295,7 +295,6 @@ dtbext.pywikibot.debug = True
 #print userlib.User(pywikibot.getSite(), u'º_the_Bench_º')
 
 
-#bots = dtbext.botlist.get()
 import botlist
 bots = botlist.get()
 print bots

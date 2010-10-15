@@ -329,8 +329,8 @@ class Page(pywikibot.Page):
 		(revid, timestmp, username, comment) = self.getVersionHistory(revCount=1)[0][:4]
 
 		# is the last/actual editor already a human?
-		import dtbext_botlist # like watchlist
-		if not dtbext_botlist.isBot(username):
+		import botlist # like watchlist
+		if not botlist.isBot(username):
 			self._userNameHuman = username
 			return username
 
@@ -339,7 +339,7 @@ class Page(pywikibot.Page):
 		for vh in self.getVersionHistory()[1:]:
 			(revid, timestmp, username, comment) = vh[:4]
 
-			if username and (not dtbext_botlist.isBot(username)):
+			if username and (not botlist.isBot(username)):
 				# user is a human (not a bot)
 				self._userNameHuman = username
 				break
