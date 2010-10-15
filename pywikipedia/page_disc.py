@@ -134,7 +134,7 @@ docuReplacements = {
 }
 
 
-class PageDiscRobot:
+class PageDiscRobot(dtbext.basic.BasicBot):
 	'''
 	Robot which will check your latest edits for discussions and your old
 	discussions against recent changes, pages to check are provided by a
@@ -320,7 +320,7 @@ class PageDiscRobot:
 			pywikibot.output(u'[%i entries]' % count )
 
 			pywikibot.setAction(u'Diskussions-Zusammenfassung für Unterseite hinzugefügt: %i Einträge' % count)
-			if not self._appendSection(self._target[0]['page'], u'\n' + buf, section = self._target[0]['section']):
+			if not self.append(self._target[0]['page'], u'\n' + buf, section = self._target[0]['section']):
 				pywikibot.output(u'*** ERROR: Writing of data to Wiki was not possible !')
 
 			self._writeFile( str(self._hist_list).decode('latin-1') )
@@ -360,68 +360,6 @@ class PageDiscRobot:
 		except (pywikibot.NoPage, pywikibot.IsRedirectPage):
 			content = u''
 		return content
-
-	# SOLLTE NACH 'dtbext_wikipedia.py' IN class 'Page' MUSS dafür aber um einges UEBERARBEITET werden !!!
-	# VIELLEICHT AUCH SCHON SO WAS IN PYWIKIPEDIABOT FRAMEWORK
-	def _appendSection(self, page, data, section = 0, minorEdit = True):
-		'''
-		append to wiki page
-
-		input:  page
-                        data [string (unicode)]
-		returns:  (appends data to page on the wiki, nothing else)
-		'''
-
-		pywikibot.output(u'\03{lightblue}Appending to Wiki section %i on %s...\03{default}' % (section, page.title(asLink=True)))
-
-		try:
-			# get token needed to send a mail
-			#http://de.wikipedia.org/w/api.php?action=query&prop=info&intoken=email&titles=User:DrTrigon
-			request = {
-			    'action'	: 'query',
-			    'prop'	: 'info',
-			    'intoken'	: 'edit',
-			    'titles'	: 'User:%s' % 'DrTrigonBot',
-			    }
-			pywikibot.get_throttle()
-			buf = dtbext.query.GetProcessedData(request,
-								'page',
-								'',
-								['edittoken'],
-								pages = 'pages' )
-			edittoken = buf[0][0]
-
-			# basically the same problem as already occurred in 'mailer.py'
-			# according to http://www.mediawiki.org/wiki/Talk:API#http_response_codes check the http request output in 'wikipedia.py/postData'
-			# as it showed up, the framework was changed, to handle such problems (compare 'dtbext_query.py/GetData' with 'query.py/GetData')
-			# and thus the creation of 'path' for 'postForm' call has to be adapted... this could also solve the mailing restriction (and make
-			# the long mailer support obsolete...?!?)
-			#pywikibot.verbose = True
-
-			# send mail by POST request
-			request = {
-			    'action'		: 'edit',
-			    #'title'		: page.title().encode(pywikibot.getSite().encoding()),
-			    'title'		: page.title(),
-			    'section'		: '%i' % section,	# Section number. 0 for the top section, 'new' for a new section
-			    #'text'		: text,
-			    'appendtext'	: page._encodeArg(data, 'text'),
-			    'token'		: edittoken,
-			    #'summary'		: pywikibot.action.encode(pywikibot.getSite().encoding()),
-			    'summary'		: page._encodeArg(pywikibot.action, 'summary'),
-			    'bot'		: 1,
-			    }
-			if minorEdit:	request['minor'] = 1
-			else:		request['notminor'] = 1
-			buf = dtbext.query.GetProcessedData(request,
-								'edit',
-								'',
-								[],
-								post = True )
-		except pywikibot.SpamfilterError, error:
-			pywikibot.output(u'\03{lightred}SpamfilterError while trying to change %s: %s\03{default}' % (page.title(asLink=True), "error.url"))
-
-		return (buf[u'result'] == u'Success')
 
 	def _checkRelevancyTh(self):
 		'''

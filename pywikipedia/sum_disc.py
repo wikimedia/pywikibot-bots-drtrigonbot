@@ -302,6 +302,8 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		page = pywikibot.Page(self.site, bot_config['maintenance_queue'])
 		self.maintenance_msg = self.loadJobQueue(page, bot_config['queue_security'], debug = ('write2wiki' in debug))
 
+		self._wday = time.gmtime().tm_wday
+
 		# init variable/dynamic objects
 
 		# code debugging
@@ -335,10 +337,9 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			self.checkRecentEdits()
 			# RecentEditsPageGenerator
 
-# some user return a lot more than 500 backlinks!
-# (maybe check the backlinks only once a week/month...?!?)
 			# get the backlinks to user disc page
-			if self._param['getbacklinks_switch']:
+			# (some return > 500 backlinks, thus check only once a week)
+			if (self._wday == 0) and self._param['getbacklinks_switch']:
 				self.getUserBacklinks()
 				# all pages served from here ARE CURRENTLY
 				# SIGNED (have a Signature at the moment)
@@ -635,9 +636,11 @@ class SumDiscBot(dtbext.basic.BasicBot):
 							       inverse = True, 
 							       ignore_namespace = False)
 		# Preloads _contents and _versionhistory
-		# [ DOES NOT USE API YET! / ThreadedGenerator would be nice! / JIRA: ticket? ]
+		# [ DOES NOT USE API YET! / JIRA: ticket? ]
 		# WithoutInterwikiPageGenerator, 
-		gen3 = pagegenerators.PreloadingGenerator(gen2)
+		#gen3 = pagegenerators.PreloadingGenerator(gen2)
+		gen3 = pagegenerators.ThreadedGenerator(target=pagegenerators.PreloadingGenerator,
+							args=(gen2,))
 		#gen4 = pagegenerators.RedirectFilterPageGenerator(gen3)
 		for page in gen3:
 # count page number (for debug not to loose pages)
@@ -695,6 +698,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 # DOES THE PreloadingGenerator WORK ???
 #		if not (len(work.keys()) == jj):
 #			raise pywikibot.Error(u'PreloadingGenerator has lost some pages!')
+		gen3.stop()
 
 		pywikibot.output(u'\03{lightpurple}*** Latest News searched\03{default}')
 

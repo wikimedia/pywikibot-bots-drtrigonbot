@@ -240,15 +240,28 @@ class BasicBot(basic.BasicBot):
 
 	# ADDED
 	# REASON: needed by various bots
-	def append(self, page, text, comment=None, minorEdit=True):
-		#pywikibot.output(u'\03{lightblue}Appending to wiki on %s...\03{default}' % page.title(asLink=True))
+	def append(self, page, text, comment=None, minorEdit=True, section=None):
+		if section:
+			pywikibot.output(u'\03{lightblue}Appending to wiki on %s in section %s...\03{default}' % (page.title(asLink=True), section))
 
-		content = self.load( page )
+			for i in range(3): # try max. 3 times
+				try:
+					# enhance to dtbext.pywikibot.Page
+					dtbext.pywikibot.addAttributes(page)
 
-		content += u'\n\n'
-		content += text
+					# Append to page section
+					page.append(text, comment=comment, minorEdit=minorEdit, section=section)
+				except pywikibot.PageNotSaved, error:
+					pywikibot.output(u'\03{lightblue}Cannot change %s because of %s\03{default}' % (page.title(), error))
+				else:
+					return True
+		else:
+			content = self.load( page )
 
-		content = self.save(page, text, comment=comment, minorEdit=minorEdit)
+			content += u'\n\n'
+			content += text
+
+			return self.save(page, content, comment=comment, minorEdit=minorEdit)
 
 	def loadFile(self):
 		'''

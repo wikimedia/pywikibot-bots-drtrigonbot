@@ -52,6 +52,7 @@ def addAttributes(obj):
 		obj.__dict__['_findSection']		= lambda *args, **kwds: Page.__dict__['_findSection'](obj, *args, **kwds)
 		obj.__dict__['purgeCache']		= lambda *args, **kwds: Page.__dict__['purgeCache'](obj, *args, **kwds)
 		obj.__dict__['userNameHuman']		= lambda *args, **kwds: Page.__dict__['userNameHuman'](obj, *args, **kwds)
+		obj.__dict__['append']			= lambda *args, **kwds: Page.__dict__['append'](obj, *args, **kwds)
 	elif "class 'wikipedia.Site'" in str(type(obj)):
 		obj.__dict__['getParsedString']		= lambda *args, **kwds: Site.__dict__['getParsedString'](obj, *args, **kwds)
 
@@ -346,6 +347,45 @@ class Page(pywikibot.Page):
 
 		# store and return info
 		return self._userNameHuman
+
+	# ADDED: new (r49)
+	# REASON: to support appending to single sections
+	def append(self, newtext, comment=None, minorEdit=True, section=0):
+		"""Append the wiki-text to the page.
+		   ADDED METHOD: to support appending to single sections
+                   [ submit upstream and include into framework, maybe in 'put' / this function
+		     is very simple and not mature/worked out yet, has to be completed / JIRA: ticket? ]
+
+		   Returns the result of text append to page section number 'section'.
+		   0 for the top section, 'new' for a new section.
+		"""
+
+        	# If no comment is given for the change, use the default
+        	comment = comment or pywikibot.action
+
+		# send mail by POST request
+		params = {
+		    'action'		: 'edit',
+		    #'title'		: self.title().encode(self.site().encoding()),
+		    'title'		: self.title(),
+		    'section'		: '%i' % section,
+		    'appendtext'	: self._encodeArg(newtext, 'text'),
+		    'token'		: self.site().getToken(),
+		    'summary'		: self._encodeArg(comment, 'summary'),
+		    'bot'		: 1,
+		    }
+
+		if minorEdit:
+			params['minor'] = 1
+		else:
+			params['notminor'] = 1
+
+                response, data = query.GetData(params, self.site(), back_response = True)
+
+		if not (data['edit']['result'] == u"Success"):
+			raise PageNotSaved('Bad result returned: %s' % data['edit']['result'])
+
+		return response.code, response.msg, data
 
 
 # ADDED: new (r19)
