@@ -645,14 +645,15 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		# WithoutInterwikiPageGenerator, 
 		#gen3 = pagegenerators.PreloadingGenerator(gen2)
 		gen3 = pagegenerators.ThreadedGenerator(target=pagegenerators.PreloadingGenerator,
-							args=(gen2,))
+							args=(gen2,),
+							qsize=60)
 		#gen4 = pagegenerators.RedirectFilterPageGenerator(gen3)
 		for page in gen3:
 # count page number (for debug not to loose pages)
 #			jj+=1
 
 			name = page.title()
-			#print name
+			#print ">>>", name, "<<<"
 			page.sum_disc_data = work[name].sum_disc_data
 
 			# get history (was preloaded)

@@ -20,7 +20,7 @@ and the bot will only work on that single page.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '$Id: blockreview.py 8657 2010-10-16 13:33:42Z xqt $'
 #
 
 import wikipedia as pywikibot
