@@ -309,6 +309,9 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		# code debugging
 		dtbext.pywikibot.debug = ('code' in debug)
 
+	## @todo re-write some functions to be pagegenerators and use pagegenerators.CombinedPageGenerator()
+	#        and others to combine and use them
+	#        \n[ JIRA: ticket? ]
 	def run(self):
 		'''Run SumDiscBot().'''
 
@@ -339,32 +342,26 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 			# get the backlinks to user disc page
 			# (some return > 500 backlinks, thus check only once a week)
-			if (self._wday == 0) and self._param['getbacklinks_switch']:
+#			if (self._wday == 0) and self._param['getbacklinks_switch']:
+			if self._param['getbacklinks_switch']:
 				self.getUserBacklinks()
 				# all pages served from here ARE CURRENTLY
 				# SIGNED (have a Signature at the moment)
 				# UserBacklinksPageGenerator
 
-			# check for news to report
+			# get global wiki notifications (toolserver/merl)		
 			if self._param['globwikinotify_switch']:
-				# get global wiki notifications (toolserver/merl)		
-				if 'toolserver' in debug:
-					pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE TOOLSERVER ACCESS WILL BE SKIPPED ! ===\03{default}')
-					globalnotify = []
-				else:
-					dtbext.userlib.addAttributes(self._user)
-					globalnotify = self._user.globalnotifications()
+				self.AddGlobWikiNotify()
 
-				self.getLatestNews(globalnotify=globalnotify)
-			else:
-				self.getLatestNews()
+			# check for news to report and those on relevancy
+			# (disc-thread oriented version)
+			self.getLatestRelevantNews()
+
 			# CombinedPageGenerator from previous 2 (or 3) generators
 			# feed this generator into a DuplicateFilterPageGenerator
-			# and pass this with GlobalWikiNotificationsPageGen to
-			# getLatestNews
-
-			# check self.pages on relevancy, disc-thread oriented version...
-			self.checkRelevancy()
+			# and pass this (maybe with GlobalWikiNotificationsPageGen)
+			# to getLatestRelevantNews
+			# [ JIRA: ticket? ]
 
 			# gehen auch in jede history... werden aber bei compress entfernt
 			self.AddMaintenanceMsg()
@@ -625,8 +622,10 @@ class SumDiscBot(dtbext.basic.BasicBot):
 	#  @todo wikipedia.Page.getVersionHistory() is not able to check page exceptions always and
 	#        crashes sometimes, u'Benutzer Diskussion:MerlBot' for example
 	#        \n[ JIRA: ticket? ]
-	def getLatestNews(self, globalnotify=[]):
-		"""Check latest contributions on recent news.
+	def getLatestRelevantNews(self):
+		"""Check latest contributions on recent news and check relevancy of page by
+		   splitting it into sections and searching each for specific users signature,
+		   this is all done by PageSections class.
 
 		   Returns nothing, but feeds to self.pages class instance.
 		"""
@@ -634,6 +633,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		# check for news to report
 		hist = self.pages.hist
 		work = self.pages.work
+		self.pages.start_promotion()
 		size = len(work)
 		jj = 0
 		gen1 = pagegenerators.PagesFromTitlesGenerator(work.keys())
@@ -673,6 +673,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				continue
 
 			# actual/new status of page, has something changed?
+			news = False
 			if name in hist:
 				if (not (hist[name].sum_disc_data[3] == actual[0][1])):
 					# discussion has changed, some news?
@@ -682,6 +683,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 										  actual[0][1], 
 										  hist[name].sum_disc_data[4], 
 										  _PS_changed ) )
+					news = True
 				else:
 					# nothing new to report (but keep for history and update it)
 					self.pages.edit_oth(page, sum_disc_data=(hist[name].sum_disc_data[0], 
@@ -698,50 +700,13 @@ class SumDiscBot(dtbext.basic.BasicBot):
 									  actual[0][1], 
 									  {}, 
 									  _PS_new ) )
+				news = True
 
-# DOES THE PreloadingGenerator WORK ???
-#		if not (len(work.keys()) == jj):
-#			raise pywikibot.Error(u'PreloadingGenerator has lost some pages!')
-		gen3.stop()
-
-		pywikibot.output(u'\03{lightpurple}*** Latest News searched\03{default}')
-
-		# check for GlobalWikiNotifications to report
-		localinterwiki = self.site.language()
-		for (page, data) in globalnotify:
-			# skip to local disc page, since this is the only page the user should watch itself
-			if page.site().language() == localinterwiki:
-				pywikibot.output(u'\03{lightaqua}WARNING: skipping global wiki notify to local wiki %s\03{default}' % page.title(asLink=True))
+			# checkRelevancy: Check relevancy of page by splitting it into sections and searching
+			if not news:
 				continue
 
-			# actual/new status of page, has something changed?
-			if (data[u'link'] in hist.keys()) and \
-			   (data[u'timestamp'] == hist[data[u'link']].sum_disc_data[3]):
-				continue
-
-			#data = page.globalwikinotify
-			self.pages.edit_oth(page, sum_disc_data=(self._param['notify_msg'][_PS_notify], 
-								 None, # obsolete (and recursive)
-								 data['user'], 
-								 data['timestamp'], 
-								 {u'':('',True,u'')}, 
-								 _PS_notify ),
-						 title=data[u'link'])
-			#self.pages.edit_hist(self._news_list[page.title()])
-
-		if globalnotify:
-			pywikibot.output(u'\03{lightpurple}*** Global wiki notifications added\03{default}')
-
-	def checkRelevancy(self):
-		"""Check relevancy of page by splitting it into sections and searching
-		   each for specific users signature, this is all done by PageSections class.
-
-		   Returns nothing, but feeds to self.pages class instance.
-		"""
-
-		self.pages.start_promotion()
-		for page in self.pages.news.values():
-			keys = page.title()
+			self.pages.promote_page() # hist -> news
 
 			strt = time.time()
 			entries = PageSections(page, self._param)
@@ -766,14 +731,63 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 			# if page is not relevant, don't list discussion
 			if not page_rel:
-				self.pages.promote_irrel(page, page_signed)
+				self.pages.promote_page_irrel(page, page_signed)
 
 			# free the memory again
 			del entries
 
+# DOES THE PreloadingGenerator WORK ???
+#		if not (len(work.keys()) == jj):
+#			raise pywikibot.Error(u'PreloadingGenerator has lost some pages!')
+		gen3.stop()
+
 		self.pages.end_promotion()
 
-		pywikibot.output(u'\03{lightpurple}*** Relevancy of threads checked\03{default}')
+		pywikibot.output(u'\03{lightpurple}*** Latest News searched and relevancy of threads checked\03{default}')
+
+	def AddGlobWikiNotify(self):
+		"""Check if there are any global wiki notifications and add them to every users news.
+
+		   Returns nothing, but feeds to self.pages class instance.
+		"""
+
+		hist = self.pages.hist
+
+		# get global wiki notifications (toolserver/merl)		
+		if 'toolserver' in debug:
+			pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE TOOLSERVER ACCESS WILL BE SKIPPED ! ===\03{default}')
+			globalnotify = []
+		else:
+			dtbext.userlib.addAttributes(self._user)
+			globalnotify = self._user.globalnotifications()
+
+		# check for GlobalWikiNotifications to report
+		localinterwiki = self.site.language()
+		count = 0
+		for (page, data) in globalnotify:
+			# skip to local disc page, since this is the only page the user should watch itself
+			if page.site().language() == localinterwiki:
+				pywikibot.output(u'\03{lightaqua}WARNING: skipping global wiki notify to local wiki %s\03{default}' % page.title(asLink=True))
+				continue
+
+			# actual/new status of page, has something changed?
+			if (data[u'link'] in hist.keys()) and \
+			   (data[u'timestamp'] == hist[data[u'link']].sum_disc_data[3]):
+				continue
+
+			#data = page.globalwikinotify
+			self.pages.edit_oth(page, sum_disc_data=(self._param['notify_msg'][_PS_notify], 
+								 None, # obsolete (and recursive)
+								 data['user'], 
+								 data['timestamp'], 
+								 {u'':('',True,u'')}, 
+								 _PS_notify ),
+						 title=data[u'link'])
+			#self.pages.edit_hist(self._news_list[page.title()])
+			count += 1
+
+		if globalnotify:
+			pywikibot.output(u'\03{lightpurple}*** %i Global wiki notifications checked\03{default}' % count)
 
 	def AddMaintenanceMsg(self):
 		"""Check if there are any bot maintenance messages and add them to every users news.
@@ -904,6 +918,8 @@ class SumDiscPages(object):
 		# add news page to news page list
 		self._news_list[newspage.title()] = newspage
 
+		self.newspage = newspage # for promote_page
+
 	def edit_oth(self, othpage, sum_disc_data=None, title=None):
 		# add sum_disc_data if present
 		if sum_disc_data:
@@ -924,8 +940,13 @@ class SumDiscPages(object):
 
 	def start_promotion(self):
 		# start relevancy check page promotion to news
-		# and re-create an actual history
-		self._hist_list = copy.deepcopy(self._news_list)
+		# (and re-create an actual history)
+		self._hist_list = {}
+
+	def promote_page(self):
+		# do relevancy check page promotion to news
+		# (and re-create an actual history)
+		self._hist_list[self.newspage.title()] = self.newspage
 
 	def end_promotion(self):
 		# finish relevancy check page promotion to news
@@ -945,7 +966,7 @@ class SumDiscPages(object):
 				# warnings: '_PS_warning', ...
 				self._news_list[title] = self._oth_list[title]
 
-	def promote_irrel(self, page, signed):
+	def promote_page_irrel(self, page, signed):
 		# page is not relevant, thus don't list discussion
 
 		title         = page.title()
