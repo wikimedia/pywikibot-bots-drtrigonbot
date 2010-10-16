@@ -1,22 +1,24 @@
 # -*- coding: utf-8  -*-
 """
+This is a part of pywikipedia framework, it is a deviation of pywikibot/textlib.py.
+
 ...
 """
+## @package dtbext.dtbext_pywikibot.dtbext_textlib
+#  @brief   Deviation of pywikibot.textlib
 #
-# @copyright Dr. Trigon, 2010
+#  @copyright Dr. Trigon, 2010
 #
-# @todo      ...
+#  @section FRAMEWORK
 #
-# @section FRAMEWORK
+#  Python wikipedia robot framework, DrTrigonBot.
+#  @see http://pywikipediabot.sourceforge.net/
+#  @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
-# Python wikipedia robot framework, DrTrigonBot.
-# @see http://pywikipediabot.sourceforge.net/
-# @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+#  @section LICENSE
 #
-# @section LICENSE
-#
-# Distributed under the terms of the MIT license.
-# @see http://de.wikipedia.org/wiki/MIT-Lizenz
+#  Distributed under the terms of the MIT license.
+#  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
 __version__ = '$Id$'
 #
@@ -25,8 +27,8 @@ __version__ = '$Id$'
 from HTMLParser import HTMLParser
 
 
-# ADDED: new (r19)
-# REASON: needed by various bots
+## @since   r19 (ADDED)
+#  @remarks needed by various bots
 def removeHTMLParts(text, keeptags = ['tt', 'nowiki', 'small', 'sup']):
 	"""
 	Return text without portions where HTML markup is disabled
@@ -64,8 +66,8 @@ class _GetDataHTML(HTMLParser):
 # Functions dealing with templates
 #----------------------------------
 
-# ADDED: new (r20)
-# REASON: needed by various bots
+## @since   r20 (ADDED)
+#  @remarks needed by various bots
 def glue_template_and_params(template_and_params):
 	"""Return wiki text of template glued from params.
 

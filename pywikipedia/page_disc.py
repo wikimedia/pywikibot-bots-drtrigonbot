@@ -75,21 +75,21 @@ Syntax example:
 # 
 # ====================================================================================================
 
+## @package page_disc
+#  @brief   Summarize Page Discussions Robot (like sum_disc)
 #
-# @copyright Dr. Trigon, 2010
+#  @copyright Dr. Trigon, 2010
 #
-# @todo      ...
+#  @section FRAMEWORK
 #
-# @section FRAMEWORK
+#  Python wikipedia robot framework, DrTrigonBot.
+#  @see http://pywikipediabot.sourceforge.net/
+#  @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
-# Python wikipedia robot framework, DrTrigonBot.
-# @see http://pywikipediabot.sourceforge.net/
-# @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+#  @section LICENSE
 #
-# @section LICENSE
-#
-# Distributed under the terms of the MIT license.
-# @see http://de.wikipedia.org/wiki/MIT-Lizenz
+#  Distributed under the terms of the MIT license.
+#  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
 __version__ = '$Id$'
 #

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This bot cleans a sandbox by replacing the current contents with predefined
+This bot cleans a user sandbox by replacing the current contents with predefined
 text.
 
 This script understands the following command-line arguments:
@@ -15,21 +15,21 @@ This script understands the following command-line arguments:
                    The minimum delay time is 5 minutes.
 
 """
+## @package clean_user_sandbox
+#  @brief   Clean User Sandbox Robot (like clean_sandbox)
 #
-# @copyright Dr. Trigon, 2008-2010
+#  @copyright Dr. Trigon, 2008-2010
 #
-# @todo      ...
+#  @section FRAMEWORK
 #
-# @section FRAMEWORK
+#  Python wikipedia robot framework, DrTrigonBot.
+#  @see http://pywikipediabot.sourceforge.net/
+#  @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
-# Python wikipedia robot framework, DrTrigonBot.
-# @see http://pywikipediabot.sourceforge.net/
-# @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+#  @section LICENSE
 #
-# @section LICENSE
-#
-# Distributed under the terms of the MIT license.
-# @see http://de.wikipedia.org/wiki/MIT-Lizenz
+#  Distributed under the terms of the MIT license.
+#  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
 __version__ = '$Id$'
 #
@@ -78,6 +78,7 @@ class UserSandboxBot(dtbext.basic.BasicBot, clean_sandbox.SandboxBot):
 
 		# init variable/dynamic objects
 
+	## @todo LOOK BELOW!
 	def run(self):
 		'''Run UserSandboxBot().'''
 

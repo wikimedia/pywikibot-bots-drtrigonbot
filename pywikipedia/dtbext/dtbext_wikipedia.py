@@ -5,21 +5,21 @@ the page class from there.
 
 ...
 """
+## @package dtbext.dtbext_wikipedia
+#  @brief   Deviation of @ref wikipedia
 #
-# @copyright Dr. Trigon, 2008-2010
+#  @copyright Dr. Trigon, 2008-2010
 #
-# @todo      ...
+#  @section FRAMEWORK
 #
-# @section FRAMEWORK
+#  Python wikipedia robot framework, DrTrigonBot.
+#  @see http://pywikipediabot.sourceforge.net/
+#  @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
-# Python wikipedia robot framework, DrTrigonBot.
-# @see http://pywikipediabot.sourceforge.net/
-# @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+#  @section LICENSE
 #
-# @section LICENSE
-#
-# Distributed under the terms of the MIT license.
-# @see http://de.wikipedia.org/wiki/MIT-Lizenz
+#  Distributed under the terms of the MIT license.
+#  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
 __version__ = '$Id$'
 #
@@ -37,8 +37,8 @@ import query, userlib, config
 debug = False
 
 
-# ADDED: new (r19)
-# REASON: needed to convert wikipedia.Page, Site ... objects to dtbext.wikipedia.Page, Site, ... objects
+## @since   r19 (ADDED)
+#  @remarks needed to convert wikipedia.Page, Site ... objects to dtbext.dtbext_wikipedia.Page, Site, ... objects
 def addAttributes(obj):
 	"""Add methods to various classes to convert them to the dtbext modified version."""
 	# http://mousebender.wordpress.com/2007/02/17/copying-methods-in-python/
@@ -57,16 +57,16 @@ def addAttributes(obj):
 		obj.__dict__['getParsedString']		= lambda *args, **kwds: Site.__dict__['getParsedString'](obj, *args, **kwds)
 
 
-# MODIFIED
-# REASON: (look below)
+## @since   ? (MODIFIED)
+#  @remarks (look below)
 class Page(pywikibot.Page):
 	"""Page: A MediaWiki page
 
 	   look at wikipedia.py for more information!
 	"""
 
-	# MODIFIED
-	# REASON: should be faster than original (look into re-write for something similar!)
+	## @since   ? (MODIFIED)
+	#  @remarks should be faster than original (look into re-write for something similar!)
 	def isRedirectPage(self):
 		"""Return True if this is a redirect, False if not or not existing.
 		   MODIFIED METHOD: should be faster than original
@@ -100,8 +100,8 @@ class Page(pywikibot.Page):
 
 		return self._redir
 
-	# MODIFIED: new (r33)
-	# REASON: to support 'force' with 'getSections'
+	## @since   r33 (MODIFIED)
+	#  @remarks to support 'force' with dtbext.dtbext_wikipedia.Page.getSections()
 	def get(self, *args, **kwds):
 		"""Return the wiki-text of the page.
 		   MODIFIED METHOD: to support 'force' with 'getSections'
@@ -115,8 +115,11 @@ class Page(pywikibot.Page):
 
 		return pywikibot.Page.get(self, *args, **kwds)
 
-	# ADDED: new (r18)
-	# REASON: needed by various bots
+	## @since   r18 (ADDED)
+	#  @remarks needed by various bots
+	#
+	#  @todo    patch needed by dtbext.dtbext_wikipedia.Page._findSection() for some pages
+	#           \n[ JIRA ticket? ]
 	def getSections(self, minLevel=2, sectionsonly=False):
 		"""Parses the page with API and return section information.
 		   ADDED METHOD: needed by various bots
@@ -173,7 +176,7 @@ class Page(pywikibot.Page):
 				f.write( debug_data.encode('utf8') + '\n' )
 				f.close()
 
-			# [ patch needed by '_findSection' for some pages / JIRA ticket? ]
+			# [ JIRA ticket? ]
 			self._contents = self._contents.replace(u'\r\n', u'\n')
 
 			for i, item in enumerate(r):
@@ -207,8 +210,8 @@ class Page(pywikibot.Page):
 
 		return self._sections
 
-	# ADDED: new (r18)
-	# REASON: needed by 'getSections'
+	## @since   r18 (ADDED)
+	#  @remarks needed by dtbext.dtbext_wikipedia.Page.getSections()
 	def _getSectionByteOffset(self, section):
         	"""determine the byteoffset of the given section (can be slow due another API call).
 		   ADDED METHOD: needed by 'getSections'
@@ -269,8 +272,8 @@ class Page(pywikibot.Page):
 		section[u'wikiline_mq'] = best_match[0]					# match quality
 		section[u'wikiline_bo'] = self._contents.find(section[u'wikiline'])	# byteoffset
 
-	# ADDED: new (r18)
-	# REASON: needed by 'getSections'
+	## @since   r18 (ADDED)
+	#  @remarks needed by dtbext.dtbext_wikipedia.Page.getSections()
 	def _findSection(self, section):
         	"""find and extract section.
 		   ADDED METHOD: needed by 'getSections'
@@ -281,8 +284,8 @@ class Page(pywikibot.Page):
 		#return self._contents[(bo+l):(end-l)].strip()
 		return self._contents[bo:end].strip()
 
-	# ADDED (non-api purge can be done with 'Page.purge_address()')
-	# REASON: needed by various bots
+	## @since   ? (ADDED; non-api purge can be done with wikipedia.Page.purge_address())
+	#  @remarks needed by various bots
 	def purgeCache(self):
 		"""Purges the page cache with API.
 		   ADDED METHOD: needed by various bots
@@ -311,8 +314,8 @@ class Page(pywikibot.Page):
 
 		return (u'purged' in r)
 
-	# ADDED: new (r24)
-	# REASON: needed by various bots
+	## @since   r24 (ADDED)
+	#  @remarks needed by various bots
 	def userNameHuman(self):
 		"""Return name or IP address of last human/non-bot user to edit page.
 		   ADDED METHOD: needed by various bots
@@ -348,13 +351,15 @@ class Page(pywikibot.Page):
 		# store and return info
 		return self._userNameHuman
 
-	# ADDED: new (r49)
-	# REASON: to support appending to single sections
+	## @since   r49 (ADDED)
+	#  @remarks to support appending to single sections
+	#
+	#  @todo    submit upstream and include into framework, maybe in wikipedia.Page.put()
+	#           (this function is very simple and not mature/worked out yet, has to be completed)
+	#           \n[ JIRA: ticket? ]
 	def append(self, newtext, comment=None, minorEdit=True, section=0):
 		"""Append the wiki-text to the page.
 		   ADDED METHOD: to support appending to single sections
-                   [ submit upstream and include into framework, maybe in 'put' / this function
-		     is very simple and not mature/worked out yet, has to be completed / JIRA: ticket? ]
 
 		   Returns the result of text append to page section number 'section'.
 		   0 for the top section, 'new' for a new section.
@@ -388,16 +393,16 @@ class Page(pywikibot.Page):
 		return response.code, response.msg, data
 
 
-# ADDED: new (r19)
-# REASON: needed by various bots
+## @since   r19 (ADDED)
+#  @remarks needed by various bots
 class Site(object):
 	"""A MediaWiki site.
 
 	   look at wikipedia.py for more information!
 	"""
 
-	# ADDED
-	# REASON: needed by various bots
+	## @since   r19 (ADDED)
+	#  @remarks needed by various bots
 	def getParsedString(self, string, keeptags = [u'*']):
 		"""Parses the string with API and return html content.
 		   ADDED METHOD: needed by various bots

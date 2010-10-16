@@ -66,21 +66,23 @@ For tests its sometimes better to use:
 	python clean_user_sandbox.py
 	python sum_disc.py
 """
+## @package bot_control
+#  @brief   General DrTrigonBot Robot(s) Caller
 #
-# @copyright Dr. Trigon, 2008-2010
+#  @copyright Dr. Trigon, 2008-2010
 #
-# @todo      look also at 'daemonize.py'
+#  @todo      look also at and learn from daemonize.py (@ref daemonize)
 #
-# @section FRAMEWORK
+#  @section FRAMEWORK
 #
-# Python wikipedia robot framework, DrTrigonBot.
-# @see http://pywikipediabot.sourceforge.net/
-# @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+#  Python wikipedia robot framework, DrTrigonBot.
+#  @see http://pywikipediabot.sourceforge.net/
+#  @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
-# @section LICENSE
+#  @section LICENSE
 #
-# Distributed under the terms of the MIT license.
-# @see http://de.wikipedia.org/wiki/MIT-Lizenz
+#  Distributed under the terms of the MIT license.
+#  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
 __version__  = '$Id$'
 __revision__ = '8640'

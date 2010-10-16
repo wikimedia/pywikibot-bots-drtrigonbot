@@ -4,21 +4,21 @@ This is a part of pywikipedia framework, it is a deviation of date.py.
 
 ...
 """
+## @package dtbext.dtbext_date
+#  @brief   Deviation of @ref date
 #
-# @copyright Dr. Trigon, 2009-2010
+#  @copyright Dr. Trigon, 2009-2010
 #
-# @todo      ...
+#  @section FRAMEWORK
 #
-# @section FRAMEWORK
+#  Python wikipedia robot framework, DrTrigonBot.
+#  @see http://pywikipediabot.sourceforge.net/
+#  @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
-# Python wikipedia robot framework, DrTrigonBot.
-# @see http://pywikipediabot.sourceforge.net/
-# @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+#  @section LICENSE
 #
-# @section LICENSE
-#
-# Distributed under the terms of the MIT license.
-# @see http://de.wikipedia.org/wiki/MIT-Lizenz
+#  Distributed under the terms of the MIT license.
+#  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
 __version__ = '$Id$'
 #
@@ -31,8 +31,8 @@ import config
 import wikipedia as pywikibot
 
 
-# ADDED
-# REASON: need for some standard timestamp formats
+## @since   ? (ADDED)
+#  @remarks need for some standard timestamp formats
 def getTimeStmpNow(full = False, humanreadable = False, local = False):
 #def getTimeStmpNow(full = True, humanreadable = False, local = False):	# framework default
 	"""Produce different timestamp formats."""
@@ -51,8 +51,8 @@ def getTimeStmpNow(full = False, humanreadable = False, local = False):
 	# according to/taken from 'runbotrun.py'
 	return time.strftime(format, getter())		
 
-# ADDED
-# REASON: need to convert wiki timestamp format to python
+## @since   ? (ADDED)
+#  @remarks need to convert wiki timestamp format to python
 def getTime(timestamp, localized=True):
 	"""Convert wiki timestamp to (localized) python format."""
 	# thanks to: http://docs.python.org/library/time.html

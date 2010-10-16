@@ -1,26 +1,28 @@
 # -*- coding: utf-8  -*-
 """
+This is a part of pywikipedia framework, it is a deviation of basic.py.
+
 ...
 """
 #
 #    python sum_disc.py -test_run
 #        Loads old history entry of all Users, e.g. for debuging.
 #"""
+## @package dtbext.dtbext_basic
+#  @brief   Deviation of @ref basic
 #
-# @copyright Dr. Trigon, 2010
+#  @copyright Dr. Trigon, 2010
 #
-# @todo      ...
+#  @section FRAMEWORK
 #
-# @section FRAMEWORK
+#  Python wikipedia robot framework, DrTrigonBot.
+#  @see http://pywikipediabot.sourceforge.net/
+#  @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
-# Python wikipedia robot framework, DrTrigonBot.
-# @see http://pywikipediabot.sourceforge.net/
-# @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+#  @section LICENSE
 #
-# @section LICENSE
-#
-# Distributed under the terms of the MIT license.
-# @see http://de.wikipedia.org/wiki/MIT-Lizenz
+#  Distributed under the terms of the MIT license.
+#  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
 __version__ = '$Id$'
 #
@@ -45,8 +47,8 @@ class BasicBot(basic.BasicBot):
 	_REGEX_eol		= re.compile(u'\n')
 	_REGEX_subster_tag	= u'<!--SUBSTER-%(var)s-->'
 
-	# MODIFIED
-	# REASON: needed by various bots
+	## @since   ? (MODIFIED)
+	#  @remarks needed by various bots
 	def __init__(self, bot_config):
 		"""Constructor of BasicBot(); setup environment, initialize needed consts and objects.
 		   MODIFIED METHOD: needed by various bots
@@ -73,8 +75,8 @@ class BasicBot(basic.BasicBot):
 		self.site = pywikibot.getSite()
 		dtbext.pywikibot.addAttributes( self.site )		# enhance to dtbext.pywikibot.Site
 
-	# ADDED
-	# REASON: needed by SumDiscBot
+	## @since   ? (ADDED)
+	#  @remarks needed by sum_disc
 	def loadMode(self, page, regex_compile=False):
 		"""Get operating mode from user's disc page by searching for the template.
 		   ADDED METHOD: needed by SumDiscBot
@@ -109,8 +111,8 @@ class BasicBot(basic.BasicBot):
 			tmpl_pos  = self._template_regex.search(self._content)
 			self._content = self._content[:tmpl_pos.start()] + tmpl_text + self._content[tmpl_pos.end():]
 
-	# ADDED
-	# REASON: needed by various bots
+	## @since   ? (ADDED)
+	#  @remarks needed by various bots
 	def loadTemplates(self, page, default={}):
 		"""Get operating mode from page with template by searching the template.
 		   ADDED METHOD: needed by various bots
@@ -131,8 +133,8 @@ class BasicBot(basic.BasicBot):
 				templates.append( param_default )
 		return templates
 
-	# ADDED
-	# REASON: common interface to bot user settings on wiki
+	## @since   ? (ADDED)
+	#  @remarks common interface to bot user settings on wiki
 	def loadUsersConfig(self, page):
 		"""Get user list from wiki page, e.g. [[Benutzer:DrTrigonBot/Diene_Mir!]].
 		   ADDED METHOD: common interface to bot user settings on wiki
@@ -173,8 +175,8 @@ class BasicBot(basic.BasicBot):
 
 		return final_users
 
-	# ADDED
-	# REASON: common interface to bot job queue on wiki
+	## @since   ? (ADDED)
+	#  @remarks common interface to bot job queue on wiki
 	def loadJobQueue(self, page, queue_security, debug = False):
 		"""Check if the data queue security is ok to execute the jobs,
 		   if so read the jobs and reset the queue.
@@ -214,8 +216,8 @@ class BasicBot(basic.BasicBot):
 			queue.append( line[1:].strip() )
 		return queue
 
-	# MODIFIED
-	# REASON: needed by various bots
+	## @since   ? (MODIFIED)
+	#  @remarks needed by various bots
 	def save(self, page, text, comment=None, minorEdit=True):
 		pywikibot.output(u'\03{lightblue}Writing to wiki on %s...\03{default}' % page.title(asLink=True))
 
@@ -238,8 +240,8 @@ class BasicBot(basic.BasicBot):
 				return True
 		return False
 
-	# ADDED
-	# REASON: needed by various bots
+	## @since   ? (ADDED)
+	#  @remarks needed by various bots
 	def append(self, page, text, comment=None, minorEdit=True, section=None):
 		if section:
 			pywikibot.output(u'\03{lightblue}Appending to wiki on %s in section %s...\03{default}' % (page.title(asLink=True), section))

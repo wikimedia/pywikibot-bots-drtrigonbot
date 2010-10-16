@@ -61,21 +61,21 @@ Syntax example:
 #    python sum_disc.py -test_run
 #        Loads old history entry of all Users, e.g. for debuging.
 #"""
+## @package sum_disc
+#  @brief   Summarize Discussions Robot
 #
-# @copyright Dr. Trigon, 2008-2010
+#  @copyright Dr. Trigon, 2008-2010
 #
-# @todo      ...
+#  @section FRAMEWORK
 #
-# @section FRAMEWORK
+#  Python wikipedia robot framework, DrTrigonBot.
+#  @see http://pywikipediabot.sourceforge.net/
+#  @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
-# Python wikipedia robot framework, DrTrigonBot.
-# @see http://pywikipediabot.sourceforge.net/
-# @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+#  @section LICENSE
 #
-# @section LICENSE
-#
-# Distributed under the terms of the MIT license.
-# @see http://de.wikipedia.org/wiki/MIT-Lizenz
+#  Distributed under the terms of the MIT license.
+#  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
 __version__ = '$Id$'
 #
@@ -549,6 +549,8 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 		pywikibot.output(u'\03{lightpurple}*** History updated\03{default}')
 
+	## @todo should be done in framework, in userlib.User.contributions() or else
+	#        \n[ JIRA: DRTRIGON-59 ]
 	def checkRecentEdits(self):
 		"""Check wiki on recent contributions of specific user.
 
@@ -558,7 +560,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		check_list = self._param['checkedit_list']
 		count = self._param['checkedit_count']
 
-		# [ should be done in framework / JIRA: DRTRIGON-59 ]
+		# [ JIRA: DRTRIGON-59 ]
 		pywikibot.output(u'Getting latest contributions from user "%s" via API...' % self._user.name())
 
 		# thanks to http://www.amk.ca/python/howto/regex/ and http://bytes.com/forum/thread24382.html
@@ -616,14 +618,18 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		# feed data to pages
 		self.pages.update_work(work)
 
+	## @todo speed up by catching all pages (used the same day) to disk, look into diskcache.py (@ref diskcache)
+	#        \n[ JIRA: ticket? (think about it!) ]
+	#  @todo preloading does not use API yet, should be done within pywikipedia framework
+	#        \n[ JIRA: ticket? ]
+	#  @todo wikipedia.Page.getVersionHistory() is not able to check page exceptions always and
+	#        crashes sometimes, u'Benutzer Diskussion:MerlBot' for example
+	#        \n[ JIRA: ticket? ]
 	def getLatestNews(self, globalnotify=[]):
 		"""Check latest contributions on recent news.
 
 		   Returns nothing, but feeds to self.pages class instance.
 		"""
-
-		# -SPEEDUP EVEN MORE BY CACHING ALL PAGES TO DISK USED THE SAME DAY?!? (JIRA ticket??? think about it!)
-		#  look into 'diskcache.py'
 
 		# check for news to report
 		hist = self.pages.hist
@@ -635,8 +641,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 							       self._param['ignorepage_list'], 
 							       inverse = True, 
 							       ignore_namespace = False)
-		# Preloads _contents and _versionhistory
-		# [ DOES NOT USE API YET! / JIRA: ticket? ]
+		# Preloads _contents and _versionhistory / [ JIRA: ticket? ]
 		# WithoutInterwikiPageGenerator, 
 		#gen3 = pagegenerators.PreloadingGenerator(gen2)
 		gen3 = pagegenerators.ThreadedGenerator(target=pagegenerators.PreloadingGenerator,
@@ -656,9 +661,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			try:
 				actual = page.getVersionHistory(revCount=1)
 
-				# check page exceptions
-				# [ because 'getVersionHistory' is not able to do this and crashes sometimes, 
-				#   e.g. for u'Benutzer Diskussion:MerlBot' / JIRA: ticket? ]
+				# check page exceptions / [ JIRA: ticket? ]
 				if hasattr(page, u'_getexception'):
 					raise page._getexception
 			except pywikibot.NoPage:

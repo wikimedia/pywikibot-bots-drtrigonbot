@@ -5,21 +5,21 @@ the same functions but enhanced.
 
 ...
 """
+## @package dtbext.dtbext_userlib
+#  @brief   Deviation of @ref userlib
 #
-# @copyright Dr. Trigon, 2009-2010
+#  @copyright Dr. Trigon, 2009-2010
 #
-# @todo      ...
+#  @section FRAMEWORK
 #
-# @section FRAMEWORK
+#  Python wikipedia robot framework, DrTrigonBot.
+#  @see http://pywikipediabot.sourceforge.net/
+#  @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
-# Python wikipedia robot framework, DrTrigonBot.
-# @see http://pywikipediabot.sourceforge.net/
-# @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+#  @section LICENSE
 #
-# @section LICENSE
-#
-# Distributed under the terms of the MIT license.
-# @see http://de.wikipedia.org/wiki/MIT-Lizenz
+#  Distributed under the terms of the MIT license.
+#  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
 __version__ = '$Id$'
 #
@@ -37,8 +37,8 @@ import wikipedia as pywikibot
 REQUEST_getGlobalWikiNotifys	= 'http://toolserver.org/~merl/UserPages/query.php?user=%s&format=xml'
 
 
-# ADDED: new (r26)
-# REASON: needed to convert userlib.User, ... objects to dtbext.userlib.User, ... objects
+## @since   r26 (ADDED)
+#  @remarks needed to convert userlib.User, ... objects to dtbext.dtbext_userlib.User, ... objects
 def addAttributes(obj):
 	"""Add methods to various classes to convert them to the dtbext modified version."""
 	# http://mousebender.wordpress.com/2007/02/17/copying-methods-in-python/
@@ -49,16 +49,16 @@ def addAttributes(obj):
 		obj.__dict__['globalnotifications'] = lambda *args, **kwds: User.__dict__['globalnotifications'](obj, *args, **kwds)
 
 
-# MODIFIED
-# REASON: (look below)
+## @since   ? (MODIFIED)
+#  @remarks (look below)
 class User(userlib.User):
 	"""A class that represents a Wiki user.
 
 	   look at userlib.py for more information!
 	"""
 
-	# ADDED
-	# REASON: due to http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 38)
+	## @since   ? (ADDED)
+	#  @remarks due to http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 38)
 	def globalnotifications(self):
 		"""Provides a list of results using the toolserver Merlissimo API (can also
 		   be used for a Generator analog to UserContributionsGenerator).
