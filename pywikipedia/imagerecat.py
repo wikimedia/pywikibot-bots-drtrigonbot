@@ -24,7 +24,7 @@ The following command line parameters are supported:
                 wps : Work on all wikipedia's
 
 """
-__version__ = '$Id: imagerecat.py 8530 2010-09-12 12:19:44Z xqt $'
+__version__ = '$Id: imagerecat.py 8659 2010-10-16 18:43:42Z multichill $'
 #
 #  (C) Multichill 2008
 #   
@@ -225,8 +225,7 @@ def followRedirects(categories):
         categoryPage = pywikibot.Page(pywikibot.getSite(u'commons', u'commons'),
                                       cat, defaultNamespace=14)
         if categoryPage.isCategoryRedirect():
-            result.append(getCategoryRedirectTarget(),
-                          categoryPage.titleWithoutNamespace())
+            result.append(categoryPage.getCategoryRedirectTarget().titleWithoutNamespace())
         else:
             result.append(cat)
     return result

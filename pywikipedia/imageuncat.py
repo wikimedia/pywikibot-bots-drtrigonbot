@@ -4,7 +4,7 @@ Program to add uncat template to images without categories at commons.
 See imagerecat.py (still working on that one) to add these images to categories.
 
 """
-__version__ = '$Id: imageuncat.py 8391 2010-08-08 16:00:24Z multichill $'
+__version__ = '$Id: imageuncat.py 8658 2010-10-16 18:34:02Z multichill $'
 #
 #  (C) Multichill 2008
 #
@@ -219,6 +219,7 @@ ignoreTemplates = [ u'1000Bit',
                     u'CC-LukeFord',
                     u'Cc-pd',
                     u'Cc-sa-1.0',
+                    u'Cc-zero',
                     u'Cdo',
                     u'Ce',
                     u'Ceb',
