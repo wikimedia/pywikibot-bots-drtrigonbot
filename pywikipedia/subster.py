@@ -55,6 +55,9 @@ bot_config = {	# unicode values
 debug = True
 
 
+## @todo try to implement magic words, look also at runbotrun
+#        (use, for example: '\<!--SUBSTER-BOTerror--\>\<!--SUBSTER-BOTerror--\>')
+#        \n[ JIRA: ticket? ]
 class SubsterBot(dtbext.basic.BasicBot):
 	'''
 	Robot which will does substitutions of tags within wiki page content with external or

@@ -765,8 +765,11 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		localinterwiki = self.site.language()
 		count = 0
 		for (page, data) in globalnotify:
+			count += 1
+
 			# skip to local disc page, since this is the only page the user should watch itself
-			if page.site().language() == localinterwiki:
+			if (page.site().language() == localinterwiki) and \
+			   (page.site().family.name == u'wikipedia'):
 				pywikibot.output(u'\03{lightaqua}WARNING: skipping global wiki notify to local wiki %s\03{default}' % page.title(asLink=True))
 				continue
 
@@ -784,7 +787,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 								 _PS_notify ),
 						 title=data[u'link'])
 			#self.pages.edit_hist(self._news_list[page.title()])
-			count += 1
 
 		if globalnotify:
 			pywikibot.output(u'\03{lightpurple}*** %i Global wiki notifications checked\03{default}' % count)

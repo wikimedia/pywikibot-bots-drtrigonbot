@@ -80,6 +80,12 @@ Syntax example:
 #
 #  @copyright Dr. Trigon, 2010
 #
+#  @todo      The whole code here has to be adapted to he new bot style.
+#             May be the simplest could be to do a re-write with code from
+#             sum_disc. But this makes no sense as long as not reply has
+#             come from Hæggis.
+#             \n[ JIRA: DRTRIGON-49 ]
+#
 #  @section FRAMEWORK
 #
 #  Python wikipedia robot framework, DrTrigonBot.

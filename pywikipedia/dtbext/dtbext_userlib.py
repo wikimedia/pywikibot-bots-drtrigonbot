@@ -59,6 +59,9 @@ class User(userlib.User):
 
 	## @since   ? (ADDED)
 	#  @remarks due to http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste (id 38)
+	#
+	#  @todo framework claims to know 'wiki' but does not!
+	#        \n[ JIRA: DRTRIGON-60 ]
 	def globalnotifications(self):
 		"""Provides a list of results using the toolserver Merlissimo API (can also
 		   be used for a Generator analog to UserContributionsGenerator).
