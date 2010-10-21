@@ -4,7 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: config.py 8563 2010-09-15 15:13:57Z purodha $'
+__version__ = '$Id: config.py 8672 2010-10-20 15:10:58Z multichill $'
 
 import os, re
 import sys as __sys
@@ -333,9 +333,15 @@ msn_appid = ''
 
 # Using the Flickr api
 flickr = {
-    'api_key': None,  # Provide your key!
+    'api_key': u'',  # Provide your key!
     'review': False,  # Do we use automatically make our uploads reviewed?
-    'reviewer': None, # If so, under what reviewer name?
+    'reviewer': u'', # If so, under what reviewer name?
+    }
+
+# Using the Panoramio api
+panoramio = {
+    'review': False,  # Do we use automatically make our uploads reviewed?
+    'reviewer': u'', # If so, under what reviewer name?
     }
 
 # for all connections: proxy handle

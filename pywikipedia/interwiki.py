@@ -307,7 +307,7 @@ have to break it off, use "-continue" next time.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: interwiki.py 8635 2010-10-09 23:22:42Z xqt $'
+__version__ = '$Id: interwiki.py 8674 2010-10-20 15:52:22Z xqt $'
 #
 
 import sys, copy, re, os
@@ -455,6 +455,7 @@ msg = {
     'ml': (u'യന്ത്രം ', u'ചേര്‍ക്കുന്നു', u'നീക്കുന്നു', u'പുതുക്കുന്നു'),
     'mn': (u'робот ', u'Нэмж байна', u'Арилгаж байна', u'Өөрчилж байна'),
     'mr': (u'सांगकाम्याने ',  u'वाढविले', u'काढले', u'बदलले'),
+    'mrj': (u'робот', u'темен', u'карангден', u'вашталтен'),
     'ms': (u'bot ', u'menambah', u'membuang', u'mengubah'),
     'myv': (u'роботось ', u'путызеть', u'нардызеть', u'полавтызеть'),
     'mzn': (u'ربوت ', u'بیشتن', u'بیتن', u'هکردن'),

@@ -294,9 +294,14 @@ class User(object):
                 raise pywikibot.Error
             for contrib in result['query']['usercontribs']:
                 ts = pywikibot.parsetime2stamp(contrib['timestamp'])
-                yield (pywikibot.Page(self.site(), contrib['title'], defaultNamespace=contrib['ns']),
-                            contrib['revid'], ts, contrib['comment']
-                )
+                if 'commenthidden' in contrib:
+                    yield (pywikibot.Page(self.site(), contrib['title'], defaultNamespace=contrib['ns']),
+                                contrib['revid'], ts, u''
+                    )
+                else:
+                    yield (pywikibot.Page(self.site(), contrib['title'], defaultNamespace=contrib['ns']),
+                                contrib['revid'], ts, contrib['comment']
+                    )
                 nbresults += 1
                 if nbresults >= limit:
                     break

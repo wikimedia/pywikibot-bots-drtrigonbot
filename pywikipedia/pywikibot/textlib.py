@@ -11,7 +11,7 @@ and return a unicode string.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: textlib.py 8604 2010-10-04 19:58:47Z xqt $'
+__version__ = '$Id: textlib.py 8661 2010-10-17 21:05:10Z xqt $'
 
 
 import wikipedia as pywikibot
@@ -920,7 +920,7 @@ def _altlang(code):
     if code in ['ne', 'new']:
         return ['ne', 'new', 'hi']
     #Indonesian and Malay
-    if code in ['ace', 'bug', 'id', 'jv', 'ms', 'su']:
+    if code in ['ace', 'bug', 'bjn', 'id', 'jv', 'ms', 'su']:
         return ['id', 'ms', 'jv']
     if code == 'map-bms':
         return ['jv', 'id', 'ms']
@@ -953,8 +953,9 @@ def _altlang(code):
     if code in ['mo', 'roa-rup']:
         return ['ro']
     #Russian and Belarusian
-    if code in ['ab', 'av', 'ba', 'bxr', 'ce', 'cv', 'kk', 'ky', 'lbe', 'mdf',
-                'mhr', 'myv', 'os', 'sah', 'tg', 'tt', 'udm', 'uk', 'xal']:
+    if code in ['ab', 'av', 'ba', 'bxr', 'ce', 'cv', 'kk', 'koi', 'ky', 'lbe',
+                'mdf', 'mhr', 'mrj', 'myv', 'os', 'sah', 'tg', 'tt', 'udm',
+                'uk', 'xal']:
         return ['ru']
     if code in ['be', 'be-x-old']:
         return ['be', 'be-x-old', 'ru']

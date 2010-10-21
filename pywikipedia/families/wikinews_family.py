@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikinews_family.py 8523 2010-09-11 13:16:56Z xqt $'
+__version__ = '$Id: wikinews_family.py 8665 2010-10-18 12:12:35Z xqt $'
 
 # The Wikimedia family that is known as Wikinews
 
@@ -13,7 +13,7 @@ class Family(family.Family):
         self.languages_by_size = [
             'sr', 'en', 'pl', 'de', 'fr', 'it', 'pt', 'es', 'zh', 'ja', 'sv',
             'ru', 'fi', 'he', 'ta', 'cs', 'bg', 'ro', 'ar', 'sd', 'hu', 'no',
-            'uk', 'tr', 'ca', 'bs', 'th', 'ko',
+            'uk', 'tr', 'ca', 'bs', 'th', 'fa', 'ko',
         ]
 
         if family.config.SSL_connection:
@@ -40,6 +40,7 @@ class Family(family.Family):
             'ca': u'Viquinotícies',
             'cs': u'Wikizprávy',
             'es': u'Wikinoticias',
+            'fa': u'ویکی‌خبر',
             'fi': u'Wikiuutiset',
             'he': u'ויקיחדשות',
             'hu': u'Wikihírek',
@@ -66,6 +67,7 @@ class Family(family.Family):
             'cs': u'Diskuse k Wikizprávám',
             'de': u'Wikinews Diskussion',
             'es': u'Wikinoticias Discusión',
+            'fa': u'بحث ویکی‌خبر',
             'fi': u'Keskustelu Wikiuutisista',
             'fr': u'Discussion Wikinews',
             'he': u'שיחת ויקיחדשות',

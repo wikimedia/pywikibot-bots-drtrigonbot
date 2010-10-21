@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikisource_family.py 8654 2010-10-15 05:08:06Z xqt $'
+__version__ = '$Id: wikisource_family.py 8664 2010-10-18 12:10:33Z xqt $'
 
 # The Wikimedia family that is known as Wikisource
 
@@ -330,6 +330,7 @@ class Family(family.Family):
             'pt': u'Página',
             'ru': u'Индекс',
             'sv': u'Författare',
+            'te': u'సూచిక',
             'vi': u'Mục lục',
             'zh': u'Index',
         }
@@ -351,6 +352,7 @@ class Family(family.Family):
             'pt': u'Página Discussão',
             'ru': u'Обсуждение индекса',
             'sv': u'Författardiskussion',
+            'te': u'సూచిక చర్చ',
             'vi': u'Thảo luận Mục lục',
             'zh': u'Index talk',
         }
