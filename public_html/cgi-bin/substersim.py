@@ -15,7 +15,7 @@ to make it usable from server, use: 'chmod 755 test.py', which results in
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: substersim.py 0.2.0034 2009-11-26 18:55 drtrigon $'
+__version__='$Id$'
 #
 
 

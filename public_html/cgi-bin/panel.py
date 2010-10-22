@@ -20,7 +20,7 @@ to make it usable from server, use: 'chmod 755 test.py', which results in
 #  B: bigger relases with tidy code and nice comments
 #  A: really big release with multi lang. and toolserver support, ready
 #     to use in pywikipedia framework, should also be contributed to it
-__version__='$Id: panel.py 0.1.0013 2009-06-04 23:15:00Z drtrigon $'
+__version__='$Id$'
 #
 
 
@@ -48,7 +48,7 @@ src="https://wiki.toolserver.org/favicon.ico" border="0"
 alt="Toolserver"> Powered by Wikimedia Toolserver</a>.
 <a href="http://de.selfhtml.org/index.htm"><img 
 src="http://de.selfhtml.org/src/favicon.ico" border="0" width="16" 
-height="16" alt="SELFHTML"> Thanks to SELFHTML</a>.
+height="16" alt="SELFHTML"> Thanks to SELFHTML</a>. <a href="http://toolserver.org/~daniel/stats/">stats</a>.
 """
 footer_w3c = """<a href="http://validator.w3.org/check?uri=referer"><img 
 src="http://www.w3.org/Icons/valid-html401-blue" 
@@ -170,7 +170,7 @@ botstate_img = {#'green':	'http://upload.wikimedia.org/wikipedia/commons/3/3c/Bu
 
 bottimeout = 24
 
-botdonemsg = 'Done.'
+botdonemsg = 'DONE.'
 
 X,Y = 500, 275			# image width and height
 

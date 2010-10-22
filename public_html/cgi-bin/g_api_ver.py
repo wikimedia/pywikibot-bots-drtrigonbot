@@ -20,7 +20,7 @@ to make it usable from server, use: 'chmod 755 test.py', which results in
 #  B: bigger relases with tidy code and nice comments
 #  A: really big release with multi lang. and toolserver support, ready
 #     to use in pywikipedia framework, should also be contributed to it
-__version__='$Id: checksum_check.py 0.1.0014 2009-06-25 16:27:00Z drtrigon $'
+__version__='$Id$'
 #
 
 
