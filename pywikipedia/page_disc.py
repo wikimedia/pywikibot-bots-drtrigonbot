@@ -112,7 +112,7 @@ import copy #, zlib
 # Splitting the bot into library parts
 import wikipedia as pywikibot
 
-import sets, string, datetime, hashlib
+import string, datetime, hashlib
 #import titletranslate
 #from datetime import datetime, timedelta
 

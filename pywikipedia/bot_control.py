@@ -85,11 +85,11 @@ For tests its sometimes better to use:
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
 __version__  = '$Id$'
-__revision__ = '8640'
+__revision__ = '8682'
 #
 
 # wikipedia-bot imports
-import pagegenerators, userlib
+import pagegenerators, userlib, botlist
 import sys, os, re, time, codecs
 import clean_user_sandbox, sum_disc, subster, page_disc
 #import clean_user_sandbox, sum_disc, replace_tmpl
@@ -111,6 +111,7 @@ error_mail          = (u'DrTrigon', u'Bot ERROR')	# error mail via wiki mail int
 # logging of framework info
 infolist = [ pywikibot.__version__, pywikibot.config.__version__,	# framework
              pywikibot.query.__version__, pagegenerators.__version__,	#
+             botlist.__version__,					#
              dtbext.pywikibot.__version__, dtbext.basic.__version__,	# DrTrigonBot extensions
              dtbext.date.__version__, dtbext.userlib.__version__,	#
              __version__, clean_user_sandbox.__version__,		# bots
@@ -121,10 +122,11 @@ infolist = [ pywikibot.__version__, pywikibot.config.__version__,	# framework
 bot_list = { 'clean_user_sandbox': (clean_user_sandbox, u'clean userspace Sandboxes'),
              'sum_disc':           (sum_disc, u'discussion summary'),
              'compress_history':   (sum_disc, u'compressing discussion summary'),
-             'replace_tmpl':       (replace_tmpl, u'replace_tmpl'),
+             #'replace_tmpl':       (replace_tmpl, u'replace_tmpl'),
              'subster':            (subster, u'"SubsterBot"'),
              'page_disc':          (page_disc, u'page_disc (beta test)'), }
-bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'subster', 'page_disc' ]
+#bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'subster', 'page_disc' ]
+bot_order = [ 'sum_disc' ] # debug
 
 
 # Bot Error Handling; to prevent bot errors to stop execution of other bots
@@ -140,7 +142,8 @@ class BotErrorHandler:
 
 	def raise_exceptions(self):
 		if self.error_buffer:
-			raise BotError('Exception(s) occured in Bot')
+			#raise BotError('Exception(s) occured in Bot')
+			pywikibot.output( u'BotError: ' + str(BotError('Exception(s) occured in Bot')) )
 
 	def handle_exceptions(self, log):
 		self.gettraceback(sys.exc_info())
@@ -170,7 +173,7 @@ class BotErrorHandler:
 			error = (exc_info[0], exc_info[1], result)
 			self.error_buffer.append( error )
 
-			pywikibot.output(u'\03{lightred}%s\03{default}' % error[2])
+			pywikibot.output(u'\n\03{lightred}%s\03{default}' % error[2])
 
 class BotController:
 	def __init__(self, bot, desc, run_bot, ErrorHandler):
@@ -186,10 +189,10 @@ class BotController:
 			self.skip()
 
 	def skip(self):
-		pywikibot.output(u'SKIPPING: ' + self.desc)
+		pywikibot.output(u'\nSKIPPING: ' + self.desc)
 
 	def run(self):
-		pywikibot.output(u'RUN BOT: ' + self.desc)
+		pywikibot.output(u'\nRUN BOT: ' + self.desc)
 
 		try:
 			self.bot.main()
@@ -207,7 +210,7 @@ class Logger:
 		self.file.flush()
 		string = re.sub('\x1B\[.*?m', '', string)	# make more readable
 		string = re.sub('\x03\{.*?\}', '', string)	#
-		if logger_tmsp: string = re.sub('\n', '\n' + dtbext.date.getTimeStmp(full = True, humanreadable = True, local = True) + ':: ', string)
+		if logger_tmsp: string = re.sub('\n', '\n' + dtbext.date.getTimeStmpNow(full = True, humanreadable = True, local = True) + ':: ', string)
 		result = self.file.write( str(string).decode('latin-1') )
 		self.file.flush()
 		return result
@@ -223,7 +226,7 @@ class OutputLog:
 		if addlogname == None:
 			self.logfile = None
 		else:
-			self.logfile = Logger(logname % dtbext.date.getTimeStmp() + addlogname,
+			self.logfile = Logger(logname % dtbext.date.getTimeStmpNow() + addlogname,
 				              encoding=pywikibot.config.textfile_encoding,
 				              mode='a+')
 
@@ -248,7 +251,6 @@ class OutputLog:
 # Retrieve revision number of pywikibedia framework
 def getversion_svn():
 	# framework revision?
-	pywikibot.output(u'LATEST FRAMEWORK REVISION:')
 	buf = pywikibot.getSite().getUrl( 'http://svn.wikimedia.org/viewvc/pywikipedia/trunk/pywikipedia/', no_hostname = True, retry = False )
 	match = re.search('<td>Directory revision:</td>\n<td><a (.*?)>(.*?)</a> \(of <a (.*?)>(.*?)</a>\)</td>', buf)
 	if match and (len(match.groups()) > 0):
@@ -264,14 +266,15 @@ def main():
 #	global do_dict		# alle anderen NICHT noetig, warum diese hier ?!?????
 
 	# script call
-	pywikibot.output(u'\nSCRIPT CALL:')
+	pywikibot.output(u'SCRIPT CALL:')
 	pywikibot.output(u'  ' + u' '.join(sys.argv))
 
 	# logging of framework info
-	pywikibot.output(u'FRAMEWORK VERSION:')
+	pywikibot.output(u'\nFRAMEWORK VERSION:')
 	for item in infolist: pywikibot.output(u'  %s' % item)
 
 	# new framework revision?
+	pywikibot.output(u'\nLATEST FRAMEWORK REVISION:')
 	getversion_svn()
 
 	# processing of messages on bot discussion page
@@ -282,12 +285,12 @@ def main():
 		pywikibot.output(u'==================================================')
 
 	for bot_name in bot_order:
-		(bot_module, bot_desc) = bot_list[bot]
+		(bot_module, bot_desc) = bot_list[bot_name]
 
 		bot = BotController(bot_module,
 			            bot_desc,
 			            do_dict[bot_name],
-		                    error) )
+		                    error )
 
 		#if bot.desc == u'"SubsterBot"':
 		if bot_name == 'subster':
@@ -309,12 +312,13 @@ def main():
 		else:
 			bot.trigger()
 
-	pywikibot.output(u'\nDone.')
+	pywikibot.output(u'\nDONE.')
 	return
 
 
 if __name__ == "__main__":
 	arg = pywikibot.handleArgs()
+	log = None
 	if len(arg) > 0:
 		#arg = pywikibot.handleArgs()[0]
 		#print sys.argv[0]	# who am I?
@@ -378,10 +382,12 @@ if __name__ == "__main__":
 		main()
 		error.raise_exceptions()
 	except:
-		error.handle_exceptions(log)
+		if log:
+			error.handle_exceptions(log)
 		raise #sys.exc_info()[0](sys.exc_info()[1])
 	finally:
 		pywikibot.stopme()
 
-	log.close()
+	if log:
+		log.close()
 
