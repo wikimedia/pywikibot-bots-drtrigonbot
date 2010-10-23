@@ -1265,15 +1265,18 @@ def main():
 	if len(pywikibot.handleArgs()) > 0:
 		for arg in pywikibot.handleArgs():
 			if arg[:2] == "u'": arg = eval(arg)		# for 'runbotrun.py' and unicode compatibility
-			if 	arg[:17] == "-compress_history":
+			if   arg[:17] == "-compress_history":
 			#if 	arg[:17] == "-compress_history":
 				bot.compressHistory( eval(arg[18:]) )
 				return
-			elif	(arg[:17] == "-rollback_history"):
+			elif (arg[:17] == "-rollback_history"):
 				bot.rollback = int( arg[18:] )
-			elif	(arg[:5] == "-auto") or (arg[:5] == "-cron"):
+			elif (arg[:5] == "-auto") \
+			     or (arg[:5] == "-cron"):
 				pass
-			elif	(arg == "-all") or ("-sum_disc" in arg):
+			elif (arg == "-all") \
+			     or (arg == "-default") \
+			     or ("-sum_disc" in arg):
 				pass
 			#elif	(arg == "-test_run"):
 			#	debug = ...

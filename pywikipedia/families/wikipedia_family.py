@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikipedia_family.py 8667 2010-10-18 16:29:08Z xqt $'
+__version__ = '$Id: wikipedia_family.py 8683 2010-10-23 11:28:25Z multichill $'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 
@@ -37,7 +37,7 @@ class Family(family.Family):
             'iu', 'ik', 'chr', 'bi', 'as', 'cdo', 'ee', 'ss', 'om', 'za', 'ti',
             'ts', 've', 'zu', 'ha', 'dz', 'sg', 'ch', 'cr', 'ak', 'xh', 'st',
             'rw', 'tn', 'ki', 'bxr', 'bug', 'ny', 'lbe', 'tw', 'rn', 'ff',
-            'chy', 'lg',
+            'chy', 'lg', 'bjn', 'mrj', 'koi',
         ]
 
         if family.config.SSL_connection:
