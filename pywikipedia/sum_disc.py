@@ -341,8 +341,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			# RecentEditsPageGenerator
 
 			# get the backlinks to user disc page
-			# (some return > 500 backlinks, thus check only once a week)
-#			if (self._wday == 0) and self._param['getbacklinks_switch']:
+			# (some return >> 500 backlinks, thus check only once a week ALL those)
 			if self._param['getbacklinks_switch']:
 				self.getUserBacklinks()
 				# all pages served from here ARE CURRENTLY
@@ -598,7 +597,20 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		userbacklicksList = list(set(userbacklicksList))	# drop duplicates
 
 		work = {}
+		count = 0
+		# (some return >> 500 backlinks, thus check
+		# only once a week ALL those, else limit)
+		if (self._wday == 0):
+			max_count = len(userbacklicksList)
+		else:
+			max_count = 500
 		for item in userbacklicksList:
+			count += 1
+
+			# drop the rest if limited
+			if (len(work) > max_count):
+				break
+
 			#item = item[0]
 			for check in check_list:
 				match = check.search(item)
@@ -610,7 +622,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 					work[name] = page
 					break		# should only match one of the possibilities, anyway just add it once!
 
-		pywikibot.output(u'\03{lightpurple}*** %i Backlinks to user checked\03{default}' % len(userbacklicksList))
+		pywikibot.output(u'\03{lightpurple}*** %i Backlinks to user checked (limited to %i)\03{default}' % (len(userbacklicksList), max_count))
 
 		# feed data to pages
 		self.pages.update_work(work)
