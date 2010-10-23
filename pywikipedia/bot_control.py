@@ -11,60 +11,6 @@ that DrTrigonBot does. That are:
 Options/parameters:
 	-cron	run as CRON job, no output to stdout and stderr except error output
 		that should be sent by mail, all other output goes to a log file
-
-
-Run all bots (output to stdout):
-	python bot_control.py
-NEW:	python bot_control.py -all
-(do user_sandbox, sum_disc, subster)
-
-# Run all bots as CRON job (output to log on server, and another one for subster):
-# NEW:	python bot_control.py -all -cron
-# (do user_sandbox, sum_disc, subster, page_disc / ATTENTION: this mode uses 2 log files !!!)
-# CRON (toolserver):
-# # m h  dom mon dow   command
-# 0 2 * * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -all -cron
-# FUNKTIONIERT LEIDER NOCH NICHT, DA ZUM ZEITPUNKT DER AUSFUEHRUNG VON SUBSTER IM LOG 'Done.'
-# NOCH NICHT GESCHRIEBEN WURDE, ALSO EIN FEHLER GEMELDET WIRD!!! Waere cool, da es magic_words
-# liefern wuerde.
-
-Run default bot set as CRON job (output to log on server):
-	python bot_control.py -cron
-NEW:	python bot_control.py -default -cron
-(do user_sandbox, sum_disc, page_disc / skip subster)
-CRON (toolserver):
-# m h  dom mon dow   command
-0 2 * * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -default -cron
-
-Run sum_disc.py history compression as CRON job (output to log on server):
-	python bot_control.py -skip_clean_user_sandbox -compress_history:[] -cron
-NEW:	python bot_control.py -compress_history:[] -cron
-(do sum_disc history compression only / skip user_sandbox, sum_disc, subster)
-CRON (toolserver):
-# m h  dom mon dow   command
-0 0 */14 * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -compress_history:[] -cron
-
-Run subster bot only as CRON job (output to own log not to disturb the output of 'panel.py'
-and run stand-alone to catch failed other runs...):
-	python bot_control.py -subster -no_magic_words -cron
-(do subster / skip user_sandbox, sum_disc / ATTENTION: this mode uses another log than usual !!!)
-CRON (toolserver):
-# m h  dom mon dow   command
-0 */12 * * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -subster -no_magic_words -cron
-0 14 * * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -subster -no_magic_words -cron
-
-
-others:
-Run the bot 'clean_user_sandbox.py' only:
-	python bot_control.py -clean_user_sandbox
-
-Run the bot 'sum_disc.py' only:
-	python bot_control.py -sum_disc
-
-
-For tests its sometimes better to use:
-	python clean_user_sandbox.py
-	python sum_disc.py
 """
 ## @package bot_control
 #  @brief   General DrTrigonBot Robot(s) Caller
@@ -83,6 +29,54 @@ For tests its sometimes better to use:
 #
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
+#
+#  @section Usage
+#  @li Run all bots (according to bot_control.bot_order) with output to stdout:
+#  @verbatim python bot_control.py -all @endverbatim
+#
+#  @li Run all bots (according to bot_control.bot_order) as CRON job with output to log on server,
+#  and another one for subster.SubsterBot:
+#  @verbatim python bot_control.py -all -cron @endverbatim
+#  CRON (toolserver):
+#  @verbatim # m h  dom mon dow   command
+#  0 2 * * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -all -cron @endverbatim
+#  @attention
+#  Zum Zeitpunkt der Ausführung von subster ist im log 'DONE.' noch nicht geschrieben, aber es
+#  sind subster.magic_words vorhanden. Um ALLES zu prüfen ist ein separater @ref subster Lauf nötig.
+#  \n(this mode uses 2 log files !!!)
+#
+#  @li Run default bot set (clean_user_sandbox, sum_disc, @ref subster, page_disc) as CRON job with output
+#  to log on server:
+#  @verbatim python bot_control.py -default -cron @endverbatim
+#  CRON (toolserver):
+#  @verbatim # m h  dom mon dow   command
+#  0 2 * * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -default -cron @endverbatim
+#
+#  @li Run sum_disc history compression as CRON job with output to log on server:
+#  @verbatim python bot_control.py -compress_history:[] -cron @endverbatim
+#  CRON (toolserver):
+#  @verbatim # m h  dom mon dow   command
+#  0 0 */14 * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -compress_history:[] -cron @endverbatim
+#
+#  @li Run @ref subster bot only as CRON job with output to own log not to disturb the output of 
+#  'panel.py' (run stand-alone to catch failed other runs):
+#  @verbatim python bot_control.py -subster -no_magic_words -cron @endverbatim
+#  CRON (toolserver):
+#  @verbatim # m h  dom mon dow   command
+#  0 */12 * * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -subster -no_magic_words -cron
+#  0 14 * * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -subster -no_magic_words -cron @endverbatim
+#  @attention
+#  (this mode uses another log than usual !!!)
+#
+#  @li Run the bot clean_user_sandbox only:
+#  @verbatim python bot_control.py -clean_user_sandbox @endverbatim
+#
+#  @li Run the bot sum_disc only:
+#  @verbatim python bot_control.py -sum_disc @endverbatim
+#
+#  @li For tests its sometimes better to invoke the bot scripts separately:
+#  @verbatim python clean_user_sandbox.py @endverbatim
+#  @verbatim python sum_disc.py @endverbatim
 #
 __version__  = '$Id$'
 __revision__ = '8682'
@@ -126,7 +120,7 @@ bot_list = { 'clean_user_sandbox': (clean_user_sandbox, u'clean userspace Sandbo
              'subster':            (subster, u'"SubsterBot"'),
              'page_disc':          (page_disc, u'page_disc (beta test)'), }
 #bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'subster', 'page_disc' ]
-bot_order = [ 'sum_disc' ] # debug
+bot_order = [ 'clean_user_sandbox', 'sum_disc', 'subster' ] # debug
 
 
 # Bot Error Handling; to prevent bot errors to stop execution of other bots
@@ -175,6 +169,8 @@ class BotErrorHandler:
 
 			pywikibot.output(u'\n\03{lightred}%s\03{default}' % error[2])
 
+## BotController (or WatchDog) class.
+#
 class BotController:
 	def __init__(self, bot, desc, run_bot, ErrorHandler):
 		self.bot          = bot
@@ -303,7 +299,7 @@ def main():
 				bot.bot.magic_words = {'BOTerror':          str(bool(error.error_buffer)),
 				                       'BOTerrortraceback': str([item[2] for item in error.error_buffer]),}
 				                       #'BOTversion':        '0.2.0000, rev. ' + __revision__,
-				                       #'BOTrunningsubbots': '...',}
+				                       #'BOTrunningsubbots': bot_order,}
 			bot.trigger()
 			if cron:
 				# back to default log (for everything else than subster)
@@ -344,7 +340,7 @@ if __name__ == "__main__":
 			do_dict.update({ 'clean_user_sandbox': True,
 			                 'sum_disc':           True,
 			                 #'replace_tmpl':       True,
-			                 #'subster':            True,
+			                 'subster':            True,
 			                 'page_disc':          True,
 			})
 		elif ("-compress_history:[]" in arg):		# muss alleine laufen, sollte aber mit allen 

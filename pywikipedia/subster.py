@@ -52,21 +52,19 @@ bot_config = {	# unicode values
 					}
 }
 
+## used/defined magic words, look also at bot_control
+#  use, for example: '\<!--SUBSTER-BOTerror--\>\<!--SUBSTER-BOTerror--\>'
+magic_words = {} # no magic word substitution (for empty dict)
+
+# debug tools
 debug = True
 
 
-## @todo try to implement magic words, look also at runbotrun
-#        (use, for example: '\<!--SUBSTER-BOTerror--\>\<!--SUBSTER-BOTerror--\>')
-#        \n[ JIRA: ticket? ]
 class SubsterBot(dtbext.basic.BasicBot):
 	'''
 	Robot which will does substitutions of tags within wiki page content with external or
 	other wiki text data. Like dynamic text updating.
 	'''
-
-	# used/defined magic words, look also at 'runbotrun.py'
-	# use, e.g.: '<!--SUBSTER-BOTerror--><!--SUBSTER-BOTerror-->'
-	magic_words	= {}	# no magic word substitution (for empty dict)
 
 	_param_default  = bot_config['param_default']
 
@@ -95,6 +93,9 @@ class SubsterBot(dtbext.basic.BasicBot):
 		else:	pagegen = pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
 
 		for page in pagegen:
+			pywikibot.output(u'Getting page %s via API from %s...'
+			                 % (page.title(asLink=True), self.site))
+
 			# setup source to get data from
 			if sim:
 				content = sim['content']
@@ -112,13 +113,13 @@ class SubsterBot(dtbext.basic.BasicBot):
 			if sim:
 				return substed_content
 			else:
-				if debug:
-					pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
-					continue
-
 				# if changed, write!
 				if (substed_content != content):
 					self.outputContentDiff(content, substed_content)
+
+					if debug:
+						pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
+						continue
 
 					self.save(page, substed_content, u'Bot: substituting changed tags.')
 				else:
@@ -176,8 +177,8 @@ class SubsterBot(dtbext.basic.BasicBot):
 			substed_content = var_regex.sub((self._var_regex_str%{'var':item['value'],'cont':external_data}), substed_content, int(item['count']))
 
 			# 6.) subst (internal) magic words
-			for subitem in self.magic_words.keys():
-				substed_content = self.get_var_regex(subitem).sub( (self._var_regex_str%{'var':subitem,'cont':self.magic_words[subitem]}),
+			for subitem in magic_words.keys():
+				substed_content = self.get_var_regex(subitem).sub( (self._var_regex_str%{'var':subitem,'cont':magic_words[subitem]}),
 										   substed_content)
 
 		return substed_content
@@ -216,12 +217,15 @@ def main():
 	bot = SubsterBot()	# for several user's, but what about complete automation (continous running...)
 	if len(pywikibot.handleArgs()) > 0:
 		for arg in pywikibot.handleArgs():
-			if arg[:2] == "u'": arg = eval(arg)		# for 'runbotrun.py' and unicode compatibility
-			if	(arg[:5] == "-auto") or (arg[:5] == "-cron"):
+			if arg[:2] == "u'": arg = eval(arg)		# for 'bot_control.py' and unicode compatibility
+			if   (arg[:5] == "-auto") \
+			     or (arg[:5] == "-cron"):
 				bot.silent = True
-			elif	(arg == "-all") or ("-subster" in arg):
+			elif (arg == "-all") \
+			     or (arg == "-default") \
+			     or ("-subster" in arg):
 				pass
-			elif	(arg == "-no_magic_words"):
+			elif (arg == "-no_magic_words"):
 				pass
 			else:
 				pywikibot.showHelp()

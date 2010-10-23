@@ -57,6 +57,10 @@ bot_config = {	# unicode values
 # 'TemplateName' is just a dummy for 'dtbext.basic.BasicBot'
 }
 
+# debug tools
+debug = True
+
+
 class UserSandboxBot(dtbext.basic.BasicBot, clean_sandbox.SandboxBot):
 	'''
 	Robot which will clean per user sandbox pages.
@@ -108,6 +112,10 @@ class UserSandboxBot(dtbext.basic.BasicBot, clean_sandbox.SandboxBot):
 			#except pywikibot.EditConflict:
 			#	pywikibot.output(u'*** Loading again because of edit conflict.')
 
+			if debug:
+				pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
+				continue
+
 			clean_sandbox.SandboxBot.run(self)
 
 def main():
@@ -118,9 +126,12 @@ def main():
         if arg.startswith('-hours:'):
             hours = float(arg[7:])
             no_repeat = False
-        elif	(arg[:5] == "-auto") or (arg[:5] == "-cron"):
+        elif (arg[:5] == "-auto") \
+          or (arg[:5] == "-cron"):
             pass
-        elif	(arg == "-all") or ("-clean_user_sandbox" in arg):
+        elif (arg == "-all") \
+          or (arg == "-default") \
+          or ("-clean_user_sandbox" in arg):
             pass
         elif arg.startswith('-delay:'):
             delay = int(arg[7:])
