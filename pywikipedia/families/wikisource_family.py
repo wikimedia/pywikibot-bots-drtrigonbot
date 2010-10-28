@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikisource_family.py 8664 2010-10-18 12:10:33Z xqt $'
+__version__ = '$Id: wikisource_family.py 8688 2010-10-28 05:49:05Z xqt $'
 
 # The Wikimedia family that is known as Wikisource
 
@@ -278,7 +278,7 @@ class Family(family.Family):
             'ru': u'Страница',
             'sl': u'Kazalo',
             'sv': u'Sida',
-            'te': [u'పేజీ', u'Page'],
+            'te': [u'పుట', u'పేజీ', u'Page'],
             'vi': u'Trang',
             'zh': u'Page',
         }
@@ -308,7 +308,7 @@ class Family(family.Family):
             'ru': u'Обсуждение страницы',
             'sl': u'Pogovor o kazalu',
             'sv': u'Siddiskussion',
-            'te': [u'పేజీ చర్చ', u'Page talk'],
+            'te': [u'పుట చర్చ', u'పేజీ చర్చ', u'Page talk'],
             'vi': u'Thảo luận Trang',
             'zh': u'Page talk',
         }

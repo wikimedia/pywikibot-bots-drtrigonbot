@@ -29,7 +29,7 @@ Todo:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: flickrripper.py 8520 2010-09-11 10:40:05Z xqt $'
+__version__ = '$Id: flickrripper.py 8686 2010-10-24 21:40:00Z multichill $'
 
 import sys, urllib, re,  StringIO, hashlib, base64, time
 import wikipedia as pywikibot
@@ -128,14 +128,14 @@ def getTags(photoInfo = None):
 
 def getFlinfoDescription(photo_id = 0):
     '''
-    Get the description from http://pywikibot.ramselehof.de/flinfo.php
+    Get the description from http://wikipedia.ramselehof.de/flinfo.php
 
     TODO: Add exception handling, try a couple of times
     '''
     parameters = urllib.urlencode({'id' : photo_id, 'raw' : 'on'})
     
     rawDescription = urllib.urlopen(
-        "http://pywikibot.ramselehof.de/flinfo.php?%s" % parameters).read()
+        "http://wikipedia.ramselehof.de/flinfo.php?%s" % parameters).read()
     
     return rawDescription.decode('utf-8')
 

@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: family.py 8661 2010-10-17 21:05:10Z xqt $'
+__version__='$Id: family.py 8685 2010-10-24 12:10:15Z multichill $'
 
 import config
 import re
@@ -21,7 +21,7 @@ class Family:
         # Updated from http://meta.wikimedia.org/wiki/Interwiki_sorting_order
         self.alphabetic = [
             'ace', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an', 'arc',
-            'roa-rup', 'frp', 'as', 'ast', 'gn', 'av', 'ay', 'az', 'bm', 'bnj',
+            'roa-rup', 'frp', 'as', 'ast', 'gn', 'av', 'ay', 'az', 'bm', 'bjn',
             'bn', 'zh-min-nan', 'nan', 'map-bms', 'ba', 'be', 'be-x-old', 'bh',
             'bcl', 'bi', 'bar', 'bo', 'bs', 'br', 'bg', 'bxr', 'ca', 'cv',
             'ceb', 'cs', 'ch', 'cbk-zam', 'ny', 'sn', 'tum', 'cho', 'co', 'cy',

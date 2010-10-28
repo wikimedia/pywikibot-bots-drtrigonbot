@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wiktionary_family.py 8654 2010-10-15 05:08:06Z xqt $'
+__version__ = '$Id: wiktionary_family.py 8688 2010-10-28 05:49:05Z xqt $'
 
 # The Wikimedia family that is known as Wiktionary
 
@@ -378,11 +378,13 @@ class Family(family.Family):
 
         self.namespaces[108] = {
             'en': u'Transwiki',
+            'fr': u'Projet',
             'pt': u'Citações',
         }
 
         self.namespaces[109] = {
             'en': u'Transwiki talk',
+            'fr': u'Discussion Projet',
             'pt': u'Citações Discussão',
         }
 
