@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: commons_family.py 8594 2010-09-24 04:20:50Z xqt $'
+__version__ = '$Id: commons_family.py 8719 2010-11-12 08:30:08Z xqt $'
 
 import family
 
@@ -39,6 +39,12 @@ class Family(family.Family):
         }
         self.namespaces[105] = {
             '_default': [u'Sequence talk'],
+        }
+        self.namespaces[106] = {
+            '_default': [u'Institution'],
+        }
+        self.namespaces[107] = {
+            '_default': [u'Institution talk'],
         }
 
         self.interwiki_forward = 'wikipedia'

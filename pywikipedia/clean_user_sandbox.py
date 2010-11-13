@@ -40,12 +40,8 @@ import dtbext
 import wikipedia as pywikibot
 
 clean_sandbox.content = {
-	'de': u'{{Benutzer:DrTrigon/Entwurf/Vorlage:Spielwiese}}\n',
+	'de': u'(.*?{{Benutzer\:DrTrigon\/Entwurf\/Vorlage\:Spielwiese}}\n)(.*)',
 	}
-
-#clean_sandbox.msg = {
-#	'de': u'RESET (Spielwiese gemäht)',
-#	}
 
 clean_sandbox.sandboxTitle = {
 	'de': u'Benutzer:%s/Spielwiese',
@@ -87,36 +83,40 @@ class UserSandboxBot(dtbext.basic.BasicBot, clean_sandbox.SandboxBot):
 	def run(self):
 		'''Run UserSandboxBot().'''
 
-		#for user in self._user_list:
-		import userlib
-		for user in [userlib.User(self.site, u'DrTrigon')]:
-			pywikibot.output(u'\03{lightgreen}** Processing User: %s\03{default}' % user)
+		# analog to clean_sandbox.SandboxBot.run(self) done for several users:
 
-			clean_sandbox.sandboxTitle['de'] = clean_sandbox.sandboxTitle['de'] % user.name()
+		pywikibot.output(u'\03{lightgreen}* Processing User List (wishes):\03{default}')
 
-			sandboxPage = pywikibot.Page(self.site, clean_sandbox.sandboxTitle['de'])
+		localSandboxTitle = pywikibot.translate(self.site, clean_sandbox.sandboxTitle)
+		#import userlib
+		#self._user_list = [userlib.User(self.site, u'DrTrigon'),]
+		titles = [localSandboxTitle % user.name() for user in self._user_list]
+
+		for title in titles:
+			pywikibot.output(u'\03{lightred}** Processing page [[%s]]\03{default}' % title)
+
+			sandboxPage = pywikibot.Page(self.site, title)
 			if not sandboxPage.exists():
-				pywikibot.output(u'The sandbox %s is not existent, skipping.' % sandboxPage.title(asLink=True))
-				break
-
-# try to implement this also with 'clean_sandbox.SandboxBot'  vvv
-# [ should be done in framework / JIRA: ticket? ]
-			#try:
-			#	text = sandboxPage.get(get_redirect=True)
-			#	content = re.search(u'(.*?{{Benutzer\:DrTrigon\/Entwurf\/Vorlage\:Spielwiese}}\n)(.*)', text, re.S)
-			#	if content == None:
-			#		pywikibot.output(u'The sandbox [[%s]] is still clean (or not set up), no change necessary.' % sandboxPage.title())
-			#	else:
-			#		pywikibot.output(u'The sandbox [[%s]] is cleaned up.' % sandboxPage.title())
-			#		sandboxPage.put(content.group(1))
-			#except pywikibot.EditConflict:
-			#	pywikibot.output(u'*** Loading again because of edit conflict.')
-
-			if debug:
-				pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
+				pywikibot.output(u'The sandbox is not existent, skipping.')
 				continue
 
-			clean_sandbox.SandboxBot.run(self)
+			try:
+				#text = sandboxPage.get(get_redirect=True)
+				text = sandboxPage.get()
+				translatedContent = pywikibot.translate(self.site, clean_sandbox.content)
+				translatedMsg = pywikibot.translate(self.site, clean_sandbox.msg)
+				translatedContent = re.search(translatedContent, text, re.S)
+				if translatedContent == None:
+					pywikibot.output(u'The sandbox is still clean or not set up, no change necessary.')
+				else:
+					if debug:
+						pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
+						continue
+
+					sandboxPage.put(translatedContent.group(1), translatedMsg)
+					pywikibot.output(u'The sandbox is cleaned up.')
+			except pywikibot.EditConflict:
+				pywikibot.output(u'*** Loading again because of edit conflict.')
 
 def main():
     hours = 1

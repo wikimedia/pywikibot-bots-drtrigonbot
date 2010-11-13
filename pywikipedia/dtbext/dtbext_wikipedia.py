@@ -31,7 +31,7 @@ from dtbext_pywikibot import *
 
 # Application specific imports
 import wikipedia as pywikibot
-import query, userlib, config
+import query, config
 
 
 debug = False

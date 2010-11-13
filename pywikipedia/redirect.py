@@ -60,7 +60,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: redirect.py 8587 2010-09-21 16:47:03Z xqt $'
+__version__='$Id: redirect.py 8718 2010-11-11 20:23:45Z xqt $'
 #
 import re, sys, datetime
 import wikipedia as pywikibot
@@ -74,10 +74,11 @@ msg_double={
     'ar': u'روبوت: تصليح تحويلة مزدوجة → %s',
     'bat-smg': u'Robots: Taisuoms dvėgobs paradresavėms → %s',
     'be-x-old': u'Робат: выпраўленьне падвойнага перанакіраваньня → %s',
+    'bjn': u'Robot: Pamasangan paugahan ganda ka %s',
     'br': u'Kempennet adkas doubl gant robot → %s',
     'cs': u'Robot opravil dvojité přesměrování → %s',
     'de': u'Bot: Korrigiere doppelte Weiterleitung zu %s',
-    'en': u'Robot: Fixing double redirect to %s',
+    'en': u'Bot: Fixing double redirect to %s',
     'es': u'Robot: Arreglando doble redirección → %s',
     'fa': u'ربات:اصلاح تغییر مسیر دوتایی ← %s',
     'fi': u'Botti korjasi kaksinkertaisen ohjauksen → %s',

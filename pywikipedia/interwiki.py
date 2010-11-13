@@ -307,7 +307,7 @@ have to break it off, use "-continue" next time.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: interwiki.py 8687 2010-10-27 21:16:01Z valhallasw $'
+__version__ = '$Id: interwiki.py 8703 2010-11-06 19:13:28Z xqt $'
 #
 
 import sys, copy, re, os
@@ -383,6 +383,7 @@ msg = {
     'be': (u'робат ', u'Дадаем', u'Выдаляем', u'Мяняем'),
     'be-x-old': (u'робат ', u'дадаў', u'выдаліў', u'зьмяніў'),
     'bg': (u'Робот ', u'Добавяне', u'Изтриване', u'Промяна'),
+    'bjn': (u'bot ', u'Manambah', u'Mambuang', u"Ma'ubah"),
     'bn': (u'রোবট ', u'যোগ করছে', u'মুছে ফেলছে', u'পরিবর্তন সাধন করছে'),
     'bo': (u'འཕྲུལ་ཆས་ཀྱི་མི། ', u'ཁ་སྣོན་རྒྱག་པ།', u'བསུབ་པ།', u'བསྐྱར་བཅོས་བྱེད་པ།'),
     'bpy': (u'রোবট ', u'তিলকরের', u'থেইকরের', u'বদালার'),
@@ -435,6 +436,7 @@ msg = {
     'ka': (u'ბოტის ', u'დამატება', u'წაშლა', u'შეცვლა'),
     'kab': (u'a rubut ', u'ti merniwt', u'a ḍegger', u'a senfel'),
     'ko': (u'로봇이 ', u'더함', u'지움', u'바꿈'),
+    'koi': (u'робот ', u'содтiс', u'чышкис', u'мöдкодьсьöтiс'),
     'kk': (u'Боттың ', u'үстегені', u'аластағаны', u'түзеткені'),
     'kl': (u'Robot ', u'Ilassut', u'Peersineq', u'Inisseeqqinneq'),
     'km': (u'រ៉ូបូ ', u'បន្ថែម', u'ដកចេញ', u'កែសំរួល'),
@@ -1865,7 +1867,7 @@ u'NOTE: number of edits are restricted at %s'
                 if not globalvar.cleanup or \
                    rmPage.aslink(forceInterwiki=True) not in globalvar.remove or \
                    rmPage.site().sitename() == 'wikipedia:hi' and \
-                   page.site().sitename() != 'wikipedia:de': #work-arround for bug #3081100 (do not remove hi-pages)
+                   pywikibot.unicode_error: #work-arround for bug #3081100 (do not remove hi-pages)
                     new[rmsite] = rmPage
                     pywikibot.output(
                         u"WARNING: %s is either deleted or has a mismatching disambiguation state."
@@ -2564,17 +2566,6 @@ def main():
 globalvar=Global()
 
 if __name__ == "__main__":
-    # TEST for bug #3081100
-    if not __import__('unicodedata').normalize('NFC', u'\u092e\u093e\u0930\u094d\u0915 \u091c\u093c\u0941\u0915\u0947\u0930\u092c\u0930\u094d\u0917') == u'\u092e\u093e\u0930\u094d\u0915 \u091c\u093c\u0941\u0915\u0947\u0930\u092c\u0930\u094d\u0917':
-        pywikibot.output("""
-
-================================================================================
-\03{lightyellow}WARNING:\03{lightred} your python version might trigger issue #3081100\03{default}
-See https://sourceforge.net/tracker/index.php?func=detail&aid=3081100&group_id=93107&atid=603138 for more information.
-\03{lightyellow}Use an older python version (<2.6.5) if you are running on wikimedia sites!\03{default}
-================================================================================
-
-""")
     try:
         main()
     finally:

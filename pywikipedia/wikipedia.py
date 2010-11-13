@@ -120,7 +120,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 8660 2010-10-17 16:18:45Z xqt $'
+__version__ = '$Id: wikipedia.py 8717 2010-11-09 15:54:51Z shizhao $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -592,20 +592,21 @@ not supported by PyWikipediaBot!"""
         retrieved yet, or if force is True. This can raise the following
         exceptions that should be caught by the calling code:
 
-            NoPage: The page does not exist
-            IsRedirectPage: The page is a redirect. The argument of the
+          - NoPage: The page does not exist
+          - IsRedirectPage: The page is a redirect. The argument of the
                             exception is the title of the page it redirects to.
-            SectionError: The subject does not exist on a page with a # link
+          - SectionError: The section does not exist on a page with a # link
 
-        If get_redirect is True, return the redirect text and save the
-        target of the redirect, do not raise an exception.
-        If force is True, reload all page attributes, including
-        errors.
-        If change_edit_time is False, do not check this version for changes
-        before saving. This should be used only if the page has been loaded
-        previously.
-        If expandtemplates is True, all templates in the page content are
-        fully resolved too (if API is used).
+        @param force: reload all page attributes, including errors.
+        @param get_redirect: return the redirect text, do not follow the
+            redirect, do not raise an exception.
+        @param sysop: if the user has a sysop account, use it to retrieve
+            this page
+        @param change_edit_time: if False, do not check this version for
+            changes before saving. This should be used only if the page has
+            been loaded previously.
+        @param expandtemplates: all templates in the page content are fully
+            resolved too (if API is used).
 
         """
         # NOTE: The following few NoPage exceptions could already be thrown at
@@ -624,12 +625,14 @@ not supported by PyWikipediaBot!"""
         if self.site().isInterwikiLink(self.title()):
             raise NoPage('%s is not a local page on %s!'
                          % (self.aslink(), self.site()))
-        if force or expandtemplates:
-            # When forcing, we retry the page no matter what. Old exceptions
-            # and contents do not apply any more.
-            for attr in ['_redirarg', '_getexception', '_contents']:
+        if force:
+            # When forcing, we retry the page no matter what:
+            # * Old exceptions and contents do not apply any more
+            # * Deleting _contents and _expandcontents to force reload
+            for attr in ['_redirarg', '_getexception',
+                         '_contents', '_expandcontents']:
                 if hasattr(self, attr):
-                    delattr(self,attr)
+                    delattr(self, attr)
         else:
             # Make sure we re-raise an exception we got on an earlier attempt
             if hasattr(self, '_redirarg') and not get_redirect:
@@ -640,10 +643,18 @@ not supported by PyWikipediaBot!"""
                 else:
                     raise self._getexception
         # Make sure we did try to get the contents once
-        if not hasattr(self, '_contents'):
+        if expandtemplates:
+            attr = '_expandcontents'
+        else:
+            attr = '_contents'
+        if not hasattr(self, attr):
             try:
-                self._contents = self._getEditPage(get_redirect=get_redirect, throttle=throttle, sysop=sysop,
-                                                   expandtemplates = expandtemplates)
+                contents = self._getEditPage(get_redirect=get_redirect, throttle=throttle, sysop=sysop,
+                                             expandtemplates = expandtemplates)
+                if expandtemplates:
+                    self._expandcontents = contents
+                else:
+                    self._contents = contents
                 hn = self.section()
                 if hn:
                     m = re.search("=+ *%s *=+" % hn, self._contents)
@@ -669,6 +680,8 @@ not supported by PyWikipediaBot!"""
                         output("The IP address is blocked, retry by login.")
                     self.site().forceLogin(sysop=sysop)
                     return self.get(force, get_redirect, throttle, sysop, change_edit_time)
+        if expandtemplates:
+            return self._expandcontents
         return self._contents
 
     def _getEditPage(self, get_redirect=False, throttle=True, sysop=False,
@@ -920,7 +933,11 @@ not supported by PyWikipediaBot!"""
 
     def getOldVersion(self, oldid, force=False, get_redirect=False,
                       throttle=True, sysop=False, change_edit_time=True):
-        """Return text of an old revision of this page; same options as get()."""
+        """Return text of an old revision of this page; same options as get().
+
+        @param oldid: The revid of the revision desired.
+
+        """
         # TODO: should probably check for bad pagename, NoPage, and other
         # exceptions that would prevent retrieving text, as get() does
 
@@ -1193,7 +1210,7 @@ not supported by PyWikipediaBot!"""
                 try:
                     default = set(self._site.family.disambig('_default'))
                 except KeyError:
-                    default = set(u'Disambig')
+                    default = set([u'Disambig'])
                 try:
                     distl = self._site.family.disambig(self._site.lang,
                                                        fallback=False)
@@ -1212,7 +1229,7 @@ not supported by PyWikipediaBot!"""
                             regex = re.compile('\(\((.+?)\)\)')
                             content = disambigpages.get()
                             for index in regex.findall(content):
-                                disambigs.add(index)
+                                disambigs.add(index[:1].upper() + index[1:])
                     except NoPage:
                         disambigs = set([self._site.mediawiki_message(
                             'Disambiguationspage').split(':', 1)[1]])
@@ -2763,32 +2780,88 @@ not supported by PyWikipediaBot!"""
         result += '|}\n'
         return result
 
-    def fullVersionHistory(self):
+    def fullVersionHistory(self, getAll=False, skipFirst=False, reverseOrder=False,
+                           revCount=500):
         """Iterate previous versions including wikitext.
 
         Gives a list of tuples consisting of revision ID, edit date/time, user name and
         content
 
         """
-        address = self.site().export_address()
-        predata = {
-            'action': 'submit',
-            'pages': self.title()
-        }
-        get_throttle(requestsize = 10)
-        now = time.time()
-        response, data = self.site().postForm(address, predata)
-        data = data.encode(self.site().encoding())
+        if not self.site().has_api() or self.site().versionnumber() < 8:
+            address = self.site().export_address()
+            predata = {
+                'action': 'submit',
+                'pages': self.title()
+            }
+            get_throttle(requestsize = 10)
+            now = time.time()
+            response, data = self.site().postForm(address, predata)
+            data = data.encode(self.site().encoding())
 #        get_throttle.setDelay(time.time() - now)
-        output = []
+            output = []
         # TODO: parse XML using an actual XML parser instead of regex!
-        r = re.compile("\<revision\>.*?\<id\>(?P<id>.*?)\<\/id\>.*?\<timestamp\>(?P<timestamp>.*?)\<\/timestamp\>.*?\<(?:ip|username)\>(?P<user>.*?)\</(?:ip|username)\>.*?\<text.*?\>(?P<content>.*?)\<\/text\>",re.DOTALL)
+            r = re.compile("\<revision\>.*?\<id\>(?P<id>.*?)\<\/id\>.*?\<timestamp\>(?P<timestamp>.*?)\<\/timestamp\>.*?\<(?:ip|username)\>(?P<user>.*?)\</(?:ip|username)\>.*?\<text.*?\>(?P<content>.*?)\<\/text\>",re.DOTALL)
         #r = re.compile("\<revision\>.*?\<timestamp\>(.*?)\<\/timestamp\>.*?\<(?:ip|username)\>(.*?)\<",re.DOTALL)
-        return [  (match.group('id'),
-                   match.group('timestamp'),
-                   unescape(match.group('user')),
-                   unescape(match.group('content')))
-                for match in r.finditer(data)  ]
+            return [  (match.group('id'),
+                       match.group('timestamp'),
+                       unescape(match.group('user')),
+                       unescape(match.group('content')))
+                    for match in r.finditer(data)  ]
+         
+        """Load history informations by API query. """
+
+        dataQ = []
+        thisHistoryDone = False
+        params = {
+            'action': 'query',
+            'prop': 'revisions',
+            'titles': self.title(),
+            'rvprop': 'ids|timestamp|user|content',
+            'rvlimit': revCount,
+        }
+        while not thisHistoryDone:
+            if reverseOrder:
+                params['rvdir'] = 'newer'
+
+            result = query.GetData(params, self.site())
+            if 'error' in result:
+                raise RuntimeError("%s" % result['error'])
+            pageInfo = result['query']['pages'].values()[0]
+            if result['query']['pages'].keys()[0] == "-1":
+                if 'missing' in pageInfo:
+                    raise NoPage(self.site(), self.aslink(forceInterwiki=True),
+                                 "Page does not exist.")
+                elif 'invalid' in pageInfo:
+                    raise BadTitle('BadTitle: %s' % self)
+
+            if 'query-continue' in result and getAll:
+                params['rvstartid'] = result['query-continue']['revisions']['rvstartid']
+            else:
+                thisHistoryDone = True
+            
+            if skipFirst:
+                skipFirst = False
+            else:
+                for r in pageInfo['revisions']:
+                    c = ''
+                    if 'comment' in r:
+                        c = r['comment']
+                    #revision id, edit date/time, user name, edit summary
+                    (revidStrr, timestampStrr, userStrr) = (None, None, None)
+                    if 'revid' in r:
+                        revidStrr = r['revid']
+                    if 'timestamp' in r:
+                        timestampStrr = r['timestamp']
+                    if 'user' in r:
+                        userStrr = r['user']
+                    s='' #Will return -1 if not found
+                    if '*' in r:
+                        s = r['*']
+                    dataQ.append((revidStrr, timestampStrr, userStrr, s))
+                if len(result['query']['pages'].values()[0]['revisions']) < revCount:
+                    thisHistoryDone = True
+        return dataQ
 
     def contributingUsers(self, step=None, total=None):
         """Return a set of usernames (or IPs) of users who edited this page.
@@ -5147,7 +5220,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                         retry_attempt += 1
                         if retry_attempt > config.maxretries:
                             raise MaxTriesExceededError()
-                        output(u"""WARNING: Could not open '%s'.\nMaybe the server is down. Retrying in %i minutes..."""
+                        output(u"WARNING: Could not open '%s'.\nMaybe the server is down. Retrying in %i minutes..."
                                % (url, retry_idle_time))
                         time.sleep(retry_idle_time * 60)
                         # Next time wait longer, but not longer than half an hour
@@ -5162,7 +5235,10 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
             except Exception, e:
                 output(u'%s' %e)
                 if config.retry_on_fail:
-                    output(u"""WARNING: Could not open '%s'. Maybe the server or\n your connection is down. Retrying in %i minutes..."""
+                    retry_attempt += 1
+                    if retry_attempt > config.maxretries:
+                        raise MaxTriesExceededError()
+                    output(u"WARNING: Could not open '%s'. Maybe the server or\n your connection is down. Retrying in %i minutes..."
                            % (url, retry_idle_time))
                     time.sleep(retry_idle_time * 60)
                     retry_idle_time *= 2
@@ -5270,6 +5346,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
         # case the server is down or overloaded).
         # Wait for retry_idle_time minutes (growing!) between retries.
         retry_idle_time = 1
+        retry_attempt = 0
         while True:
             try:
                 request = urllib2.Request(url, data, headers)
@@ -5293,8 +5370,11 @@ u'Page %s could not be retrieved. Check your virus wall.'
                 elif e.code == 504:
                     output(u'HTTPError: %s %s' % (e.code, e.msg))
                     if retry:
+                        retry_attempt += 1
+                        if retry_attempt > config.maxretries:
+                            raise MaxTriesExceededError()
                         output(
-u"""WARNING: Could not open '%s'.Maybe the server or\n your connection is down. Retrying in %i minutes..."""
+u"WARNING: Could not open '%s'.Maybe the server or\n your connection is down. Retrying in %i minutes..."
                                % (url, retry_idle_time))
                         time.sleep(retry_idle_time * 60)
                         # Next time wait longer,
@@ -5310,8 +5390,11 @@ u"""WARNING: Could not open '%s'.Maybe the server or\n your connection is down. 
             except Exception, e:
                 output(u'%s' %e)
                 if retry:
+                    retry_attempt += 1
+                    if retry_attempt > config.maxretries:
+                        raise MaxTriesExceededError()
                     output(
-u"""WARNING: Could not open '%s'. Maybe the server or\n your connection is down. Retrying in %i minutes..."""
+u"WARNING: Could not open '%s'. Maybe the server or\n your connection is down. Retrying in %i minutes..."
                            % (url, retry_idle_time))
                     time.sleep(retry_idle_time * 60)
                     retry_idle_time *= 2
@@ -7462,6 +7545,18 @@ def handleArgs(*args):
             # the argument is not global. Let the specific bot script care
             # about it.
             nonGlobalArgs.append(arg)
+    
+    # TEST for bug #3081100
+    if unicode_error and (default_code == 'hi' or moduleName=='interwiki'):
+                output("""
+
+================================================================================
+\03{lightyellow}WARNING:\03{lightred} your python version might trigger issue #3081100\03{default} 
+See https://sourceforge.net/tracker/index.php?func=detail&aid=3081100&group_id=93107&atid=603138 for more information.
+\03{lightyellow}Use an older python version (<2.6.5) if you are running on wikimedia sites!\03{default} 
+================================================================================
+
+""")
     if verbose:
       output(u'Pywikipediabot %s' % (version.getversion()))
       output(u'Python %s' % (sys.version))
@@ -7477,6 +7572,14 @@ exec "import %s_interface as uiModule" % config.userinterface
 ui = uiModule.UI()
 verbose = 0
 debug = False
+
+# TEST for bug #3081100
+unicode_error = __import__('unicodedata').normalize(
+    'NFC',
+    u'\u092e\u093e\u0930\u094d\u0915 \u091c\u093c\u0941\u0915\u0947\u0930\u092c\u0930\u094d\u0917'
+    ) != u'\u092e\u093e\u0930\u094d\u0915 \u091c\u093c\u0941\u0915\u0947\u0930\u092c\u0930\u094d\u0917'
+if unicode_error:
+    print u'unicode test: triggers problem #3081100'
 
 default_family = config.family
 default_code = config.mylang

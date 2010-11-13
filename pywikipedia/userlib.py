@@ -7,7 +7,7 @@ Library to work with users, their pages and talk pages.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: userlib.py 8588 2010-09-22 04:53:21Z xqt $'
+__version__ = '$Id: userlib.py 8701 2010-11-06 03:10:04Z xqt $'
 
 import re
 import wikipedia as pywikibot
@@ -294,14 +294,10 @@ class User(object):
                 raise pywikibot.Error
             for contrib in result['query']['usercontribs']:
                 ts = pywikibot.parsetime2stamp(contrib['timestamp'])
-                if 'commenthidden' in contrib:
-                    yield (pywikibot.Page(self.site(), contrib['title'], defaultNamespace=contrib['ns']),
-                                contrib['revid'], ts, u''
-                    )
-                else:
-                    yield (pywikibot.Page(self.site(), contrib['title'], defaultNamespace=contrib['ns']),
-                                contrib['revid'], ts, contrib['comment']
-                    )
+                yield (pywikibot.Page(self.site(), contrib['title'],
+                                      defaultNamespace=contrib['ns']),
+                       contrib['revid'], ts, contrib.get('comment', None)
+                )
                 nbresults += 1
                 if nbresults >= limit:
                     break
@@ -310,7 +306,6 @@ class User(object):
             else:
                 break
         return
-
 
     def uploadedImages(self, number=10):
         """ Yield tuples describing files uploaded by this user.

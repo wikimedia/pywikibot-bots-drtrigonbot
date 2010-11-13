@@ -27,7 +27,7 @@ used on a page reachable via interwiki links.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: imagetransfer.py 8572 2010-09-17 23:43:47Z amir $'
+__version__='$Id: imagetransfer.py 8705 2010-11-07 14:55:50Z xqt $'
 
 import re, sys, md5, urllib
 import wikipedia as pywikibot
@@ -48,6 +48,7 @@ copy_message = {
     'nl':u"Afbeelding gekopieerd vanaf %s. De beschrijving daar was:\r\n\r\n%s",
     'pl':u"Ten obraz został skopiowany z %s. Oryginalny opis to:\r\n\r\n%s",
     'pt':u"Esta imagem foi copiada de %s. A descrição original foi:\r\n\r\n%s",
+    'ru':u"Изображение было скопировано с %s. Оригинальное описание содержало:\r\n\r\n%s"
     'sr':u"Ова слика је копирана са %s. Оригинални опис је:\r\n\r\n%s",
     'zh':u"本圖像從 %s 複製，原始說明資料：\r\n\r\n%s",
 }
