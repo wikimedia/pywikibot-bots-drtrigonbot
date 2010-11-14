@@ -78,8 +78,8 @@ class UserSandboxBot(dtbext.basic.BasicBot, clean_sandbox.SandboxBot):
 
 		# init variable/dynamic objects
 
-	## @todo try to implement this also with @ref clean_sandbox.SandboxBot, should be done in framework
-	#        \n[ JIRA: ticket? ]
+	## @todo try to implement/merge this also with @ref clean_sandbox.SandboxBot, should be done in framework
+	#        \n[ JIRA: DRTRIGON-71 ]
 	def run(self):
 		'''Run UserSandboxBot().'''
 
