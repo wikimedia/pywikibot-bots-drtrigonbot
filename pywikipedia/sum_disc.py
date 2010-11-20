@@ -312,6 +312,8 @@ class SumDiscBot(dtbext.basic.BasicBot):
 	## @todo re-write some functions to be pagegenerators and use pagegenerators.CombinedPageGenerator()
 	#        and others to combine and use them
 	#        \n[ JIRA: ticket? ]
+	#  @todo litted backlings: try to take the most recent ones
+	#        \n[ JIRA: ticket? ]
 	def run(self):
 		'''Run SumDiscBot().'''
 
@@ -342,6 +344,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 			# get the backlinks to user disc page
 			# (some return >> 500 backlinks, thus check only once a week ALL those)
+# TRY TO TAKE THE 500 MOST RECENT ONES !!!
 			if self._param['getbacklinks_switch']:
 				self.getUserBacklinks()
 				# all pages served from here ARE CURRENTLY

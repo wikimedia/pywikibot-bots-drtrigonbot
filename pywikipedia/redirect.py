@@ -60,7 +60,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: redirect.py 8718 2010-11-11 20:23:45Z xqt $'
+__version__='$Id: redirect.py 8731 2010-11-19 13:59:31Z xqt $'
 #
 import re, sys, datetime
 import wikipedia as pywikibot
@@ -104,6 +104,7 @@ msg_double={
     'nl': u'Bot: dubbele doorverwijzing gecorrigeerd aan %s',
     'nn': u'robot: retta dobbel omdirigering → %s',
     'no': u'bot: Retter dobbel omdirigering → %s',
+    'pfl': u'Bot: E doppelte Waiterlaitung vabessat zu %s',
     'pl': u'Robot naprawia podwójne przekierowanie → %s',
     'pt': u'Bot: Corrigido duplo redirecionamento → %s',
     'ro': u'Robot: Corectarea dublu redirecţionare în %s',

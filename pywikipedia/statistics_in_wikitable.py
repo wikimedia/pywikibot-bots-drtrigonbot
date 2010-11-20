@@ -12,7 +12,7 @@ The following parameters are supported:
         If not existing yet, it is created.
         If existing, it is updated.
 """
-__version__ = '$Id: statistics_in_wikitable.py 8631 2010-10-09 21:01:00Z xqt $'
+__version__ = '$Id: statistics_in_wikitable.py 8730 2010-11-16 13:58:47Z xqt $'
 #
 import time
 import wikipedia as pywikibot
@@ -38,8 +38,8 @@ class StatisticsBot:
         """
         self.screen = screen
         self.your_page = your_page
-        self.dict = self.getdata() # Try to get data.
         self.site = pywikibot.getSite()
+        self.dict = self.getdata() # Try to get data.
 
     def run(self):
         if self.screen:

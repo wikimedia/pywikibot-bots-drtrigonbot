@@ -307,7 +307,7 @@ have to break it off, use "-continue" next time.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: interwiki.py 8703 2010-11-06 19:13:28Z xqt $'
+__version__ = '$Id: interwiki.py 8731 2010-11-19 13:59:31Z xqt $'
 #
 
 import sys, copy, re, os
@@ -457,7 +457,7 @@ msg = {
     'ml': (u'യന്ത്രം ', u'ചേര്‍ക്കുന്നു', u'നീക്കുന്നു', u'പുതുക്കുന്നു'),
     'mn': (u'робот ', u'Нэмж байна', u'Арилгаж байна', u'Өөрчилж байна'),
     'mr': (u'सांगकाम्याने ',  u'वाढविले', u'काढले', u'बदलले'),
-    'mrj': (u'робот', u'темен', u'карангден', u'вашталтен'),
+    'mrj': (u'робот ', u'темен', u'карангден', u'вашталтен'),
     'ms': (u'bot ', u'menambah', u'membuang', u'mengubah'),
     'myv': (u'роботось ', u'путызеть', u'нардызеть', u'полавтызеть'),
     'mzn': (u'ربوت ', u'بیشتن', u'بیتن', u'هکردن'),
@@ -472,6 +472,7 @@ msg = {
     'nv': (u'botígíí díí naaltsoos tʼáá bíniʼ łahgo áyiilaa ', u'(+)', u'(-)', u'(+/-)'),
     'os': (u'Робот ', u'баххæст кодта', u'Баивта', u'Аиуварс'),
     'pdc': (u'Bot: ', u'dezu geduh', u'raus gnumme', u'gennert'),
+    'pfl': (u'Bot: ', u'Aigfiecht', u'Rausgenumme', u"Gä'ännat"),
     'pl': (u'robot ', u'dodaje', u'usuwa', u'poprawia'),
     'pms': (u'ël trigomiro ', u'a gionta', u'a gava', u'a modìfica'),
     'pt': (u'Bot: ', u'Adicionando', u'Removendo',u'Modificando'),

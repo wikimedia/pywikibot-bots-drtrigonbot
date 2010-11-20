@@ -49,7 +49,7 @@ your user-config.py:
 
     cosmetic_changes_disable['wikipedia'] = ('de', 'en', 'fr')
 """
-__version__ = '$Id: cosmetic_changes.py 8678 2010-10-21 13:03:29Z amir $'
+__version__ = '$Id: cosmetic_changes.py 8732 2010-11-19 14:31:51Z xqt $'
 import wikipedia as pywikibot
 import isbn
 import pagegenerators
@@ -107,7 +107,8 @@ msg_standalone = {
     'nl': u'Bot: cosmetische wijzigingen',
     'no': u'Bot: Kosmetiske endringer',
     'nn': u'Robot: Kosmetiske endringar',
-    'pdc':u'Waddefresser: gleene Enneringe',
+    'pdc':u'Waddefresser: gleenere Enneringe',
+    'pfl':u'Bot: Klännere Ännerunge',
     'pl': u'Robot dokonuje poprawek kosmetycznych',
     'pt': u'Bot: Mudanças triviais',
     'ro': u'robot modificări cosmetice',
@@ -170,7 +171,8 @@ msg_append = {
     'nl': u'; cosmetische veranderingen',
     'no': u'; kosmetiske endringer',
     'nn': u'; kosmetiske endringar',
-    'pdc':u', gleene Enneringe',
+    'pdc':u'; gleenere Enneringe',
+    'pfl':u'; klännere Ännerunge',
     'pl': u'; zmiany kosmetyczne',
     'pt': u'; mudanças triviais',
     'ro': u'; modificări cosmetice',

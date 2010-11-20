@@ -51,7 +51,7 @@ Please fix these if you are capable and motivated:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: nowcommons.py 8628 2010-10-09 05:02:29Z xqt $'
+__version__ = '$Id: nowcommons.py 8729 2010-11-16 12:24:39Z xqt $'
 #
 
 import sys, re, webbrowser, urllib
@@ -156,6 +156,14 @@ nowCommons = {
     ],
     'ro': [
         u'NowCommons'
+    ],
+    'ru': [
+        u'NowCommons',
+        u'NCT',
+        u'Nowcommons',
+        u'Now Commons',
+        u'Db-commons',
+        u'Перенесено на Викисклад',
     ],
     'zh':[
         u'NowCommons',

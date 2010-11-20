@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiquote_family.py 8719 2010-11-12 08:30:08Z xqt $'
+__version__ = '$Id: wikiquote_family.py 8731 2010-11-19 13:59:31Z xqt $'
 
 # The Wikimedia family that is known as Wikiquote
 
@@ -14,7 +14,7 @@ class Family(family.Family):
             'en', 'pl', 'it', 'de', 'pt', 'ru', 'sk', 'es', 'bg', 'bs', 'tr',
             'sl', 'fr', 'cs', 'he', 'lt', 'el', 'id', 'zh', 'hu', 'fa', 'uk',
             'eo', 'fi', 'sv', 'nl', 'no', 'ja', 'nn', 'hy', 'et', 'ca', 'li',
-            'ar', 'cy', 'ka', 'hr', 'ko', 'ku', 'sr', 'gl', 'ro', 'az', 'ml',
+            'ar', 'cy', 'ka', 'hr', 'ko', 'ku', 'sr', 'gl', 'ro', 'ml', 'az',
             'is', 'th', 'te', 'da', 'af', 'eu', 'sq', 'vi', 'la', 'br', 'hi',
             'mr', 'be', 'ast', 'uz', 'ta', 'ang', 'ur', 'zh-min-nan', 'gu',
             'lb', 'su', 'wo', 'kn', 'ky', 'am', 'co',

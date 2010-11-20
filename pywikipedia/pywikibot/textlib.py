@@ -11,7 +11,7 @@ and return a unicode string.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: textlib.py 8661 2010-10-17 21:05:10Z xqt $'
+__version__ = '$Id: textlib.py 8734 2010-11-19 15:01:25Z xqt $'
 
 
 import wikipedia as pywikibot
@@ -875,7 +875,7 @@ def _altlang(code):
     if code in ['cs', 'sk']:
         return ['cs', 'sk']
     #German
-    if code in ['bar', 'frr', 'ksh', 'pdc']:
+    if code in ['bar', 'frr', 'ksh', 'pdc', 'pfl']:
         return ['de']
     if code in ['als', 'lb']:
         return ['de', 'fr']
@@ -967,6 +967,8 @@ def _altlang(code):
     #Turkish and Kurdish
     if code in ['diq', 'ku']:
         return ['ku', 'tr']
+    if code == 'gag':
+        return ['tr']
     if code == 'ckb':
         return ['ku', 'ar']
     #Chinese
