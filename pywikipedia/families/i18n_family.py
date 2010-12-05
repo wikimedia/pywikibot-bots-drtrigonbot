@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: i18n_family.py 8400 2010-08-12 21:00:36Z siebrand $'
+__version__ = '$Id: i18n_family.py 8737 2010-11-21 23:35:01Z siebrand $'
 
 import family
 
@@ -44,6 +44,12 @@ class Family(family.Family):
         }
         self.namespaces[101] = {
             '_default': [u'Portal talk'],
+        }
+        self.namespaces[420] = {
+            '_default': [u'Layer'],
+        }
+        self.namespaces[421] = {
+            '_default': [u'Layer talk'],
         }
         self.namespaces[1102] = {
             '_default': [u'Translating'],
@@ -146,6 +152,12 @@ class Family(family.Family):
         }
         self.namespaces[1229] = {
             '_default': [u'iHRIS talk'],
+        }
+        self.namespaces[1230] = {
+            '_default': [u'Mifos'],
+        }
+        self.namespaces[1231] = {
+            '_default': [u'Mifos talk'],
         }
 
     def version(self, code):

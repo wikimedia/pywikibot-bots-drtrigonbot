@@ -103,7 +103,7 @@ Additionaly, these arguments can be used to restrict the bot to certain pages:
 
     -lack:         used as -lack:xx with xx a language code: only work on pages
                    without links to language xx. You can also add a number nn
-                   lick -lack:xx:nn, so that the bot only works on pages with
+                   like -lack:xx:nn, so that the bot only works on pages with
                    at least n interwiki links (the default value for n is 1).
                        
 These arguments are useful to provide hints to the bot:
@@ -307,7 +307,7 @@ have to break it off, use "-continue" next time.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: interwiki.py 8731 2010-11-19 13:59:31Z xqt $'
+__version__ = '$Id: interwiki.py 8757 2010-12-05 13:12:36Z purodha $'
 #
 
 import sys, copy, re, os
@@ -384,7 +384,7 @@ msg = {
     'be-x-old': (u'робат ', u'дадаў', u'выдаліў', u'зьмяніў'),
     'bg': (u'Робот ', u'Добавяне', u'Изтриване', u'Промяна'),
     'bjn': (u'bot ', u'Manambah', u'Mambuang', u"Ma'ubah"),
-    'bn': (u'রোবট ', u'যোগ করছে', u'মুছে ফেলছে', u'পরিবর্তন সাধন করছে'),
+    'bn': (u'রোবট ', u'যোগ করছে', u'মুছে ফেলছে', u'পরিবর্তন করছে'),
     'bo': (u'འཕྲུལ་ཆས་ཀྱི་མི། ', u'ཁ་སྣོན་རྒྱག་པ།', u'བསུབ་པ།', u'བསྐྱར་བཅོས་བྱེད་པ།'),
     'bpy': (u'রোবট ', u'তিলকরের', u'থেইকরের', u'বদালার'),
     'br': (u'Robot ', u'ouzhpennet', u'tennet', u'kemmet'),
@@ -402,7 +402,7 @@ msg = {
     'dv': (u'ރޮބޮޓ ', u'އިތުރު ކުރުނ', u'ފޮހެލުނ', u'ބަދަލު ގެނައުނ'),
     'el': (u'Ρομπότ: ', u'Προσθήκη', u'Αφαίρεση', u'Τροποποίηση'),
     'en': (u'robot ', u'Adding', u'Removing', u'Modifying'),
-    'eo': (u'roboto ', u'aldono de', u'forigo de', u'modifo de'),
+    'eo': (u'robota ', u'aldono de', u'forigo de', u'modifo de'),
     'es': (u'robot ', u'Añadido', u'Eliminado', u'Modificado'),
     'et': (u'robot ', u'lisas', u'kustutas', u'muutis'),
     'eu': (u'robota ', u'Erantsia', u'Ezabatua', u'Aldatua'),
@@ -560,7 +560,7 @@ moved_links = {
 }
 
 # A list of template names in different languages.
-# Pages which contains these shouldn't be changed.
+# Pages which contain these shouldn't be changed.
 ignoreTemplates = {
     '_default': [u'delete'],
     'ar' : [u'قيد الاستخدام'],
@@ -960,7 +960,7 @@ class Subject(object):
         # download.
         self.pending = PageTree()
         if globalvar.hintsareright:
-            # This is a set of sites that we got hits to
+            # This is a set of sites that we got hints to
             self.hintedsites = set()
         self.translate(hints, globalvar.hintsareright)
         self.confirm = globalvar.confirm
@@ -1336,7 +1336,7 @@ class Subject(object):
                     if globalvar.initialredirect:
                         if globalvar.contentsondisk:
                             redirectTargetPage = StoredPage(redirectTargetPage)
-                        #don't follow double redirects; it might be a self loop
+                        # don't follow another redirect; it might be a self loop
                         if not redirectTargetPage.isRedirectPage() \
                            and not redirectTargetPage.isCategoryRedirect():
                             self.originPage = redirectTargetPage
@@ -1703,7 +1703,7 @@ class Subject(object):
                 # http://is.wikipedia.org/wiki/Wikipediaspjall:V%C3%A9lmenni
                 # allow edits for the same conditions as -whenneeded
                 # or the last edit wasn't a bot
-                # or the last edit as 1 month ago
+                # or the last edit was 1 month ago
                 smallWikiAllowed = True
                 if globalvar.autonomous and page.site().sitename() == 'wikipedia:is':
                     old={}
@@ -1867,7 +1867,7 @@ u'NOTE: number of edits are restricted at %s'
                 #put it to new means don't delete it
                 if not globalvar.cleanup or \
                    rmPage.aslink(forceInterwiki=True) not in globalvar.remove or \
-                   rmPage.site().sitename() == 'wikipedia:hi' and \
+                   rmPage.site().lang in ['hi', 'cdo'] and \
                    pywikibot.unicode_error: #work-arround for bug #3081100 (do not remove hi-pages)
                     new[rmsite] = rmPage
                     pywikibot.output(
@@ -2319,8 +2319,10 @@ def compareLanguages(old, new, insite):
         fmt = lambda d, site: site.lang
 
     head, add, rem, mod = pywikibot.translate(insite.lang, msg)
-    if insite.lang=='de' and not globalvar.autonomous:
-        head = u'Halbautomatischer %s' % head #prevents abuse filter blocking for hi-wiki
+    #Version info marks bots without unicode error
+    #This also prevents abuse filter blocking on de-wiki
+    if not pywikibot.unicode_error:
+        head = u'r%s) (%s' % (sys.version.split()[0], head)
 
     colon = u': '
     comma = u', '

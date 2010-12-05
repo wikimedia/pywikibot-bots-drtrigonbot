@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: family.py 8734 2010-11-19 15:01:25Z xqt $'
+__version__='$Id: family.py 8756 2010-12-04 10:54:12Z purodha $'
 
 import config
 import re
@@ -123,6 +123,7 @@ class Family:
                 'be': u'Мультымедыя',
                 'be-x-old': u'Мэдыя',
                 'bg': u'Медия',
+                'bh': u'मीडिया',
                 'bm': u'Média',
                 'bn': [u'মিডিয়া', u'Média'],
                 'bpy': u'মিডিয়া',
@@ -259,6 +260,7 @@ class Family:
                 'be': u'Адмысловае',
                 'be-x-old': u'Спэцыяльныя',
                 'bg': u'Специални',
+                'bh': u'विशेष',
                 'bjn': u'Istimewa',
                 'bm': u'Spécial',
                 'bn': u'বিশেষ',
@@ -452,6 +454,7 @@ class Family:
                 'be': u'Размовы',
                 'be-x-old': u'Абмеркаваньне',
                 'bg': u'Беседа',
+                'bh': u'वार्तालाप',
                 'bjn': [u'Pembicaraan', u'Bicara'],
                 'bm': u'Discussion',
                 'bn': u'আলাপ',
@@ -648,6 +651,7 @@ class Family:
                 'be': u'Удзельнік',
                 'be-x-old': u'Удзельнік',
                 'bg': u'Потребител',
+                'bh': u'प्रयोगकर्ता',
                 'bjn': u'Pengguna',
                 'bm': u'Utilisateur',
                 'bn': u'ব\u09cdযবহারকারী',
@@ -845,6 +849,7 @@ class Family:
                 'be': u'Размовы з удзельнікам',
                 'be-x-old': u'Гутаркі ўдзельніка',
                 'bg': u'Потребител беседа',
+                'bh': u'प्रयोगकर्ता वार्ता',
                 'bjn': [u'Pembicaraan Pengguna', u'Bicara Pengguna'],
                 'bm': u'Discussion utilisateur',
                 'bn': u'ব্যবহারকারী আলাপ',
@@ -1041,7 +1046,7 @@ class Family:
                 'ab': u'Авикипедиа ахцәажәара',
                 'ace': [u'Marit Wikipedia', u'Pembicaraan Wikipedia'],
                 'arc': [u'ܡܡܠܠܐ ܕ ܘܝܩܝܦܕܝܐ', u'ܘܝܩܝܦܕܝܐ talk'],
-                'bh': u'विकिपीडिया talk',
+                'bh': u'विकिपीडिया वार्ता',
                 'bjn': u'Wikipidia pamandiran',
                 'bn': u'উইকিপিডিয়া আলোচনা',
                 'ckb': u'لێدوانی Wikipedia',
@@ -1098,6 +1103,7 @@ class Family:
                 'be': u'Выява',
                 'be-x-old': [u'Файл', u'Выява'],
                 'bg': [u'Файл', u'Картинка'],
+                'bh': u'चित्र',
                 'bjn': [u'Berkas', u'Gambar'],
                 'bm': u'Fichier',
                 'bn': u'চিত্র',
@@ -1296,6 +1302,7 @@ class Family:
                 'be': u'Размовы пра выяву',
                 'be-x-old': [u'Абмеркаваньне файла', u'Абмеркаваньне выявы'],
                 'bg': [u'Файл беседа', u'Картинка беседа'],
+                'bh': u'चित्र वार्ता',
                 'bjn': u'Pembicaraan Berkas',
                 'bm': [u'Discussion fichier', u'Discussion Image'],
                 'bn': [u'চিত্র আলোচনা', u'চিত্র আলাপ'],
@@ -1481,6 +1488,7 @@ class Family:
                 'az': u'MediyaViki',
                 'bcl': u'MediaWiki',
                 'bg': u'МедияУики',
+                'bh': u'मीडियाविकि',
                 'bn': u'মিডিয়াউইকি',
                 'bpy': u'মিডিয়াউইকি',
                 'bs': [u'MediaWiki', u'MedijaViki'],
@@ -1555,6 +1563,7 @@ class Family:
                 'be': u'Размовы пра MediaWiki',
                 'be-x-old': u'Абмеркаваньне MediaWiki',
                 'bg': u'МедияУики беседа',
+                'bh': u'मीडियाविकि वार्ता',
                 'bjn': [u'Pembicaraan MediaWiki', u'MediaWiki Pembicaraan'],
                 'bm': u'Discussion MediaWiki',
                 'bn': [u'মিডিয়াউইকি আলোচনা', u'MediaWiki আলাপ'],
@@ -1750,6 +1759,7 @@ class Family:
                 'be': u'Шаблон',
                 'be-x-old': u'Шаблён',
                 'bg': u'Шаблон',
+                'bh': u'टेम्पलेट',
                 'bjn': u'Templat',
                 'bm': u'Modèle',
                 'bn': u'টেমপ্লেট',
@@ -1778,6 +1788,7 @@ class Family:
                 'es': u'Plantilla',
                 'et': u'Mall',
                 'eu': u'Txantiloi',
+                'ext': u'Prantilla',
                 'fa': u'الگو',
                 'ff': u'Modèle',
                 'fi': u'Malline',
@@ -1941,6 +1952,7 @@ class Family:
                 'be': u'Размовы пра шаблон',
                 'be-x-old': u'Абмеркаваньне шаблёну',
                 'bg': u'Шаблон беседа',
+                'bh': u'टेम्पलेट वार्ता',
                 'bjn': [u'Pembicaraan Templat', u'Templat Pembicaraan'],
                 'bm': u'Discussion modèle',
                 'bn': u'টেমপ্লেট আলোচনা',
@@ -2136,6 +2148,7 @@ class Family:
                 'be': u'Даведка',
                 'be-x-old': u'Дапамога',
                 'bg': u'Помощ',
+                'bh': u'मदद',
                 'bjn': u'Bantuan',
                 'bm': u'Aide',
                 'bn': u'সাহায্য',
@@ -2332,6 +2345,7 @@ class Family:
                 'be': u'Размовы пра даведку',
                 'be-x-old': u'Абмеркаваньне дапамогі',
                 'bg': u'Помощ беседа',
+                'bh': u'मदद वार्ता',
                 'bjn': [u'Pembicaraan Bantuan', u'Bantuan Pembicaraan'],
                 'bm': u'Discussion aide',
                 'bn': u'সাহায্য আলোচনা',
@@ -2529,6 +2543,7 @@ class Family:
                 'be': u'Катэгорыя',
                 'be-x-old': u'Катэгорыя',
                 'bg': u'Категория',
+                'bh': u'श्रेणी',
                 'bjn': u'Kategori',
                 'bm': u'Catégorie',
                 'bn': u'বিষয়শ্রেণী',
@@ -2727,6 +2742,7 @@ class Family:
                 'be': u'Размовы пра катэгорыю',
                 'be-x-old': u'Абмеркаваньне катэгорыі',
                 'bg': u'Категория беседа',
+                'bh': u'श्रेणी वार्ता',
                 'bjn': [u'Pembicaraan Kategori', u'Kategori Pembicaraan'],
                 'bm': u'Discussion catégorie',
                 'bn': u'বিষয়শ্রেণী আলোচনা',
@@ -3424,6 +3440,12 @@ class Family:
         # These families can set this variable to the name of the target
         # family.
         self.interwiki_forward = None
+
+        # Some families, e. g. wikipedia, receive forwarded interlanguage
+        # links from other families, e. g. incubator, commons, or meta.
+        # These families can set this variable to the names of their source
+        # families.
+        self.interwiki_forwarded_from = {}
 
         # Which language codes no longer exist and by which language code
         # should they be replaced. If for example the language with code xx:

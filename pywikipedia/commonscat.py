@@ -50,7 +50,7 @@ TODO:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: commonscat.py 8620 2010-10-07 11:56:18Z xqt $'
+__version__ = '$Id: commonscat.py 8743 2010-11-25 12:15:11Z xqt $'
 #
 
 import wikipedia as pywikibot
@@ -257,11 +257,11 @@ u'Cannot change %s because of spam blacklist entry %s'
                         return True
         return False
 
-
-    def getCommonscatTemplate (self, lang = None):
-        '''
-        Get the template name in a language. Expects the language code.
+    @classmethod
+    def getCommonscatTemplate (self, lang=None):
+        '''Get the template name in a language. Expects the language code.
         Return as tuple containing the primary template and it's alternatives
+
         '''
         if lang in commonscatTemplates:
             return  commonscatTemplates[lang]
@@ -514,8 +514,9 @@ def main():
                 summary = arg[9:]
         elif arg.startswith('-checkcurrent'):
             checkcurrent = True
-            primaryCommonscat, commonscatAlternatives = getCommonscatTemplate(
-                pywikibot.getSite().language())
+            primaryCommonscat, commonscatAlternatives = \
+                               CommonscatBot.getCommonscatTemplate(
+                                   pywikibot.getSite().language())
             generator = pagegenerators.NamespaceFilterPageGenerator(
                 pagegenerators.ReferringPageGenerator(
                     pywikibot.Page(pywikibot.getSite(),

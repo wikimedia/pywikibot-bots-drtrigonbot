@@ -35,9 +35,9 @@ Basic pagegenerators commands, -page, etc...
 # (C) 2008 - Nicolas Dumazet ( en:User:NicDumZ )
 # (C) Pywikipedia bot team, 2008-2010
 #
-# Distributed under the terms of the MIT license.
+# Distributed under the terms of the GPL
 #
-__version__ = '$Id: reflinks.py 8630 2010-10-09 19:32:57Z xqt $'
+__version__ = '$Id: reflinks.py 8742 2010-11-23 08:14:23Z xqt $'
 #
 
 import sys, re, urllib2, httplib, socket, codecs, ftplib
