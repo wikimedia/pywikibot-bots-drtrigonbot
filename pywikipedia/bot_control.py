@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8  -*-
 """
 This bot is the general DrTrigonBot caller. It runs all the different sub tasks,
@@ -79,7 +80,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__  = '$Id$'
-__revision__ = '8757'
+__revision__ = '8822'
 #
 
 # wikipedia-bot imports

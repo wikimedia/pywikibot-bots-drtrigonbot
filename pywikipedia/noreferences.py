@@ -31,7 +31,7 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 
-__version__='$Id: noreferences.py 8592 2010-09-23 15:18:04Z xqt $'
+__version__='$Id: noreferences.py 8783 2010-12-20 05:25:30Z xqt $'
 
 import re, sys
 import wikipedia as pywikibot
@@ -286,8 +286,7 @@ referencesSections = {
     ],
     'pl': [
         u'Przypisy',
-        u'Ogólne przypisy',
-        u'Notatki',
+        u'Uwagi',
     ],
     'pt': [
         u'Referências',
@@ -333,7 +332,7 @@ referencesTemplates = {
                u'Referenties', u'Bron', u'Bronnen/noten/referenties', u'Bron2',
                u'Bron3', u'ref', u'references', u'appendix',
                u'Noot', u'FootnotesSmall'],
-        'pl': [u'przypisy', u'Przypisy'],
+        'pl': [u'Przypisy', u'Przypisy-lista', u'Uwagi'],
         'pt': [u'Notas', u'ref-section', u'Referências', u'Reflist'],
         'ru': [u'Reflist', u'Ref-list', u'Refs', u'Sources',
                u'Примечания', u'Список примечаний',
@@ -353,6 +352,12 @@ referencesSubstitute = {
     },
 }
 
+# Sites where no title is required for references template
+# as it is already included there
+# like pl.wiki where {{Przypisy}} generates
+# == Przypisy ==
+# <references />
+noTitleRequired = [u'pl']
 
 class XmlDumpNoReferencesPageGenerator:
     """
@@ -512,7 +517,14 @@ class NoReferencesBot:
         return self.createReferenceSection(oldText, index)
 
     def createReferenceSection(self, oldText, index, ident = '=='):
-        newSection = u'\n%s %s %s\n%s\n' % (ident, pywikibot.translate(self.site, referencesSections)[0], ident, self.referencesText)
+        if self.site.language() in noTitleRequired:
+            newSection = u'\n%s\n' % (self.referencesText)
+        else:
+            newSection = u'\n%s %s %s\n%s\n' % (ident,
+                                                pywikibot.translate(
+                                                    self.site,
+                                                    referencesSections)[0],
+                                                ident, self.referencesText)
         return oldText[:index] + newSection + oldText[index:]
 
     def save(self, page, newText):

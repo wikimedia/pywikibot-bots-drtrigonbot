@@ -120,7 +120,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 8725 2010-11-15 08:44:06Z xqt $'
+__version__ = '$Id: wikipedia.py 8815 2010-12-31 10:39:50Z xqt $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -376,17 +376,20 @@ not supported by PyWikipediaBot!"""
                     break
 
             sectionStart = t.find(u'#')
-            # Categories does not have sections.
             # But maybe there are magic words like {{#time|}}
             # TODO: recognize magic word and templates inside links
             # see http://la.wikipedia.org/w/index.php?title=997_Priska&diff=prev&oldid=1038880
-            if sectionStart > 0 and self._namespace not in [14]:
-                self._section = t[sectionStart+1 : ].lstrip(" ")
-                self._section = sectionencode(self._section,
-                                              self._site.encoding())
-                if not self._section:
-                    self._section = None
-                t = t[ : sectionStart].rstrip(" ")
+            if sectionStart > 0:
+                # Categories does not have sections.
+                if self._namespace == 14:
+                    raise InvalidTitle(u"Invalid section in category '%s'" % t)
+                else:
+                    self._section = t[sectionStart+1 : ].lstrip(" ")
+                    self._section = sectionencode(self._section,
+                                                  self._site.encoding())
+                    if not self._section:
+                        self._section = None
+                    t = t[ : sectionStart].rstrip(" ")
             elif sectionStart == 0:
                 raise InvalidTitle(u"Invalid title starting with a #: '%s'" % t)
             else:
@@ -466,12 +469,18 @@ not supported by PyWikipediaBot!"""
                 except TypeError:
                     print title, begin, anchor
                     raise
+
         if asLink:
-            if allowInterwiki and (forceInterwiki or self._site != getSite()):
+            iw_target_site = getSite()
+            iw_target_family = getSite().family
+            if iw_target_family.interwiki_forward:
+                iw_target_family = pywikibot.Family(iw_target_family.interwiki_forward)
+
+            if allowInterwiki and (forceInterwiki or self._site != iw_target_site):
                 colon = ""
                 if textlink:
                     colon = ":"
-                if  self._site.family != getSite().family \
+                if  self._site.family != iw_target_family \
                         and self._site.family.name != self._site.lang:
                     title =  u'[[%s%s:%s:%s]]' % (colon, self._site.family.name,
                                                 self._site.lang, title)
@@ -2561,8 +2570,9 @@ not supported by PyWikipediaBot!"""
         except NoPage:
             raise
         except IsRedirectPage, err:
-            target = err[0].replace('&amp;quot;', '"') # otherwise it will return error with
-                                                       # pages with " inside.
+            # otherwise it will return error pages with " inside.
+            target = err[0].replace('&amp;quot;', '"')
+
             if '|' in target:
                 warnings.warn("'%s' has a | character, this makes no sense"
                               % target, Warning)
@@ -5751,13 +5761,10 @@ u"WARNING: Could not open '%s'. Maybe the server or\n your connection is down. R
                 for k, v in data.iteritems():
                     self._info[k] = v 
         #data pre-process
-        try:
-            if dump:
-                return self._info
-            else:
-                return self._info[key]
-        except KeyError:
-            return None
+        if dump:
+            return self._info
+        else:
+            return self._info.get(key)
 
     def mediawiki_message(self, key, forceReload = False):
         """Return the MediaWiki message text for key "key" """
@@ -5935,7 +5942,7 @@ u"WARNING: Could not open '%s'. Maybe the server or\n your connection is down. R
             
             self._getUserDataOld(text, sysop = sysop, force = force)
 
-    def search(self, key, number = 10, namespaces = None):
+    def search(self, key, number=10, namespaces=None):
         """
         Yield search results for query.
         Use API when enabled use_api and version >= 1.11,
@@ -5947,13 +5954,14 @@ u"WARNING: Could not open '%s'. Maybe the server or\n your connection is down. R
                 'action': 'query',
                 'list': 'search',
                 'srsearch': key,
-                'srlimit': number
             }
+            if number:
+                params['srlimit'] = number
             if namespaces:
                 params['srnamespace'] = namespaces
 
             offset = 0
-            while offset < number:
+            while offset < number or not number:
                 params['sroffset'] = offset
                 data = query.GetData(params, self)['query']
                 if 'error' in data:
@@ -7375,7 +7383,7 @@ u"WARNING: Could not open '%s'. Maybe the server or\n your connection is down. R
 
     def languages(self):
         """Return list of all valid language codes for this site's Family."""
-        return self.family.langs.keys()
+        return self.family.iwkeys
 
     def validLanguageLinks(self):
         """Return list of language codes that can be used in interwiki links."""

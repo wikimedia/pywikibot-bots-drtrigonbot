@@ -36,7 +36,8 @@ import commands, os, errno
 #import subprocess
 import re
 
-import Image,ImageDraw
+#import Image,ImageDraw
+import matplotlib.pyplot as plt
 import cStringIO
 
 
@@ -48,14 +49,18 @@ src="https://wiki.toolserver.org/favicon.ico" border="0"
 alt="Toolserver"> Powered by Wikimedia Toolserver</a>.
 <a href="http://de.selfhtml.org/index.htm"><img 
 src="http://de.selfhtml.org/src/favicon.ico" border="0" width="16" 
-height="16" alt="SELFHTML"> Thanks to SELFHTML</a>. <a href="http://toolserver.org/~daniel/stats/">stats</a>.
+height="16" alt="SELFHTML"> Thanks to SELFHTML</a>.
 """
 footer_w3c = """<a href="http://validator.w3.org/check?uri=referer"><img 
 src="http://www.w3.org/Icons/valid-html401-blue" 
 alt="Valid HTML 4.01 Transitional" height="16" width="44" 
 border="0"></a></small>
+<small><a href="http://toolserver.org/~daniel/stats/">stat</a> /
+<a href="http://toolserver.org/~daniel/stats/url_201007.html">url</a>
+<a href="http://munin.toolserver.org/index.html">.</a></small>
 </span></p>
 """
+# with preprocessed (by daniel) statistics from '/mnt/user-store/stats/'
 
 displaystate_content = """Content-Type: text/html
 <?xml version="1.0" encoding="ISO-8859-1" ?>
@@ -190,32 +195,49 @@ def oldlogfiles(all=False):
 
 	return (localdir, files, log)
 
-def graph(xdata, xscale=1, xticks=10, xmajor=5, yscale=1, yticks=10, ymajor=1):
-	img = Image.new("RGB", (X,Y), "#FFFFFF")
-	draw = ImageDraw.Draw(img)
+#def graph(xdata, xscale=1, xticks=10, xmajor=5, yscale=1, yticks=10, ymajor=1):
+#	img = Image.new("RGB", (X,Y), "#FFFFFF")
+#	draw = ImageDraw.Draw(img)
+#
+#	#draw some axes and markers
+#	for i in range(X/10):
+#		draw.line((i*10+30, Y-15, i*10+30, 20), fill="#DDD")
+#		if i % xmajor == 0:
+#			draw.text((xscale*(i*xticks)+15, Y-15), `i*xticks`, fill="#000")
+#	for j in range(1,Y/10-2):
+#		if i % ymajor == 0:
+#			#draw.text((xscale*(0),Y-15-yscale*(j*yticks)), `j*yticks`, fill="#000")
+#			draw.text((xscale*(0),Y-15-yscale*(2*j*yticks)), `j*yticks`, fill="#000")	# cheap patch
+#	draw.line((20,Y-19,X,Y-19), fill="#000")
+#	draw.line((19,20,19,Y-18), fill="#000")
+#
+#	#graph data (file)
+#	#log = file(r"c:\python\random_img\%s" % filename)
+#	#log = file(filename)
+#	for (i, value) in enumerate(xdata):
+#		#value = int(value.strip())
+#		draw.line((xscale*(i)+20,Y-20,xscale*(i)+20,Y-20-yscale*(value)), fill="#55d")
+#
+#	#write to file object
+#	f = cStringIO.StringIO()
+#	img.save(f, "PNG")
+#	f.seek(0)
+#
+#	#output to browser
+#	return "Content-type: image/png\n\n" + f.read()
 
-	#draw some axes and markers
-	for i in range(X/10):
-		draw.line((i*10+30, Y-15, i*10+30, 20), fill="#DDD")
-		if i % xmajor == 0:
-			draw.text((xscale*(i*xticks)+15, Y-15), `i*xticks`, fill="#000")
-	for j in range(1,Y/10-2):
-		if i % ymajor == 0:
-			#draw.text((xscale*(0),Y-15-yscale*(j*yticks)), `j*yticks`, fill="#000")
-			draw.text((xscale*(0),Y-15-yscale*(2*j*yticks)), `j*yticks`, fill="#000")	# cheap patch
-	draw.line((20,Y-19,X,Y-19), fill="#000")
-	draw.line((19,20,19,Y-18), fill="#000")
+def graph(xdata, *args, **kwargs):
+	fig = plt.figure(figsize=(10,4))
+	ax = fig.add_subplot(111)
+	plot1 = ax.bar(range(len(xdata)), xdata)
 
-	#graph data (file)
-	#log = file(r"c:\python\random_img\%s" % filename)
-	#log = file(filename)
-	for (i, value) in enumerate(xdata):
-		#value = int(value.strip())
-		draw.line((xscale*(i)+20,Y-20,xscale*(i)+20,Y-20-yscale*(value)), fill="#55d")
+	ax.grid(True)
+
+	#plt.show()
 
 	#write to file object
 	f = cStringIO.StringIO()
-	img.save(f, "PNG")
+	plt.savefig(f, format="PNG")
 	f.seek(0)
 
 	#output to browser

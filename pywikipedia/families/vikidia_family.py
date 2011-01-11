@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-__version__ = '$Id$'
+__version__ = '$Id: vikidia_family.py 8799 2010-12-26 12:27:05Z xqt $'
 
 import family
 

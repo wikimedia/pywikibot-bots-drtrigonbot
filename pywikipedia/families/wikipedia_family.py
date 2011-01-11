@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikipedia_family.py 8751 2010-12-03 07:53:26Z xqt $'
+__version__ = '$Id: wikipedia_family.py 8821 2011-01-06 22:01:33Z xqt $'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 
@@ -11,33 +11,33 @@ class Family(family.Family):
         self.name = 'wikipedia'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'pl', 'it', 'ja', 'es', 'nl', 'pt', 'ru', 'sv',
-            'zh', 'ca', 'no', 'fi', 'uk', 'hu', 'cs', 'ro', 'tr', 'ko', 'vi',
-            'da', 'ar', 'eo', 'id', 'sr', 'lt', 'sk', 'vo', 'he', 'fa', 'bg',
-            'sl', 'war', 'hr', 'ms', 'et', 'new', 'simple', 'gl', 'th', 'nn',
-            'roa-rup', 'eu', 'hi', 'el', 'ht', 'la', 'tl', 'te', 'ka', 'az',
-            'ceb', 'mk', 'br', 'sh', 'mr', 'lb', 'lv', 'jv', 'bs', 'is',
-            'be-x-old', 'pms', 'cy', 'sq', 'ta', 'be', 'bpy', 'an', 'oc', 'bn',
-            'ksh', 'sw', 'io', 'lmo', 'fy', 'gu', 'nds', 'af', 'qu', 'scn',
-            'ml', 'ku', 'ur', 'su', 'zh-yue', 'ast', 'nap', 'bat-smg', 'wa',
-            'hy', 'ga', 'cv', 'yo', 'ne', 'kn', 'pnb', 'tg', 'roa-tara', 'vec',
-            'yi', 'gd', 'tt', 'zh-min-nan', 'uz', 'os', 'pam', 'sah', 'als',
-            'arz', 'kk', 'mi', 'li', 'nah', 'hsb', 'glk', 'co', 'gan', 'am',
-            'mn', 'ia', 'sco', 'bcl', 'fo', 'fiu-vro', 'si', 'nds-nl', 'tk',
-            'vls', 'my', 'sa', 'mg', 'bar', 'gv', 'dv', 'ilo', 'nrm', 'rm',
-            'pag', 'map-bms', 'diq', 'ckb', 'se', 'mzn', 'wuu', 'fur', 'ug',
-            'lij', 'mt', 'bh', 'nov', 'ang', 'csb', 'sc', 'zh-classical', 'bo',
-            'km', 'lad', 'cbk-zam', 'pi', 'hif', 'frp', 'hak', 'ps', 'kw', 'pa',
-            'szl', 'xal', 'pdc', 'nv', 'haw', 'stq', 'ie', 'fj', 'kv', 'crh',
-            'so', 'to', 'ace', 'myv', 'krc', 'mhr', 'ln', 'gn', 'ext', 'ky',
-            'pcd', 'eml', 'arc', 'ay', 'jbo', 'wo', 'bjn', 'ba', 'frr', 'pap',
-            'kab', 'tpi', 'ty', 'srn', 'zea', 'kl', 'ce', 'mrj', 'udm', 'koi',
-            'ig', 'dsb', 'or', 'ab', 'kg', 'lo', 'mdf', 'rmy', 'mwl', 'cu',
-            'kaa', 'sm', 'av', 'tet', 'ks', 'got', 'bm', 'sd', 'bi', 'ik', 'na',
-            'pih', 'iu', 'pnt', 'as', 'chr', 'ss', 'cdo', 'ha', 'ee', 'ti',
-            'zu', 'om', 'za', 've', 'ts', 'dz', 'sg', 'cr', 'ch', 'lg', 'bxr',
-            'rw', 'ak', 'xh', 'st', 'bug', 'ny', 'tn', 'ki', 'rn', 'sn', 'lbe',
-            'tum', 'tw', 'ff', 'chy', 'gag', 'pfl',
+            'en', 'de', 'fr', 'pl', 'it', 'ja', 'es', 'pt', 'nl', 'ru', 'sv',
+            'zh', 'ca', 'no', 'fi', 'uk', 'cs', 'hu', 'ro', 'tr', 'ko', 'vi',
+            'id', 'da', 'ar', 'eo', 'sr', 'lt', 'sk', 'vo', 'fa', 'he', 'bg',
+            'sl', 'war', 'ms', 'hr', 'et', 'new', 'hi', 'simple', 'gl', 'th',
+            'eu', 'nn', 'roa-rup', 'el', 'ht', 'az', 'la', 'tl', 'te', 'ka',
+            'mk', 'ceb', 'sh', 'br', 'mr', 'pms', 'lv', 'lb', 'jv', 'be-x-old',
+            'cy', 'is', 'bs', 'sq', 'ta', 'be', 'bpy', 'an', 'oc', 'bn', 'sw',
+            'io', 'fy', 'lmo', 'gu', 'nds', 'af', 'qu', 'ml', 'scn', 'ku', 'ur',
+            'su', 'zh-yue', 'ast', 'nap', 'bat-smg', 'hy', 'yo', 'ga', 'cv',
+            'wa', 'ksh', 'ne', 'pnb', 'kn', 'tg', 'roa-tara', 'vec', 'yi', 'gd',
+            'tt', 'zh-min-nan', 'uz', 'os', 'pam', 'sah', 'als', 'arz', 'kk',
+            'mi', 'li', 'am', 'nah', 'hsb', 'glk', 'co', 'gan', 'mn', 'sco',
+            'ia', 'bcl', 'my', 'fo', 'fiu-vro', 'si', 'nds-nl', 'tk', 'vls',
+            'sa', 'bar', 'mg', 'gv', 'ilo', 'dv', 'nrm', 'pag', 'map-bms', 'rm',
+            'ckb', 'diq', 'se', 'mzn', 'wuu', 'fur', 'ug', 'lij', 'mt', 'bh',
+            'nov', 'bo', 'ang', 'csb', 'sc', 'zh-classical', 'hif', 'km', 'lad',
+            'cbk-zam', 'pi', 'frp', 'ps', 'hak', 'kw', 'pa', 'nv', 'szl', 'xal',
+            'pdc', 'haw', 'stq', 'ie', 'kv', 'so', 'crh', 'to', 'ace', 'myv',
+            'mhr', 'krc', 'pcd', 'ln', 'ext', 'gn', 'ky', 'eml', 'arc', 'ay',
+            'jbo', 'wo', 'bjn', 'frr', 'pap', 'kl', 'ba', 'tpi', 'kab', 'ty',
+            'ce', 'udm', 'zea', 'srn', 'mrj', 'koi', 'dsb', 'ig', 'ab', 'or',
+            'rw', 'gag', 'kg', 'lo', 'av', 'mdf', 'mwl', 'rmy', 'cu', 'kaa',
+            'sm', 'tet', 'got', 'ks', 'bm', 'ik', 'sd', 'bi', 'lbe', 'na',
+            'pih', 'iu', 'pnt', 'chr', 'as', 'ss', 'pfl', 'cdo', 'ha', 'ee',
+            'ti', 'zu', 'om', 'za', 've', 'ts', 'rn', 'dz', 'sg', 'cr', 'ch',
+            'lg', 'bug', 'bxr', 'fj', 'xh', 'ak', 'st', 'ny', 'tn', 'ff', 'ki',
+            'sn', 'tum', 'tw', 'chy',
         ]
 
         if family.config.SSL_connection:
@@ -93,11 +93,11 @@ class Family(family.Family):
             'cy': u'Wicipedia',
             'dsb': u'Wikipedija',
             'el': u'Βικιπαίδεια',
-            'en': [u"Wikipedia", u"WP"],
-            'eo': u'Vikipedio',
+            'en': [u'Wikipedia', u'WP'],
+            'eo': [u'Vikipedio', u'VP'],
             'et': u'Vikipeedia',
             'ext': u'Güiquipeya',
-            'fa': u'ویکی‌پدیا',
+            'fa': [u'ویکی‌پدیا', u'وپ'],
             'fr': [u'Wikipédia', u'Wikipedia'],
             'frp': u'Vouiquipèdia',
             'fur': u'Vichipedie',
@@ -886,6 +886,16 @@ class Family(family.Family):
             'zh-min-nan': u'Khu-pia̍t-ia̍h',
             }
 
+        # families that redirect their interlanguage links here.
+        self.interwiki_forwarded_from = [
+            'commons',
+            'incubator',
+            'meta',
+            'species',
+            'strategy',
+            'test',
+        ]
+
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
             'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews', 'wikiversity',
@@ -981,6 +991,7 @@ class Family(family.Family):
             'pl': self.alphabetic,
             'simple': self.alphabetic,
             'sr': self.alphabetic_latin,
+            'sv': self.alphabetic,
             'te': ['en', 'hi', 'kn', 'ta', 'ml'],
             'ur': ['ar', 'fa', 'en'] + self.alphabetic,
             'vi': self.alphabetic_revised,
@@ -1032,6 +1043,11 @@ class Family(family.Family):
             },
             'km': {
                 '_default': [0, 4, 12],
+            },
+            #wrong wikipedia namespace alias
+            'mzn': {
+                '_default': [0, 4],
+
             },
         }
         self.crossnamespace[1] = {

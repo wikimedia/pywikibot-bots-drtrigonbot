@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikisource_family.py 8745 2010-11-26 07:22:31Z xqt $'
+__version__ = '$Id: wikisource_family.py 8821 2011-01-06 22:01:33Z xqt $'
 
 # The Wikimedia family that is known as Wikisource
 
@@ -12,11 +12,11 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'ru', 'zh', 'pt', 'fr', 'de', 'it', 'es', 'he', 'ar', 'hu',
-            'fa', 'pl', 'th', 'cs', 'ro', 'hr', 'te', 'fi', 'bn', 'sv', 'vi',
-            'nl', 'tr', 'sl', 'ko', 'uk', 'sr', 'el', 'ja', 'la', 'li', 'ml',
-            'yi', 'az', 'is', 'ca', 'bs', 'hy', 'mk', 'id', 'ta', 'da', 'no',
-            'et', 'bg', 'lt', 'gl', 'kn', 'cy', 'sk', 'zh-min-nan', 'fo',
-            'br', 'vec',
+            'fa', 'pl', 'th', 'cs', 'ro', 'hr', 'te', 'fi', 'sv', 'bn', 'vi',
+            'tr', 'nl', 'sl', 'ko', 'uk', 'sr', 'el', 'ja', 'la', 'ml', 'li',
+            'yi', 'az', 'br', 'is', 'ca', 'hy', 'bs', 'vec', 'mk', 'ta', 'id',
+            'da', 'no', 'et', 'bg', 'lt', 'gl', 'kn', 'cy', 'sk', 'zh-min-nan',
+            'fo',
         ]
 
         if family.config.SSL_connection:

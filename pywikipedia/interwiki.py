@@ -60,18 +60,6 @@ These command-line arguments can be used to specify which pages to work on:
                    against the live wiki is using the warnfile.py
                    script.
 
-    -quiet:        Use this option to get less output
-
-    -async:        Put page on queue to be saved to wiki asynchronously. This
-                   enables loading pages during saving throtteling and gives a
-                   better performance.
-                   NOTE: For post-processing it always assumes that saving the
-                   the pages was sucessful.
-
-    -summary:      Set an additional action summary message for the edit. This
-                   could be used for further explainings of the bot action.
-                   This will only be used in non-autonomous mode.
-
 Additionaly, these arguments can be used to restrict the bot to certain pages:
 
     -namespace:n   Number or name of namespace to process. The parameter can be
@@ -104,29 +92,69 @@ Additionaly, these arguments can be used to restrict the bot to certain pages:
     -lack:         used as -lack:xx with xx a language code: only work on pages
                    without links to language xx. You can also add a number nn
                    like -lack:xx:nn, so that the bot only works on pages with
-                   at least n interwiki links (the default value for n is 1).
-                       
+                   at least nn interwiki links (the default value for nn is 1).
+
+These arguments control miscellanous bot behaviour:
+
+    -quiet         Use this option to get less output
+                   (note: without ending colon)
+
+    -async         Put page on queue to be saved to wiki asynchronously. This
+                   enables loading pages during saving throtteling and gives a
+                   better performance.
+                   NOTE: For post-processing it always assumes that saving the
+                   the pages was sucessful.
+                   (note: without ending colon)
+
+    -summary:      Set an additional action summary message for the edit. This
+                   could be used for further explainings of the bot action.
+                   This will only be used in non-autonomous mode.
+
+    -hintsonly     The bot does not ask for a page to work on, even if none of
+                   the above page sources was specified.  This will make the
+                   first existing page of -hint or -hinfile slip in as the start
+                   page, determining properties like namespace, disambiguation
+                   state, and so on.  When no existing page is found in the
+                   hints, the bot does nothing.
+                   Hitting return without input on the "Which page to check:"
+                   prompt has the same effect as using -hintsonly.
+                   Options like -back, -same or -wiktionary are in effect only
+                   after a page has been found to work on.
+                   (note: without ending colon)
+
 These arguments are useful to provide hints to the bot:
 
     -hint:         used as -hint:de:Anweisung to give the robot a hint
-                   where to start looking for translations. This is only
-                   useful if you specify a single page to work on. If no
-                   text is given after the second ':', the name of the page
+                   where to start looking for translations. If no text
+                   is given after the second ':', the name of the page
                    itself is used as the title for the hint, unless the
                    -hintnobracket command line option (see there) is also
                    selected.
 
                    There are some special hints, trying a number of languages
                    at once:
-                       * all:     All languages with at least ca. 100 articles.
-                       * 10:      The 10 largest languages (sites with most
-                                  articles). Analogous for any other natural
-                                  number.
-                       * arab:    All languages useing the Arabic alphabet.
-                       * cyril:   All languages that use the Cyrillic alphabet.
-                       * chinese: All Chinese dialects.
-                       * latin:   All languages using the Latin script.
-                       * scand:   All Scandinavian languages.
+                       * all:       All languages with at least ca. 100 articles.
+                       * 10:        The 10 largest languages (sites with most
+                                    articles). Analogous for any other natural
+                                    number.
+                       * arab:      All languages using the Arabic alphabet.
+                       * cyril:     All languages that use the Cyrillic alphabet.
+                       * chinese:   All Chinese dialects.
+                       * latin:     All languages using the Latin script.
+                       * scand:     All Scandinavian languages.
+
+                   Names of families that forward their interlanguage links
+                   to the wiki family being worked upon can be used, they are:
+                     with -family=wikipedia only:
+                       * commons:   Interlanguage links of Mediawiki Commons.
+                       * incubator: Links in pages on the Mediawiki Incubator.
+                       * meta:      Interlanguage links of named pages on Meta.
+                       * species:   Interlanguage links of the wikispecies wiki.
+                       * strategy:  Links in pages on Wikimedias strategy wiki.
+                       * test:      Take interwiki links from Test Wikipedia
+
+                   Languages, groups and families having the same page title
+                   can be combined, as  -hint:5,scand,sr,pt,commons:New_York 
 
     -hintfile:     similar to -hint, except that hints are taken from the given
                    file, enclosed in [[]] each, instead of the command line.
@@ -204,7 +232,7 @@ These arguments specify in which way the bot should follow interwiki links:
 
     -initialredirect  work on its target if a redirect or category redirect is
                    entered on the command line or by a generator (note: without
-                   ending colon). It is recommended to use this option with
+                   ending colon). It is recommended to use this option with the
                    -movelog pagegenerator.
 
     -neverlink:    used as -neverlink:xx where xx is a language code:
@@ -218,10 +246,10 @@ These arguments specify in which way the bot should follow interwiki links:
     -ignorefile:   similar to -ignore, except that the pages are taken from
                    the given file instead of the command line.
 
-    -localright    do not follow interwiki from other pages than the starting
-                   page. (Warning! Should be used very sparingly, only when
-                   you are sure you have first gotten the interwiki on the
-                   starting page exactly right).
+    -localright    do not follow interwiki links from other pages than the
+                   starting page. (Warning! Should be used very sparingly,
+                   only when you are sure you have first gotten the interwiki
+                   links on the starting page exactly right).
                    (note: without ending colon)
  
     -hintsareright do not follow interwiki links to sites for which hints
@@ -246,23 +274,25 @@ multiple languages, and specify on which sites the bot should modify pages:
     -limittwo      only update two pages - one in the local wiki (if logged-in)
                    and one in the top available one.
                    For example, if the local page has links to de and fr,
-                   this option will make sure that only local and de: (larger)
-                   site is updated. This option is useful to quickly set two
-                   way links without updating all of wiki's sites.
+                   this option will make sure that only the local site and
+                   the de: (larger) sites are updated. This option is useful
+                   to quickly set two way links without updating all of the
+                   wiki families sites.
                    (note: without ending colon)
 
     -whenneeded    works like limittwo, but other languages are changed in the
                    following cases:
-                   * If there are no interwiki at all on the page
-                   * If an interwiki must be removed
-                   * If an interwiki must be changed and there has been a
-                     conflict for this page
+                   * If there are no interwiki links at all on the page
+                   * If an interwiki link must be removed
+                   * If an interwiki link must be changed and there has been
+                     a conflict for this page
                    Optionally, -whenneeded can be given an additional number
                    (for example -whenneeded:3), in which case other languages
                    will be changed if there are that number or more links to
                    change or add. (note: without ending colon)
 
 The following arguments influence how many pages the bot works on at once:
+
     -array:        The number of pages the bot tries to be working on at once.
                    If the number of pages loaded is lower than this number,
                    a new set of pages is loaded from the starting wiki. The
@@ -295,8 +325,8 @@ If interwiki.py is terminated before it is finished, it will write a dump file
 to the interwiki-dumps subdirectory. The program will read it if invoked with
 the "-restore" or "-continue" option, and finish all the subjects in that list.
 After finishing the dump file will be deleted. To run the interwiki-bot on all
-pages on a language, run it with option "-start:!", and if it takes so long you
-have to break it off, use "-continue" next time.
+pages on a language, run it with option "-start:!", and if it takes so long
+that you have to break it off, use "-continue" next time.
 
 """
 #
@@ -307,7 +337,7 @@ have to break it off, use "-continue" next time.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: interwiki.py 8757 2010-12-05 13:12:36Z purodha $'
+__version__ = '$Id: interwiki.py 8808 2010-12-28 21:50:45Z xqt $'
 #
 
 import sys, copy, re, os
@@ -446,7 +476,7 @@ msg = {
     'la': (u'bot ', u'addit', u'abdit', u'mutat'),
     'lb': (u'Bot ', u'Derbäi setzen', u'Ewech huelen', u'Änneren'),
     'lmo': (u'Robot ', u'jontant', u'trant via', u'modifiant'),
-    'ln': (u'bot ', u'ebakisí', u'elongólí', u'ebongolí'),
+    'ln': (u'bot ', u'ebakísí', u'elongólí', u'ebóngólí'),
     'lo': (u'ໂຣບົດ ', u'ພວມເພີ່ມ', u'ພວມລຶບ', u'ພວມແປງ'),
     'lt': (u'robotas ', u'Pridedama', u'Šalinama', u'Keičiama'),
     'mi': (u'he karetao ', u'e tāpiri ana', u'e tango ana', u'e whakarerekē ana'),
@@ -555,6 +585,9 @@ moved_links = {
     'ro' : (u'documentaţie',  u'/doc'),
     'ru' : (u'doc',           u'/doc'),
     'sv' : (u'dokumentation', u'/dok'),
+    'uk' : ([u'документація',
+             u'doc',
+             u'documentation'], u'/Документація'),
     'vi' : (u'documentation', u'/doc'),
     'zh' : ([u'documentation', u'doc'], u'/doc'),
 }
@@ -820,7 +853,7 @@ class PageTree(object):
         # to the original topic than pages found later on, after
         # 3, 4, 5 or more interwiki hops.
 
-        # Keeping this order is hence important to display ordered
+        # Keeping this order is hence important to display an ordered
         # list of pages to the user when he'll be asked to resolve
         # conflicts.
         self.tree = {}
@@ -934,19 +967,21 @@ class Subject(object):
         this Object.
     """
 
-    def __init__(self, originPage, hints = None):
+    def __init__(self, originPage = None, hints = None):
         """Constructor. Takes as arguments the Page on the home wiki
            plus optionally a list of hints for translation"""
 
         if globalvar.contentsondisk:
-            originPage = StoredPage(originPage)
+            if originPage:
+                originPage = StoredPage(originPage)
 
         # Remember the "origin page"
         self.originPage = originPage
         # todo is a list of all pages that still need to be analyzed.
         # Mark the origin page as todo.
         self.todo = PageTree()
-        self.todo.add(originPage)
+        if originPage:
+            self.todo.add(originPage)
 
         # done is a list of all pages that have been analyzed and that
         # are known to belong to this subject.
@@ -955,7 +990,10 @@ class Subject(object):
         # pages are values. It stores where we found each page.
         # As we haven't yet found a page that links to the origin page, we
         # start with an empty list for it.
-        self.foundIn = {self.originPage:[]}
+        if originPage:
+            self.foundIn = {self.originPage:[]}
+        else:
+            self.foundIn = {}
         # This is a list of all pages that are currently scheduled for
         # download.
         self.pending = PageTree()
@@ -1006,23 +1044,25 @@ class Subject(object):
         """
         for tree in [self.done, self.pending, self.todo]:
             for page in tree.filter(site):
-                if page.namespace() == self.originPage.namespace():
+                # -hintsonly: before we have an origin page, any namespace will do.
+                if self.originPage and page.namespace() == self.originPage.namespace():
                     if page.exists() and not page.isRedirectPage() and not page.isCategoryRedirect():
                         return page
         return None
 
     def translate(self, hints = None, keephintedsites = False):
         """Add the given translation hints to the todo list"""
-        if globalvar.same:
+        if globalvar.same and self.originPage:
             if hints:
-                pages = titletranslate.translate(self.originPage, hints = hints + ['all:'], auto = globalvar.auto, removebrackets
-= globalvar.hintnobracket)
+                pages = titletranslate.translate(self.originPage, hints = hints + ['all:'],
+                           auto = globalvar.auto, removebrackets = globalvar.hintnobracket)
             else:
-                pages = titletranslate.translate(self.originPage, hints = ['all:'], auto = globalvar.auto, removebrackets
-= globalvar.hintnobracket)
+                pages = titletranslate.translate(self.originPage, hints = ['all:'],
+                           auto = globalvar.auto, removebrackets = globalvar.hintnobracket)
         else:
-            pages = titletranslate.translate(self.originPage, hints = hints, auto = globalvar.auto, removebrackets
-= globalvar.hintnobracket)
+            pages = titletranslate.translate(self.originPage, hints = hints,
+                           auto = globalvar.auto, removebrackets = globalvar.hintnobracket,
+                           site = pywikibot.getSite() )
         for page in pages:
             if globalvar.contentsondisk:
                 page = StoredPage(page)
@@ -1082,7 +1122,7 @@ class Subject(object):
         """
         if self.forcedStop:
             return False
-        if globalvar.nobackonly:
+        if globalvar.nobackonly and originPage: # cannot check backlink before we have an origin page
             if page == self.originPage:
                 try:
                     pywikibot.output(u"%s has a backlink from %s."
@@ -1120,7 +1160,7 @@ class Subject(object):
         if linkedPage in self.foundIn:
             # We have seen this page before, don't ask again.
             return False
-        elif self.originPage.namespace() != linkedPage.namespace():
+        elif self.originPage and self.originPage.namespace() != linkedPage.namespace():
             # Allow for a mapping between different namespaces
             crossFrom = self.originPage.site().family.crossnamespace.get(self.originPage.namespace(), {})
             crossTo = crossFrom.get(self.originPage.site().language(), crossFrom.get('_default', {}))
@@ -1128,17 +1168,24 @@ class Subject(object):
             if linkedPage.namespace() in nsmatch:
                 return False
             if globalvar.autonomous:
-                pywikibot.output(u"NOTE: Ignoring link from page %s in namespace %i to page %s in namespace %i." % (linkingPage.aslink(True), linkingPage.namespace(), linkedPage.aslink(True), linkedPage.namespace()))
+                pywikibot.output(u"NOTE: Ignoring link from page %s in namespace %i to page %s in namespace %i."
+                                 % (linkingPage.aslink(True), linkingPage.namespace(),
+                                    linkedPage.aslink(True), linkedPage.namespace()))
                 # Fill up foundIn, so that we will not write this notice
                 self.foundIn[linkedPage] = [linkingPage]
                 return True
             else:
                 preferredPage = self.getFoundInCorrectNamespace(linkedPage.site())
                 if preferredPage:
-                    pywikibot.output(u"NOTE: Ignoring link from page %s in namespace %i to page %s in namespace %i because page %s in the correct namespace has already been found." % (linkingPage.aslink(True), linkingPage.namespace(), linkedPage.aslink(True), linkedPage.namespace(), preferredPage.aslink(True)))
+                    pywikibot.output(u"NOTE: Ignoring link from page %s in namespace %i to page %s in namespace %i because page %s in the correct namespace has already been found."
+                                    % (linkingPage.aslink(True), linkingPage.namespace(), linkedPage.aslink(True),
+                                      linkedPage.namespace(), preferredPage.aslink(True)))
                     return True
                 else:
-                    choice = pywikibot.inputChoice('WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?' % (self.originPage.aslink(True), self.originPage.namespace(), linkedPage.aslink(True), linkedPage.namespace()), ['Yes', 'No', 'Add an alternative', 'give up'], ['y', 'n', 'a', 'g'])
+                    choice = pywikibot.inputChoice('WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
+                                                   % (self.originPage.aslink(True), self.originPage.namespace(),
+                                                      linkedPage.aslink(True), linkedPage.namespace()),
+                                                     ['Yes', 'No', 'Add an alternative', 'give up'], ['y', 'n', 'a', 'g'])
                     if choice != 'y':
                         # Fill up foundIn, so that we will not ask again
                         self.foundIn[linkedPage] = [linkingPage]
@@ -1156,10 +1203,11 @@ class Subject(object):
                         return True
         else:
             # same namespaces, no problem
+            # or no origin page yet, also no problem
             return False
 
     def wiktionaryMismatch(self, page):
-        if globalvar.same=='wiktionary':
+        if self.originPage and globalvar.same=='wiktionary':
             if page.title().lower() != self.originPage.title().lower():
                 pywikibot.output(u"NOTE: Ignoring %s for %s in wiktionary mode" % (page.title(asLink=True), self.originPage.title(asLink=True)))
                 return True
@@ -1182,33 +1230,46 @@ class Subject(object):
         alternativePage is either None, or a page that the user has
         chosen to use instead of the given page.
         """
+        if not self.originPage:
+            return (False, None) # any page matches until we have an origin page
         if globalvar.autonomous:
             if self.originPage.isDisambig() and not page.isDisambig():
-                pywikibot.output(u"NOTE: Ignoring link from disambiguation page %s to non-disambiguation %s" % (self.originPage.aslink(True), page.aslink(True)))
+                pywikibot.output(u"NOTE: Ignoring link from disambiguation page %s to non-disambiguation %s"
+                                 % (self.originPage.aslink(True), page.aslink(True)))
                 return (True, None)
             elif not self.originPage.isDisambig() and page.isDisambig():
-                pywikibot.output(u"NOTE: Ignoring link from non-disambiguation page %s to disambiguation %s" % (self.originPage.aslink(True), page.aslink(True)))
+                pywikibot.output(u"NOTE: Ignoring link from non-disambiguation page %s to disambiguation %s"
+                                 % (self.originPage.aslink(True), page.aslink(True)))
                 return (True, None)
         else:
             choice = 'y'
             if self.originPage.isDisambig() and not page.isDisambig():
                 disambig = self.getFoundDisambig(page.site())
                 if disambig:
-                    pywikibot.output(u"NOTE: Ignoring non-disambiguation page %s for %s because disambiguation page %s has already been found." % (page.aslink(True), self.originPage.aslink(True), disambig.aslink(True)))
+                    pywikibot.output(u"NOTE: Ignoring non-disambiguation page %s for %s because disambiguation page %s has already been found."
+                                     % (page.aslink(True), self.originPage.aslink(True), disambig.aslink(True)))
                     return (True, None)
                 else:
-                    choice = pywikibot.inputChoice(u'WARNING: %s is a disambiguation page, but %s doesn\'t seem to be one. Follow it anyway?' % (self.originPage.aslink(True), page.aslink(True)), ['Yes', 'No', 'Add an alternative', 'Give up'], ['y', 'n', 'a', 'g'])
+                    choice = pywikibot.inputChoice(u'WARNING: %s is a disambiguation page, but %s doesn\'t seem to be one. Follow it anyway?'
+                                                   % (self.originPage.aslink(True), page.aslink(True)),
+                                                   ['Yes', 'No', 'Add an alternative', 'Give up'],
+                                                   ['y', 'n', 'a', 'g'])
             elif not self.originPage.isDisambig() and page.isDisambig():
                 nondisambig = self.getFoundNonDisambig(page.site())
                 if nondisambig:
-                    pywikibot.output(u"NOTE: Ignoring disambiguation page %s for %s because non-disambiguation page %s has already been found." % (page.aslink(True), self.originPage.aslink(True), nondisambig.aslink(True)))
+                    pywikibot.output(u"NOTE: Ignoring disambiguation page %s for %s because non-disambiguation page %s has already been found."
+                                     % (page.aslink(True), self.originPage.aslink(True), nondisambig.aslink(True)))
                     return (True, None)
                 else:
-                    choice = pywikibot.inputChoice(u'WARNING: %s doesn\'t seem to be a disambiguation page, but %s is one. Follow it anyway?' % (self.originPage.aslink(True), page.aslink(True)), ['Yes', 'No', 'Add an alternative', 'Give up'], ['y', 'n', 'a', 'g'])
+                    choice = pywikibot.inputChoice(u'WARNING: %s doesn\'t seem to be a disambiguation page, but %s is one. Follow it anyway?'
+                                                   % (self.originPage.aslink(True), page.aslink(True)),
+                                                   ['Yes', 'No', 'Add an alternative', 'Give up'],
+                                                   ['y', 'n', 'a', 'g'])
             if choice == 'n':
                 return (True, None)
             elif choice == 'a':
-                newHint = pywikibot.input(u'Give the alternative for language %s, not using a language code:' % page.site().language())
+                newHint = pywikibot.input(u'Give the alternative for language %s, not using a language code:'
+                                          % page.site().language())
                 alternativePage = pywikibot.Page(page.site(), newHint)
                 return (True, alternativePage)
             elif choice == 'g':
@@ -1240,6 +1301,7 @@ class Subject(object):
             # Do not ask hints for pages that we don't work on anyway
             return
         if (self.untranslated or globalvar.askhints) and not self.hintsAsked \
+           and self.originPage and self.originPage.exists() \
            and not self.originPage.isRedirectPage() and not self.originPage.isCategoryRedirect():
             # Only once!
             self.hintsAsked = True
@@ -1259,8 +1321,8 @@ class Subject(object):
                     elif not newhint:
                         break
                     else:
-                        pages = titletranslate.translate(self.originPage, hints = [newhint], auto = globalvar.auto, removebrackets
-= globalvar.hintnobracket)
+                        pages = titletranslate.translate(self.originPage, hints=[newhint],
+                                   auto = globalvar.auto, removebrackets=globalvar.hintnobracket)
                         for page in pages:
                             self.addIfNew(page, counter, None)
                             if globalvar.hintsareright:
@@ -1286,7 +1348,10 @@ class Subject(object):
             if globalvar.skipauto:
                 dictName, year = page.autoFormat()
                 if dictName is not None:
-                    pywikibot.output(u'WARNING: %s:%s relates to %s:%s, which is an auto entry %s(%s)' % (self.originPage.site().language(), self.originPage.title(), page.site().language(),page.title(),dictName,year))
+                    if self.originPage:
+                        pywikibot.output(u'WARNING: %s:%s relates to %s:%s, which is an auto entry %s(%s)'
+                                         % (self.originPage.site().language(), self.originPage.title(),
+                                            page.site().language(),page.title(),dictName,year))
 
                     # Abort processing if the bot is running in autonomous mode.
                     if globalvar.autonomous:
@@ -1332,7 +1397,8 @@ class Subject(object):
                 if not globalvar.quiet or pywikibot.verbose:
                     pywikibot.output(u"NOTE: %s is %sredirect to %s"
                                      % (page.aslink(True), redir, redirectTargetPage.aslink(True)))
-                if page == self.originPage:
+                if self.originPage is None or page == self.originPage:
+                    # the 1st existig page becomes the origin page, if none was supplied
                     if globalvar.initialredirect:
                         if globalvar.contentsondisk:
                             redirectTargetPage = StoredPage(redirectTargetPage)
@@ -1357,7 +1423,8 @@ class Subject(object):
                     if self.addIfNew(redirectTargetPage, counter, page):
                         if config.interwiki_shownew or pywikibot.verbose:
                             pywikibot.output(u"%s: %s gives new %sredirect %s"
-                                             %  (self.originPage.title(asLink=True), page.aslink(True), redir, redirectTargetPage.aslink(True)))
+                                             % (self.originPage.title(asLink=True), page.aslink(True),
+                                                redir, redirectTargetPage.aslink(True)))
                 continue
 
             # must be behind the page.isRedirectPage() part
@@ -1370,7 +1437,8 @@ class Subject(object):
                     for site, count in self.todo.siteCounts():
                         counter.minus(site, count)
                     self.todo = PageTree()
-                    self.done = PageTree() 
+                    self.done = PageTree()
+                    self.originPage = None
                 continue
 
             elif page.section():
@@ -1379,6 +1447,9 @@ class Subject(object):
                 continue
 
             # Page exists, isnt a redirect, and is a plain link (no section)
+            if self.originPage is None:
+                # the 1st existig page becomes the origin page, if none was supplied
+                self.originPage = page
             try:
                 iw = page.interwiki()
             except pywikibot.NoSuchSite:
@@ -1502,6 +1573,9 @@ class Subject(object):
         for page in self.done:
             if page.exists() and not page.isRedirectPage() and not page.isCategoryRedirect():
                 site = page.site()
+                if site.family.interwiki_forward:
+                    #TODO: allow these cases to be propagated!
+                    continue # inhibit the forwarding families pages to be updated.
                 if site == self.originPage.site():
                     if page != self.originPage:
                         self.problem(u"Found link to %s" % page.aslink(True) )
@@ -1546,6 +1620,7 @@ class Subject(object):
                     pywikibot.output(u"  (%d) Found link to %s in:" % (i, page2.aslink(True)))
                     self.whereReport(page2, indent = 8)
                 while True:
+                    #TODO: allow answer to repeat previous or go back after a mistake
                     answer = pywikibot.input(u"Which variant should be used? (<number>, [n]one, [g]ive up) ").lower()
                     if answer:
                         if answer == 'g':
@@ -1576,6 +1651,7 @@ class Subject(object):
                     if acceptall:
                         answer = 'a'
                     else:
+                        #TODO: allow answer to repeat previous or go back after a mistake
                         answer = pywikibot.inputChoice(u'What should be done?', ['accept', 'reject', 'give up', 'accept all'], ['a', 'r', 'g', 'l'], 'a')
                     if answer == 'l': # accept all
                         acceptall = True
@@ -1620,10 +1696,11 @@ class Subject(object):
         if self.forcedStop: # autonomous with problem
             pywikibot.output(u"======Aborted processing %s======" % self.originPage.aslink(True))
             return
-        if self.originPage.isRedirectPage():
-            return
-        if self.originPage.isCategoryRedirect():
-            return
+        if self.originPage:
+            if self.originPage.isRedirectPage():
+                return
+            if self.originPage.isCategoryRedirect():
+                return
         if not self.untranslated and globalvar.untranslatedonly:
             return
         # The following check is not always correct and thus disabled.
@@ -1632,16 +1709,21 @@ class Subject(object):
 #         if len(self.done) == 1:
 #             # No interwiki at all
 #             return
-        pywikibot.output(u"======Post-processing %s======" % self.originPage.aslink(True))
+        if self.originPage:
+            pywikibot.output(u"======Post-processing %s======" % self.originPage.aslink(True))
         # Assemble list of accepted interwiki links
         new = self.assemble()
         if new is None: # User said give up
             pywikibot.output(u"======Aborted processing %s======" % self.originPage.aslink(True))
             return
+        if not len(new): # nothing else to do
+            return
 
         # Make sure new contains every page link, including the page we are processing
+        # TODO: sould be move to assemble()
         # replaceLinks will skip the site it's working on.
         if self.originPage.site() not in new:
+          if not self.originPage.site().family.interwiki_forward: #TODO: make this possible as well.
             new[self.originPage.site()] = self.originPage
 
         #self.replaceLinks(self.originPage, new, True, bot)
@@ -1735,8 +1817,7 @@ class Subject(object):
                             if diff > 30*24*60:
                                 smallWikiAllowed = True
                             else:
-                                pywikibot.output(
-u'NOTE: number of edits are restricted at %s'
+                                pywikibot.output( u'NOTE: number of edits are restricted at %s'
                                     % page.site().sitename())
 
                 # if we have an account for this site
@@ -1844,6 +1925,12 @@ u'NOTE: number of edits are restricted at %s'
 
         # Avoid adding an iw link back to itself
         del new[page.site()]
+
+        # Do not add interwiki links to foreign families that page.site() does not forward to
+        for stmp in new.keys():
+            if stmp.family != page.site().family:
+                if stmp.family.name != page.site().family.interwiki_forward:
+                    del new[stmp]
 
         # Put interwiki links into a map
         old={}
@@ -2045,16 +2132,22 @@ u'NOTE: number of edits are restricted at %s'
                         if expectedPage != page:
                             try:
                                 linkedPage = linkedPagesDict[expectedPage.site()]
-                                pywikibot.output(u"WARNING: %s: %s does not link to %s but to %s" % (page.site().family.name, page.aslink(True), expectedPage.aslink(True), linkedPage.aslink(True)))
+                                pywikibot.output(u"WARNING: %s: %s does not link to %s but to %s"
+                                                 % (page.site().family.name, page.aslink(True),
+                                                    expectedPage.aslink(True), linkedPage.aslink(True)))
                             except KeyError:
-                                pywikibot.output(u"WARNING: %s: %s does not link to %s" % (page.site().family.name, page.aslink(True), expectedPage.aslink(True)))
+                                pywikibot.output(u"WARNING: %s: %s does not link to %s"
+                                                 % (page.site().family.name, page.aslink(True),
+                                                    expectedPage.aslink(True)))
                     # Check for superfluous links
                     for linkedPage in linkedPages:
                         if linkedPage not in expectedPages:
                             # Check whether there is an alternative page on that language.
                             # In this case, it was already reported above.
                             if linkedPage.site() not in expectedSites:
-                                pywikibot.output(u"WARNING: %s: %s links to incorrect %s" % (page.site().family.name, page.aslink(True), linkedPage.aslink(True)))
+                                pywikibot.output(u"WARNING: %s: %s links to incorrect %s"
+                                                 % (page.site().family.name, page.aslink(True),
+                                                    linkedPage.aslink(True)))
         except (socket.error, IOError):
             pywikibot.output(u'ERROR: could not report backlinks')
 
@@ -2098,7 +2191,8 @@ class InterwikiBot(object):
         else: mode = 'written'
         f = codecs.open(dumpfn, mode[0], 'utf-8')
         for subj in self.subjects:
-            f.write(subj.originPage.aslink(None)+'\n')
+            if subj.originPage:
+                f.write(subj.originPage.aslink(None)+'\n')
         f.close()
         pywikibot.output(u'Dump %s (%s) %s.' % (site.lang, site.family.name, mode))
         return dumpfn
@@ -2373,6 +2467,7 @@ def readWarnfile(filename, bot):
 
 def main():
     singlePageTitle = []
+    opthintsonly = False
     start = None
     # Which namespaces should be processed?
     # default to [] which means all namespaces will be processed
@@ -2428,6 +2523,8 @@ def main():
             optRestore = not globalvar.restoreAll
         elif arg == '-continue':
             optContinue = True
+        elif arg == '-hintsonly':
+            opthintsonly = True
         elif arg.startswith('-namespace:'):
             try:
                 namespaces.append(int(arg[11:]))
@@ -2536,9 +2633,12 @@ def main():
         readWarnfile(warnfile, bot)
     else:
         singlePageTitle = ' '.join(singlePageTitle)
-        if not singlePageTitle:
-            singlePageTitle = pywikibot.input(u'Which page to check:')
-        singlePage = pywikibot.Page(pywikibot.getSite(), singlePageTitle)
+        if not singlePageTitle and not opthintsonly:
+             singlePageTitle = pywikibot.input(u'Which page to check:')
+        if singlePageTitle:
+            singlePage = pywikibot.Page(pywikibot.getSite(), singlePageTitle)
+        else:
+            singlePage = None
         bot.add(singlePage, hints = globalvar.hints)
 
     try:

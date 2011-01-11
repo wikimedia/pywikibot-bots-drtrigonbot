@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: incubator_family.py 8591 2010-09-22 15:15:06Z xqt $'
+__version__ = '$Id: incubator_family.py 8758 2010-12-05 18:46:44Z purodha $'
 
 import family
 
@@ -28,6 +28,7 @@ class Family(family.Family):
         self.namespaces[101] = {
             '_default': u'Lost talk',
         }
+        self.interwiki_forward = 'wikipedia'
         self.cross_projects = [
             'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews', 'wikiversity',
             'meta', 'mediawiki', 'test', 'commons', 'species',

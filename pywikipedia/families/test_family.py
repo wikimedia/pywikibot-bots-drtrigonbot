@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: test_family.py 8066 2010-04-09 07:55:32Z xqt $'
+__version__ = '$Id: test_family.py 8758 2010-12-05 18:46:44Z purodha $'
 
 import family
 
@@ -125,6 +125,7 @@ class Family(family.Family):
         self.namespaces[133] = {
             '_default': u'نقاش المساعدة',
         }
+        self.interwiki_forward = 'wikipedia'
         self.cross_projects = [
             'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews', 'wikiversity',
             'meta', 'mediawiki', 'incubator', 'commons', 'species',

@@ -37,7 +37,7 @@ Basic pagegenerators commands, -page, etc...
 #
 # Distributed under the terms of the GPL
 #
-__version__ = '$Id: reflinks.py 8742 2010-11-23 08:14:23Z xqt $'
+__version__ = '$Id: reflinks.py 8770 2010-12-12 22:47:38Z xqt $'
 #
 
 import sys, re, urllib2, httplib, socket, codecs, ftplib
@@ -528,7 +528,11 @@ class ReferencesRobot:
                 f = None
                 try:
                     socket.setdefaulttimeout(20)
-                    f = urllib2.urlopen(ref.url)
+                    try:
+                        f = urllib2.urlopen(ref.url.decode("utf8"))
+                    except UnicodeError:
+                        ref.url = urllib2.quote(ref.url.encode("utf8"),"://")
+                        f = urllib2.urlopen(ref.url)
                     #Try to get Content-Type from server
                     headers = f.info()
                     contentType = headers.getheader('Content-Type')

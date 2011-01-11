@@ -73,7 +73,7 @@ Furthermore, the following command line parameters are supported:
                   the bot will check every regex without waiting using all the
                   resources. This will slow it down between a regex and another
                   in order not to waste too much CPU.
- 
+
 -query:           The maximum number of pages that the bot will load at once.
                   Default value is 60. Ignored when reading an XML file.
 
@@ -138,7 +138,7 @@ from __future__ import generators
 #
 # (C) Daniel Herding & the Pywikipedia team, 2004-2010
 #
-__version__='$Id: replace.py 8704 2010-11-07 12:27:43Z xqt $'
+__version__='$Id: replace.py 8805 2010-12-26 16:43:08Z xqt $'
 #
 # Distributed under the terms of the MIT license.
 #

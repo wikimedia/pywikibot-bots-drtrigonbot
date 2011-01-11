@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: family.py 8756 2010-12-04 10:54:12Z purodha $'
+__version__='$Id: family.py 8820 2011-01-06 22:00:02Z xqt $'
 
 import config
 import re
@@ -677,7 +677,7 @@ class Family:
                 'dv': u'މެމްބަރު',
                 'el': u'Χρήστης',
                 'eml': u'Utente',
-                'eo': u'Uzanto',
+                'eo': [u'Uzanto', u'Vikipediisto'],
                 'es': u'Usuario',
                 'et': u'Kasutaja',
                 'eu': u'Lankide',
@@ -874,7 +874,7 @@ class Family:
                 'dsb': u'Diskusija wužywarja',
                 'el': u'Συζήτηση χρήστη',
                 'eml': u'Discussioni utente',
-                'eo': u'Uzanta diskuto',
+                'eo': [u'Uzanta diskuto', u'Vikipediista diskuto'],
                 'es': u'Usuario Discusión',
                 'et': u'Kasutaja arutelu',
                 'eu': u'Lankide eztabaida',
@@ -3539,6 +3539,13 @@ class Family:
         # self.crossnamespace[102] = {
         #     'pt': { '_default': [0]}
         # }
+    
+    @property
+    def iwkeys(self):
+        if self.interwiki_forward:
+            import wikipedia as pywikibot
+            return pywikibot.Family(self.interwiki_forward).langs.keys()
+        return self.langs.keys()
 
     def _addlang(self, code, location, namespaces = {}):
         """Add a new language to the langs and namespaces of the family.

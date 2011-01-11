@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikibooks_family.py 8751 2010-12-03 07:53:26Z xqt $'
+__version__ = '$Id: wikibooks_family.py 8821 2011-01-06 22:01:33Z xqt $'
 
 # The Wikimedia family that is known as Wikibooks
 
@@ -12,13 +12,13 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'de', 'fr', 'ja', 'hu', 'pt', 'nl', 'es', 'pl', 'it', 'he',
-            'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'hr', 'zh', 'sv', 'tr', 'da',
+            'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'zh', 'hr', 'sv', 'tr', 'da',
             'id', 'th', 'mk', 'ko', 'sr', 'fa', 'tl', 'gl', 'ar', 'is', 'no',
-            'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'uk', 'si', 'la',
-            'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'az', 'ur', 'tt', 'oc', 'ms',
-            'ml', 'eu', 'hi', 'fy', 'ie', 'tg', 'af', 'bn', 'hy', 'pa', 'te',
-            'sa', 'bs', 'ky', 'be', 'ne', 'ast', 'zh-min-nan', 'mg', 'cy', 'ku',
-            'co', 'tk', 'als', 'su', 'vo', 'uz', 'mn', 'kk', 'my', 'li',
+            'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'uk', 'si', 'li',
+            'la', 'tt', 'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'az', 'ur', 'oc',
+            'ml', 'ms', 'eu', 'hi', 'fy', 'ie', 'tg', 'af', 'bn', 'hy', 'pa',
+            'te', 'sa', 'bs', 'ky', 'be', 'ne', 'ast', 'zh-min-nan', 'mg', 'cy',
+            'ku', 'co', 'tk', 'su', 'uz', 'vo', 'kk', 'mn', 'my',
         ]
 
         if family.config.SSL_connection:
@@ -340,6 +340,7 @@ class Family(family.Family):
         self.obsolete = {
             'aa': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wikibooks
             'ak': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Akan_Wikibooks
+            'als': None, # http://als.wikipedia.org/wiki/Wikipedia:Stammtisch/Archiv_2008-1#Afterwards.2C_closure_and_deletion_of_Wiktionary.2C_Wikibooks_and_Wikiquote_sites
             'as': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Assamese_Wikibooks
             'ay': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Aymar_Wikibooks
             'ba': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bashkir_Wikibooks

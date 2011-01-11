@@ -83,7 +83,7 @@ This will move all pages in the category US to the category United States.
 # (C) Anreas J Schwab, 2007
 # (C) Pywikipedia team, 2008-2009
 #
-__version__ = '$Id: category.py 8590 2010-09-22 05:10:49Z xqt $'
+__version__ = '$Id: category.py 8811 2010-12-29 11:24:41Z malafaya $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -136,7 +136,8 @@ msg_add={
     'sr':u'Бот: Додаје [[Категорија:%s]]',
     'sv':u'Robot: Lägger till [[Kategori:%s]]',
     'szl':u'Bot dodowo: [[Kategoria:%s]]',
-    'uk':u'Робот: додано [[Категорія:%s]]',
+    'uk':u'Робот: додавання [[Категорія:%s]]',
+    'vo':u'Bot: läükon: [[Klad:%s]]',
     'zh':u'機器人:新增目錄 [[Category:%s]]',
     }
 
@@ -175,7 +176,7 @@ msg_change={
     'sk':u'Robot zmenil [[%(oldcat)s]]→[[%(newcat)s]]',
     'sr':u'Бот: Измена категорије %(oldcat)s',
     'sv':u'Robot: Ändrar %(oldcat)s',
-    'uk':u'Робот: змінено [[Категорія:%(oldcat)s]]',
+    'uk':u'Робот: зміна %(oldcat)s',
     'zh':u'機器人:變更目錄 [[%(oldcat)s]]→[[%(newcat)s]]',
     }
 
@@ -188,6 +189,7 @@ msg_replace={
     'ja':u'ロボットによる: カテゴリ変更 [[%(oldcat)s]]→[[%(newcat)s]]',
     'pdc':u'Waddefresser: Abdeeling von %(oldcat)s nooch %(newcat)s geennert',
     'sk':u'Robot nahradil kategóriu %(oldcat)s za %(newcat)s', 
+    'uk':u'Робот: заміна категорії %(oldcat)s на %(newcat)s',
     'zh':u'機器人:變更目錄 [[%(oldcat)s]]→[[%(newcat)s]]',
     }
 
@@ -427,7 +429,8 @@ class AddCategory:
         except pywikibot.IsRedirectPage:
             redirTarget = pywikibot.Page(site, arg.args[0])
             pywikibot.output(u"WARNING: Page %s is a redirect to %s; skipping."
-                             % (page.title(asLink=True), redirTarget.title(asLink=True)))
+                             % (page.title(asLink=True),
+                                redirTarget.title(asLink=True)))
         else:
             return text
         return None
@@ -982,6 +985,7 @@ class CategoryTreeRobot:
             'pt': u'(também em %s)',
             'ru': u'(также в %s)',
             'sv': u'(också i %s)',
+            'uk': u'(також у %s)',
             'ср': u'(такође у %s)',
             'zh': u'(也在 %s)',
         }

@@ -60,7 +60,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: redirect.py 8731 2010-11-19 13:59:31Z xqt $'
+__version__='$Id: redirect.py 8785 2010-12-21 00:11:55Z valhallasw $'
 #
 import re, sys, datetime
 import wikipedia as pywikibot
@@ -247,7 +247,7 @@ class RedirectGenerator:
             if m:
                 target = m.group(1)
                 # There might be redirects to another wiki. Ignore these.
-                for code in self.site.family.langs.keys():
+                for code in self.site.family.iwkeys:
                     if target.startswith('%s:' % code) \
                             or target.startswith(':%s:' % code):
                         if code == self.site.language():

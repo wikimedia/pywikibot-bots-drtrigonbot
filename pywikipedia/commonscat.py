@@ -50,7 +50,7 @@ TODO:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: commonscat.py 8743 2010-11-25 12:15:11Z xqt $'
+__version__ = '$Id: commonscat.py 8812 2010-12-29 22:25:40Z xqt $'
 #
 
 import wikipedia as pywikibot
@@ -103,7 +103,7 @@ commonscatTemplates = {
     'os' : (u'Commonscat', [u'Commons cat']),
     'pt' : (u'Commonscat', [u'Commons cat']),
     'ro' : (u'Commonscat', [u'Commons cat']),
-    'ru' : (u'Commonscat', [u'Викисклад-кат']),
+    'ru' : (u'Commonscat', [u'Викисклад-кат', u'Commons category']),
     'sl' : (u'Kategorija v Zbirki', [u'Commonscat', u'Kategorija v zbirki',
                                      u'Commons cat', u'Katzbirke']),
     'sv' : (u'Commonscat', [u'Commonscat-rad', u'Commonskat', u'Commons cat',
@@ -163,7 +163,9 @@ msg_change = {
     'fr': u'Robot: Changé commonscat link de [[:Commons:Category:%(oldcat)s|%(oldcat)s]] à [[:Commons:Category:%(newcat)s|%(newcat)s]]',
     'frr':u'Bot: Feranere commonscat link faan [[:Commons:Category:%(oldcat)s|%(oldcat)s]] tu [[:Commons:Category:%(newcat)s|%(newcat)s]]',
     'pdc': u'Waddefresser: commonscat Gleecher vun [[:Commons:Category:%(oldcat)s|%(oldcat)s]] nooch [[:Commons:Category:%(newcat)s|%(newcat)s]] geennert',
+    'ru': u'Бот: Изменение commonscat-ссылки с [[:Commons:Category:%(oldcat)s|%(oldcat)s]] на [[:Commons:Category:%(newcat)s|%(newcat)s]]',
     'sk': u'Robot zmenil šablónu Commonscat z [[:Commons:Category:%(oldcat)s|%(oldcat)s]] na [[:Commons:Category:%(newcat)s|%(newcat)s]]',
+    'uk': u'Бот: Зміна commonscat-посилання з [[:Commons:Category:%(oldcat)s|%(oldcat)s]] на [[:Commons:Category:%(newcat)s|%(newcat)s]]',
     'th': u'บอต: เปลี่ยนลิงก์หมวดหมู่คอมมอนส์จาก [[:Commons:Category:%(oldcat)s|%(oldcat)s]] เป็น [[:Commons:Category:%(newcat)s|%(newcat)s]]',
 }
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiversity_family.py 8731 2010-11-19 13:59:31Z xqt $'
+__version__ = '$Id: wikiversity_family.py 8816 2010-12-31 12:49:51Z xqt $'
 
 # The Wikimedia family that is known as Wikiversity
 
@@ -11,8 +11,8 @@ class Family(family.Family):
         self.name = 'wikiversity'
 
         self.languages_by_size = [
-            'en', 'fr', 'de', 'beta', 'cs', 'ru', 'es', 'it', 'pt', 'el', 'fi',
-            'ja', 'sv',
+            'en', 'fr', 'de', 'cs', 'ru', 'beta', 'es', 'it', 'pt', 'el', 'fi',
+            'sv', 'ja',
         ]
 
         if family.config.SSL_connection:

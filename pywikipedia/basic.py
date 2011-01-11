@@ -20,7 +20,7 @@ and the bot will only work on that single page.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: basic.py 8589 2010-09-22 05:07:29Z xqt $'
+__version__ = '$Id: basic.py 8807 2010-12-27 21:34:11Z purodha $'
 #
 
 import wikipedia as pywikibot
@@ -48,17 +48,21 @@ class BasicBot:
         'nl': u'Bot: wijziging ...',
         'pl': u'Bot: zmienia ...',
         'pt': u'Bot: alterando...',
+        'ru': u'Бот: изменил ...',
         'sv': u'Bot: Ändrar ...',
+        'uk': u'Бот: змінив ...',
         'zh': u'機器人：編輯.....',
     }
 
     def __init__(self, generator, dry):
         """
         Constructor. Parameters:
-            * generator - The page generator that determines on which pages
-                          to work on.
-            * dry       - If True, doesn't do any real changes, but only shows
-                          what would have been changed.
+            @param generator: The page generator that determines on which pages
+                              to work.
+            @type generator: generator.
+            @param dry: If True, doesn't do any real changes, but only shows
+                        what would have been changed.
+            @type dry: boolean.
         """
         self.generator = generator
         self.dry = dry

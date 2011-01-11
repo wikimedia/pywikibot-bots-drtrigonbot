@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 #
 # (C) Rob W.W. Hooft, 2003
+#     parts by holger@trillke.net 2002/03/18
+#     Purodha Blissenbach (Modifier), 2010
+# (C) Pywikipedia bot team, 2007-2010
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: config.py 8672 2010-10-20 15:10:58Z multichill $'
+__version__ = '$Id: config.py 8813 2010-12-29 22:27:03Z xqt $'
 
 import os, re
 import sys as __sys
@@ -42,12 +45,17 @@ mylang = 'language'
 # sysopnames['wiktionary']['en'] = 'myEnglishUsername'
 usernames = {}
 sysopnames = {}
+
+# See section SOLVE_DISAMBIGUATION SETTINGS for details.
 disambiguation_comment = {}
+# This is currently not used anywhere:
 gdab_namespaces = {}
+# This is currently not used anywhere:
 account_global = False
 
 # Solve captchas in the webbrowser. Setting this to False will result in the
 # exception CaptchaError being thrown if a captcha is encountered.
+#TODO: allow more flexibility, such as runtime choices, skipping, and postponing
 solve_captcha = True
 
 # Some sites will require password authentication to access the HTML pages at
@@ -366,9 +374,9 @@ copyright_check_in_source_google = False
 copyright_check_in_source_yahoo = False
 copyright_check_in_source_msn = False
 
-# Web pages may contain a Wikipedia text without the word 'Wikipedia' but with the
-# typical '[edit]' tag as a result of a copy & paste procedure. You want no
-# report for this kind of URLs, even if they are copyright violations.
+# Web pages may contain a Wikipedia text without the word 'Wikipedia' but with
+# the typical '[edit]' tag as a result of a copy & paste procedure. You want
+# no report for this kind of URLs, even if they are copyright violations.
 # However, when enabled, these URLs are logged in a file.
 copyright_check_in_source_section_names = False
 
@@ -460,6 +468,53 @@ max_queue_size = 64
 # End of configuration section
 # ============================
 
+def makepath(path):
+    """Return a normalized absolute version of the path argument.
+
+    - if the given path already exists in the filesystem
+      the filesystem is not modified.
+
+    - otherwise makepath creates directories along the given path
+      using the dirname() of the path. You may append
+      a '/' to the path if you want it to be a directory path.
+
+    from holger@trillke.net 2002/03/18
+
+    """
+    from os import makedirs
+    from os.path import normpath, dirname, exists, abspath
+
+    dpath = normpath(dirname(path))
+    if not exists(dpath): makedirs(dpath)
+    return normpath(abspath(path))
+
+def datafilepath(*filename):
+    """Return an absolute path to a data file in a standard location.
+
+    Argument(s) are zero or more directory names, optionally followed by a
+    data file name. The return path is offset to config.base_dir. Any
+    directories in the path that do not already exist are created.
+
+    """
+    import os
+    return makepath(os.path.join(base_dir, *filename))
+
+def shortpath(path):
+    """Return a file path relative to config.base_dir."""
+    import os
+    if path.startswith(base_dir):
+        return path[len(base_dir) + len(os.path.sep) : ]
+    return path
+
+# is config verbose?
+_verbose = False
+for _arg in __sys.argv[1:]:
+    if _arg == "-v" or _arg == "-verbose":
+        _verbose = True
+        break
+if _verbose:
+    print "Config.py"
+
 # Get the names of all known families, and initialize
 # with empty dictionaries
 import wikipediatools as _wt
@@ -529,44 +584,12 @@ if console_encoding is None:
 
 # Save base_dir for use by other modules
 base_dir = _base_dir
+if _verbose:
+    print "- base_dir: ", base_dir
 
-def makepath(path):
-    """Return a normalized absolute version of the path argument.
-
-    - if the given path already exists in the filesystem
-      the filesystem is not modified.
-
-    - otherwise makepath creates directories along the given path
-      using the dirname() of the path. You may append
-      a '/' to the path if you want it to be a directory path.
-
-    from holger@trillke.net 2002/03/18
-
-    """
-    from os import makedirs
-    from os.path import normpath, dirname, exists, abspath
-
-    dpath = normpath(dirname(path))
-    if not exists(dpath): makedirs(dpath)
-    return normpath(abspath(path))
-
-def datafilepath(*filename):
-    """Return an absolute path to a data file in a standard location.
-
-    Argument(s) are zero or more directory names, optionally followed by a
-    data file name. The return path is offset to config.base_dir. Any
-    directories in the path that do not already exist are created.
-
-    """
-    import os
-    return makepath(os.path.join(base_dir, *filename))
-
-def shortpath(path):
-    """Return a file path relative to config.base_dir."""
-    import os
-    if path.startswith(base_dir):
-        return path[len(base_dir) + len(os.path.sep) : ]
-    return path
+# Exit message
+if _verbose:
+    print "- done."
 
 #
 # When called as main program, list all configuration variables
@@ -577,6 +600,12 @@ if __name__ == "__main__":
     for _arg in __sys.argv[1:]:
         if _arg == "modified":
             _all = 0
+        elif _arg == "-v":
+            pass
+        elif _arg == "-verbose":
+            pass
+        elif _arg.startswith("-dir:"):
+            pass
         else:
             print "Unknown arg %s ignored"%_arg
     _k = globals().keys()
@@ -584,7 +613,7 @@ if __name__ == "__main__":
     for _name in _k:
         if _name[0] != '_':
             if not type(globals()[_name]) in [types.FunctionType, types.ModuleType]:
-                try: 
+                try:
                     if _all or _glv[_name] != globals()[_name]:
                         print _name, "=", repr(globals()[_name])
                 except KeyError:

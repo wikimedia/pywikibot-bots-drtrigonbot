@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wiktionary_family.py 8751 2010-12-03 07:53:26Z xqt $'
+__version__ = '$Id: wiktionary_family.py 8821 2011-01-06 22:01:33Z xqt $'
 
 # The Wikimedia family that is known as Wiktionary
 
@@ -11,20 +11,20 @@ class Family(family.Family):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'en', 'fr', 'zh', 'lt', 'mg', 'tr', 'ru', 'vi', 'pl', 'ta', 'io',
-            'ko', 'pt', 'fi', 'hu', 'el', 'no', 'de', 'sv', 'it', 'nl', 'my',
-            'kn', 'li', 'lo', 'ml', 'ja', 'es', 'ku', 'ar', 'et', 'ro', 'te',
-            'id', 'gl', 'ca', 'uk', 'bg', 'vo', 'fa', 'is', 'cs', 'hr', 'scn',
-            'simple', 'sr', 'oc', 'th', 'af', 'fy', 'sw', 'br', 'he', 'la',
-            'sq', 'sl', 'hy', 'tt', 'cy', 'zh-min-nan', 'da', 'wa', 'ne', 'lv',
-            'tk', 'ast', 'ur', 'ka', 'hsb', 'eu', 'kk', 'eo', 'ky', 'az', 'wo',
-            'ang', 'hi', 'co', 'ga', 'mr', 'gn', 'ia', 'be', 'sk', 'tl', 'ms',
-            'csb', 'st', 'nn', 'nds', 'kl', 'sd', 'ps', 'ug', 'sh', 'ti', 'mk',
-            'km', 'si', 'bn', 'an', 'zu', 'gu', 'ss', 'qu', 'ts', 'bs', 'lb',
-            'fo', 'am', 'rw', 'chr', 'om', 'su', 'kw', 'gv', 'iu', 'mn', 'nah',
-            'ie', 'yi', 'pa', 'za', 'mt', 'gd', 'tg', 'tpi', 'dv', 'ik', 'mi',
-            'sg', 'roa-rup', 'so', 'uz', 'ln', 'jv', 'sm', 'ha', 'ay', 'sa',
-            'na', 'jbo', 'ks', 'fj', 'tn', 'dz', 'als',
+            'en', 'fr', 'zh', 'lt', 'mg', 'ru', 'tr', 'vi', 'pl', 'ta', 'ko',
+            'io', 'pt', 'fi', 'hu', 'el', 'de', 'no', 'sv', 'it', 'nl', 'et',
+            'kn', 'my', 'li', 'lo', 'ml', 'ja', 'es', 'ku', 'ar', 'ro', 'te',
+            'id', 'gl', 'ca', 'uk', 'bg', 'vo', 'cs', 'fa', 'is', 'hr', 'scn',
+            'simple', 'oc', 'sr', 'th', 'af', 'fy', 'sw', 'br', 'he', 'eo',
+            'la', 'sq', 'sl', 'hy', 'tt', 'cy', 'zh-min-nan', 'da', 'wa', 'eu',
+            'ne', 'lv', 'tk', 'ast', 'ka', 'ur', 'hsb', 'kk', 'ky', 'az', 'wo',
+            'nn', 'ang', 'hi', 'co', 'ga', 'mr', 'be', 'gn', 'ia', 'sk', 'tl',
+            'ms', 'csb', 'st', 'ps', 'nds', 'kl', 'sd', 'km', 'ug', 'sh', 'si',
+            'ti', 'mk', 'bn', 'an', 'zu', 'gu', 'lb', 'ss', 'qu', 'ts', 'bs',
+            'fo', 'am', 'rw', 'chr', 'om', 'su', 'kw', 'tg', 'iu', 'gv', 'mn',
+            'nah', 'ie', 'yi', 'gd', 'pa', 'za', 'mt', 'tpi', 'dv', 'ik', 'sg',
+            'mi', 'so', 'roa-rup', 'uz', 'ln', 'jv', 'sm', 'ha', 'ay', 'sa',
+            'na', 'fj', 'jbo', 'ks', 'tn', 'dz',
         ]
 
         if family.config.SSL_connection:
@@ -425,25 +425,70 @@ class Family(family.Family):
             'en': u'Sign gloss talk',
         }
 
-        # Other than most Wikipedias, page names must not start with a capital
-        # letter on ALL Wiktionaries.
-        self.nocapitalize = self.langs.keys()
-
-        # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
-        self.cross_allowed = [
-            'ang', 'ast', 'az', 'bg', 'bn', 'da', 'eo', 'es', 'fa', 'fy', 'ga', 'gd', 'hu', 
-            'ia', 'ie', 'ik', 'jv', 'ka', 'li', 'lt', 'mk', 'nl', 'no', 'oc', 'pt', 'sk', 'tg', 'th', 'ti', 
-            'ts', 'ug', 'uk', 'vo', 'za', 'zh-min-nan', 'zh', 'zu', 
-        ]
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
             'wikipedia', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews', 'wikiversity',
             'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
         ]
+        # Global bot allowed languages on
+        # http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        self.cross_allowed = [
+            'ang', 'ast', 'az', 'bg', 'bn', 'da', 'eo', 'es', 'fa', 'fy', 'ga',
+            'gd', 'hu', 'ia', 'ie', 'ik', 'jv', 'ka', 'li', 'lt', 'mk', 'nl',
+            'no', 'oc', 'pt', 'sk', 'tg', 'th', 'ti', 'ts', 'ug', 'uk', 'vo',
+            'za', 'zh-min-nan', 'zh', 'zu', 
+        ]
+
+        # Other than most Wikipedias, page names must not start with a capital
+        # letter on ALL Wiktionaries.
+        self.nocapitalize = self.langs.keys()
+
+        self.alphabetic_roman = [
+            'aa', 'af', 'ak', 'als', 'an', 'roa-rup', 'ast', 'gn', 'ay', 'az',
+            'id', 'ms', 'bm', 'zh-min-nan', 'jv', 'su', 'mt', 'bi', 'bo', 'bs',
+            'br', 'ca', 'cs', 'ch', 'sn', 'co', 'za', 'cy', 'da', 'de', 'na',
+            'mh', 'et', 'ang', 'en', 'es', 'eo', 'eu', 'to', 'fr', 'fy', 'fo',
+            'ga', 'gv', 'sm', 'gd', 'gl', 'hr', 'io', 'ia', 'ie', 'ik', 'xh',
+            'is', 'zu', 'it', 'kl', 'csb', 'kw', 'rw', 'rn', 'sw', 'ky', 'ku',
+            'la', 'lv', 'lb', 'lt', 'li', 'ln', 'jbo', 'hu', 'mg', 'mi', 'mo',
+            'my', 'fj', 'nah', 'nl', 'cr', 'no', 'nn', 'hsb', 'oc', 'om', 'ug',
+            'uz', 'nds', 'pl', 'pt', 'ro', 'rm', 'qu', 'sg', 'sc', 'st', 'tn',
+            'sq', 'scn', 'simple', 'ss', 'sk', 'sl', 'so', 'sh', 'fi', 'sv',
+            'tl', 'tt', 'vi', 'tpi', 'tr', 'tw', 'vo', 'wa', 'wo', 'ts', 'yo',
+            'el', 'av', 'ab', 'ba', 'be', 'bg', 'mk', 'mn', 'ru', 'sr', 'tg',
+            'uk', 'kk', 'hy', 'yi', 'he', 'ur', 'ar', 'tk', 'sd', 'fa', 'ha',
+            'ps', 'dv', 'ks', 'ne', 'pi', 'bh', 'mr', 'sa', 'hi', 'as', 'bn',
+            'pa', 'gu', 'or', 'ta', 'te', 'kn', 'ml', 'si', 'th', 'lo', 'dz',
+            'ka', 'ti', 'am', 'chr', 'iu', 'km', 'zh', 'ja', 'ko',
+           ]
+
+
+        # Which languages have a special order for putting interlanguage links,
+        # and what order is it? If a language is not in interwiki_putfirst,
+        # alphabetical order on language code is used. For languages that are in
+        # interwiki_putfirst, interwiki_putfirst is checked first, and
+        # languages are put in the order given there. All other languages are put
+        # after those, in code-alphabetical order.
+
+        self.interwiki_putfirst = {
+            'da': self.alphabetic,
+            'en': self.alphabetic,
+            'et': self.alphabetic,
+            'fi': self.alphabetic,
+            'fy': self.fyinterwiki,
+            'he': ['en'],
+            'hu': ['en'],
+            'ms': self.alphabetic_revised,
+            'pl': self.alphabetic,
+            'sv': self.alphabetic_roman,
+            'simple': self.alphabetic,
+        }
+
         self.obsolete = {
             'aa': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wiktionary
             'ab': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Abkhaz_Wiktionary
             'ak': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Akan_Wiktionary
+            'als': None, # http://als.wikipedia.org/wiki/Wikipedia:Stammtisch/Archiv_2008-1#Afterwards.2C_closure_and_deletion_of_Wiktionary.2C_Wikibooks_and_Wikiquote_sites
             'as': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Assamese_Wiktionary
             'av': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Avar_Wiktionary
             'ba': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bashkir_Wiktionary
@@ -473,26 +518,6 @@ class Family(family.Family):
             'yo': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yoruba_Wiktionary
             'zh-tw': 'zh',
             'zh-cn': 'zh'
-        }
-
-        # Which languages have a special order for putting interlanguage links,
-        # and what order is it? If a language is not in interwiki_putfirst,
-        # alphabetical order on language code is used. For languages that are in
-        # interwiki_putfirst, interwiki_putfirst is checked first, and
-        # languages are put in the order given there. All other languages are put
-        # after those, in code-alphabetical order.
-
-        self.interwiki_putfirst = {
-            'da': self.alphabetic,
-            'en': self.alphabetic,
-            'et': self.alphabetic,
-            'fi': self.alphabetic,
-            'fy': self.fyinterwiki,
-            'he': ['en'],
-            'hu': ['en'],
-            'ms': self.alphabetic_revised,
-            'pl': self.alphabetic,
-            'simple': self.alphabetic
         }
 
         self.interwiki_on_one_line = ['pl']

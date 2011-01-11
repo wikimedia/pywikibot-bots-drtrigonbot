@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """
 """
-__version__ = '$Id: copyright_clean.py 8517 2010-09-11 08:32:54Z xqt $'
+__version__ = '$Id: copyright_clean.py 8805 2010-12-26 16:43:08Z xqt $'
 
 #
 # (C) Francesco Cosoleto, 2006
@@ -24,6 +24,8 @@ summary_msg = {
     'fa': u'حذف',
     'fr': u'Retiré',
     'it': u'Rimozione',
+    'ru': u'Удаление',
+    'uk': u'Видалення',
 }
 
 headC = re.compile("(?m)^=== (?:<strike>)?(?:<s>)?(?:<del>)?\[\[(?::)?(.*?)\]\]")

@@ -50,7 +50,7 @@ Todo:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: imagecopy_self.py 8526 2010-09-11 16:45:50Z xqt $'
+__version__='$Id: imagecopy_self.py 8814 2010-12-30 19:19:53Z multichill $'
 #
 
 from Tkinter import *
@@ -317,7 +317,7 @@ class imageFetcher(threading.Thread):
             text = imagepage.get()
             foundMatch = False
             for (regex, replacement) in licenseTemplates:
-                match = re.search(regex, text, re.IGNORECASE)
+                match = re.search(regex, text, flags=re.IGNORECASE)
                 if match:
                     foundMatch = True
             if not foundMatch:
@@ -428,10 +428,10 @@ class imageFetcher(threading.Thread):
         #text = re.sub(u'\{\{(self|self2)\|[^\}]+\}\}', u'', text, re.IGNORECASE)
 
         for toRemove in sourceGarbage:
-            text = re.sub(toRemove, u'', text, re.IGNORECASE)
+            text = re.sub(toRemove, u'', text, flags=re.IGNORECASE)
         
         for (regex, repl) in licenseTemplates:
-            text = re.sub(regex, u'', text, re.IGNORECASE)
+            text = re.sub(regex, u'', text, flags=re.IGNORECASE)
 
         text = pywikibot.removeCategoryLinks(text, imagepage.site()).strip()
             
@@ -506,9 +506,9 @@ class imageFetcher(threading.Thread):
         result = u''   
 
         for (regex, replacement) in licenseTemplates:
-            match = re.search(regex, text, re.IGNORECASE)
+            match = re.search(regex, text, flags=re.IGNORECASE)
             if match:
-                result = re.sub(regex, replacement, match.group(0), re.IGNORECASE)
+                result = re.sub(regex, replacement, match.group(0), flags=re.IGNORECASE)
                 return result % {u'author' : self.getAuthor(imagepage),
                                  u'lang' : lang,
                                  u'family' : family}

@@ -16,7 +16,7 @@ are taken into account.
 #
 # (C) Pywikipedia team, 2008-2009
 #
-__version__ = '$Id: category_redirect.py 8681 2010-10-21 13:21:03Z amir $'
+__version__ = '$Id: category_redirect.py 8805 2010-12-26 16:43:08Z xqt $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -127,6 +127,8 @@ class CategoryRedirectBot(object):
             'ksh': u"Bot: dubbel Ömleidung eruß jemaat.",
             'pl': u"Robot: Poprawia podwójne przekierowanie",
             'pt': u"Bot: Corrigindo redirecionamento duplo",
+            'ru': u"Бот: исправление двойного перенаправления",
+            'uk': u"Бот: виправлення подвійного перенаправлення",
             'vi': u"Robot: sửa thể loại đổi hướng kép",
             'zh': u"Bot: 修复双重重定向",
         }
