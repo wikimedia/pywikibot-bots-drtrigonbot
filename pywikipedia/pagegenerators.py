@@ -18,7 +18,7 @@ These parameters are supported to specify which pages titles to print:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: pagegenerators.py 8803 2010-12-26 14:55:43Z xqt $'
+__version__='$Id: pagegenerators.py 8865 2011-01-21 06:38:10Z xqt $'
 
 import wikipedia as pywikibot
 import config
@@ -1326,7 +1326,7 @@ def main(*args):
                 i = 0
                 for page in gen:
                     i+=1
-                    pywikibot.output("%s: %s" % (repr(i).rjust(4), page.title()), toStdout = True)
+                    pywikibot.output("%4d: %s" % (i, page.title()), toStdout = True)
             else:
                 pywikibot.showHelp('pagegenerators')
     finally:

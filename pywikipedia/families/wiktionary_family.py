@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wiktionary_family.py 8821 2011-01-06 22:01:33Z xqt $'
+__version__ = '$Id: wiktionary_family.py 8868 2011-01-21 08:24:25Z xqt $'
 
 # The Wikimedia family that is known as Wiktionary
 
@@ -13,16 +13,16 @@ class Family(family.Family):
         self.languages_by_size = [
             'en', 'fr', 'zh', 'lt', 'mg', 'ru', 'tr', 'vi', 'pl', 'ta', 'ko',
             'io', 'pt', 'fi', 'hu', 'el', 'de', 'no', 'sv', 'it', 'nl', 'et',
-            'kn', 'my', 'li', 'lo', 'ml', 'ja', 'es', 'ku', 'ar', 'ro', 'te',
+            'kn', 'my', 'li', 'ml', 'lo', 'ja', 'es', 'ku', 'ar', 'ro', 'te',
             'id', 'gl', 'ca', 'uk', 'bg', 'vo', 'cs', 'fa', 'is', 'hr', 'scn',
             'simple', 'oc', 'sr', 'th', 'af', 'fy', 'sw', 'br', 'he', 'eo',
             'la', 'sq', 'sl', 'hy', 'tt', 'cy', 'zh-min-nan', 'da', 'wa', 'eu',
-            'ne', 'lv', 'tk', 'ast', 'ka', 'ur', 'hsb', 'kk', 'ky', 'az', 'wo',
-            'nn', 'ang', 'hi', 'co', 'ga', 'mr', 'be', 'gn', 'ia', 'sk', 'tl',
+            'ne', 'lv', 'tk', 'ast', 'ka', 'ur', 'hsb', 'kk', 'az', 'ky', 'wo',
+            'nn', 'ang', 'hi', 'co', 'be', 'ga', 'mr', 'gn', 'ia', 'sk', 'tl',
             'ms', 'csb', 'st', 'ps', 'nds', 'kl', 'sd', 'km', 'ug', 'sh', 'si',
             'ti', 'mk', 'bn', 'an', 'zu', 'gu', 'lb', 'ss', 'qu', 'ts', 'bs',
-            'fo', 'am', 'rw', 'chr', 'om', 'su', 'kw', 'tg', 'iu', 'gv', 'mn',
-            'nah', 'ie', 'yi', 'gd', 'pa', 'za', 'mt', 'tpi', 'dv', 'ik', 'sg',
+            'fo', 'am', 'rw', 'chr', 'om', 'tg', 'su', 'kw', 'iu', 'gv', 'nah',
+            'mn', 'ie', 'yi', 'gd', 'pa', 'za', 'mt', 'tpi', 'dv', 'ik', 'sg',
             'mi', 'so', 'roa-rup', 'uz', 'ln', 'jv', 'sm', 'ha', 'ay', 'sa',
             'na', 'fj', 'jbo', 'ks', 'tn', 'dz',
         ]
@@ -341,6 +341,7 @@ class Family(family.Family):
             'de': u'Thesaurus',
             'en': u'Index',
             'fr': u'Portail',
+            'mr': u'सूची',
             'pl': u'Portal',
             'pt': u'Rimas',
             'ru': [u'Индекс', u'Index'],
@@ -353,6 +354,7 @@ class Family(family.Family):
             'de': u'Thesaurus Diskussion',
             'en': u'Index talk',
             'fr': u'Discussion Portail',
+            'mr': u'सूची चर्चा',
             'pl': u'Dyskusja portalu',
             'pt': u'Rimas Discussão',
             'ru': [u'Обсуждение индекса', u'Index talk'],

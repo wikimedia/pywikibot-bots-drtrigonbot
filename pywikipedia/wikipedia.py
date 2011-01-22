@@ -120,7 +120,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 8815 2010-12-31 10:39:50Z xqt $'
+__version__ = '$Id: wikipedia.py 8864 2011-01-21 05:52:42Z purodha $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -1540,7 +1540,7 @@ not supported by PyWikipediaBot!"""
         if the user cannot do that.
 
         Parameters:
-        * action - the action done, which is the name of the right
+        * action - the action to be done, which is the name of the right
         * restriction - the restriction level or an empty string for no restriction
         * sysop - initially use sysop user?
         """

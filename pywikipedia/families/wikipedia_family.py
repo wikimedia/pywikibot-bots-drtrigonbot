@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikipedia_family.py 8821 2011-01-06 22:01:33Z xqt $'
+__version__ = '$Id: wikipedia_family.py 8868 2011-01-21 08:24:25Z xqt $'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 
@@ -12,32 +12,32 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'de', 'fr', 'pl', 'it', 'ja', 'es', 'pt', 'nl', 'ru', 'sv',
-            'zh', 'ca', 'no', 'fi', 'uk', 'cs', 'hu', 'ro', 'tr', 'ko', 'vi',
+            'zh', 'ca', 'no', 'fi', 'uk', 'cs', 'hu', 'ro', 'ko', 'tr', 'vi',
             'id', 'da', 'ar', 'eo', 'sr', 'lt', 'sk', 'vo', 'fa', 'he', 'bg',
-            'sl', 'war', 'ms', 'hr', 'et', 'new', 'hi', 'simple', 'gl', 'th',
-            'eu', 'nn', 'roa-rup', 'el', 'ht', 'az', 'la', 'tl', 'te', 'ka',
-            'mk', 'ceb', 'sh', 'br', 'mr', 'pms', 'lv', 'lb', 'jv', 'be-x-old',
+            'sl', 'ms', 'war', 'hr', 'et', 'new', 'simple', 'hi', 'gl', 'th',
+            'eu', 'nn', 'roa-rup', 'el', 'ht', 'az', 'tl', 'la', 'te', 'ka',
+            'mk', 'ceb', 'sh', 'br', 'pms', 'mr', 'lv', 'lb', 'jv', 'be-x-old',
             'cy', 'is', 'bs', 'sq', 'ta', 'be', 'bpy', 'an', 'oc', 'bn', 'sw',
-            'io', 'fy', 'lmo', 'gu', 'nds', 'af', 'qu', 'ml', 'scn', 'ku', 'ur',
-            'su', 'zh-yue', 'ast', 'nap', 'bat-smg', 'hy', 'yo', 'ga', 'cv',
-            'wa', 'ksh', 'ne', 'pnb', 'kn', 'tg', 'roa-tara', 'vec', 'yi', 'gd',
-            'tt', 'zh-min-nan', 'uz', 'os', 'pam', 'sah', 'als', 'arz', 'kk',
+            'io', 'lmo', 'fy', 'gu', 'af', 'nds', 'ml', 'qu', 'scn', 'ur', 'ku',
+            'zh-yue', 'su', 'ast', 'nap', 'bat-smg', 'hy', 'yo', 'ga', 'cv',
+            'wa', 'ne', 'ksh', 'pnb', 'kn', 'tg', 'roa-tara', 'vec', 'yi', 'gd',
+            'tt', 'zh-min-nan', 'os', 'uz', 'als', 'pam', 'sah', 'kk', 'arz',
             'mi', 'li', 'am', 'nah', 'hsb', 'glk', 'co', 'gan', 'mn', 'sco',
-            'ia', 'bcl', 'my', 'fo', 'fiu-vro', 'si', 'nds-nl', 'tk', 'vls',
-            'sa', 'bar', 'mg', 'gv', 'ilo', 'dv', 'nrm', 'pag', 'map-bms', 'rm',
-            'ckb', 'diq', 'se', 'mzn', 'wuu', 'fur', 'ug', 'lij', 'mt', 'bh',
-            'nov', 'bo', 'ang', 'csb', 'sc', 'zh-classical', 'hif', 'km', 'lad',
-            'cbk-zam', 'pi', 'frp', 'ps', 'hak', 'kw', 'pa', 'nv', 'szl', 'xal',
-            'pdc', 'haw', 'stq', 'ie', 'kv', 'so', 'crh', 'to', 'ace', 'myv',
-            'mhr', 'krc', 'pcd', 'ln', 'ext', 'gn', 'ky', 'eml', 'arc', 'ay',
-            'jbo', 'wo', 'bjn', 'frr', 'pap', 'kl', 'ba', 'tpi', 'kab', 'ty',
-            'ce', 'udm', 'zea', 'srn', 'mrj', 'koi', 'dsb', 'ig', 'ab', 'or',
-            'rw', 'gag', 'kg', 'lo', 'av', 'mdf', 'mwl', 'rmy', 'cu', 'kaa',
-            'sm', 'tet', 'got', 'ks', 'bm', 'ik', 'sd', 'bi', 'lbe', 'na',
-            'pih', 'iu', 'pnt', 'chr', 'as', 'ss', 'pfl', 'cdo', 'ha', 'ee',
-            'ti', 'zu', 'om', 'za', 've', 'ts', 'rn', 'dz', 'sg', 'cr', 'ch',
-            'lg', 'bug', 'bxr', 'fj', 'xh', 'ak', 'st', 'ny', 'tn', 'ff', 'ki',
-            'sn', 'tum', 'tw', 'chy',
+            'ia', 'bcl', 'my', 'fo', 'fiu-vro', 'nds-nl', 'si', 'tk', 'vls',
+            'sa', 'bar', 'mg', 'gv', 'ilo', 'dv', 'nrm', 'pag', 'map-bms',
+            'ckb', 'rm', 'diq', 'se', 'mzn', 'wuu', 'fur', 'ug', 'lij', 'mt',
+            'bh', 'nov', 'bo', 'ang', 'csb', 'sc', 'zh-classical', 'hif', 'km',
+            'lad', 'cbk-zam', 'pi', 'frp', 'ps', 'hak', 'kw', 'pa', 'nv', 'szl',
+            'xal', 'pdc', 'haw', 'stq', 'ie', 'so', 'kv', 'crh', 'to', 'ace',
+            'mhr', 'pcd', 'myv', 'krc', 'ln', 'ext', 'gn', 'ky', 'eml', 'rw',
+            'arc', 'pap', 'ay', 'jbo', 'wo', 'bjn', 'ba', 'frr', 'ce', 'kl',
+            'tpi', 'udm', 'kab', 'ty', 'srn', 'zea', 'mrj', 'gag', 'koi', 'dsb',
+            'ab', 'ig', 'or', 'lo', 'kg', 'av', 'mdf', 'mwl', 'rmy', 'cu',
+            'kaa', 'sm', 'tet', 'got', 'ks', 'bm', 'ik', 'sd', 'bi', 'lbe',
+            'na', 'pih', 'iu', 'pnt', 'as', 'chr', 'cdo', 'ss', 'pfl', 'ha',
+            'ee', 'ti', 'om', 'zu', 'za', 've', 'ts', 'rn', 'dz', 'sg', 'cr',
+            'ch', 'lg', 'bug', 'bxr', 'fj', 'ny', 'ak', 'st', 'xh', 'tn', 'ff',
+            'ki', 'tum', 'sn', 'tw', 'chy',
         ]
 
         if family.config.SSL_connection:

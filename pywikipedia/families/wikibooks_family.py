@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikibooks_family.py 8821 2011-01-06 22:01:33Z xqt $'
+__version__ = '$Id: wikibooks_family.py 8868 2011-01-21 08:24:25Z xqt $'
 
 # The Wikimedia family that is known as Wikibooks
 
@@ -13,12 +13,12 @@ class Family(family.Family):
         self.languages_by_size = [
             'en', 'de', 'fr', 'ja', 'hu', 'pt', 'nl', 'es', 'pl', 'it', 'he',
             'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'zh', 'hr', 'sv', 'tr', 'da',
-            'id', 'th', 'mk', 'ko', 'sr', 'fa', 'tl', 'gl', 'ar', 'is', 'no',
-            'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'uk', 'si', 'li',
-            'la', 'tt', 'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'az', 'ur', 'oc',
-            'ml', 'ms', 'eu', 'hi', 'fy', 'ie', 'tg', 'af', 'bn', 'hy', 'pa',
+            'id', 'th', 'mk', 'ko', 'fa', 'sr', 'tl', 'gl', 'ar', 'is', 'no',
+            'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'uk', 'el', 'si', 'li',
+            'tt', 'la', 'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'az', 'ur', 'oc',
+            'ml', 'ms', 'bn', 'eu', 'hi', 'fy', 'ie', 'tg', 'af', 'hy', 'pa',
             'te', 'sa', 'bs', 'ky', 'be', 'ne', 'ast', 'zh-min-nan', 'mg', 'cy',
-            'ku', 'co', 'tk', 'su', 'uz', 'vo', 'kk', 'mn', 'my',
+            'ku', 'co', 'tk', 'su', 'uz', 'vo', 'mn', 'kk', 'my',
         ]
 
         if family.config.SSL_connection:

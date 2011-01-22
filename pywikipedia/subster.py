@@ -196,9 +196,9 @@ class SubsterBot(dtbext.basic.BasicBot):
 		diff = difflib.Differ().compare(content.splitlines(1), substed_content.splitlines(1))
 		diff = [ line for line in diff if line[0].strip() ]
 		pywikibot.output(u'Diff:')
-		pywikibot.output(u'--- ' * 10)
+		pywikibot.output(u'--- ' * 15)
 		pywikibot.output(u''.join(diff))
-		pywikibot.output(u'--- ' * 10)
+		pywikibot.output(u'--- ' * 15)
 
 	def get_var_regex(self, var, cont='.*?'):
 		"""Get regex used/needed to find the tags to replace.

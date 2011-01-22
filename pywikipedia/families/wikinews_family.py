@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikinews_family.py 8816 2010-12-31 12:49:51Z xqt $'
+__version__ = '$Id: wikinews_family.py 8868 2011-01-21 08:24:25Z xqt $'
 
 # The Wikimedia family that is known as Wikinews
 
@@ -13,7 +13,7 @@ class Family(family.Family):
         self.languages_by_size = [
             'sr', 'en', 'pl', 'de', 'fr', 'it', 'pt', 'es', 'zh', 'ja', 'sv',
             'ru', 'ta', 'fi', 'cs', 'he', 'ro', 'bg', 'ar', 'hu', 'sd', 'uk',
-            'no', 'tr', 'ca', 'fa', 'bs', 'th', 'eo', 'ko',
+            'tr', 'no', 'ca', 'fa', 'bs', 'th', 'ko', 'eo',
         ]
 
         if family.config.SSL_connection:
@@ -154,6 +154,7 @@ class Family(family.Family):
         self.namespaces[102] = {
             'ar': u'تعليقات',
             'bg': u'Мнения',
+            'ca': u'Secció',
             'de': u'Meinungen',
             'en': u'Comments',
             'fa': u'نظرها',
@@ -167,6 +168,7 @@ class Family(family.Family):
         self.namespaces[103] = {
             'ar': u'نقاش التعليقات',
             'bg': u'Мнения беседа',
+            'ca': u'Secció Discussió',
             'de': u'Meinungen Diskussion',
             'en': u'Comments talk',
             'fa': u'بحث نظرها',
@@ -188,11 +190,13 @@ class Family(family.Family):
         self.namespaces[106] = {
             'fr': u'Dossier',
             'no': u'Portal',
+            'tr': u'Yorum',
         }
 
         self.namespaces[107] = {
             'fr': u'Discussion Dossier',
             'no': u'Portal-diskusjon',
+            'tr': u'Yorum tartışma',
         }
 
         self.namespaces[108] = {

@@ -839,7 +839,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 		(buf, count) = self.pages.parse_news(self._param)
 		if (count > 0):
-			pywikibot.output(u'='*50 + u'\n' + buf + u'\n' + u'='*50)
+			pywikibot.output(u'===='*15 + u'\n' + buf + u'\n' + u'===='*15)
 			pywikibot.output(u'[%i entries]' % count )
 
 			if 'write2wiki' in debug:
