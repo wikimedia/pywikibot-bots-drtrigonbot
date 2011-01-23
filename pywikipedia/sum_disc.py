@@ -592,22 +592,23 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 		check_list = self._param['checkedit_list']
 
-		userbacklicksList = []
+		userbacklinksList = []
 		for item in self._param['backlinks_list']:
 			page = pywikibot.Page(self.site, item)		# important for the generator to use the API
-			#userbacklicksList += [p.title() for p in pagegenerators.ReferringPageGenerator(page, withTemplateInclusion=False)]
-			userbacklicksList += [p.title() for p in page.getReferences(withTemplateInclusion=False)]
-		userbacklicksList = list(set(userbacklicksList))	# drop duplicates
+			#userbacklinksList += [p.title() for p in pagegenerators.ReferringPageGenerator(page, withTemplateInclusion=False)]
+			userbacklinksList += [p.title() for p in page.getReferences(withTemplateInclusion=False)]
+		userbacklinksList = list(set(userbacklinksList))	# drop duplicates
 
 		work = {}
 		count = 0
 		# (some return >> 500 backlinks, thus check
 		# only once a week ALL those, else limit)
-		if (self._wday == 0):
-			max_count = len(userbacklicksList)
+		#if (self._wday == 0):
+		if (self._wday == 6): # So
+			max_count = len(userbacklinksList)
 		else:
 			max_count = 500
-		for item in userbacklicksList:
+		for item in userbacklinksList:
 			count += 1
 
 			# drop the rest if limited
@@ -625,7 +626,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 					work[name] = page
 					break		# should only match one of the possibilities, anyway just add it once!
 
-		pywikibot.output(u'\03{lightpurple}*** %i Backlinks to user checked (limited to %i)\03{default}' % (len(userbacklicksList), max_count))
+		pywikibot.output(u'\03{lightpurple}*** %i Backlinks to user checked (limited to %i)\03{default}' % (len(userbacklinksList), max_count))
 
 		# feed data to pages
 		self.pages.update_work(work)
@@ -1298,7 +1299,10 @@ def main():
 			else:
 				pywikibot.showHelp()
 				return
-	bot.run()
+	try:
+		bot.run()
+	except KeyboardInterrupt:
+		pywikibot.output('\nQuitting program...')
 
 if __name__ == "__main__":
     try:

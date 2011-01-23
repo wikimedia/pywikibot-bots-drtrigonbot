@@ -80,7 +80,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__  = '$Id$'
-__revision__ = '8871'
+__revision__ = '8881'
 #
 
 # wikipedia-bot imports
