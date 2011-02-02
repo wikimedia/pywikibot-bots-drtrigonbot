@@ -1,0 +1,10 @@
+/**
+ * Toolserver notice
+ * according to https://wiki.toolserver.org/view/Toolserver_notice
+ */
+
+#tsnotice {
+    border: 1px solid silver;
+    background: lightyellow;
+    padding: 3px;
+}

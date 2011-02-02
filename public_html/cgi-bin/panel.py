@@ -1,149 +1,103 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Test CGI python script
+"""DrTrigon Bot status panel (CGI) for toolserver
 
-to make it usable from server, use: 'chmod 755 test.py', which results in
+to make it usable from server, use: 'chmod 755 panel.py', which results in
 '-rwxr-xr-x 1 drtrigon users 447 2009-04-16 19:13 test.py'
 """
 # http://www.gpcom.de/support/python
 
+## @package panel.py
+#  @brief   DrTrigon Bot status panel for toolserver
 #
-# (C) Dr. Trigon, 2008, 2009
+#  @copyright Dr. Trigon, 2008-2010
 #
-# Distributed under the terms of the MIT license.
-# (is part of DrTrigonBot-"framework")
+#  @section FRAMEWORK
 #
-# keep the version of 'clean_sandbox2.py', 'new_user.py', 'runbotrun.py', 'replace_tmpl.py', ... (and others)
-# up to date with this:
-# Versioning scheme: A.B.CCCC
-#  CCCC: beta, minor/dev relases, bugfixes, daily stuff, ...
-#  B: bigger relases with tidy code and nice comments
-#  A: really big release with multi lang. and toolserver support, ready
-#     to use in pywikipedia framework, should also be contributed to it
+#  Python wikipedia robot framework, DrTrigonBot.
+#  @see http://pywikipediabot.sourceforge.net/
+#  @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+#
+#  @section LICENSE
+#
+#  Distributed under the terms of the MIT license.
+#  @see http://de.wikipedia.org/wiki/MIT-Lizenz
+#
 __version__='$Id$'
 #
 
 
-# debug
-import cgitb
-cgitb.enable()
-
+# === python CGI script === === ===
+#
+import cgitb    # debug
+cgitb.enable()  #
 
 import cgi
+
+
+# === module imports === === ===
+#
 from time import *
 # http://www.ibm.com/developerworks/aix/library/au-python/
-import commands, os, errno
-#import subprocess
-import re
+import os, re, sys, copy
 
 #import Image,ImageDraw
 import matplotlib.pyplot as plt
 import cStringIO
 
 
-footer = """<small>DrTrigonBot status panel, written by <a href="https://wiki.toolserver.org/view/User:DrTrigon">DrTrigon</a>. 
-<!-- <img src="https://wiki.toolserver.org/w/images/e/e1/Wikimedia_Community_Logo-Toolserver.png" 
-width="16" height="16" alt="Toolserver"> -->
-<a href="http://tools.wikimedia.de/"><img 
-src="https://wiki.toolserver.org/favicon.ico" border="0" 
-alt="Toolserver"> Powered by Wikimedia Toolserver</a>.
-<a href="http://de.selfhtml.org/index.htm"><img 
-src="http://de.selfhtml.org/src/favicon.ico" border="0" width="16" 
-height="16" alt="SELFHTML"> Thanks to SELFHTML</a>.
-"""
-footer_w3c = """<a href="http://validator.w3.org/check?uri=referer"><img 
-src="http://www.w3.org/Icons/valid-html401-blue" 
-alt="Valid HTML 4.01 Transitional" height="16" width="44" 
-border="0"></a></small>
-<small><a href="http://toolserver.org/~daniel/stats/">stat</a> /
-<a href="http://toolserver.org/~daniel/stats/url_201007.html">url</a>
-<a href="http://munin.toolserver.org/index.html">.</a></small>
-</span></p>
+# === panel HTML stylesheets === === ===
+#
+#import ps_plain as style   # panel-stylesheet 'plain'
+#import ps_simple as style  # panel-stylesheet 'simple'
+#import ps_wiki as style    # panel-stylesheet 'wiki (monobook)'
+import ps_wikinew as style # panel-stylesheet 'wiki (new)' not CSS 2.1 compilant
+
+
+# === footer HTML codes === === ===
+#
+footer = \
+"""<small>DrTrigonBot status panel, written by <a href="https://wiki.toolserver.org/view/User:DrTrigon">DrTrigon</a> 
+(<a href="http://toolserver.org/~daniel/stats/">stat</a> /
+<a href="http://toolserver.org/~daniel/stats/url_201007.html">url</a> /
+<a href="http://munin.toolserver.org/index.html">info</a>).
+<img src="https://wiki.toolserver.org/favicon.ico" border="0" 
+alt="Toolserver"> <a href="http://tools.wikimedia.de/">Powered by Wikimedia Toolserver</a>.
+<img src="http://de.selfhtml.org/src/favicon.ico" border="0" width="16" 
+height="16" alt="SELFHTML"> <a href="http://de.selfhtml.org/index.htm">Thanks to SELFHTML</a>.</small>
 """
 # with preprocessed (by daniel) statistics from '/mnt/user-store/stats/'
 
-displaystate_content = """Content-Type: text/html
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-  <title>DrTrigonBot status panel</title>
-  <meta http-equiv="refresh" content="15">
-</head>
-<body>
-<p><span style="font-family:sans-serif">
-DrTrigonBot status panel<br><br><br>
-Actual state: <img src="%(botstate)s" width="15" height="15" alt="Botstate"><br><br>
+footer_w3c = \
+"""<small>
+<a href="http://validator.w3.org/check?uri=referer"><img 
+src="http://www.w3.org/Icons/valid-html401-blue" 
+alt="Valid HTML 4.01 Transitional" height="16" width="44" 
+border="0"></a>
+</small>"""
+
+footer_w3c_css = \
+"""<small>
+<a href="http://jigsaw.w3.org/css-validator/check/referer">
+    <img style="border:0;width:44px;height:16px"
+        src="http://jigsaw.w3.org/css-validator/images/vcss-blue"
+        alt="CSS ist valide!">
+</a>
+</small>"""
+
+
+# === page HTML contents === === ===
+#
+displaystate_content = \
+"""Actual state: <img src="%(botstate)s" width="15" height="15" alt="Botstate"><br><br>
 Time now: %(time)s<br><br>
+
 <a href="%(loglink)s">Latest</a> bot status message log: <b>%(botlog)s</b><br><br>
 <a href="%(oldlink)s">Old log</a> files: <i>%(oldlog)s</i><br><br>
-See also <a href="%(logstat)s">log statistics</a> <small>(also available in <a href="%(logstatraw)s">raw/plain format</a>)</small>.<br><br>
-%(footer)s
-</body>
-</html>
-"""
+See also <a href="%(logstat)s">log statistics</a> <small>(also available in <a href="%(logstatraw)s">raw/plain format</a>)</small>.<br><br>"""
 
-adminlogs_content = """Content-Type: text/html
-<html>
-<head>
-  <title>DrTrigonBot log admin panel</title>
-</head>
-<body>
-<p><span style="font-family:sans-serif">
-DrTrigonBot log admin panel<br><br><br>
-Log file count: %(logcount)s<br>
-<p>%(message)s</p>
-<form action="panel.py">
-  <input type="hidden" name="action" value="adminlogs">
-  <p>
-    %(oldloglist)s
-  </p>
-  <input type="submit" value=" Delete ">
-  <input type="reset" value=" Reset ">
-</form>
-</span></p>
-</body>
-</html>
-"""
-
-adminhist_content = """Content-Type: text/html
-<html>
-<head>
-  <title>DrTrigonBot history admin panel</title>
-</head>
-<body>
-<p><span style="font-family:sans-serif">
-DrTrigonBot history admin panel<br><br><br>
-History file count: %(histcount)s<br>
-History file size: %(histsize)s<br>
-<p>%(message)s</p>
-<form action="panel.py">
-  <input type="hidden" name="action" value="adminhist">
-  <p>
-    <input type="checkbox" name="compresshistory" value="True">compress history<br>
-  </p>
-  <input type="submit" value=" Delete ">
-  <input type="reset" value=" Reset ">
-</form>
-</span></p>
-</body>
-</html>
-"""
-
-logstat_content = """Content-Type: text/html
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-  <title>DrTrigonBot log statistics</title>
-</head>
-<body>
-<p><span style="font-family:sans-serif">
-DrTrigonBot log statistics<br><br>
-<br>
-Evaluated data period from %(start_date)s to %(end_date)s.<br>
+logstat_content = \
+"""Evaluated data period from %(start_date)s to %(end_date)s.<br>
 <br>
 <table>
 <tr><td>Total runs:</td><td>%(run_count)s</td></tr>
@@ -155,16 +109,27 @@ History compressed: %(histcomp_count)s (times)<br>
 <br>
 Problem rate (in %%):<br>
 %(reliability)s<br>
-<a href="panel.py?action=logstat&format=graph"><img src="panel.py?action=logstat&format=graph"></a><br>
+<a href="%(graphlink)s"><img src="%(graphlink)s"></a><br>
 <br>
 Warnings (%(warn_total)s distilled to %(warn_dist)s):<br>
 %(warnings)s<br>
-<br>
-%(footer)s
-</body>
-</html>
-"""
+<br>"""
 
+adminlogs_content = \
+"""Log file count: %(logcount)s<br>
+<p>%(message)s</p>
+<form action="panel.py">
+  <input type="hidden" name="action" value="adminlogs">
+  <p>
+    %(oldloglist)s
+  </p>
+  <input type="submit" value=" Delete ">
+  <input type="reset" value=" Reset ">
+</form>"""
+
+
+# === external (wiki) status links === === ===
+#
 botstate_img = {#'green':	'http://upload.wikimedia.org/wikipedia/commons/3/3c/ButtonGreen.svg',
 		'green':	'http://upload.wikimedia.org/wikipedia/commons/6/65/ButtonGreen.png',
 		#'orange':	'http://upload.wikimedia.org/wikipedia/commons/b/b0/ButtonYellow.svg',
@@ -173,13 +138,20 @@ botstate_img = {#'green':	'http://upload.wikimedia.org/wikipedia/commons/3/3c/Bu
 		'red':		'http://upload.wikimedia.org/wikipedia/commons/6/65/ButtonRed.png',
 		}
 
-bottimeout = 24
+html_color = {	'green':	'#00ff00',
+		'orange':	'#ffff00',
+		'red':		'#ff0000',
+		}
 
+
+# === bot status surveillance === === ===
+#
+bottimeout = 24
 botdonemsg = 'DONE.'
 
-X,Y = 500, 275			# image width and height
 
-
+# === functions === === ===
+#
 def oldlogfiles(all=False):
 	#localdir = os.path.dirname('../DrTrigonBot/')
 	localdir = os.path.dirname(os.path.join('..','DrTrigonBot','.'))
@@ -196,6 +168,8 @@ def oldlogfiles(all=False):
 	return (localdir, files, log)
 
 #def graph(xdata, xscale=1, xticks=10, xmajor=5, yscale=1, yticks=10, ymajor=1):
+#	X,Y = 500, 275			# image width and height
+#
 #	img = Image.new("RGB", (X,Y), "#FFFFFF")
 #	draw = ImageDraw.Draw(img)
 #
@@ -226,6 +200,7 @@ def oldlogfiles(all=False):
 #	#output to browser
 #	return "Content-type: image/png\n\n" + f.read()
 
+# http://www.scipy.org/Cookbook/Matplotlib/Using_MatPlotLib_in_a_CGI_script
 def graph(xdata, *args, **kwargs):
 	fig = plt.figure(figsize=(10,4))
 	ax = fig.add_subplot(111)
@@ -243,109 +218,111 @@ def graph(xdata, *args, **kwargs):
 	#output to browser
 	return "Content-type: image/png\n\n" + f.read()
 
+# https://wiki.toolserver.org/view/Toolserver_notice
+# http://toolserver.org/sitenotice
+# http://www.mail-archive.com/toolserver-l@lists.wikimedia.org/msg01679.html
+def print_tsnotice():
+	try:
+		notice = open('/var/www/sitenotice', 'r').read()
+		if notice:
+			return style.tsnotice % { 'text': notice }
+	except IOError:
+		pass
+	return ''
 
-def displaystate():
-	#print("Content-Type: text/html\n")
-	#
-	#print("<html>\n")
-	#print("<head><title>Test-Seite</title></head>\n")
-	#print("<body>\n")
-	#print("Willkommen<br><br>\n")
-	#print("Jetzt: " + asctime(localtime(time())) + "<br>\n")
-	##print( commands.getoutput("ls -l") )
-	#print( commands.getoutput("ps aux | grep python") )
-	##print( subprocess.call(["ls", "-l"]) )		# oder auch 'os.system(...)'
-	#print("</body>\n")
-	#print("</html>\n")
 
-	#buffer = commands.getoutput("ps aux | grep python")
-	##buffer = commands.getoutput("ps --pid 25801")
-	#buffer = re.sub('\n','<br>\n',buffer)
+# === CGI/HTML page view user interfaces === === ===
+#
+def displaystate(form):
+	data = {}
 
-	(localdir, files, log) = oldlogfiles()
+	(localdir, files, data['loglink']) = oldlogfiles()
 
-	b = file(log, "r")
+	b = file(data['loglink'], "r")
 	d = b.readlines()
 	b.close()
 
-	#buffer = os.path.join(localdir, log) + str(b.readlines())
+	#buffer = os.path.join(localdir, data['loglink']) + str(b.readlines())
 
 	d.reverse()
 
-	c = ""
+	data['botlog'] = ""
 	for item in d:
-	    try:    c = re.split(':: ', item)[-1].strip()
+	    try:    data['botlog'] = re.split(':: ', item)[-1].strip()
 	    except: pass
-	    if c: break
+	    if data['botlog']: break
 
-	#buffer = c +"\n"+ str(files)
+	#buffer = data['botlog'] +"\n"+ str(files)
 
 	files = [str(item)+".log" for item in files]
 	files.sort()
 	buf = ", "
 
-	lastrun = (time() - os.stat(log).st_mtime)/(60*60)
+	lastrun = (time() - os.stat(data['loglink']).st_mtime)/(60*60)
+	botmsg = data['botlog'][-len(botdonemsg):]
 	if (lastrun > ((bottimeout*5)/4)):
-		botstate = botstate_img['red']
-	elif (lastrun > bottimeout) or (not (c[-len(botdonemsg):] == botdonemsg)):
-		botstate = botstate_img['orange']
+		data['botstate'] = botstate_img['red']
+		color = html_color['red']
+	#elif (lastrun > bottimeout) or (not (data['botlog'][-len(botdonemsg):] == botdonemsg)):
+	elif (lastrun > bottimeout) or (not (botmsg == botdonemsg)):
+		data['botstate'] = botstate_img['orange']
+		color = html_color['orange']
 	else:
-		botstate = botstate_img['green']
+		data['botstate'] = botstate_img['green']
+		color = html_color['green']
 
-	data = {'time':		asctime(localtime(time())),
-		'botlog':	c,
-		'oldlog':	buf.join(files),
-		'loglink':	log,
-		'oldlink':	r"http://toolserver.org/~drtrigon/DrTrigonBot/",
-		'botstate':	botstate,
-		'logstat':	r"panel.py?action=logstat",
-		'logstatraw':	r"panel.py?action=logstat&amp;format=plain",
-		'footer':	footer + footer_w3c,
-	}
+	data.update({	'time':		asctime(localtime(time())),
+			'oldlog':	buf.join(files),
+			'oldlink':	r"http://toolserver.org/~drtrigon/DrTrigonBot/",
+			'logstat':	sys.argv[0] + r"?action=logstat",
+			'logstatraw':	sys.argv[0] + r"?action=logstat&amp;format=plain",
+			'refresh':	'15',
+			'title':	'DrTrigonBot status panel',
+			'tsnotice': 	print_tsnotice(),
+			#'content':	displaystate_content,
+			'p-status':	"<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': color, 'bot': 'all:', 'state': botmsg[:-1]},
+			#'footer': 	footer + footer_w3c + footer_w3c_css,
+			'footer': 	footer + footer_w3c, # wiki (new) not CSS 2.1 compilant
+	})
+	data['content'] = displaystate_content % data
 
-	return displaystate_content % data
+	return style.page % data
 
 def adminlogs(form):
+	data = {}
+
 	filelist = form.getvalue('filelist', [])
 	if type(filelist) == type(''): filelist = [filelist]
 
-	msg = ''
+	data['message'] = ''
 
 	(localdir, files, log) = oldlogfiles()
 	files_str = map(str, files)
 
 	if (len(filelist) > 0):
-		msg = []
+		data['message'] = []
 		for item in filelist:
 			if (item in files_str): os.remove( os.path.join(localdir, str(item)+".log") )
-			else: msg.append( 'Warning: "%s" is NOT a log file! Nothing done.' % item )
+			else: data['message'].append( 'Warning: "%s" is NOT a log file! Nothing done.' % item )
 			#pass
-		msg.append( '%i log file(s) deleted.' % (len(filelist)-len(msg)) )
-		msg = '<br>\n'.join(msg)
+		data['message'].append( '%i log file(s) deleted.' % (len(filelist)-len(data['message'])) )
+		data['message'] = '<br>\n'.join(data['message'])
 		(localdir, files, log) = oldlogfiles()
 
 	checkbox_tmpl = '<input type="checkbox" name="filelist" value="%(datei)s">%(datei)s<br>'
 
 	buf = '\n'
 	files.sort()
-	data = {'oldloglist':	buf.join([checkbox_tmpl % {'datei':item} for item in files[:-5]]),
-		'logcount':	len(files),
-		#'message':	filelist,
-		'message':	msg,
-	}
+	data.update({	'oldloglist':	buf.join([checkbox_tmpl % {'datei':item} for item in files[:-5]]),
+			'logcount':	len(files),
+			'refresh':	'',
+			'title':	'DrTrigonBot log admin panel',
+			'tsnotice': 	'',
+			'content':	adminlogs_content,
+			'footer': 	'',
+	})
 
-	return adminlogs_content % data
-
-def adminhist(form):
-	compresshistory = form.getvalue('compresshistory', False)
-
-	# %(histcount)s<br>
-	# %(histsize)s<br>
-	# %(message)s</p>
-	# <input type="checkbox" name="compresshistory" value="True">compress history<br>
-
-	#return adminhist_content % data
-	return ''
+	return (style.admin_page % data) % data
 
 def logstat(form):
 	format = form.getvalue('format', 'html')
@@ -396,43 +373,37 @@ def logstat(form):
 	stat['warn_dist'] = len(stat['warn_list'])
 	stat['warn_list'].sort()
 
-	#data = {'start_date':		str(asctime(strptime(files[0], "%Y%m%d.log"))),
-	#	'end_date':		str(asctime(strptime(files[-1], "%Y%m%d.log") )),
-	data = {'start_date':		str(strftime("%a %b %d %Y", stat['start_date'])),
+	data = copy.deepcopy(stat)
+	data.update({'start_date':		str(strftime("%a %b %d %Y", stat['start_date'])),
 		'end_date':		str(strftime("%a %b %d %Y", stat['end_date'])),
-		'successful_count':	stat['successful_count'],
-		'run_count':		stat['run_count'],
 		'run_diff':		(int(stat['run_count']) - int(stat['successful_count'])),
-		'histcomp_count':	stat['histcomp_count'],
 		'reliability':		[ "%.2f" % (100*item[1]) for item in stat['reliability_list'] ],
-		'warn_total':		stat['warn_total'],
-		'warn_dist':		stat['warn_dist'],
 		'warnings':		"<br>".join(stat['warn_list']),
-		'footer':		footer,
-	}
+		'graphlink':		sys.argv[0] + r"?action=logstat&format=graph",
+	})
 
-
-	# http://www.scipy.org/Cookbook/Matplotlib/Using_MatPlotLib_in_a_CGI_script
 
 	if (format == 'plain'): return "Content-Type: text/plain\n\n%s" % str(stat)
 	if (format == 'graph'):
 		xdata = [ item[1]*100 for item in stat['reliability_list'] ]
 		return graph(xdata, xscale=3, xticks=10, xmajor=1, yscale=4, yticks=10, ymajor=1)
 
-	return logstat_content % data
+	data.update({	'refresh':	'',
+			'title':	'DrTrigonBot log statistics',
+			'tsnotice': 	print_tsnotice(),
+			#'content':	logstat_content,
+                        'p-status':     '',
+			'footer': 	footer,
+	})
+	data['content'] = logstat_content % data
+
+	return style.page % data
 
 
+# === Main procedure entry point === === ===
+#
 form = cgi.FieldStorage()
 
 # operational mode
-action = form.getvalue('action', '')
-if action == 'logstat':
-	html = logstat(form)
-elif action == 'adminlogs':
-	html = adminlogs(form)
-#elif action == 'adminhist':
-#	html = adminhist(form)
-else:
-	html = displaystate()
-
-print html
+action = form.getvalue('action', 'displaystate')
+print locals()[action](form)
