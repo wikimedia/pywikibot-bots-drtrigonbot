@@ -107,21 +107,22 @@ class SubsterBot(dtbext.basic.BasicBot):
 
 			if not params: continue
 
-			substed_content = self.subContent(content, params)
+			(substed_content, substed_tags) = self.subContent(content, params)
 
 			# output result to page or return directly
 			if sim:
 				return substed_content
 			else:
 				# if changed, write!
-				if (substed_content != content):
+				#if (substed_content != content):
+				if substed_tags:
 					self.outputContentDiff(content, substed_content)
 
 					if debug:
 						pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
 						continue
 
-					self.save(page, substed_content, u'Bot: substituting changed tags.')
+					self.save(page, substed_content, u'Bot: substituting %s tags.' % (", ".join(substed_tags)))
 				else:
 					pywikibot.output(u'NOTHING TO DO!')
 
@@ -133,10 +134,12 @@ class SubsterBot(dtbext.basic.BasicBot):
 		   @param params: Params with data how to substitute tags.
 		   @type  params: dict
 
-		   Returns the new content with tags substituted.
+		   Returns a tuple containig the new content with tags
+		   substituted and a list of those tags.
 		"""
 
 		substed_content = content
+		substed_tags = []  # DRTRIGON-73
 		for item in params:
 			# 1.) getUrl or wiki text
 			if eval(item['wiki']):
@@ -174,14 +177,17 @@ class SubsterBot(dtbext.basic.BasicBot):
 			#print external_data
 
 			# 5.) subst content
+			prev_content = substed_content
 			substed_content = var_regex.sub((self._var_regex_str%{'var':item['value'],'cont':external_data}), substed_content, int(item['count']))
+			if (substed_content != prev_content):
+				substed_tags.append(item['value'])
 
 			# 6.) subst (internal) magic words
 			for subitem in magic_words.keys():
 				substed_content = self.get_var_regex(subitem).sub( (self._var_regex_str%{'var':subitem,'cont':magic_words[subitem]}),
 										   substed_content)
 
-		return substed_content
+		return (substed_content, substed_tags)
 
 	def outputContentDiff(self, content, substed_content):
 		"""Outputs the diff between the original and the new content.

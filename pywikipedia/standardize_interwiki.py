@@ -13,7 +13,7 @@ Parameters:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: standardize_interwiki.py 8630 2010-10-09 19:32:57Z xqt $'
+__version__='$Id: standardize_interwiki.py 8898 2011-01-27 12:26:47Z xqt $'
 #
 
 import os, sys
@@ -31,6 +31,7 @@ comment = {
     'he':u'בוט: מסדר את האינטרוויקי',
     'it':u'Bot: Standardizzo interwiki',
     'ja':u'ロボットによる: 言語間リンクを標準化',
+    'ml':u'യന്ത്രം: അന്തർവിക്കി ക്രമവൽക്കരണം',
     'nl':u'Bot: standaardisatie interwikiverwijzingen',
     'no':u'bot: Språklenkestandardisering',
     'ksh':u'Bot: Engerwiki Lengks opprüühme',

@@ -60,7 +60,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: redirect.py 8860 2011-01-18 20:19:10Z xqt $'
+__version__='$Id: redirect.py 8904 2011-01-27 20:43:40Z xqt $'
 #
 import re, sys, datetime
 import wikipedia as pywikibot
@@ -72,23 +72,31 @@ import xmlreader
 msg_double={
     'af': u'Robot: dubbele aanstuur na %(to)s reggemaak',
     'als': u'Bötli: Uflösig vun de doppleti Wyterleitig zue %(to)s',
-    'ar': u'روبوت: تصليح تحويلة مزدوجة → %(to)s',
+    'ar': u'بوت: تصليح تحويلة مزدوجة إلى %(to)s',
     'bat-smg': u'Robots: Taisuoms dvėgobs paradresavėms → %(to)s',
+    'be-tarask': u'Робат: выпраўленьне падвойнага перанакіраваньня на %(to)s',
     'be-x-old': u'Робат: выпраўленьне падвойнага перанакіраваньня → %(to)s',
     'bjn': u'Robot: Pamasangan paugahan ganda ka %(to)s',
+    'bn': u'বট: %(to)s-এ দ্বিপুনর্নির্দেশনা ঠিক করছে',
     'br': u'Kempennet adkas doubl gant robot → %(to)s',
     'bs': u'Bot: Popravlja dvostruka preusmjerenja na %(to)s',
     'cs': u'Robot opravil dvojité přesměrování → %(to)s',
     'de': u'Bot: Korrigiere doppelte Weiterleitung auf %(to)s',
+    'el': u'Ρομπότ: Διόρθωση διπλής ανακατεύθυνσης προς %(to)s',
     'en': u'Bot: Fixing double redirect to %(to)s',
+    'eo': u'Roboto: Riparis duoblan alidirekton al  %(to)s',
     'es': u'Robot: Arreglando doble redirección → %(to)s',
     'fa': u'ربات:اصلاح تغییر مسیر دوتایی ← %(to)s',
     'fr': u'Robot: répare double redirection à %(to)s',
+    'frp': u'Bot : rèpâre redirèccion dobla a %(to)s',
     'frr': u'Bot: Ferbeedre dobelt widjerfeerang tu %(to)s',
     'ga': u'Róbó: Ag socrú athsheolta dúbailte → %(to)s',
+    'gl': u'Bot: Arranxo a redirección dobre cara a %(to)s',
+    'gsw': u'Bötli: Uflösig vun de doppleti Wyterleitig zue %(to)s',
     'he': u'בוט: מתקן הפניה כפולה → %(to)s',
     'hr': u'Bot: Popravak dvostrukih preusmjeravanja → %(to)s',
     'hu': u'Bot: %(to)s lapra mutató dupla átirányítás javítása',
+    'hy': u'Ռոբոտ․ Շտկվում են կրկնակի վերահղումները %(to)s -ին',
     'ia': u'Robot: reparation de duple redirection → %(to)s',
     'id': u'Bot: Memperbaiki pengalihan ganda ke %(to)s',
     'is': u'Vélmenni: Lagfæri tvöfalda tilvísun → %(to)s',
@@ -97,22 +105,28 @@ msg_double={
     'ka': u'რობოტი: ორმაგი გადამისამართების გასწორება → %(to)s',
     'kk': u'Бот: Шынжырлы айдатуды түзетті → %(to)s',
     'ko': u'로봇: 이중 넘겨주기 수정 → %(to)s',
-    'ksh': u'Bot: [[special:doubleredirects|Dubbel Ömlëijdong]] fottjemaat → %(to)s',
+    'ksh': u'Bot: [[Special:Doubleredirects|Dubbel Ömlëijdong]] fottjemaat → %(to)s',
     'la': u'automaton: rectificatio redirectionis duplicis → %(to)s',
     'lb': u'Bot: Duebel Viruleedung gefléckt → %(to)s',
     'lt': u'robotas: Taisomas dvigubas peradresavimas → %(to)s',
     'mk': u'Бот: Исправка на двојни пренасочувања → %(to)s',
+    'ms': u'Bot: Memperbetulkan pelencongan berganda ke %(to)s',
     'mzn': u'ربوت:عوض هایتن دکشیه‌ئون دِتایی → %(to)s',
     'nds': u'Bot: Dubbelte Wiederleiden rutmakt → %(to)s',
     'nl': u'Robot: dubbele doorverwijzing gecorrigeerd naar %(to)s',
     'nn': u'robot: retta dobbel omdirigering → %(to)s',
-    'no': u'bot: Retter dobbel omdirigering → %(to)s',
+    'no': u'robot: Retter dobbel omdirigering til %(to)s',
+    'pdc': u'Waddefresser: Doppelte Weiderleiding nooch %(to)s gennert',
     'pfl': u'Bot: E doppelte Waiterlaitung vabessat zu %(to)s',
     'pl': u'Robot naprawia podwójne przekierowanie do %(to)s',
-    'pt': u'Bot: Corrigido duplo redirecionamento → %(to)s',
-    'ro': u'Robot: Corectarea dublu redirecţionare în %(to)s',
+    'pt': u'Robô: A corrigir o redireccionamento duplo para %(to)s',
+    'pt-br': u'Bot: Corrigido duplo redirecionamento → %(to)s',
+    'ro': u'Robot: Reparat dubla redirecționare înspre %(to)s',
     'ru': u'Робот: исправление двойного перенаправления → %(to)s',
+    'rue': u'Робот: справив двоїте напрямлїня → %(to)s',
+    'sl': u'Bot: Popravljanje dvojnih preusmeritev na %(to)s',
     'sr': u'Бот: исправљање двоструких преусмерења у %(to)s',
+    'sr-ec': u'Бот: исправљање двоструких преусмерења у %(to)s',
     'sr-el': u'Bot: ispravljanje dvostrukih preusmerenja u %(to)s',
     'sv': u'Robot: Rättar dubbel omdirigering → %(to)s',
     'szl': u'Robot sprowjo tuplowane przekerowańa → %(to)s',
@@ -771,26 +785,26 @@ class RedirectRobot:
                         pywikibot.output(
                             u'Warning: Redirect target %s forms a redirect loop.'
                             % targetPage.title(asLink=True))
-                        break ###xqt doesn't work. edits twice!
-                        try:
-                            content = targetPage.get(get_redirect=True)
-                        except pywikibot.SectionError:
-                            content = pywikibot.Page(
-                                          targetPage.site(),
-                                          targetPage.sectionFreeTitle()
-                                      ).get(get_redirect=True)
-                        if targetPage.site().lang in sd_template and \
-                           targetPage.site().lang in sd_tagging_sum:
-                            pywikibot.output(u"Tagging redirect for deletion")
-                            # Delete the two redirects
-                            content = pywikibot.translate(
-                                        targetPage.site().lang,
-                                        sd_template)+"\n"+content
-                            summ = pywikibot.translate(targetPage.site().lang,
-                                                       sd_tagging_sum)
-                            targetPage.put(content, summ)
-                            redir.put(content, summ)
-                        break # TODO Better implement loop redirect
+                        break ### doesn't work. edits twice!
+##                        try:
+##                            content = targetPage.get(get_redirect=True)
+##                        except pywikibot.SectionError:
+##                            content = pywikibot.Page(
+##                                          targetPage.site(),
+##                                          targetPage.sectionFreeTitle()
+##                                      ).get(get_redirect=True)
+##                        if targetPage.site().lang in sd_template and \
+##                           targetPage.site().lang in sd_tagging_sum:
+##                            pywikibot.output(u"Tagging redirect for deletion")
+##                            # Delete the two redirects
+##                            content = pywikibot.translate(
+##                                        targetPage.site().lang,
+##                                        sd_template)+"\n"+content
+##                            summ = pywikibot.translate(targetPage.site().lang,
+##                                                       reason_loop)
+##                            targetPage.put(content, summ)
+##                            redir.put(content, summ)
+##                        break # TODO Better implement loop redirect
                     else: # redirect target found
                         if targetPage.isStaticRedirect():
                             pywikibot.output(

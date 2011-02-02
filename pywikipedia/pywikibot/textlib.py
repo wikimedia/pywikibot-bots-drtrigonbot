@@ -11,7 +11,7 @@ and return a unicode string.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: textlib.py 8855 2011-01-18 07:13:30Z xqt $'
+__version__ = '$Id: textlib.py 8887 2011-01-27 06:53:24Z xqt $'
 
 
 import wikipedia as pywikibot
@@ -972,8 +972,8 @@ def _altlang(code):
         return ['ro']
     #Russian and Belarusian
     if code in ['ab', 'av', 'ba', 'bxr', 'ce', 'cv', 'kk', 'koi', 'ky', 'lbe',
-                'mdf', 'mhr', 'mrj', 'myv', 'os', 'sah', 'tg', 'tt', 'udm',
-                'uk', 'xal']:
+                'mdf', 'mhr', 'mrj', 'myv', 'os', 'ru', 'sah', 'tg', 'tt',
+                'udm', 'uk', 'xal']:
         return ['ru']
     if code in ['be', 'be-x-old']:
         return ['be', 'be-x-old', 'ru']

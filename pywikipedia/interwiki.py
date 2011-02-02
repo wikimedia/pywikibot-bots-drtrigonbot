@@ -337,7 +337,7 @@ that you have to break it off, use "-continue" next time.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: interwiki.py 8808 2010-12-28 21:50:45Z xqt $'
+__version__ = '$Id: interwiki.py 8905 2011-01-28 06:53:53Z xqt $'
 #
 
 import sys, copy, re, os
@@ -472,6 +472,7 @@ msg = {
     'km': (u'រ៉ូបូ ', u'បន្ថែម', u'ដកចេញ', u'កែសំរួល'),
     'ksh': (u'Bot: ', u'dobëijedonn', u'erußjenumme', u'ußjewääßelt'),
     'ku': (u'robot ', u'serzêde kirin', u'jêbirin', u'guhêrandin'),
+    'kv': (u'робот ', u'содтi', u'чышки', u'вежи'),
     'kw': (u'robot ', u'ow keworra', u'ow dilea', u'ow chanjya'),
     'la': (u'bot ', u'addit', u'abdit', u'mutat'),
     'lb': (u'Bot ', u'Derbäi setzen', u'Ewech huelen', u'Änneren'),
@@ -483,6 +484,7 @@ msg = {
     'lv': (u'robots ', u'pievieno', u'izņem', u'izmaina'),
     'mdf': (u'бот ', u'поладозе', u'нардазе', u'полафтозе'),
     'mg': (u'Rôbô ', u'Nanampy', u'Nanala', u'Nanova'),
+    'mhr': (u'робот ', u'ешарен', u'кораҥден', u'тӧрлен'),
     'mk': (u'Бот ', u'Додава', u'Брише', u'Менува'),
     'ml': (u'യന്ത്രം ', u'ചേര്‍ക്കുന്നു', u'നീക്കുന്നു', u'പുതുക്കുന്നു'),
     'mn': (u'робот ', u'Нэмж байна', u'Арилгаж байна', u'Өөрчилж байна'),
@@ -509,6 +511,7 @@ msg = {
     'qu': (u'Rurana antacha ', u'Yapasqa', u'Qullusqa', u'Hukchasqa'),
     'ro': (u'Robot interwiki: ', u'Adăugat', u'Înlăturat',u'Modificat'),
     'ru': (u'робот ', u'добавил', u'удалил', u'изменил'),
+    'rue': (u'робот ', u'додав', u'одобрав', u'змінив'),
     'sah': (u'робот ', u'эптэ', u'сотто', u'уларытта'),
     'sk': (u'robot ', u'Pridal', u'Odobral',u'Zmenil' ),
     'sl': (u'robot ', u'Dodajanje', u'Odstranjevanje', u'Spreminjanje'),

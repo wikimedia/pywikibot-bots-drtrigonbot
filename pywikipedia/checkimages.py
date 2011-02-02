@@ -84,7 +84,7 @@ right parameter.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: checkimages.py 8517 2010-09-11 08:32:54Z xqt $'
+__version__ = '$Id: checkimages.py 8908 2011-02-01 19:25:18Z filnik $'
 #
 
 import re, time, urllib, urllib2, os, locale, sys, datetime
@@ -273,7 +273,7 @@ nothing_head = {
 # Note: every __botnick__ will be repleaced with your bot's nickname (feel free not to use if you don't need it)
 nothing_notification = {
     'commons':u"\n{{subst:User:Filnik/untagged|File:%s}}\n\n''This message was '''added automatically by [[User:" + \
-               "__botnick__|__botnick__]]''', if you need some help about it, ask its master (~~~) or go to the [[Commons:Help desk]]''. --~~~~",
+               "__botnick__|__botnick__]]''', if you need some help about it, please use the [[Commons:Help desk]]''. --~~~~",
     'ar'     :u"{{subst:مصدر الصورة|File:%s}} --~~~~",
     'de'     :u'\n{{subst:Benutzer:ABF/D2|%s}} ~~~~ ',
     'en'     :u"{{subst:image source|File:%s}} --~~~~",
@@ -417,7 +417,7 @@ PageWithAllowedTemplates = {
 # Note: every __botnick__ will be repleaced with your bot's nickname (feel free not to use if you don't need it)
 HiddenTemplateNotification = {
     '_default':None,
-    'commons': u"""\n{{subst:User:Filnik/whitetemplate|File:%s}}\n\n''This message was '''added automatically by [[User:__botnick__|__botnick__]]''', if you need some help about it, ask its master (~~~) or go to the [[Commons:Help desk]]''. --~~~~""",
+    'commons': u"""\n{{subst:User:Filnik/whitetemplate|File:%s}}\n\n''This message was added automatically by __botnick__, if you need some help about it please read the text above again and follow the links in it, if you still need help ask at the [[File:Human-help-browser.svg|18px|link=Commons:Help desk|?]] '''[[Commons:Help desk|→]] [[Commons:Help desk]]''' in any language you like to use.'' --__botnick__""",
     'it'     : u"{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Template_insufficiente|%s|__botnick__}} --~~~~",
     'ko'     : u"\n{{subst:User:Kwj2772/whitetemplates|%s}} --~~~~", 
 }
