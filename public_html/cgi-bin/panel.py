@@ -47,6 +47,7 @@ import cStringIO
 
 
 # === panel HTML stylesheets === === ===
+# MAY BE USING Cheetah (http://www.cheetahtemplate.org/) WOULD BE BETTER (or needed at any point...)
 #
 #import ps_plain as style   # panel-stylesheet 'plain'
 #import ps_simple as style  # panel-stylesheet 'simple'
