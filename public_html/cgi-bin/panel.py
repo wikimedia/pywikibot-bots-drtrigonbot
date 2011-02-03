@@ -108,13 +108,13 @@ logstat_content = \
 <br>
 History compressed: %(histcomp_count)s (times)<br>
 <br>
-Problem rate (in %%):<br>
+<!--Problem rate (in %%):<br>
 %(reliability)s<br>
 <a href="%(graphlink)s"><img src="%(graphlink)s"></a><br>
 <br>
 Warnings (%(warn_total)s distilled to %(warn_dist)s):<br>
 %(warnings)s<br>
-<br>"""
+<br>-->"""
 
 adminlogs_content = \
 """Log file count: %(logcount)s<br>
@@ -369,18 +369,23 @@ def logstat(form):
 			#elif ('SCRIPT CALL:' in line): stat['run_count'] += 1
 		if request_total != 0: stat['reliability_list'].append( (item, float(request_failed)/float(request_total)) )
 
-	stat['warn_total'] = len(stat['warn_list'])
+	#stat['warn_total'] = len(stat['warn_list'])
+	stat['warn_total'] = None
 	stat['warn_list'] = list(set(stat['warn_list']))
-	stat['warn_dist'] = len(stat['warn_list'])
+	#stat['warn_dist'] = len(stat['warn_list'])
+	stat['warn_dist'] = None
 	stat['warn_list'].sort()
 
 	data = copy.deepcopy(stat)
 	data.update({'start_date':		str(strftime("%a %b %d %Y", stat['start_date'])),
 		'end_date':		str(strftime("%a %b %d %Y", stat['end_date'])),
 		'run_diff':		(int(stat['run_count']) - int(stat['successful_count'])),
-		'reliability':		[ "%.2f" % (100*item[1]) for item in stat['reliability_list'] ],
-		'warnings':		"<br>".join(stat['warn_list']),
-		'graphlink':		sys.argv[0] + r"?action=logstat&format=graph",
+		#'reliability':		[ "%.2f" % (100*item[1]) for item in stat['reliability_list'] ],
+		'reliability':		None,
+		#'warnings':		"<br>".join(stat['warn_list']),
+		'warnings':		None,
+		#'graphlink':		sys.argv[0] + r"?action=logstat&format=graph",
+		'graphlink':		None,
 	})
 
 
