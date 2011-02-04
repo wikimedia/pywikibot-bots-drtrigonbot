@@ -496,6 +496,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		hist = {}
 		for item in buf:
 			if len(item.strip())==0: continue
+
 			news_item = eval(item)
 			#news.update( news_item )
 			# news.update BUT APPEND the heading data in the last tuple arg
@@ -505,16 +506,25 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				if (len(news_item[key]) == 5):
 					news_item[key] += (_PS_unchanged,)
 					usage['old history'] = True
+				# notify tag error
+				# (origin could be 'old history' but is not clear, but can be removed in the future, eg. after comp.)
+				if (news_item[key][0] == u'Notification') and (news_item[key][5] <> _PS_notify):
+					news_item[key] = news_item[key][:-1] + (_PS_notify,)
+					usage['notify tag error'] = True
+
 				if key in news:	# APPEND the heading data in the last tuple arg
 					if news_item[key][5] in [_PS_closed]:
 						del news[key]
 					else:
 						heads = news[key][4]
 						heads.update( news_item[key][4] )
-						news[key] = (news_item[key][0], news_item[key][1], news_item[key][2], news_item[key][3], heads, news_item[key][5])
+						#news[key] = (news_item[key][0], news_item[key][1], news_item[key][2], news_item[key][3], heads, news_item[key][5])
+						news[key] = news_item[key][:4] + (heads, news_item[key][5])
 				else:
 					news[key] = news_item[key]
+
 			rollback_buf.append( copy.deepcopy(news) )
+
 		if rollback_buf:
 			rollback_buf.reverse()
 			i = min([rollback, (len(rollback_buf)-1)])
@@ -719,20 +729,11 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 			self.pages.promote_page() # hist -> news
 
-			strt = time.time()
 			entries = PageSections(page, self._param)
-			end = time.time()
-			diff1 = end-strt
 			try:
-				strt = time.time()
 				page.getSections()
-				end = time.time()
-				diff2 = end-strt
-				print "speed check:", diff1, diff2
 			except:
-				print "no speed check done."
-#should be loaded now, make speed check here!!!
-#speed check should also be done in getSection at get...
+				pass
 
 			(page, page_rel, page_signed) = entries.check_rel()
 

@@ -18,7 +18,7 @@ This script understands the following command-line arguments:
 ## @package clean_user_sandbox
 #  @brief   Clean User Sandbox Robot (like clean_sandbox)
 #
-#  @copyright Dr. Trigon, 2008-2010
+#  @copyright Dr. Trigon, 2008-2011
 #
 #  @section FRAMEWORK
 #

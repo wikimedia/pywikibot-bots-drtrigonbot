@@ -114,8 +114,8 @@ class SubsterBot(dtbext.basic.BasicBot):
 				return substed_content
 			else:
 				# if changed, write!
-				#if (substed_content != content):
-				if substed_tags:
+				if (substed_content != content):
+				#if substed_tags:
 					self.outputContentDiff(content, substed_content)
 
 					if debug:
@@ -186,6 +186,7 @@ class SubsterBot(dtbext.basic.BasicBot):
 			for subitem in magic_words.keys():
 				substed_content = self.get_var_regex(subitem).sub( (self._var_regex_str%{'var':subitem,'cont':magic_words[subitem]}),
 										   substed_content)
+				substed_tags.append(subitem)
 
 		return (substed_content, substed_tags)
 

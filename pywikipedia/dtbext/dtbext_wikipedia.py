@@ -164,10 +164,7 @@ class Page(pywikibot.Page):
 			pywikibot.output(u"  Reading wiki page text (if not already done).")
 
 			debug_data += str(len(self._contents)) + '\n'
-			strt = time.time()
 			self.get()
-			end = time.time()
-			print "speed check:", (end-strt)
 			debug_data += str(len(self._contents)) + '\n'
 			debug_data += self._contents + '\n'
 
