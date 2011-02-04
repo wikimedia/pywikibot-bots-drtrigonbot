@@ -84,7 +84,7 @@ __revision__ = '8916'
 #
 
 # wikipedia-bot imports
-import pagegenerators, userlib, botlist
+import pagegenerators, userlib, botlist, clean_sandbox
 import sys, os, re, time, codecs
 import clean_user_sandbox, sum_disc, subster, page_disc
 #import clean_user_sandbox, sum_disc, replace_tmpl
@@ -106,7 +106,7 @@ error_mail          = (u'DrTrigon', u'Bot ERROR')	# error mail via wiki mail int
 # logging of framework info
 infolist = [ pywikibot.__version__, pywikibot.config.__version__,	# framework
              pywikibot.query.__version__, pagegenerators.__version__,	#
-             botlist.__version__,					#
+             botlist.__version__, clean_sandbox.__version__,					#
              dtbext.pywikibot.__version__, dtbext.basic.__version__,	# DrTrigonBot extensions
              dtbext.date.__version__, dtbext.userlib.__version__,	#
              __version__, clean_user_sandbox.__version__,		# bots

@@ -14,6 +14,17 @@ This script understands the following command-line arguments:
                    hours and limits it between 5 and 15 minutes.
                    The minimum delay time is 5 minutes.
 
+    -userlist      Use this parameter to run the script in the user name-
+                   space.
+                   > ATTENTION: on most wiki THIS IS FORBIDEN FOR BOTS ! <
+                   > (please talk with your admin first)                 <
+                   Since it is considered bad style to edit user page with-
+                   out permission, you have to pass a page containing a
+                   list of user to process. Argument e.g. is given as
+                   "-userlist:Benutzer:DrTrigonBot/Diene_Mir\!".
+                   Please be also aware that the rules when to clean the
+                   user sandbox differ from those for project sandbox.
+
 """
 #
 # (C) Leonardo Gregianin, 2006
@@ -25,6 +36,7 @@ This script understands the following command-line arguments:
 #
 # DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 # Clean User Sandbox Robot (clean_user_sandbox.py)
+# https://fisheye.toolserver.org/browse/drtrigon/pywikipedia/clean_user_sandbox.py?hb=true
 #
 # Distributed under the terms of the MIT license.
 #
@@ -124,13 +136,18 @@ sandboxTitle = {
     }
 
 class SandboxBot:
-    def __init__(self, hours, no_repeat, delay):
+    def __init__(self, hours, no_repeat, delay, userlist):
         self.hours = hours
         self.no_repeat = no_repeat
         if delay == None:
             self.delay = min(15, max(5, int(self.hours *60)))
         else:
             self.delay = max(5, delay)
+        self.site = pywikibot.getSite()
+        if userlist == None:
+            self.userlist = None
+        else:
+            self.userlist = [page.title().split(u'/')[0] for page in pywikibot.Page(self.site, userlist).linkedPages()]
 
     def run(self):
         
@@ -147,14 +164,15 @@ class SandboxBot:
                    int(time2[10:12])
             return abs(t2-t1)
 
-        mySite = pywikibot.getSite()
+        mySite = self.site
         while True:
             wait = False
             now = time.strftime("%d %b %Y %H:%M:%S (UTC)", time.gmtime())
             localSandboxTitle = pywikibot.translate(mySite, sandboxTitle)
-            IsUserSandbox = hasattr(self, '_user_list')  # DrTrigonBot (Clean User Sandbox Robot)
+            IsUserSandbox = (self.userlist is not None)  # DrTrigonBot (Clean User Sandbox Robot)
             if IsUserSandbox:
-                localSandboxTitle = [localSandboxTitle % user.name() for user in self._user_list]
+                localSandboxTitle = u'%s/' + localSandboxTitle.split(u':')[-1]
+                localSandboxTitle = [localSandboxTitle % user for user in self.userlist]
             if type(localSandboxTitle) is list:
                 titles = localSandboxTitle
             else:
@@ -212,6 +230,7 @@ class SandboxBot:
 def main():
     hours = 1
     delay = None
+    userlist = None
     no_repeat = True
     for arg in pywikibot.handleArgs():
         if arg.startswith('-hours:'):
@@ -219,11 +238,13 @@ def main():
             no_repeat = False
         elif arg.startswith('-delay:'):
             delay = int(arg[7:])
+        elif arg.startswith('-userlist:'):
+            userlist = arg[10:]
         else:
             pywikibot.showHelp('clean_sandbox')
             return
 
-    bot = SandboxBot(hours, no_repeat, delay)
+    bot = SandboxBot(hours, no_repeat, delay, userlist)
     try:
         bot.run()
     except KeyboardInterrupt:

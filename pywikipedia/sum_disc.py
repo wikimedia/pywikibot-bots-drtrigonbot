@@ -341,7 +341,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			# RecentEditsPageGenerator
 
 			# get the backlinks to user disc page
-			# (limitted backlinks: some return >> 500 backlinks, thus check only once a week ALL those)
+			# (limitted backlinks: some return >> 500 backlinks, thus check only once a week ALL/2000 those)
 			if self._param['getbacklinks_switch']:
 				self.getUserBacklinks()
 				# all pages served from here ARE CURRENTLY
@@ -607,10 +607,11 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		work = {}
 		count = 0
 		# (some return >> 500 backlinks, thus check
-		# only once a week ALL those, else limit)
+		# only once a week ALL/2000 those, else limit)
 		#if (self._wday == 0):
 		if (self._wday == 6): # So
-			max_count = len(userbacklinksList)
+			#max_count = len(userbacklinksList)
+			max_count = 2000
 		else:
 			max_count = 500
 		for item in userbacklinksList:
@@ -655,8 +656,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		hist = self.pages.hist
 		work = self.pages.work
 		self.pages.start_promotion()
-		size = len(work)
-		jj = 0
 		gen1 = pagegenerators.PagesFromTitlesGenerator(work.keys())
 		gen2 = pagegenerators.RegexFilterPageGenerator(gen1,
 							       self._param['ignorepage_list'], 
@@ -669,10 +668,8 @@ class SumDiscBot(dtbext.basic.BasicBot):
 							args=(gen2,),
 							qsize=60)
 		#gen4 = pagegenerators.RedirectFilterPageGenerator(gen3)
+		# lets hope that no generator loses pages... (since sometimes this may happen)
 		for page in gen3:
-# count page number (for debug not to loose pages)
-#			jj+=1
-
 			name = page.title()
 			#print ">>>", name, "<<<"
 			page.sum_disc_data = work[name].sum_disc_data
@@ -748,9 +745,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			# free the memory again
 			del entries
 
-# DOES THE PreloadingGenerator WORK ???
-#		if not (len(work.keys()) == jj):
-#			raise pywikibot.Error(u'PreloadingGenerator has lost some pages!')
 		gen3.stop()
 
 		self.pages.end_promotion()

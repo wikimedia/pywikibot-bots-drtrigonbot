@@ -3,17 +3,6 @@
 This bot cleans a user sandbox by replacing the current contents with predefined
 text.
 
-This script understands the following command-line arguments:
-
-    -hours:#       Use this parameter if to make the script repeat itself
-                   after # hours. Hours can be defined as a decimal. 0.01
-                   hours are 36 seconds; 0.1 are 6 minutes.
-
-    -delay:#       Use this parameter for a wait time after the last edit
-                   was made. If no parameter is given it takes it from
-                   hours and limits it between 5 and 15 minutes.
-                   The minimum delay time is 5 minutes.
-
 """
 ## @package clean_user_sandbox
 #  @brief   Clean User Sandbox Robot (like clean_sandbox)
@@ -35,25 +24,19 @@ __version__ = '$Id$'
 #
 
 import clean_sandbox
-import dtbext
 import wikipedia as pywikibot
 
+# overwrite bot default
 clean_sandbox.content = {
 	'de': u'{{Benutzer:DrTrigon/Entwurf/Vorlage:Spielwiese}}',
 	}
 
-clean_sandbox.sandboxTitle = {
-	'de': u'Benutzer:%s/Spielwiese',
-	}
-
 bot_config = {	# unicode values
 		'userlist':		u'Benutzer:DrTrigonBot/Diene_Mir!',
-		'TemplateName':		u'',
-# 'TemplateName' is just a dummy for 'dtbext.basic.BasicBot'
 }
 
 
-class UserSandboxBot(clean_sandbox.SandboxBot, dtbext.basic.BasicBot):
+class UserSandboxBot(clean_sandbox.SandboxBot):
 	'''
 	Robot which will clean per user sandbox pages.
 	'''
@@ -63,34 +46,22 @@ class UserSandboxBot(clean_sandbox.SandboxBot, dtbext.basic.BasicBot):
 
 		pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
 
-		dtbext.basic.BasicBot.__init__(self, bot_config)
-		clean_sandbox.SandboxBot.__init__(self, hours, no_repeat, delay)
+		pywikibot.output(u'\03{lightred}** Receiving User List (wishes): [[%s]]\03{default}' % userListPage)
 
-		# init constants
-		self._userListPage = pywikibot.Page(self.site, userListPage)
-
-		pywikibot.output(u'\03{lightred}** Receiving User List (wishes): %s\03{default}' % self._userListPage)
-		self._user_list = self.loadUsersConfig(self._userListPage)
-
-		# init variable/dynamic objects
+		clean_sandbox.SandboxBot.__init__(self, hours, no_repeat, delay, userListPage)
 
 def main():
     hours = 1
     delay = None
     no_repeat = True
     for arg in pywikibot.handleArgs():
-        if arg.startswith('-hours:'):
-            hours = float(arg[7:])
-            no_repeat = False
-        elif (arg[:5] == "-auto") \
+        if (arg[:5] == "-auto") \
           or (arg[:5] == "-cron"):
             pass
         elif (arg == "-all") \
           or (arg == "-default") \
           or ("-clean_user_sandbox" in arg):
             pass
-        elif arg.startswith('-delay:'):
-            delay = int(arg[7:])
         else:
             pywikibot.showHelp('clean_sandbox')
             return
