@@ -154,7 +154,6 @@ bot_config = {	# unicode values
 					'reportchanged_switch':	True,				# REPORT CHANGED discussions, a SWITCH
 					'getbacklinks_switch':	False,				# GET BACKLINKS additionally, a SWITCH
 					'reportwarn_switch':	True,				# (not published yet)
-#					'reportwarn_switch':	False,				# 
 					'globwikinotify_switch':False,				# GET OTHER WIKIS NOTIFICATIONS additionally, a SWITCH
 					'reportclosed_switch':	True,				# (not published yet)
 					# LIST of talks/discussions to SEARCH, a LIST
@@ -200,7 +199,6 @@ bot_config = {	# unicode values
 					# (sofern auf diesen Seiten nichts geändert wird, tauchen sie gar nicht auf...)
 					'ignorepage_list':	[ u'(.*?)/Archiv', ],		# + weitere 
 					# LIST of SIGNATUREs to USE, a LIST
-# 'backlinks_list' HAS TO BE PUBLISHED TO Benutzer:DrTrigonBot ON BOT RELEASE !!!
 					'backlinks_list':	[ u'%(userdiscpage)s',
 								u'Benutzer:%(username)s', ],
 					# (hidden)
@@ -312,7 +310,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 	## @todo re-write some functions to be pagegenerators and use pagegenerators.CombinedPageGenerator()
 	#        and others to combine and use them
 	#        \n[ JIRA: ticket? ]
-	#  @todo litted backlings: try to take the most recent ones
+	#  @todo limitted backlinks: try to take the most recent ones
 	#        \n[ JIRA: ticket? ]
 	def run(self):
 		'''Run SumDiscBot().'''
@@ -343,8 +341,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			# RecentEditsPageGenerator
 
 			# get the backlinks to user disc page
-			# (some return >> 500 backlinks, thus check only once a week ALL those)
-# TRY TO TAKE THE 500 MOST RECENT ONES !!!
+			# (limitted backlinks: some return >> 500 backlinks, thus check only once a week ALL those)
 			if self._param['getbacklinks_switch']:
 				self.getUserBacklinks()
 				# all pages served from here ARE CURRENTLY
@@ -376,10 +373,10 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 		pywikibot.output(u'\03{lightgreen}* Processing Warnings:\03{default}')
 
-# handling of warnings?!? are printed to log, could be get by panel.py from log!
-# ...or is it better to have a separate and explicit warning handling here?
-		for warning in self._global_warn:		# output all warnings to log (what about a special wiki page?)
-			pywikibot.output( "%s: %s" % warning )	
+		# warnings/exceptions are printed to log, could be get by panel.py from there!
+		# (separate and explicit warning handling not used anymore)
+		#for warning in self._global_warn:		# output all warnings to log (what about a special wiki page?)
+		#	pywikibot.output( "%s: %s" % warning )	
 
 	def compressHistory(self, users = []):
 		"""Read history, and re-write new history without any duplicates.
@@ -390,20 +387,17 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		   Load, truncate and re-write history in files.
 		"""
 
-		if not users: users = [ item[0] for item in self._user_list ]
+		if not users: users = [ item for item in self._user_list ]
 
 		pywikibot.output(u'* Compressing of histories:')
 
 		if bot_config['backup_hist']:
 			timestmp = dtbext.date.getTimeStmpNow()
 			pathname = pywikibot.config.datafilepath('logs/%s/' % timestmp, '')	# according to 'setUser'
-			os.mkdir(pathname)
 			import shutil
 
 		for user in users:
-			u = userlib.User(self.site, user)
-			u.extradata = {}
-			self.setUser(u)
+			self.setUser(user)
 
 			try:
 				begin = float(os.path.getsize(self._datfilename))
@@ -416,7 +410,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				shutil.copyfile(self._datfilename, dst)
 
 			# truncate history (drop old entries)
-			self.pages = SumDiscPages()
+			self.pages = SumDiscPages(self.site, self._param)
 			self.loadHistory()
 
 			# write new history
@@ -425,7 +419,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 			end = float(os.path.getsize(self._datfilename))
 
-			pywikibot.output(u'\03{lightred}** History of %s compressed and written. (%s %%)\03{default}' % (user, (end/begin)*100))
+			pywikibot.output(u'\03{lightred}** History of %s compressed and written. (%s %%)\03{default}' % (user.name(), (end/begin)*100))
 
 	def setUser(self, user):
 		'''
@@ -506,10 +500,11 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			#news.update( news_item )
 			# news.update BUT APPEND the heading data in the last tuple arg
 			for key in news_item.keys():
-				if (len(news_item[key]) == 5):			# old history format
+				# old history format
+				# (after compression not needed anymore and can thus be removed in the future)
+				if (len(news_item[key]) == 5):
 					news_item[key] += (_PS_unchanged,)
 					usage['old history'] = True
-# why still present??
 				if key in news:	# APPEND the heading data in the last tuple arg
 					if news_item[key][5] in [_PS_closed]:
 						del news[key]
@@ -1051,12 +1046,12 @@ class SumDiscPages(object):
 				# closed
 				data = (data[0], page.title(asLink=True), self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
 				data = self.param['parse_msg'][_PS_closed] % data
-			elif data[5] in [_PS_warning]:
-				# warnings
-				data = (page.title(asLink=True), data[0])
-				data = self.param['parse_msg'][_PS_warning] % data
-				self._global_warn.append( (self._user.name(), data) )
-				if not param['reportwarn_switch']: continue
+			#elif data[5] in [_PS_warning]:
+			#	# warnings
+			#	data = (page.title(asLink=True), data[0])
+			#	data = self.param['parse_msg'][_PS_warning] % data
+			#	self._global_warn.append( (self._user.name(), data) )
+			#	if not param['reportwarn_switch']: continue
 			elif data[5] in [_PS_notify]:
 				# global wiki notifications
 				data = (data[0], page.globalwikinotify['url'], page.title(), data[2], dtbext.date.getTime(data[3]))

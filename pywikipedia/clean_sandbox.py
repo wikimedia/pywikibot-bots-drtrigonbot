@@ -21,6 +21,10 @@ This script understands the following command-line arguments:
 # (C) Andre Engels, 2007
 # (C) Siebrand Mazeland, 2007
 # (C) xqt, 2009
+# (C) Dr. Trigon, 2011
+#
+# DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+# Clean User Sandbox Robot (clean_user_sandbox.py)
 #
 # Distributed under the terms of the MIT license.
 #
@@ -148,24 +152,37 @@ class SandboxBot:
             wait = False
             now = time.strftime("%d %b %Y %H:%M:%S (UTC)", time.gmtime())
             localSandboxTitle = pywikibot.translate(mySite, sandboxTitle)
+            IsUserSandbox = hasattr(self, '_user_list')  # DrTrigonBot (Clean User Sandbox Robot)
+            if IsUserSandbox:
+                localSandboxTitle = [localSandboxTitle % user.name() for user in self._user_list]
             if type(localSandboxTitle) is list:
                 titles = localSandboxTitle
             else:
                 titles = [localSandboxTitle,]
             for title in titles:
                 sandboxPage = pywikibot.Page(mySite, title)
+                pywikibot.output(u'Preparing to process sandbox page %s' % sandboxPage.title(asLink=True))
                 try:
                     text = sandboxPage.get()
                     translatedContent = pywikibot.translate(mySite, content)
                     translatedMsg = pywikibot.translate(mySite, msg)
                     subst = 'subst:' in translatedContent
+                    pos = text.find(translatedContent.strip())
                     if text.strip() == translatedContent.strip():
                         pywikibot.output(u'The sandbox is still clean, no change necessary.')
                     elif subst and sandboxPage.userName() == mySite.loggedInAs():
                         pywikibot.output(u'The sandbox might be clean, no change necessary.')
-                    elif text.find(translatedContent.strip()) <> 0 and not subst:
-                        sandboxPage.put(translatedContent, translatedMsg)
-                        pywikibot.output(u'Standard content was changed, sandbox cleaned.')
+                    elif pos <> 0 and not subst:
+                        if IsUserSandbox:
+                            endpos = pos + len(translatedContent.strip())
+                            if (pos < 0) or (endpos == len(text)):
+                                pywikibot.output(u'The user sandbox is still clean or not set up, no change necessary.')
+                            else:
+                                sandboxPage.put(text[:endpos], translatedMsg)
+                                pywikibot.output(u'Standard content was changed, user sandbox cleaned.')
+                        else:
+                            sandboxPage.put(translatedContent, translatedMsg)
+                            pywikibot.output(u'Standard content was changed, sandbox cleaned.')
                     else:
                         diff = minutesDiff(sandboxPage.editTime(), time.strftime("%Y%m%d%H%M%S", time.gmtime()))
                         if pywikibot.verbose:
@@ -179,6 +196,9 @@ class SandboxBot:
                             wait = True
                 except pywikibot.EditConflict:
                     pywikibot.output(u'*** Loading again because of edit conflict.\n')
+                except pywikibot.NoPage:
+                    pywikibot.output(u'*** The sandbox is not existent, skipping.')
+                    continue
             if self.no_repeat:
                 pywikibot.output(u'\nDone.')
                 return

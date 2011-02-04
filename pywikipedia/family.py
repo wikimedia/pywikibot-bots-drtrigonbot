@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: family.py 8907 2011-01-31 14:47:53Z xqt $'
+__version__='$Id: family.py 8910 2011-02-03 13:05:23Z xqt $'
 
 import config
 import re
@@ -1048,6 +1048,7 @@ class Family:
                 'mwl': u'Biquipédia',
                 'nah': u'Huiquipedia',
                 'ne': u'विकिपीडिया',
+                'pt': u'Wikipédia',
                 'rue': u'Вікіпедія',
                 'si': u'විකිපීඩියා',
                 'tk': u'Wikipediýa',
@@ -1085,6 +1086,7 @@ class Family:
                 'ne': u'विकिपीडिया वार्ता',
                 'nv': u'Wikiibíídiiya baa yáshtiʼ',
                 'pfl': u'Wikipedia Diskussion',
+                'pt': u'Wikipédia Discussão',
                 'rm': u'Wikipedia discussiun',
                 'ro': u'Discuție Wikipedia',
                 'rue': u'Діскузія ку Вікіпедії',

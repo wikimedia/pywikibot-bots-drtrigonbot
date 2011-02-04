@@ -34,13 +34,12 @@ This script understands the following command-line arguments:
 __version__ = '$Id$'
 #
 
-import re
 import clean_sandbox
 import dtbext
 import wikipedia as pywikibot
 
 clean_sandbox.content = {
-	'de': u'(.*?{{Benutzer\:DrTrigon\/Entwurf\/Vorlage\:Spielwiese}}\n)(.*)',
+	'de': u'{{Benutzer:DrTrigon/Entwurf/Vorlage:Spielwiese}}',
 	}
 
 clean_sandbox.sandboxTitle = {
@@ -53,11 +52,8 @@ bot_config = {	# unicode values
 # 'TemplateName' is just a dummy for 'dtbext.basic.BasicBot'
 }
 
-# debug tools
-debug = True
 
-
-class UserSandboxBot(dtbext.basic.BasicBot, clean_sandbox.SandboxBot):
+class UserSandboxBot(clean_sandbox.SandboxBot, dtbext.basic.BasicBot):
 	'''
 	Robot which will clean per user sandbox pages.
 	'''
@@ -77,46 +73,6 @@ class UserSandboxBot(dtbext.basic.BasicBot, clean_sandbox.SandboxBot):
 		self._user_list = self.loadUsersConfig(self._userListPage)
 
 		# init variable/dynamic objects
-
-	## @todo try to implement/merge this also with @ref clean_sandbox.SandboxBot, should be done in framework
-	#        \n[ JIRA: DRTRIGON-71 ]
-	def run(self):
-		'''Run UserSandboxBot().'''
-
-		# analog to clean_sandbox.SandboxBot.run(self) done for several users:
-
-		pywikibot.output(u'\03{lightgreen}* Processing User List (wishes):\03{default}')
-
-		localSandboxTitle = pywikibot.translate(self.site, clean_sandbox.sandboxTitle)
-		#import userlib
-		#self._user_list = [userlib.User(self.site, u'DrTrigon'),]
-		titles = [localSandboxTitle % user.name() for user in self._user_list]
-
-		for title in titles:
-			pywikibot.output(u'\03{lightred}** Processing page [[%s]]\03{default}' % title)
-
-			sandboxPage = pywikibot.Page(self.site, title)
-			if not sandboxPage.exists():
-				pywikibot.output(u'The sandbox is not existent, skipping.')
-				continue
-
-			try:
-				#text = sandboxPage.get(get_redirect=True)
-				text = sandboxPage.get()
-				translatedContent = pywikibot.translate(self.site, clean_sandbox.content)
-				translatedMsg = pywikibot.translate(self.site, clean_sandbox.msg)
-				translatedContent = re.search(translatedContent, text, re.S)
-				if translatedContent == None:
-					pywikibot.output(u'The sandbox is still clean or not set up, no change necessary.')
-				else:
-					if debug:
-						pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
-						continue
-
-					sandboxPage.put(translatedContent.group(1), translatedMsg)
-					pywikibot.output(u'The sandbox is cleaned up.')
-			except pywikibot.EditConflict:
-				pywikibot.output(u'*** Loading again because of edit conflict.')
 
 def main():
     hours = 1

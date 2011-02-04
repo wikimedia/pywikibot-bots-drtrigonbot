@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiquote_family.py 8868 2011-01-21 08:24:25Z xqt $'
+__version__ = '$Id: wikiquote_family.py 8914 2011-02-04 14:17:35Z xqt $'
 
 # The Wikimedia family that is known as Wikiquote
 
@@ -12,11 +12,11 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'pl', 'it', 'de', 'ru', 'pt', 'sk', 'es', 'bg', 'bs', 'tr',
-            'fr', 'sl', 'cs', 'he', 'lt', 'el', 'id', 'zh', 'hu', 'fa', 'uk',
+            'fr', 'sl', 'cs', 'he', 'lt', 'el', 'id', 'zh', 'fa', 'hu', 'uk',
             'eo', 'fi', 'sv', 'nl', 'no', 'nn', 'ja', 'hy', 'et', 'ca', 'li',
             'ar', 'cy', 'hr', 'ka', 'ko', 'sr', 'ku', 'ro', 'gl', 'ml', 'az',
-            'is', 'th', 'te', 'da', 'eu', 'af', 'sq', 'vi', 'la', 'br', 'hi',
-            'mr', 'be', 'ast', 'ta', 'uz', 'ang', 'ur', 'zh-min-nan', 'gu',
+            'is', 'th', 'te', 'da', 'eu', 'af', 'sq', 'vi', 'hi', 'la', 'br',
+            'mr', 'be', 'ast', 'ta', 'uz', 'ang', 'zh-min-nan', 'ur', 'gu',
             'su', 'lb', 'wo', 'kn', 'ky', 'am', 'co',
         ]
 
@@ -58,6 +58,7 @@ class Family(family.Family):
             'ru': u'Викицитатник',
             'sk': u'Wikicitáty',
             'sl': u'Wikinavedek',
+            'th': u'วิกิคำคม',
             'tr': u'Vikisöz',
             'uk': u'Вікіцитати',
             'ur': u'وکی اقتباسات',
@@ -131,7 +132,7 @@ class Family(family.Family):
             'sv': u'Wikiquotediskussion',
             'ta': u'Wikiquote பேச்சு',
             'te': u'Wikiquote చర్చ',
-            'th': u'คุยเรื่องWikiquote',
+            'th': u'คุยเรื่องวิกิคำคม',
             'tr': u'Vikisöz tartışma',
             'tt': u'Wikiquote bäxäse',
             'uk': u'Обговорення Вікіцитат',

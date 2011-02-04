@@ -80,7 +80,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__  = '$Id$'
-__revision__ = '8908'
+__revision__ = '8914'
 #
 
 # wikipedia-bot imports
@@ -121,7 +121,8 @@ bot_list = { 'clean_user_sandbox': (clean_user_sandbox, u'clean userspace Sandbo
              'subster':            (subster, u'"SubsterBot"'),
              'page_disc':          (page_disc, u'page_disc (beta test)'), }
 #bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'subster', 'page_disc' ]
-bot_order = [ 'clean_user_sandbox', 'sum_disc', 'subster' ] # debug
+bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'subster' ]
+#bot_order = [ 'clean_user_sandbox', 'sum_disc', 'subster' ] # debug
 
 
 # Bot Error Handling; to prevent bot errors to stop execution of other bots

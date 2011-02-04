@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikinews_family.py 8868 2011-01-21 08:24:25Z xqt $'
+__version__ = '$Id: wikinews_family.py 8912 2011-02-04 13:19:21Z xqt $'
 
 # The Wikimedia family that is known as Wikinews
 
@@ -12,8 +12,8 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'sr', 'en', 'pl', 'de', 'fr', 'it', 'pt', 'es', 'zh', 'ja', 'sv',
-            'ru', 'ta', 'fi', 'cs', 'he', 'ro', 'bg', 'ar', 'hu', 'sd', 'uk',
-            'tr', 'no', 'ca', 'fa', 'bs', 'th', 'ko', 'eo',
+            'ru', 'ta', 'fi', 'cs', 'he', 'ro', 'bg', 'ar', 'hu', 'sd', 'tr',
+            'uk', 'no', 'ca', 'fa', 'bs', 'th', 'ko', 'eo',
         ]
 
         if family.config.SSL_connection:
