@@ -10,7 +10,7 @@ to make it usable from server, use: 'chmod 755 panel.py', which results in
 ## @package panel.py
 #  @brief   DrTrigon Bot status panel for toolserver
 #
-#  @copyright Dr. Trigon, 2008-2010
+#  @copyright Dr. Trigon, 2008-2011
 #
 #  @section FRAMEWORK
 #
@@ -53,38 +53,6 @@ import cStringIO
 #import ps_simple as style  # panel-stylesheet 'simple'
 #import ps_wiki as style    # panel-stylesheet 'wiki (monobook)'
 import ps_wikinew as style # panel-stylesheet 'wiki (new)' not CSS 2.1 compilant
-
-
-# === footer HTML codes === === ===
-#
-footer = \
-"""<small>DrTrigonBot status panel, written by <a href="https://wiki.toolserver.org/view/User:DrTrigon">DrTrigon</a> 
-(<a href="http://toolserver.org/~daniel/stats/">stat</a> /
-<a href="http://toolserver.org/~daniel/stats/url_201007.html">url</a> /
-<a href="http://munin.toolserver.org/index.html">info</a>).
-<img src="https://wiki.toolserver.org/favicon.ico" border="0" 
-alt="Toolserver"> <a href="http://tools.wikimedia.de/">Powered by Wikimedia Toolserver</a>.
-<img src="http://de.selfhtml.org/src/favicon.ico" border="0" width="16" 
-height="16" alt="SELFHTML"> <a href="http://de.selfhtml.org/index.htm">Thanks to SELFHTML</a>.</small>
-"""
-# with preprocessed (by daniel) statistics from '/mnt/user-store/stats/'
-
-footer_w3c = \
-"""<small>
-<a href="http://validator.w3.org/check?uri=referer"><img 
-src="http://www.w3.org/Icons/valid-html401-blue" 
-alt="Valid HTML 4.01 Transitional" height="16" width="44" 
-border="0"></a>
-</small>"""
-
-footer_w3c_css = \
-"""<small>
-<a href="http://jigsaw.w3.org/css-validator/check/referer">
-    <img style="border:0;width:44px;height:16px"
-        src="http://jigsaw.w3.org/css-validator/images/vcss-blue"
-        alt="CSS ist valide!">
-</a>
-</small>"""
 
 
 # === page HTML contents === === ===
@@ -282,8 +250,8 @@ def displaystate(form):
 			'tsnotice': 	print_tsnotice(),
 			#'content':	displaystate_content,
 			'p-status':	"<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': color, 'bot': 'all:', 'state': botmsg[:-1]},
-			#'footer': 	footer + footer_w3c + footer_w3c_css,
-			'footer': 	footer + footer_w3c, # wiki (new) not CSS 2.1 compilant
+			#'footer': 	style.footer + style.footer_w3c + style.footer_w3c_css,
+			'footer': 	style.footer + style.footer_w3c, # wiki (new) not CSS 2.1 compilant
 	})
 	data['content'] = displaystate_content % data
 
@@ -398,8 +366,8 @@ def logstat(form):
 			'title':	'DrTrigonBot log statistics',
 			'tsnotice': 	print_tsnotice(),
 			#'content':	logstat_content,
-                        'p-status':     '',
-			'footer': 	footer,
+			'p-status':	'<tr><td></td></tr>',
+			'footer': 	style.footer + style.footer_w3c,
 	})
 	data['content'] = logstat_content % data
 
