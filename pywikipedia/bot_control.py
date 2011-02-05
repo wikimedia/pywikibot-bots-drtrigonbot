@@ -81,6 +81,7 @@ Options/parameters:
 #
 __version__  = '$Id$'
 __revision__ = '8916'
+__release__  = '1.0.????'
 #
 
 # wikipedia-bot imports
@@ -122,7 +123,6 @@ bot_list = { 'clean_user_sandbox': (clean_user_sandbox, u'clean userspace Sandbo
              'page_disc':          (page_disc, u'page_disc (beta test)'), }
 #bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'subster', 'page_disc' ]
 bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'subster' ]
-#bot_order = [ 'clean_user_sandbox', 'sum_disc', 'subster' ] # debug
 
 
 # Bot Error Handling; to prevent bot errors to stop execution of other bots
@@ -200,24 +200,34 @@ class BotController:
 
 # Bot Output Redirecting And Logging; to assure all output is logged into file
 class Logger:
+	_REGEX_boc = re.compile('\x1B\[.*?m')   # BeginOfColor
+	_REGEX_eoc = re.compile('\x03\{.*?\}')  # EndOfColor
+	_REGEX_eol = re.compile('\n')           # EndOfLine
 	def __init__(self, filename, **param):
 		self.file = codecs.open(filename, **param)
 		self._filename = filename
 		self._param = param
+		if logger_tmsp:
+			self.file.write( self._get_tmsp() )
 	def write(self, string):
-		self.file.flush()
-		string = re.sub('\x1B\[.*?m', '', string)	# make more readable
-		string = re.sub('\x03\{.*?\}', '', string)	#
-		if logger_tmsp: string = re.sub('\n', '\n' + dtbext.date.getTimeStmpNow(full = True, humanreadable = True, local = True) + ':: ', string)
-		result = self.file.write( str(string).decode('latin-1') )
-		self.file.flush()
-		return result
+		string = self._REGEX_boc.sub('', string)  # make more readable
+		string = self._REGEX_eoc.sub('', string)  #
+		if logger_tmsp:
+			string = self._REGEX_eol.sub('\n' + self._get_tmsp(), string)
+		res = self.file.write( str(string).decode('latin-1') )
+		self.flush()
+		return res
 	def close(self):
-		self.file.close()
+		self.file.write( '\n' )
+		self.flush()
+		res = self.file.close()
 		#del self.file
 		self.file = None
+		return res
 	def flush(self):
-		self.file.flush()
+		return self.file.flush()
+	def _get_tmsp(self):
+		return dtbext.date.getTimeStmpNow(full = True, humanreadable = True, local = True) + ':: '
 
 class OutputLog:
 	def __init__(self, addlogname=None):
@@ -238,12 +248,6 @@ class OutputLog:
 
 		if self.logfile:
 			self.logfile.close()
-
-	def switch(self, addlogname=""):
-		pywikibot.output(u'switching log to "...%s.log", please look there ...' % addlogname)
-
-		self.close()
-		self.__init__(addlogname=addlogname)
 
 
 # Retrieve revision number of pywikibedia framework
@@ -290,25 +294,16 @@ def main():
 			            do_dict[bot_name],
 		                    error )
 
+		# magic words for subster, look also at 'subster.py' (should be strings, but not needed)
 		#if bot.desc == u'"SubsterBot"':
-		if bot_name == 'subster':
-			if cron:
-				# use another log (for subster because of 'panel.py')
-				logname_enh = "_subster"
-				log.switch(addlogname=logname_enh)
-			# magic words for subster, look also at 'subster.py' (should be strings, but not needed)
-			if not no_magic_words:
-				bot.bot.magic_words = {'BOTerror':          str(bool(error.error_buffer)),
-				                       'BOTerrortraceback': str([item[2] for item in error.error_buffer]),}
-				                       #'BOTversion':        '0.2.0000, rev. ' + __revision__,
-				                       #'BOTrunningsubbots': bot_order,}
-			bot.trigger()
-			if cron:
-				# back to default log (for everything else than subster)
-				logname_enh = ""
-				log.switch(addlogname=logname_enh)
-		else:
-			bot.trigger()
+		if (bot_name == 'subster') and (not no_magic_words):
+			bot.bot.magic_words = {'BOTerror':          str(bool(error.error_buffer)),
+				                     'BOTerrortraceback': str([item[2] for item in error.error_buffer]),
+				                     'BOTversion':        __release__,
+				                     'BOTframework':      __revision__,
+				                     'BOTrunningsubbots': bot_order,
+				                     }
+		bot.trigger()
 
 	pywikibot.output(u'\nDONE.')
 	return

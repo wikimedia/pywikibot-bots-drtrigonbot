@@ -296,6 +296,23 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		pywikibot.output(u'\03{lightred}** Receiving User List (wishes): %s\03{default}' % self._userListPage)
 		self._user_list = self.loadUsersConfig(self._userListPage)
 
+		# [JIRA: DRTRIGON-8, DRTRIGON-32]
+		# (this is a possible but dangerous solution, could
+		# inhibit notifications between the bot users disc. pages)
+		#bot_user_ignorepage = []
+		#for user in self._user_list:
+		#	_userPage = pywikibot.Page(self.site, u'Benutzer_Diskussion:%s' % user.name())
+ 		#	if _userPage.isRedirectPage():
+ 		#		_userPage = _userPage.getRedirectTarget()
+ 		#	self.loadMode(_userPage)
+		#	if   self._mode:
+		#		bot_user_ignorepage.append( self._tmpl_data )
+		#	elif (u'userResultPage' in user.param):
+		#		bot_user_ignorepage.append( u'Benutzer:%s' % user.param['userResultPage'] )
+		#if 'ignorepage_list' in bot_config['regex_compile']:
+		#	bot_user_ignorepage = [re.compile(item) for item in bot_user_ignorepage]
+		#self._param_default['ignorepage_list'] += bot_user_ignorepage
+
 		pywikibot.output(u'\03{lightred}** Receiving Job Queue (Maintenance Messages)\03{default}')
 		page = pywikibot.Page(self.site, bot_config['maintenance_queue'])
 		self.maintenance_msg = self.loadJobQueue(page, bot_config['queue_security'], debug = ('write2wiki' in debug))
@@ -589,6 +606,8 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		# feed data to pages
 		self.pages.update_work(work)
 
+	## @todo generate a time sorted backling list and use the 2000 newest ones!
+	#        \n[ JIRA: DRTRIGON-8 ]
 	def getUserBacklinks(self):
 		"""Check wiki on backlinks to specific user.
 

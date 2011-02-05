@@ -103,6 +103,7 @@ class BasicBot(basic.BasicBot):
 			self._tmpl_data = tmpl[u'data']
 			if regex_compile:
 				self._tmpl_data = re.compile(self._tmpl_data)
+			#if hasattr(self, '_param'):  # [JIRA: DRTRIGON-8, DRTRIGON-32]
 			self._param['ignorepage_list'].append( self._tmpl_data )
 
 			# update template and content
