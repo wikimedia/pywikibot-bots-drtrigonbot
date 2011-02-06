@@ -79,9 +79,10 @@ Options/parameters:
 #  @verbatim python clean_user_sandbox.py @endverbatim
 #  @verbatim python sum_disc.py @endverbatim
 #
-__version__  = '$Id$'
-__revision__ = '8916'
-__release__  = '1.0.????'
+__version__       = '$Id$'
+__framework_rev__ = '8927'
+__release_ver__   = '1.0'
+__release_rev__   = '%i'
 #
 
 # wikipedia-bot imports
@@ -94,6 +95,7 @@ import dtbext
 import wikipedia as pywikibot
 
 import traceback, StringIO
+import pysvn
 
 
 logname = pywikibot.config.datafilepath('../public_html/DrTrigonBot', '%s.log')
@@ -251,13 +253,42 @@ class OutputLog:
 
 
 # Retrieve revision number of pywikibedia framework
-def getversion_svn():
+def getSVN_framework_ver():
 	# framework revision?
 	buf = pywikibot.getSite().getUrl( 'http://svn.wikimedia.org/viewvc/pywikipedia/trunk/pywikipedia/', no_hostname = True, retry = False )
 	match = re.search('<td>Directory revision:</td>\n<td><a (.*?)>(.*?)</a> \(of <a (.*?)>(.*?)</a>\)</td>', buf)
 	if match and (len(match.groups()) > 0):
+		framework_rev   = int(match.groups()[-1])
+		__framework_rev = int(__framework_rev__)
+		if   framework_rev <  __framework_rev:
+			info = '<'
+		elif framework_rev == __framework_rev:
+			info = '='
+		elif framework_rev <= (__framework_rev + 100):
+			info = '~'
+		elif framework_rev <= (__framework_rev + 500):
+			info = '>'
+		else:
+			info = '>>'
+		pywikibot.output(u'  Directory revision: %s (%s %s)' % (framework_rev, info, __framework_rev__))
+	else:
+		pywikibot.output(u'  WARNING: could not retrieve information!')
+
+# Retrieve revision number of pywikibedia framework
+def getSVN_release_ver():
+	global __release_rev__
+	# local release revision?
+	client = pysvn.Client()
+	#client.info2('.', revision=pysvn.Revision( pysvn.opt_revision_kind.head ))
+	rel = max( [item[1]['rev'].number for item in client.info2('.')] )
+	__release_rev__ = __release_rev__ % rel
+	# release revision?
+	buf = pywikibot.getSite().getUrl( 'http://svn.toolserver.org/svnroot/drtrigon/', no_hostname = True, retry = False )
+	match = re.search('<title>drtrigon - Revision (.*?): /</title>', buf)
+	if match and (len(match.groups()) > 0):
+		release_rev = match.groups()[-1]
 		info = {True: '=', False: '>'}		
-		pywikibot.output(u'  Directory revision: %s (%s %s)' % (match.groups()[-1], info[(match.groups()[-1]==__revision__)], __revision__))
+		pywikibot.output(u'  Directory revision: %s (%s %s)' % (release_rev, info[(release_rev==__release_rev__)], __release_rev__))
 	else:
 		pywikibot.output(u'  WARNING: could not retrieve information!')
 
@@ -271,13 +302,14 @@ def main():
 	pywikibot.output(u'SCRIPT CALL:')
 	pywikibot.output(u'  ' + u' '.join(sys.argv))
 
-	# logging of framework info
-	pywikibot.output(u'\nFRAMEWORK VERSION:')
+	# logging of release/framework info
+	pywikibot.output(u'\nRELEASE/FRAMEWORK VERSION:')
 	for item in infolist: pywikibot.output(u'  %s' % item)
 
-	# new framework revision?
-	pywikibot.output(u'\nLATEST FRAMEWORK REVISION:')
-	getversion_svn()
+	# new release/framework revision?
+	pywikibot.output(u'\nLATEST RELEASE/FRAMEWORK REVISION:')
+	getSVN_release_ver()
+	getSVN_framework_ver()
 
 	# processing of messages on bot discussion page
 	if pywikibot.getSite().messages():
@@ -299,8 +331,8 @@ def main():
 		if (bot_name == 'subster') and (not no_magic_words):
 			bot.bot.magic_words = {'BOTerror':          str(bool(error.error_buffer)),
 				                     'BOTerrortraceback': str([item[2] for item in error.error_buffer]),
-				                     'BOTversion':        __release__,
-				                     'BOTframework':      __revision__,
+				                     'BOTrelease_ver':    __release_ver__ + '.' + __release_rev__,
+				                     'BOTframework_ver':  __framework_rev__,
 				                     'BOTrunningsubbots': bot_order,
 				                     }
 		bot.trigger()

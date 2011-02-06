@@ -245,7 +245,7 @@ class Page(pywikibot.Page):
 			}
 
 			pywikibot.get_throttle()
-			pywikibot.output(u"  Reading section %s from %s." % (section[u'index'], self.title(asLink=True)))
+			pywikibot.output(u"  Reading section %s from %s via API..." % (section[u'index'], self.title(asLink=True)))
 
 			result = query.GetData(params, self.site())
 			r = result[u'query'][u'pages'].values()[0]

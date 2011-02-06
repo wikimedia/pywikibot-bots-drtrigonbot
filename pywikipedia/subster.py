@@ -237,7 +237,10 @@ def main():
 			else:
 				pywikibot.showHelp()
 				return
-	bot.run()
+	try:
+		bot.run()
+	except KeyboardInterrupt:
+		pywikibot.output('\nQuitting program...')
 
 if __name__ == "__main__":
     try:

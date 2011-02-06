@@ -84,7 +84,7 @@ right parameter.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: checkimages.py 8908 2011-02-01 19:25:18Z filnik $'
+__version__ = '$Id: checkimages.py 8924 2011-02-05 22:34:21Z amir $'
 #
 
 import re, time, urllib, urllib2, os, locale, sys, datetime
@@ -107,7 +107,7 @@ n_txt = {
     'ar'     :u'\n{{subst:لم}}',
     'de'     :u'{{Benutzer:ABF/D|~~~~}} {{Dateiüberprüfung/benachrichtigt (Kategorie)|{{subst:LOCALYEAR}}|{{subst:LOCALMONTH}}|{{subst:LOCALDAY}}}} {{Dateiüberprüfung/benachrichtigt (Text)|Lizenz|||||}} --This was added by ~~~~-- ',
     'en'     :u'\n{{subst:nld}}',
-    'fa'     :u'{{حق تکثیر تصویر نامعلوم}}',
+    'fa'     :u'{{جا:حق تکثیر تصویر نامعلوم}}',
     'fr'     :u'\n{{subst:lid}}',
     'ga'     :u'\n{{subst:Ceadúnas de dhíth}}',
     'hu'     :u'\n{{nincslicenc|~~~~~}}',
@@ -129,7 +129,7 @@ txt_find =  {
     'ar':[u'{{لت', u'{{لا ترخيص'],
     'de':[u'{{DÜP', u'{{Dateiüberprüfung'],
     'en':[u'{{nld', u'{{no license'],
-    'fa':[u'{{حق تکثیر تصویر نامعلوم'],
+    'fa':[u'{{حق تکثیر تصویر نامعلوم۲'],
     'ga':[u'{{Ceadúnas de dhíth', u'{{Ceadúnas de dhíth'],
     'hu':[u'{{nincsforrás',u'{{nincslicenc'],
     'it':[u'{{unverdata', u'{{unverified'],

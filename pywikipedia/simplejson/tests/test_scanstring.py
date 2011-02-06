@@ -1,5 +1,4 @@
 import sys
-import decimal
 from unittest import TestCase
 
 import simplejson as json
@@ -109,3 +108,10 @@ class TestScanString(TestCase):
                           "xxx")
         self.assertRaises(UnicodeDecodeError,
                           json.encoder.encode_basestring_ascii, "xx\xff")
+
+    def test_overflow(self):
+        # Python 2.5 does not have maxsize
+        maxsize = getattr(sys, 'maxsize', sys.maxint)
+        self.assertRaises(OverflowError, json.decoder.scanstring, "xxx",
+                          maxsize + 1)
+

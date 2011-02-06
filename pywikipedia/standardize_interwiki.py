@@ -13,7 +13,7 @@ Parameters:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: standardize_interwiki.py 8898 2011-01-27 12:26:47Z xqt $'
+__version__='$Id: standardize_interwiki.py 8925 2011-02-05 22:40:10Z amir $'
 #
 
 import os, sys
@@ -27,6 +27,7 @@ comment = {
     'cs':u'Standadizace interwiki',
     'de':u'Bot: Interwikilinks standardisieren',
     'en':u'Robot: Interwiki standardization',
+    'fa':u'ربات: تصحیح جایگذاری میان‌ویکی‌ها',
     'fr':u'Robot : Standardisation des interwikis',
     'he':u'בוט: מסדר את האינטרוויקי',
     'it':u'Bot: Standardizzo interwiki',
