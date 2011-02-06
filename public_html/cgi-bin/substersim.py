@@ -1,19 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""(Test) CGI python script
+"""DrTrigonBot subster simulation panel (CGI) for toolserver
 
-to make it usable from server, use: 'chmod 755 test.py', which results in
-'-rwxr-xr-x 1 drtrigon users 447 2009-04-16 19:13 test.py'
+(for mor info look at 'panel.py' also!)
 """
-# http://www.gpcom.de/support/python
 
+## @package substersim.py
+#  @brief   DrTrigonBot subster simulation panel (CGI) for toolserver
 #
+#  @copyright Dr. Trigon, 2008-2011
 #
-# (C) Dr. Trigon, 2009-2010
+#  @section FRAMEWORK
 #
-# DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
+#  Python wikipedia robot framework, DrTrigonBot.
+#  @see http://pywikipediabot.sourceforge.net/
+#  @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
-# Distributed under the terms of the MIT license.
+#  @section LICENSE
+#
+#  Distributed under the terms of the MIT license.
+#  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
 __version__='$Id$'
 #
@@ -22,6 +28,8 @@ __version__='$Id$'
 # debug
 import cgitb
 cgitb.enable()
+
+import cgi
 
 
 ## import any path or dir (not only subdirs of current script)
@@ -40,53 +48,33 @@ cgitb.enable()
 #            if fp: fp.close()
 #    return
 
-import cgi
+
 from time import *
 # http://www.ibm.com/developerworks/aix/library/au-python/
-#import commands, os, errno, imp, sys
 import os, sys, re
 import StringIO, traceback, signal
+
+
 bot_path = os.path.realpath("../../pywikipedia/")
 #importglobal("subster_beta", bot_path)
 #importglobal(["wikipedia", "xmlreader", "config", "dtbext", "subster_beta"], bot_path)
 # http://stackoverflow.com/questions/279237/python-import-a-module-from-a-folder
-from xml.sax import saxutils, make_parser		# dummy import (by adapting 'suber.py' they should be supressable)
-from xml.sax.handler import feature_namespaces		# (the whole 'xml' directory !)
-import xml.utils.iso8601				#
 sys.path.append( bot_path )				# bot import form other path (!)
+#import subster						#
 import subster_beta					#
-import config
 
 
-footer = """<small>DrTrigonBot subster simulation panel, written by <a href="https://wiki.toolserver.org/view/User:DrTrigon">DrTrigon</a>. 
-<!-- <img src="https://wiki.toolserver.org/w/images/e/e1/Wikimedia_Community_Logo-Toolserver.png" 
-width="16" height="16" alt="Toolserver"> -->
-<a href="http://tools.wikimedia.de/"><img 
-src="https://wiki.toolserver.org/favicon.ico" border="0" 
-alt="Toolserver"> Powered by Wikimedia Toolserver</a>.
-<a href="http://de.selfhtml.org/index.htm"><img 
-src="http://de.selfhtml.org/src/favicon.ico" border="0" width="16" 
-height="16" alt="SELFHTML"> Thanks to SELFHTML</a>.
-"""
-footer_w3c = """<!--<a href="http://validator.w3.org/check?uri=referer"><img 
-src="http://www.w3.org/Icons/valid-html401-blue" 
-alt="Valid HTML 4.01 Transitional" height="16" width="44" 
-border="0"></a>--></small>
-</span></p>
-"""
+# === panel HTML stylesheets === === ===
+# MAY BE USING Cheetah (http://www.cheetahtemplate.org/) WOULD BE BETTER (or needed at any point...)
+#
+#import ps_plain as style   # panel-stylesheet 'plain'
+#import ps_simple as style  # panel-stylesheet 'simple'
+#import ps_wiki as style    # panel-stylesheet 'wiki (monobook)'
+import ps_wikinew as style # panel-stylesheet 'wiki (new)' not CSS 2.1 compilant
 
-maindisplay_content = """Content-Type: text/html
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-  <title>DrTrigonBot subster simulation panel</title>
-</head>
-<body>
-<p><span style="font-family:sans-serif">
-DrTrigonBot subster simulation panel<br>
-<small>(analog to <a href="http://meta.wikimedia.org/wiki/Special:ExpandTemplates">Special:ExpandTemplates</a>)</small><br><br><br>
+
+maindisplay_content = \
+"""<small>(analog to <a href="http://meta.wikimedia.org/wiki/Special:ExpandTemplates">Special:ExpandTemplates</a>)</small><br><br>
 Version:<br>
 panel: %(panel_ver)s<br>
 bot: %(subster_bot_ver)s<br><br>
@@ -102,8 +90,8 @@ Simulation:
     postproc=<input name="postproc" type="text" size="60" maxlength="200" value="%(postproc)s"><br>
     wiki=<input name="wiki" type="text" size="60" maxlength="200" value="%(wiki)s"><br>
     (add. params) <input name="add_params" type="text" size="60" maxlength="200" value="%(add_params)s"><br>
-  <p>
   </p>
+  <p>
     content: <textarea name="content" cols="60" rows="10">%(content)s</textarea>
   </p>
   <input type="submit" value=" Simulate ">
@@ -112,11 +100,8 @@ Simulation:
 </form><br><br>
 Bot output:
 <p style="border-color:#888888; border-width:1px; border-style:solid; padding:4px"><small>%(bot_output)s</small></p>
-<br>
-%(footer)s
-</body>
-</html>
-"""
+<br>"""
+
 
 sim_param_default = {	'value': 	'val',
 			'action':	'',
@@ -148,7 +133,8 @@ def timeout_handler(signum, frame):
 
 
 def maindisplay():
-	param_default = subster_beta.SubsterBot._param_default
+#	param_default = subster_beta.SubsterBot._param_default
+	param_default = subster_beta.SubsterRobot._param_default
 	param_default['postproc'] = re.sub('"', '\'', param_default['postproc'])	# hack: wegen unsauberer def. in 'subster_beta.py'
 	param_default.update(sim_param_default)
 	params = {}
@@ -172,7 +158,8 @@ def maindisplay():
 		signal.alarm(timeout)
 
 		try:
-			params['content'] = subster_beta.SubsterBot().run(sim=params)
+#			params['content'] = subster_beta.SubsterBot().run(sim=params)
+			params['content'] = subster_beta.SubsterRobot().run(sim=params)
 		except:
 			#params['content'] = "ERROR OCCURRED DURING BOT SIMULATION"
 			bot_output.append(gettraceback(sys.exc_info())[2])
@@ -182,7 +169,7 @@ def maindisplay():
 
 		# restore stdout and stderr
 		(sys.stdout, sys.stderr) = (out_stream, err_stream)
-		bot_output[0] = stdlog.getvalue()
+		bot_output[0] = re.sub('\x03', '', stdlog.getvalue())
 		stdlog.close()
 
 	bot_output = re.sub("\n", "<br>\n", "\n".join(bot_output))
@@ -190,7 +177,6 @@ def maindisplay():
 	data = {'panel_ver':		__version__,
 		'subster_bot_ver':	subster_beta.__version__,
 		'bot_output':		bot_output,
-		'footer':		footer + footer_w3c,
 	}
 
 	if type(params['content']) == type(u""):
@@ -199,18 +185,21 @@ def maindisplay():
 
 	data.update( params )
 
-	return maindisplay_content % data
+	data.update({	'refresh':	'',
+			'title':	'DrTrigonBot subster simulation panel',
+			'tsnotice': 	'',
+			#'content':	displaystate_content,
+			'p-status':	"<tr><td></td></tr>",
+			#'footer': 	style.footer + style.footer_w3c + style.footer_w3c_css,
+			'footer': 	style.footer + style.footer_w3c, # wiki (new) not CSS 2.1 compilant
+	})
+	data['content'] = maindisplay_content % data
+
+	return style.page % data
 
 
 form = cgi.FieldStorage()
 
 # operational mode
 action = form.getvalue('action', '')
-#if action == 'logstat':
-#	html = logstat(form)
-#else:
-#	html = maindisplay()
-
-html = maindisplay()
-
-print html
+print maindisplay()
