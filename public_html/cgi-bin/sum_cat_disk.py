@@ -168,8 +168,8 @@ _SQL_query_wiki_info = \
    dbname,
    CONCAT("http://", DOMAIN, script_path, "api.php") AS url
  FROM toolserver.wiki
- WHERE family = "wikipedia";"""
-# ORDER BY SIZE DESC LIMIT 10;"""
+ WHERE family = "wikipedia"
+ ORDER BY SIZE DESC LIMIT %i;"""
 
 
 SQL_LIMIT_max = 1000
@@ -246,7 +246,7 @@ def checkRecentEdits_API(cat, end):
 	return res
 
 def get_wikiinfo_db(wiki, limit=SQL_LIMIT_max):
-	for item in query_db(_SQL_query_wiki_info, limit):
+	for item in query_db(_SQL_query_wiki_info % limit, limit):
 		if item[2] == (wiki + "wiki_p"):
 			return item
 	return None

@@ -62,6 +62,7 @@ bot_path = os.path.realpath("../../pywikipedia/")
 sys.path.append( bot_path )				# bot import form other path (!)
 #import subster						#
 import subster_beta					#
+import config						#
 
 
 # === panel HTML stylesheets === === ===
