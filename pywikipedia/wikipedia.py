@@ -120,7 +120,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 8864 2011-01-21 05:52:42Z purodha $'
+__version__ = '$Id: wikipedia.py 8928 2011-02-07 08:46:04Z alexsh $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -7562,7 +7562,7 @@ def handleArgs(*args):
 
 ================================================================================
 \03{lightyellow}WARNING:\03{lightred} your python version might trigger issue #3081100\03{default} 
-See https://sourceforge.net/tracker/index.php?func=detail&aid=3081100&group_id=93107&atid=603138 for more information.
+See http://goo.gl/W8lJB for more information.
 \03{lightyellow}Use an older python version (<2.6.5) if you are running on wikimedia sites!\03{default} 
 ================================================================================
 

@@ -4,11 +4,14 @@ import time
 
 import test_utils
 
-import pagegenerators
+import pagegenerators, catlib
 import dtbext
 import userlib
 # Splitting the bot into library parts
 import wikipedia as pywikibot
+
+
+site = pywikibot.getSite()
 
 
 #TESTPAGE = u'Benutzer:DrTrigonBot/ToDo-Liste'
@@ -295,10 +298,21 @@ dtbext.pywikibot.debug = True
 #print userlib.User(pywikibot.getSite(), u'º_the_Bench_º')
 
 
-import botlist
-bots = botlist.get()
-print bots
-print len(bots)
+#import botlist
+#bots = botlist.get()
+#print bots
+#print len(bots)
+
+
+#cat = catlib.Category(site, "%s:%s" % (site.namespace(14), u'Baden-Württemberg'))
+cat = catlib.Category(site, "%s:%s" % (site.namespace(14), u'Portal:Hund'))
+for page in pagegenerators.CategorizedPageGenerator(cat, recurse=True):
+  if not page.isTalkPage():
+    page = page.toggleTalkPage()
+#  try:
+  print page.title(), page.getVersionHistory(revCount=1)[0][1]
+#  except pywikibot.exceptions.NoPage:
+#    pass
 
 
 print "done."

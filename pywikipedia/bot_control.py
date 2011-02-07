@@ -80,9 +80,10 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '8927'
+__framework_rev__ = '8938'
 __release_ver__   = '1.0'
-__release_rev__   = '%i'
+#__release_rev__   = '%i'
+__release_rev__   = '85'
 #
 
 # wikipedia-bot imports
@@ -95,7 +96,7 @@ import dtbext
 import wikipedia as pywikibot
 
 import traceback, StringIO
-import pysvn
+#import pysvn  # JIRA: TS-936
 
 
 logname = pywikibot.config.datafilepath('../public_html/DrTrigonBot', '%s.log')
@@ -278,10 +279,10 @@ def getSVN_framework_ver():
 def getSVN_release_ver():
 	global __release_rev__
 	# local release revision?
-	client = pysvn.Client()
-	#client.info2('.', revision=pysvn.Revision( pysvn.opt_revision_kind.head ))
-	rel = max( [item[1]['rev'].number for item in client.info2('.')] )
-	__release_rev__ = __release_rev__ % rel
+#	client = pysvn.Client()
+#	#client.info2('.', revision=pysvn.Revision( pysvn.opt_revision_kind.head ))
+#	rel = max( [item[1]['rev'].number for item in client.info2('.')] )
+#	__release_rev__ = __release_rev__ % rel
 	# release revision?
 	buf = pywikibot.getSite().getUrl( 'http://svn.toolserver.org/svnroot/drtrigon/', no_hostname = True, retry = False )
 	match = re.search('<title>drtrigon - Revision (.*?): /</title>', buf)

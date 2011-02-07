@@ -492,6 +492,9 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		for item in bot_config['translate']:
 			self._param[item] = pywikibot.translate(self.site.lang, self._param[item])
 
+	## @todo the error correctors 'old history' and 'notify tag error' can be removed if
+	#        they do not appear in bot logs anymore!
+	#        \n[ JIRA: e.g. DRTRIGON-68 ]
 	def loadHistory(self, rollback = 0):
 		"""Read history, and restore the page objects with sum_disc_data.
 
