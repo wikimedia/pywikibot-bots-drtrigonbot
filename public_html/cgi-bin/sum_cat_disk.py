@@ -73,6 +73,10 @@ displaystate_content = \
 <form action="sum_cat_disk.py">
   <table>
     <tr>
+      <td>wiki:</td>
+      <td><input name="wiki" value="%(wiki)s"></td>
+    </tr>
+    <tr>
       <td>Category:</td>
       <td><input name="cat" value="%(cat)s"></td>
     </tr>
@@ -97,6 +101,10 @@ displaystate_content = \
 %(output)s"""
 
 
+# http://www.mediawiki.org/wiki/Manual:Database_layout
+# http://en.wikipedia.org/wiki/Wikipedia:Namespace
+# http://sql.1keydata.com/de/sql-like.php
+
 # https://wiki.toolserver.org/view/Queries#Pages_in_a_specific_category_using_a_specific_template
 _SQL_query_ns_content = \
 """SELECT page_title, page_namespace
@@ -118,7 +126,7 @@ WHERE page_title LIKE "%s"
 AND page_namespace = %i
 LIMIT %i"""
 
-#_SQL_query_02 = \
+#_SQL_query__ = \
 #"""SELECT page_title, page_namespace, page_touched
 #FROM page
 #WHERE page_title IN
@@ -127,6 +135,41 @@ LIMIT %i"""
 #JOIN categorylinks ON cl_from = page_id WHERE cl_to = "%s")
 #AND page_namespace IN (1, 3, 5, 9, 11, 13, 15, 91, 93, 101, 109)
 #LIMIT %i"""
+
+# written by Merlissimo (merl) - Thanks a lot!
+# http://kpaste.net/da2d, http://kpaste.net/5b2f97f
+# ~/devel/experimental/diskchanges.sql
+# (need db write access; e.g. not possible during 'schema changes in progress')
+_SQL_query_01 = \
+"""CREATE TEMPORARY TABLE cattemp (catname VARCHAR(255) PRIMARY KEY);
+CREATE TEMPORARY TABLE cat (catname VARCHAR(255) PRIMARY KEY, depth INT, INDEX(depth));
+INSERT IGNORE INTO cat (catname, depth) SELECT page_title, 0 FROM dewiki_p.page WHERE page_namespace=14 AND page_title='%s';"""
+_SQL_query_02 = \
+"""DELETE FROM cattemp;
+INSERT IGNORE INTO cattemp (catname) SELECT catname FROM cat WHERE depth=%i;
+INSERT IGNORE INTO cat (catname, depth) SELECT page_title, %i FROM cattemp INNER JOIN dewiki_p.categorylinks ON catname=cl_to INNER JOIN dewiki_p.page ON cl_from = page_id WHERE page_namespace=14;"""
+_SQL_query_03 = \
+"""SELECT rc_namespace, rc_title, rc_user_text, rc_timestamp, rc_comment
+ FROM cat
+  INNER JOIN dewiki_p.categorylinks ON ct = cl_to
+  INNER JOIN dewiki_p.page p1 ON cl_from = page_id
+  INNER JOIN dewiki_p.page p2 ON p1.page_title = p2.page_title AND p1.page_namespace+1=p2.page_namespace
+  INNER JOIN dewiki_p.recentchanges ON p2.page_id = rc_cur_id
+ WHERE p1.page_namespace IN (0,10,14)
+  AND rc_timestamp >= DATE_SUB(CURDATE(),INTERVAL 3 DAY)
+  AND rc_old_len < rc_new_len
+ ORDER BY rc_timestamp DESC;"""
+
+# https://wiki.toolserver.org/view/Database_access#wiki
+_SQL_query_wiki_info = \
+"""SELECT 
+   lang,
+   CONCAT("sql-s", server) AS dbserver,
+   dbname,
+   CONCAT("http://", DOMAIN, script_path, "api.php") AS url
+ FROM toolserver.wiki
+ WHERE family = "wikipedia";"""
+# ORDER BY SIZE DESC LIMIT 10;"""
 
 
 SQL_LIMIT_max = 1000
@@ -140,12 +183,13 @@ def query_db(query, limit=SQL_LIMIT_max):
 
 	return [row for row in r.fetch_row(limit)]
 
-def get_cat_tree(cat, limit=SQL_LIMIT_max):
+# recursive
+def get_cat_tree_rec(cat, limit=SQL_LIMIT_max):
 	res = set([])
-	for row in query_db(_SQL_query_ns_content % (cat, limit)):
+	for row in query_db(_SQL_query_ns_content % (cat.replace(' ', '_'), limit)):
 		# Category
 		if int(row[1]) == 14:
-			res = res.union( get_cat_tree(row[0], limit) )
+			res = res.union( get_cat_tree_rec(row[0], limit) )
 			continue
 
 		# Page
@@ -153,9 +197,25 @@ def get_cat_tree(cat, limit=SQL_LIMIT_max):
 
 	return res
 
+# iterative (heavily SQL based)
+def get_cat_tree_it(cat, limit=SQL_LIMIT_max):
+        db.query(_SQL_query_01 % cat.replace(' ', '_'))
+        r = db.store_result()
+	return r
+
+	for i in range(25):
+	        db.query(_SQL_query_02 % (i, i+1))
+        	r = db.store_result()
+
+#	int [] co = stmt.executeBatch();
+#	if(co[2] == 0) break;
+
+        db.query(_SQL_query_03)
+        r = db.store_result()
+
 def checkRecentEdits_db(cat, end, limit=SQL_LIMIT_max):
 	res = []
-	for row in list(get_cat_tree(cat, limit)):
+	for row in list(get_cat_tree_rec(cat, limit)):
 		ns = row[1]
 		ns = ns + (1 - (ns % 2))  # next bigger odd
 		subrow = query_db(_SQL_query_page_info % (row[0], ns, 1))
@@ -185,6 +245,12 @@ def checkRecentEdits_API(cat, end):
 
 	return res
 
+def get_wikiinfo_db(wiki, limit=SQL_LIMIT_max):
+	for item in query_db(_SQL_query_wiki_info, limit):
+		if item[2] == (wiki + "wiki_p"):
+			return item
+	return None
+
 
 def displayhtmlpage(form):
 	cat    = form.getvalue('cat', '')
@@ -211,6 +277,10 @@ def displayhtmlpage(form):
 
 #	res += str( query_db(_SQL_query_02 % (cat, )) )
 #	res += "<br>\n"
+
+#	cat = 'Portal:Hund'
+#	data['output'] = str( get_cat_tree_it(cat, limit=SQL_LIMIT_max) )
+#	cat = ''
 
 	if cat:
 		tic = time()
@@ -248,11 +318,14 @@ def displayhtmlpage(form):
 
 	data['output'] += "<br>\n"
 
+	data['output'] += '<small>%s</small><br>\n' % str( get_wikiinfo_db(wiki) )
+
 	data.update({	'title':	'DrTrigonBot category discussion summary',
 			'refresh':	'',
 			'tsnotice': 	style.print_tsnotice(),
-			'p-status':	'<tr><td></td></tr>',
+			'p-status':	'<tr><td><small><a href="http://status.toolserver.org/" target="_blank">DB status</a></small></td></tr>',
 			'footer': 	style.footer + style.footer_w3c, # wiki (new) not CSS 2.1 compilant
+			'wiki':		wiki,
 			'cat':		cat,
 			'start':	start,
 			'period':	period,
@@ -263,10 +336,11 @@ def displayhtmlpage(form):
 
 
 form = cgi.FieldStorage()
+wiki = form.getvalue('wiki', 'de')
 
 # Establich a connection
 #db = MySQLdb.connect(db='enwiki_p', host="enwiki-p.rrdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
-db = MySQLdb.connect(db='dewiki_p', host="dewiki-p.rrdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
+db = MySQLdb.connect(db=wiki+'wiki_p', host=wiki+"wiki-p.rrdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
 
 # operational mode
 print displayhtmlpage(form)
