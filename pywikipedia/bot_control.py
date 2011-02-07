@@ -6,7 +6,6 @@ that DrTrigonBot does. That are:
 	-sandbox cleaner
 	-sum disc (sum disc hisory compression)
 	-subster
-	-page disc		[experimental]
 ...
 
 Options/parameters:
@@ -83,7 +82,7 @@ __version__       = '$Id$'
 __framework_rev__ = '8938'
 __release_ver__   = '1.0'
 #__release_rev__   = '%i'
-__release_rev__   = '85'
+__release_rev__   = '87'
 #
 
 # wikipedia-bot imports
@@ -126,6 +125,20 @@ bot_list = { 'clean_user_sandbox': (clean_user_sandbox, u'clean userspace Sandbo
              'page_disc':          (page_disc, u'page_disc (beta test)'), }
 #bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'subster', 'page_disc' ]
 bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'subster' ]
+
+
+# debug tools
+# 'write2wiki', 'write2hist'		# operational mode (default)
+# 'user'				# no write, skip users
+# 'write2hist'				# write only history (for code changes and smooth update)
+# 'write2wiki', 'user'			# write wiki, skip users
+# 'write2hist', 'toolserver'		# write only history (for code changes and smooth update), toolserver down
+debug = []				# no write, all users
+#debug.append( 'write2wiki' )		# write to wiki (operational mode)
+#debug.append( 'user' )			# skip users
+debug.append( 'write2hist' )		# write history (operational mode)
+#debug.append( 'toolserver' )		# toolserver down
+#debug.append( 'code' )			# code debugging
 
 
 # Bot Error Handling; to prevent bot errors to stop execution of other bots
@@ -196,6 +209,7 @@ class BotController:
 		pywikibot.output(u'\nRUN BOT: ' + self.desc)
 
 		try:
+			self.bot.debug = debug
 			self.bot.main()
 		except:
 			self.ErrorHandler.gettraceback(sys.exc_info())

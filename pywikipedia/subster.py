@@ -49,6 +49,7 @@ bot_config = {	# unicode values
 					#'postproc':	'("","")',
 					'postproc':	'(\'\', \'\')',
 					'wiki':		'False',
+					'magicwords_only':	'False',
 					}
 }
 
@@ -57,7 +58,9 @@ bot_config = {	# unicode values
 magic_words = {} # no magic word substitution (for empty dict)
 
 # debug tools
-debug = True
+# (look at 'bot_control.py' for more info)
+debug = []				# no write, all users
+#debug.append( 'write2wiki' )		# write to wiki (operational mode)
 
 
 class SubsterBot(dtbext.basic.BasicBot):
@@ -118,7 +121,7 @@ class SubsterBot(dtbext.basic.BasicBot):
 				#if substed_tags:
 					self.outputContentDiff(content, substed_content)
 
-					if debug:
+					if 'write2wiki' not in debug:
 						pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
 						continue
 
@@ -140,20 +143,30 @@ class SubsterBot(dtbext.basic.BasicBot):
 
 		substed_content = content
 		substed_tags = []  # DRTRIGON-73
+
+		# 1.) subst (internal) magic words
+		for subitem in magic_words.keys():
+			substed_content = self.get_var_regex(subitem).sub( (self._var_regex_str%{'var':subitem,'cont':magic_words[subitem]}),
+									   substed_content)
+			substed_tags.append(subitem)
+
+		if (len(params) == 1) and eval(params[0]['magicwords_only']):
+			return (substed_content, substed_tags)
+
 		for item in params:
-			# 1.) getUrl or wiki text
+			# 2.) getUrl or wiki text
 			if eval(item['wiki']):
 				external_buffer = self.load( dtbext.pywikibot.Page(self.site, item['url']) )
 			else:
 				external_buffer = self.site.getUrl(item['url'], no_hostname = True)
 
-			# 2.) regexp
+			# 3.) regexp
 			#for subitem in item['regex']:
 			subitem = item['regex']
 			regex = re.compile(subitem, re.S | re.I)
 			var_regex = self.get_var_regex(item['value'])
 
-			# 3.) subst in content
+			# 4.) subst in content
 			external_data = regex.search(external_buffer)
 
 			if external_data:
@@ -168,7 +181,7 @@ class SubsterBot(dtbext.basic.BasicBot):
 				external_data = self._tag_regex.sub(item['notags'], external_data)
 			#print external_data
 
-			# 4.) postprocessing
+			# 5.) postprocessing
 			item['postproc'] = eval(item['postproc'])
 			if (item['postproc'][0] == 'list'):		# create list
 				external_data = str(re.compile(item['postproc'][1], re.S | re.I).findall(external_data))
@@ -176,17 +189,11 @@ class SubsterBot(dtbext.basic.BasicBot):
 				external_data = "* " + "\n* ".join(re.compile(item['postproc'][1], re.S | re.I).findall(external_data)) + "\n"
 			#print external_data
 
-			# 5.) subst content
+			# 6.) subst content
 			prev_content = substed_content
 			substed_content = var_regex.sub((self._var_regex_str%{'var':item['value'],'cont':external_data}), substed_content, int(item['count']))
 			if (substed_content != prev_content):
 				substed_tags.append(item['value'])
-
-			# 6.) subst (internal) magic words
-			for subitem in magic_words.keys():
-				substed_content = self.get_var_regex(subitem).sub( (self._var_regex_str%{'var':subitem,'cont':magic_words[subitem]}),
-										   substed_content)
-				substed_tags.append(subitem)
 
 		return (substed_content, substed_tags)
 

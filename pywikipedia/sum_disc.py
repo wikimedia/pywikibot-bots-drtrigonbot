@@ -247,17 +247,11 @@ bot_config = {	# unicode values
 }
 
 # debug tools
-# 'write2wiki', 'write2hist'		# operational mode (default)
-# 'user'				# no write, skip users
-# 'user', 'write2hist'			# write only history, skip users
-# 'write2wiki', 'user', 'write2hist'	# write, skip users
-# 'write2hist'				# write only history (for code changes and smooth update)
-# 'write2wiki', 'user'			# write wiki, skip users
-# 'write2hist', 'toolserver'		# write only history (for code changes and smooth update), toolserver down
+# (look at 'bot_control.py' for more info)
 debug = []				# no write, all users
 #debug.append( 'write2wiki' )		# write to wiki (operational mode)
 #debug.append( 'user' )			# skip users
-debug.append( 'write2hist' )		# write history
+#debug.append( 'write2hist' )		# write history (operational mode)
 #debug.append( 'toolserver' )		# toolserver down
 #debug.append( 'code' )			# code debugging
 
