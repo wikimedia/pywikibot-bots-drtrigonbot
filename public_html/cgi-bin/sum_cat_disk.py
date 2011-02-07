@@ -42,7 +42,7 @@ import datetime
 import os, re, sys
 
 
-import MySQLdb
+import MySQLdb, _mysql_exceptions 
 
 
 bot_path = os.path.realpath("../../pywikipedia/")
@@ -218,9 +218,12 @@ def checkRecentEdits_db(cat, end, limit=SQL_LIMIT_max):
 	for row in list(get_cat_tree_rec(cat, limit)):
 		ns = row[1]
 		ns = ns + (1 - (ns % 2))  # next bigger odd
-		subrow = query_db(_SQL_query_page_info % (row[0], ns, 1))
-		if subrow and (int(subrow[0][2]) >= end):
-			res.append( subrow )
+		try:
+			subrow = query_db(_SQL_query_page_info % (row[0], ns, 1))
+			if subrow and (int(subrow[0][2]) >= end):
+				res.append( subrow )
+		except _mysql_exceptions.ProgrammingError:  # are displayed later with '(!)' mark
+			res.append( [(row[0], ns, '')] )
 
 	return res
 
@@ -305,7 +308,11 @@ def displayhtmlpage(form):
 				data['output'] += '<a href="http://de.wikipedia.org/wiki/%s" target="_blank">%s</a>' % (title, title.replace('_', ' '))
 				data['output'] += "</td>\n  <td>"
 #				data['output'] += str(subrow[0][1:])
-				data['output'] += asctime(strptime(subrow[0][2], wikitime)) + " (UTC)"
+				try:
+					tmsp = asctime(strptime(subrow[0][2], wikitime)) + " (UTC)"
+				except ValueError:
+					tmsp = subrow[0][2] + " (!)"
+				data['output'] += tmsp
 				data['output'] += "</td>\n</tr>\n"
 
 			data['output'] += "</table>\n"
