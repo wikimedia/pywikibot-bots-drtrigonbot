@@ -187,7 +187,7 @@ def maindisplay():
 
 	data.update({	'refresh':	'',
 			'title':	'DrTrigonBot subster simulation panel',
-			'tsnotice': 	'',
+			'tsnotice': 	style.print_tsnotice(),
 			#'content':	displaystate_content,
 			'p-status':	"<tr><td></td></tr>",
 			#'footer': 	style.footer + style.footer_w3c + style.footer_w3c_css,

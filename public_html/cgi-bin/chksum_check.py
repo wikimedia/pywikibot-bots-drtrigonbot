@@ -134,7 +134,7 @@ def displayhtmlpage(form):
 
         data.update({   'title':        'DrTrigonBot checksum checker',
                         'refresh':      '',
-                        'tsnotice':     '',
+                        'tsnotice':     style.print_tsnotice(),
                         'p-status':     '<tr><td></td></tr>',
                         'footer':       style.footer + style.footer_w3c, # wiki (new) not CSS 2.1 compilant
         })

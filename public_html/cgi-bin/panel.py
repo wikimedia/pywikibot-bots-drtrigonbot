@@ -187,18 +187,6 @@ def graph(xdata, *args, **kwargs):
 	#output to browser
 	return "Content-type: image/png\n\n" + f.read()
 
-# https://wiki.toolserver.org/view/Toolserver_notice
-# http://toolserver.org/sitenotice
-# http://www.mail-archive.com/toolserver-l@lists.wikimedia.org/msg01679.html
-def print_tsnotice():
-	try:
-		notice = open('/var/www/sitenotice', 'r').read()
-		if notice:
-			return style.tsnotice % { 'text': notice }
-	except IOError:
-		pass
-	return ''
-
 
 # === CGI/HTML page view user interfaces === === ===
 #
@@ -247,7 +235,7 @@ def displaystate(form):
 			'logstatraw':	sys.argv[0] + r"?action=logstat&amp;format=plain",
 			'refresh':	'15',
 			'title':	'DrTrigonBot status panel',
-			'tsnotice': 	print_tsnotice(),
+			'tsnotice': 	style.print_tsnotice(),
 			#'content':	displaystate_content,
 			'p-status':	"<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': color, 'bot': 'all:', 'state': botmsg[:-1]},
 			#'footer': 	style.footer + style.footer_w3c + style.footer_w3c_css,
@@ -364,7 +352,7 @@ def logstat(form):
 
 	data.update({	'refresh':	'',
 			'title':	'DrTrigonBot log statistics',
-			'tsnotice': 	print_tsnotice(),
+			'tsnotice': 	style.print_tsnotice(),
 			#'content':	logstat_content,
 			'p-status':	'<tr><td></td></tr>',
 			'footer': 	style.footer + style.footer_w3c,

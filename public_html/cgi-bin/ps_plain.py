@@ -85,3 +85,18 @@ footer_w3c_css = \
         alt="CSS ist valide!">
 </a>
 </small>"""
+
+
+# === functions === === ===
+#
+# https://wiki.toolserver.org/view/Toolserver_notice
+# http://toolserver.org/sitenotice
+# http://www.mail-archive.com/toolserver-l@lists.wikimedia.org/msg01679.html
+def print_tsnotice():
+        try:
+                notice = open('/var/www/sitenotice', 'r').read()
+                if notice:
+                        return tsnotice % { 'text': notice }
+        except IOError:
+                pass
+        return ''
