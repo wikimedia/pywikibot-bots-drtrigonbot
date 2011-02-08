@@ -56,6 +56,7 @@ import family
 
 site = pywikibot.getSite()
 
+# may be use also https://wiki.toolserver.org/view/Database_access#namespacename
 trans_ns = family.Family().namespaces
 trans_ns.update({101: {'de': u'Portal_Diskussion'}})
 
