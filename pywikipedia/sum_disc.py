@@ -114,6 +114,7 @@ bot_config = {	# unicode values
 		'queue_security':	([u'DrTrigon'], u'Bot: exec'),
 
 		# NON (!) unicode values
+		'data_path':		'../data/sum_disc',
 		'logger_tmsp':		True,
 		'backup_hist':		True,
 
@@ -404,7 +405,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 		if bot_config['backup_hist']:
 			timestmp = dtbext.date.getTimeStmpNow()
-			pathname = pywikibot.config.datafilepath('logs/%s/' % timestmp, '')	# according to 'setUser'
+			pathname = pywikibot.config.datafilepath(self._bot_config['data_path'], timestmp, '')	# according to 'setUser'
 			import shutil
 
 		for user in users:
@@ -468,7 +469,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		if 'userResultPage' in self._param:				# user with extended info (extra page to use)
 			self._userPage = pywikibot.Page(self.site, u'Benutzer:%s' % self._param['userResultPage'])
 			self._param['ignorepage_list'].append( self._userPage.title() )
-		self._datfilename = pywikibot.config.datafilepath('logs', 'sum_disc-%s-%s-%s.dat' % (self.site.family.name, self.site.lang, self._user.name()))
+		self._datfilename = pywikibot.config.datafilepath(self._bot_config['data_path'], 'sum_disc-%s-%s-%s.dat' % (self.site.family.name, self.site.lang, self._user.name()))
 
 		# substitute variables for use in user defined parameters/options
 		param_vars = {	'username':	self._user.name(),

@@ -82,7 +82,7 @@ __version__       = '$Id$'
 __framework_rev__ = '8938'
 __release_ver__   = '1.0'
 #__release_rev__   = '%i'
-__release_rev__   = '87'
+__release_rev__   = '89'
 #
 
 # wikipedia-bot imports
