@@ -60,8 +60,7 @@ bot_path = os.path.realpath("../../pywikipedia/")
 #importglobal(["wikipedia", "xmlreader", "config", "dtbext", "subster_beta"], bot_path)
 # http://stackoverflow.com/questions/279237/python-import-a-module-from-a-folder
 sys.path.append( bot_path )				# bot import form other path (!)
-#import subster						#
-import subster_beta					#
+import subster						#
 import config						#
 
 
@@ -134,8 +133,7 @@ def timeout_handler(signum, frame):
 
 
 def maindisplay():
-#	param_default = subster_beta.SubsterBot._param_default
-	param_default = subster_beta.SubsterRobot._param_default
+	param_default = subster.SubsterBot._param_default
 	param_default['postproc'] = re.sub('"', '\'', param_default['postproc'])	# hack: wegen unsauberer def. in 'subster_beta.py'
 	param_default.update(sim_param_default)
 	params = {}
@@ -159,8 +157,7 @@ def maindisplay():
 		signal.alarm(timeout)
 
 		try:
-#			params['content'] = subster_beta.SubsterBot().run(sim=params)
-			params['content'] = subster_beta.SubsterRobot().run(sim=params)
+			params['content'] = subster.SubsterBot().run(sim=params)
 		except:
 			#params['content'] = "ERROR OCCURRED DURING BOT SIMULATION"
 			bot_output.append(gettraceback(sys.exc_info())[2])
@@ -176,7 +173,7 @@ def maindisplay():
 	bot_output = re.sub("\n", "<br>\n", "\n".join(bot_output))
 
 	data = {'panel_ver':		__version__,
-		'subster_bot_ver':	subster_beta.__version__,
+		'subster_bot_ver':	subster.__version__,
 		'bot_output':		bot_output,
 	}
 
