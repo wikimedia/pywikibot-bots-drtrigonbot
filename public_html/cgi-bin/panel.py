@@ -230,7 +230,7 @@ def displaystate(form):
 			data['botstate'] = botstate_img['orange']
 			color = html_color['orange']
 			state_text = "problem"
-		elif (lastrun <= 15):  # during run is also green (thus: lastrun <= 15)
+		elif (lastrun <= 60):  # during run is also green (thus: lastrun <= 60)
 			data['botstate'] = botstate_img['green']
 			color = html_color['green']
 			state_text = "running"
