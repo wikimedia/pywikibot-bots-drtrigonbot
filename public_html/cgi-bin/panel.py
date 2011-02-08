@@ -116,7 +116,7 @@ html_color = {	'green':	'#00ff00',
 # === bot status surveillance === === ===
 #
 bottimeout = 24
-botdonemsg = 'DONE.'
+botdonemsg = 'DONE'
 
 
 # === functions === === ===
@@ -215,18 +215,25 @@ def displaystate(form):
 	files.sort()
 	buf = ", "
 
-	lastrun = (time() - os.stat(data['loglink']).st_mtime)/(60*60)
-	botmsg = data['botlog'][-len(botdonemsg):]
-	if (lastrun > ((bottimeout*5)/4)):
-		data['botstate'] = botstate_img['red']
-		color = html_color['red']
-	#elif (lastrun > bottimeout) or (not (data['botlog'][-len(botdonemsg):] == botdonemsg)):
-	elif (lastrun > bottimeout) or (not (botmsg == botdonemsg)):
-		data['botstate'] = botstate_img['orange']
-		color = html_color['orange']
-	else:
-		data['botstate'] = botstate_img['green']
-		color = html_color['green']
+	lastrun = (time() - os.stat(data['loglink']).st_mtime)
+	botmsg = data['botlog'].strip()
+
+	data['botstate'] = botstate_img['red']
+	color = html_color['red']
+	state_text = "n/a"
+	if (lastrun <= (bottimeout*60*60)):
+		if   (botmsg == botdonemsg):
+			data['botstate'] = botstate_img['green']
+			color = html_color['green']
+			state_text = "OK"
+		elif (botmsg.find(botdonemsg) == 0):
+			data['botstate'] = botstate_img['orange']
+			color = html_color['orange']
+			state_text = "problem"
+		elif (lastrun <= 15):  # during run is also green (thus: lastrun <= 15)
+			data['botstate'] = botstate_img['green']
+			color = html_color['green']
+			state_text = "running"
 
 	data.update({	'time':		asctime(localtime(time())),
 			'oldlog':	buf.join(files),
@@ -237,7 +244,7 @@ def displaystate(form):
 			'title':	'DrTrigonBot status panel',
 			'tsnotice': 	style.print_tsnotice(),
 			#'content':	displaystate_content,
-			'p-status':	"<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': color, 'bot': 'all:', 'state': botmsg[:-1]},
+			'p-status':	"<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': color, 'bot': 'all:', 'state': state_text},
 			#'footer': 	style.footer + style.footer_w3c + style.footer_w3c_css,
 			'footer': 	style.footer + style.footer_w3c, # wiki (new) not CSS 2.1 compilant
 	})
