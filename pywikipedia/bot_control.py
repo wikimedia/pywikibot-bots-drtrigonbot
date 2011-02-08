@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8  -*-
+#$ -m as
+# Tip from Merlissimo: use (a=reschedule or abort, s= suspended) to send mail
+# by SGE and exitcode 99 to restart the job and 100 to stop it in error state.
+# https://wiki.toolserver.org/view/Job_scheduling#Receiving_mail_when_the_job_starts_or_finishes
 """
 This bot is the general DrTrigonBot caller. It runs all the different sub tasks,
 that DrTrigonBot does. That are:
@@ -82,7 +86,7 @@ __version__       = '$Id$'
 __framework_rev__ = '8938'
 __release_ver__   = '1.0'
 #__release_rev__   = '%i'
-__release_rev__   = '89'
+__release_rev__   = '92'
 #
 
 # wikipedia-bot imports
@@ -134,7 +138,7 @@ bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'subster' ]
 # 'write2wiki', 'user'			# write wiki, skip users
 # 'write2hist', 'toolserver'		# write only history (for code changes and smooth update), toolserver down
 debug = []				# no write, all users
-#debug.append( 'write2wiki' )		# write to wiki (operational mode)
+debug.append( 'write2wiki' )		# write to wiki (operational mode)
 #debug.append( 'user' )			# skip users
 debug.append( 'write2hist' )		# write history (operational mode)
 #debug.append( 'toolserver' )		# toolserver down
@@ -152,27 +156,44 @@ class BotErrorHandler:
 	def __init__(self):
 		self.error_buffer = []
 
-	def raise_exceptions(self):
+	# minor error; in a sub-bot script
+	def raise_exceptions(self, log=None):
+		self.list_exceptions(log=log)
 		if self.error_buffer:
 			#raise BotError('Exception(s) occured in Bot')
-			pywikibot.output( u'BotError: ' + str(BotError('Exception(s) occured in Bot')) )
+			pywikibot.output( u'\nDONE with BotError: ' + str(BotError('Exception(s) occured in Bot')) )
+		else:
+			pywikibot.output( u'\nDONE' )
 
+	# major (critical) error; in this controller script
 	def handle_exceptions(self, log):
 		self.gettraceback(sys.exc_info())
+		self.list_exceptions(log=log)
 
-		for item in self.error_buffer:		# if Ctrl-C/BREAK/keyb-int; the 'error_buffer' should be empty
-			item = item[2]
-			# if runned as CRON-job mail occuring exception and traceback to bot admin
-			if cron and error_mail_fromwiki:
-				pywikibot.output(u'ERROR:\n%s\n' % item)
-				pywikibot.output(u'Sending mail "%s" to "%s" as notification!' % (error_mail[1], error_mail[0]))
-				usr = userlib.User(pywikibot.getSite(), error_mail[0])
-				if not usr.sendMail(subject=error_mail[1], text=item):		# 'item' should be unicode!
-					pywikibot.output(u'!!! WARNING: mail could not be sent!')
+	def list_exceptions(self, log=None):
+		# if Ctrl-C/BREAK/keyb-int; the 'error_buffer' should be empty
+		if not self.error_buffer:
+			return
 
+		pywikibot.output(u'\nEXCEPTIONS/ERRORS:')
+
+		item = u'\n'.join([u'%s:\n%s' % (str(item[0]), item[2]) for item in self.error_buffer])
+		pywikibot.output(item)
+
+		# if runned as CRON-job mail occuring exception and traceback to bot admin
+		if cron and error_mail_fromwiki:
+			self.send_mailnotification(item)
+
+		if log:
 			# https://wiki.toolserver.org/view/Cronjob#Output use CRON for error and mail handling, if
 			# something should be mailed/reported just print it to 'log.stdout' or 'log.stderr'
 			print >> log.stdout, item
+
+	def send_mailnotification(self, item):
+		pywikibot.output(u'Sending mail "%s" to "%s" as notification!' % (error_mail[1], error_mail[0]))
+		usr = userlib.User(pywikibot.getSite(), error_mail[0])
+		if not usr.sendMail(subject=error_mail[1], text=item):		# 'item' should be unicode!
+			pywikibot.output(u'!!! WARNING: mail could not be sent!')
 
 	def gettraceback(self, exc_info):
 		output = StringIO.StringIO()
@@ -352,7 +373,6 @@ def main():
 				                     }
 		bot.trigger()
 
-	pywikibot.output(u'\nDONE.')
 	return
 
 
@@ -420,8 +440,10 @@ if __name__ == "__main__":
 
 	try:
 		main()
-		error.raise_exceptions()
+		# minor error; in a sub-bot script
+		error.raise_exceptions(log)
 	except:
+		# major (critical) error; in this controller script
 		if log:
 			error.handle_exceptions(log)
 		raise #sys.exc_info()[0](sys.exc_info()[1])
@@ -431,3 +453,4 @@ if __name__ == "__main__":
 	if log:
 		log.close()
 
+	#sys.exit(100)  # use exit code 100 to force SGE to send mail!
