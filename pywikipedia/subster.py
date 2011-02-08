@@ -23,7 +23,7 @@ __version__ = '$Id$'
 #
 
 
-import re
+import re, sys
 import difflib
 
 import pagegenerators
@@ -34,6 +34,7 @@ import wikipedia as pywikibot
 
 bot_config = {	# unicode values
 		'TemplateName':		u'Benutzer:DrTrigon/Entwurf/Vorlage:Subster',
+		'ErrorTemplate':		u'\n----\n;SubsterBot Exception\n%s\n',
 
 		# regex values
 		'tag_regex':		re.compile('<.*?>', re.S | re.I),
@@ -96,8 +97,8 @@ class SubsterBot(dtbext.basic.BasicBot):
 		else:	pagegen = pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
 
 		for page in pagegen:
-			pywikibot.output(u'Getting page %s via API from %s...'
-			                 % (page.title(asLink=True), self.site))
+			pywikibot.output(u'Getting page "%s" via API from %s...'
+			                 % (page, self.site))
 
 			# setup source to get data from
 			if sim:
@@ -144,58 +145,110 @@ class SubsterBot(dtbext.basic.BasicBot):
 		substed_content = content
 		substed_tags = []  # DRTRIGON-73
 
-		# 1.) subst (internal) magic words
-		for subitem in magic_words.keys():
-			substed_content = self.get_var_regex(subitem).sub( (self._var_regex_str%{'var':subitem,'cont':magic_words[subitem]}),
-									   substed_content)
-			substed_tags.append(subitem)
+		# 0.) subst (internal) magic words
+		try:
+			(substed_content, tags) = self.subBotMagicWords(substed_content)
+			substed_tags += tags
+		except:
+			exc_info = sys.exc_info()
+			(exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)
+			substed_content += bot_config['ErrorTemplate'] % (u' ' + result.replace(u'\n', u'\n '))
+			substed_tags.append( u'>error:BotMagicWords<' )
 
 		if (len(params) == 1) and eval(params[0]['magicwords_only']):
 			return (substed_content, substed_tags)
 
 		for item in params:
-			# 2.) getUrl or wiki text
-			if eval(item['wiki']):
-				external_buffer = self.load( dtbext.pywikibot.Page(self.site, item['url']) )
-			else:
-				external_buffer = self.site.getUrl(item['url'], no_hostname = True)
-
-			# 3.) regexp
-			#for subitem in item['regex']:
-			subitem = item['regex']
-			regex = re.compile(subitem, re.S | re.I)
-			var_regex = self.get_var_regex(item['value'])
-
-			# 4.) subst in content
-			external_data = regex.search(external_buffer)
-
-			if external_data:
-				external_data = external_data.groups()
-				if (len(external_data) == 1):
-					external_data = external_data[0]
-				else:
-					external_data = str(external_data)
-			#print external_data
-
-			if item['notags']:
-				external_data = self._tag_regex.sub(item['notags'], external_data)
-			#print external_data
-
-			# 5.) postprocessing
-			item['postproc'] = eval(item['postproc'])
-			if (item['postproc'][0] == 'list'):		# create list
-				external_data = str(re.compile(item['postproc'][1], re.S | re.I).findall(external_data))
-			elif (item['postproc'][0] == 'wikilist'):	# create list in wiki format
-				external_data = "* " + "\n* ".join(re.compile(item['postproc'][1], re.S | re.I).findall(external_data)) + "\n"
-			#print external_data
-
-			# 6.) subst content
-			prev_content = substed_content
-			substed_content = var_regex.sub((self._var_regex_str%{'var':item['value'],'cont':external_data}), substed_content, int(item['count']))
-			if (substed_content != prev_content):
-				substed_tags.append(item['value'])
+			# 1.) - 5.) subst templates
+			try:
+				(substed_content, tags) = self.subTemplate(substed_content, item)
+				substed_tags += tags
+			except:
+				exc_info = sys.exc_info()
+				(exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)
+				substed_content += bot_config['ErrorTemplate'] % (u' ' + result.replace(u'\n', u'\n '))
+				substed_tags.append( u'>error:Template<' )
 
 		return (substed_content, substed_tags)
+
+	def subBotMagicWords(self, content):
+		"""Substitute the DrTrigonBot Magic Word (tag)s in content.
+
+		   @param content: Content with tags to substitute.
+		   @type  content: string
+
+		   Returns a tuple containig the new content with tags
+		   substituted and a list of those tags.
+		"""
+
+		substed_tags = []  # DRTRIGON-73
+
+		# 0.) subst (internal) magic words
+		for subitem in magic_words.keys():
+			prev_content = content
+			content = self.get_var_regex(subitem).sub( (self._var_regex_str%{'var':subitem,'cont':magic_words[subitem]}),
+									   content, 1)  # subst. once
+			if (content != prev_content):
+				substed_tags.append(subitem)
+
+		return (content, substed_tags)
+
+	def subTemplate(self, content, param):
+		"""Substitute the template tags in content according to param.
+
+		   @param content: Content with tags to substitute.
+		   @type  content: string
+		   @param param: Param with data how to substitute tags.
+		   @type  param: dict
+
+		   Returns a tuple containig the new content with tags
+		   substituted and a list of those tags.
+		"""
+
+		substed_tags = []  # DRTRIGON-73
+
+		# 1.) getUrl or wiki text
+		if eval(param['wiki']):
+			external_buffer = self.load( dtbext.pywikibot.Page(self.site, param['url']) )
+		else:
+			external_buffer = self.site.getUrl(param['url'], no_hostname = True)
+
+		# 2.) regexp
+		#for subitem in param['regex']:
+		subitem = param['regex']
+		regex = re.compile(subitem, re.S | re.I)
+		var_regex = self.get_var_regex(param['value'])
+
+		# 3.) subst in content
+		external_data = regex.search(external_buffer)
+
+		if external_data:
+			external_data = external_data.groups()
+			if (len(external_data) == 1):
+				external_data = external_data[0]
+			else:
+				external_data = str(external_data)
+		#print external_data
+
+		if param['notags']:
+			external_data = self._tag_regex.sub(param['notags'], external_data)
+		#print external_data
+
+		# 4.) postprocessing
+		param['postproc'] = eval(param['postproc'])
+		if (param['postproc'][0] == 'list'):		# create list
+			external_data = str(re.compile(param['postproc'][1], re.S | re.I).findall(external_data))
+		elif (param['postproc'][0] == 'wikilist'):	# create list in wiki format
+			external_data = "* " + "\n* ".join(re.compile(param['postproc'][1], re.S | re.I).findall(external_data)) + "\n"
+		#print external_data
+
+		# 5.) subst content
+		prev_content = content
+		content = var_regex.sub((self._var_regex_str%{'var':param['value'],'cont':external_data}), content, int(param['count']))
+		if (content != prev_content):
+			substed_tags.append(param['value'])
+
+		return (content, substed_tags)
 
 	def outputContentDiff(self, content, substed_content):
 		"""Outputs the diff between the original and the new content.

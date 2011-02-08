@@ -60,7 +60,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: redirect.py 8934 2011-02-07 13:27:25Z xqt $'
+__version__='$Id: redirect.py 8941 2011-02-08 17:05:32Z xqt $'
 #
 import re, sys, datetime
 import wikipedia as pywikibot
@@ -602,7 +602,7 @@ class RedirectRobot:
                         % targetPage.title(asLink=True))
                     if targetPage.site().sitename() == 'wikipedia:en':
                         mw_msg = targetPage.site().mediawiki_message(
-                                     'Wikieditor-toolbar-tool-redirect-example')
+                                     'wikieditor-toolbar-tool-redirect-example')
                         if targetPage.title() == mw_msg:
                             pywikibot.output(
                                 u"Skipping toolbar example: Redirect source is potentially vandalized.")

@@ -83,10 +83,10 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '8938'
+__framework_rev__ = '8944'
 __release_ver__   = '1.0'
 #__release_rev__   = '%i'
-__release_rev__   = '92'
+__release_rev__   = '95'
 #
 
 # wikipedia-bot imports
@@ -98,7 +98,6 @@ import dtbext
 # Splitting the bot into library parts
 import wikipedia as pywikibot
 
-import traceback, StringIO
 #import pysvn  # JIRA: TS-936
 
 
@@ -146,12 +145,6 @@ debug.append( 'write2hist' )		# write history (operational mode)
 
 
 # Bot Error Handling; to prevent bot errors to stop execution of other bots
-class BotError(pywikibot.Error):
-	def __init__(self, value):
-		self.value = value
-	def __str__(self):
-		return repr(self.value)
-
 class BotErrorHandler:
 	def __init__(self):
 		self.error_buffer = []
@@ -160,8 +153,8 @@ class BotErrorHandler:
 	def raise_exceptions(self, log=None):
 		self.list_exceptions(log=log)
 		if self.error_buffer:
-			#raise BotError('Exception(s) occured in Bot')
-			pywikibot.output( u'\nDONE with BotError: ' + str(BotError('Exception(s) occured in Bot')) )
+			#raise dtbext.pywikibot.BotError('Exception(s) occured in Bot')
+			pywikibot.output( u'\nDONE with BotError: ' + str(dtbext.pywikibot.BotError('Exception(s) occured in Bot')) )
 		else:
 			pywikibot.output( u'\nDONE' )
 
@@ -196,13 +189,8 @@ class BotErrorHandler:
 			pywikibot.output(u'!!! WARNING: mail could not be sent!')
 
 	def gettraceback(self, exc_info):
-		output = StringIO.StringIO()
-		traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], file=output)
-		if ('KeyboardInterrupt\n' not in traceback.format_exception_only(exc_info[0], exc_info[1])):
-			result = output.getvalue()
-			output.close()
-			#exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-			#return (exc_info[0], exc_info[1], result)
+		(exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)
+		if ('KeyboardInterrupt\n' not in exception_only):
 			error = (exc_info[0], exc_info[1], result)
 			self.error_buffer.append( error )
 
@@ -253,7 +241,7 @@ class Logger:
 		if logger_tmsp:
 			string = self._REGEX_eol.sub('\n' + self._get_tmsp(), string)
 		res = self.file.write( str(string).decode('latin-1') )
-		self.flush()
+		#self.flush()  # paranoid since it's a logger
 		return res
 	def close(self):
 		self.file.write( '\n' )

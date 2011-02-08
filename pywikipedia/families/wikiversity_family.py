@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiversity_family.py 8867 2011-01-21 07:52:54Z xqt $'
+__version__ = '$Id: wikiversity_family.py 8943 2011-02-08 21:20:19Z xqt $'
 
 # The Wikimedia family that is known as Wikiversity
 
@@ -11,7 +11,7 @@ class Family(family.Family):
         self.name = 'wikiversity'
 
         self.languages_by_size = [
-            'en', 'fr', 'de', 'cs', 'ru', 'beta', 'es', 'it', 'pt', 'el', 'fi',
+            'en', 'fr', 'de', 'ru', 'cs', 'beta', 'es', 'it', 'pt', 'el', 'fi',
             'sv', 'ja',
         ]
 
