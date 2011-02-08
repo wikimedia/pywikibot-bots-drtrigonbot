@@ -5,7 +5,7 @@
 (for mor info look at 'panel.py' also!)
 """
 
-## @package sum_cat_disk.py
+## @package sum_cat_disc.py
 #  @brief   DrTrigonBot category discussion summary (CGI) for toolserver
 #
 #  @copyright Dr. Trigon, 2008-2011
@@ -71,7 +71,7 @@ import ps_wikinew as style # panel-stylesheet 'wiki (new)' not CSS 2.1 compilant
 
 displaystate_content = \
 """<br>
-<form action="sum_cat_disk.py">
+<form action="sum_cat_disc.py">
   <table>
     <tr>
       <td>wiki:</td>
