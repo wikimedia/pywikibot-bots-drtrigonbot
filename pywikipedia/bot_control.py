@@ -85,8 +85,7 @@ Options/parameters:
 __version__       = '$Id$'
 __framework_rev__ = '8944'
 __release_ver__   = '1.0'
-#__release_rev__   = '%i'
-__release_rev__   = '96'
+__release_rev__   = '%i'
 #
 
 # wikipedia-bot imports
@@ -98,7 +97,7 @@ import dtbext
 # Splitting the bot into library parts
 import wikipedia as pywikibot
 
-#import pysvn  # JIRA: TS-936
+import pysvn  # JIRA: TS-936
 
 
 logname = pywikibot.config.datafilepath('../public_html/DrTrigonBot', '%s.log')
@@ -302,10 +301,10 @@ def getSVN_framework_ver():
 def getSVN_release_ver():
 	global __release_rev__
 	# local release revision?
-#	client = pysvn.Client()
-#	#client.info2('.', revision=pysvn.Revision( pysvn.opt_revision_kind.head ))
-#	rel = max( [item[1]['rev'].number for item in client.info2('.')] )
-#	__release_rev__ = __release_rev__ % rel
+	client = pysvn.Client()
+	#client.info2('.', revision=pysvn.Revision( pysvn.opt_revision_kind.head ))
+	rel = max( [item[1]['rev'].number for item in client.info2('.')] )
+	__release_rev__ = __release_rev__ % rel
 	# release revision?
 	buf = pywikibot.getSite().getUrl( 'http://svn.toolserver.org/svnroot/drtrigon/', no_hostname = True, retry = False )
 	match = re.search('<title>drtrigon - Revision (.*?): /</title>', buf)

@@ -285,7 +285,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		dtbext.basic.BasicBot.__init__(self, bot_config)
 
 		# init constants
-        	self._userListPage = pywikibot.Page(self.site, bot_config['userlist'])
+		self._userListPage = pywikibot.Page(self.site, bot_config['userlist'])
 		#print [item[0] for item in self._getUsers()]		# enhance 'ignorepage_list'
 
 		pywikibot.output(u'\03{lightred}** Receiving User List (wishes): %s\03{default}' % self._userListPage)
@@ -1013,7 +1013,7 @@ class SumDiscPages(object):
 			#del self._hist_list[title]
 			self.edit_hist(page)
 
-        def parse_news(self, param):
+	def parse_news(self, param):
 		"""Filter and parse all the info and rewrite in in wiki-syntax, to be put on page.
 
 		   Returns a tuple (result wiki text, message count).
@@ -1076,7 +1076,7 @@ class SumDiscPages(object):
 		if (count > 0):
 			buf =  string.join(buf, u'\n')
 			buf += self.param['parse_msg'][u'end']
-                else:
+		else:
 			buf = u''
 
 		return (buf, count)
@@ -1152,6 +1152,10 @@ class PageSections(object):
 
 		# drop from templates included headings (are None)
 		sections = [ s for s in sections if s[0] ]
+
+		# replace 'byteoffset' by self calculated, since they do not match (mediawiki bug?)
+		# bug fix: DRTRIGON-82
+		sections = [ ((buf.find(s[2]),) + s[1:]) for s in sections if s[0] ]
 
 		if len(sections) == 0:
 			self._entries = [ ((u'',u'',u''), buf) ]
@@ -1245,9 +1249,10 @@ class PageSections(object):
 
 		# check if user was last editor
 		# look at part after '\n', after each signature is at least one '\n'
-		data = data[signs_pos[-1]:] + u'\n'
-		data = _REGEX_eol.split(data, maxsplit=1)[1]
-		checks['lasteditor'] = not (len(data.strip(u' \n')) > 0) # just check for add. text (more paranoid)
+		# (small bug fix: DRTRIGON-82)
+		data = data[signs_pos[-1]:].strip()
+		(sign, data) = _REGEX_eol.split(data + u'\n', maxsplit=1)
+		checks['lasteditor'] = not (len(data.strip()) > 0) # just check for add. text (more paranoid)
 
 		if checks['lasteditor']:
 			return (False, checksum_cur, checks)
@@ -1312,8 +1317,8 @@ def main():
 		pywikibot.output('\nQuitting program...')
 
 if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        pywikibot.stopme()
+	try:
+		main()
+	finally:
+		pywikibot.stopme()
 
