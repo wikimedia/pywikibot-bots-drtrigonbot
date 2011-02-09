@@ -1153,10 +1153,14 @@ class PageSections(object):
 		# drop from templates included headings (are None)
 		sections = [ s for s in sections if s[0] ]
 
-		# replace 'byteoffset' by self calculated, since they do not match (mediawiki bug?)
+		# replace 'byteoffset' by self calculated, since they do not match (parsed vs. wiki text)
 		# bug fix: DRTRIGON-82
-		sections = [ ((buf.find(s[2]),) + s[1:]) for s in sections if s[0] ]
+		pos = -1
+		for i, s in enumerate(sections):
+			pos = buf.find(s[2], pos+1)
+			sections[i] = (pos,) + s[1:]
 
+		# extract sections bodies
 		if len(sections) == 0:
 			self._entries = [ ((u'',u'',u''), buf) ]
 		else:

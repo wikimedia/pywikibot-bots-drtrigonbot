@@ -134,6 +134,8 @@ class Page(pywikibot.Page):
 		   This list may be empty and if sections are embedded by template, the according
 		   byteoffset and wikiline entries are None. The wikiline is the wiki text,
 		   line is the parsed text and anchor ist the (unique) link label.
+		   ATTENTION: byteoffset is according to the parsed text, and thus >= to that
+		              calculated form wiki text!
 		"""
 
 		# was there already a call? already some info available?
