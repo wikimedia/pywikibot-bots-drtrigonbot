@@ -24,6 +24,7 @@ __version__ = '$Id$'
 #
 
 import clean_sandbox
+import dtbext
 import wikipedia as pywikibot
 
 # overwrite bot default
@@ -36,7 +37,7 @@ bot_config = {	# unicode values
 }
 
 
-class UserSandboxBot(clean_sandbox.SandboxBot):
+class UserSandboxBot(clean_sandbox.SandboxBot, dtbext.basic.BasicBot):
 	'''
 	Robot which will clean per user sandbox pages.
 	'''
@@ -45,6 +46,8 @@ class UserSandboxBot(clean_sandbox.SandboxBot):
 		'''Constructor of UserSandboxBot(); setup environment, initialize needed consts and objects.'''
 
 		pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
+
+		dtbext.basic.BasicBot.__init__(self)  # setting TZ
 
 		pywikibot.output(u'\03{lightred}** Receiving User List (wishes): [[%s]]\03{default}' % userListPage)
 

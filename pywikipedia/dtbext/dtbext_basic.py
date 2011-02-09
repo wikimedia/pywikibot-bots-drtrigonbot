@@ -49,7 +49,7 @@ class BasicBot(basic.BasicBot):
 
 	## @since   ? (MODIFIED)
 	#  @remarks needed by various bots
-	def __init__(self, bot_config):
+	def __init__(self, bot_config={}):
 		"""Constructor of BasicBot(); setup environment, initialize needed consts and objects.
 		   MODIFIED METHOD: needed by various bots
 
@@ -67,13 +67,14 @@ class BasicBot(basic.BasicBot):
 		# Default action
 		pywikibot.setAction('Wikipedia python library / dtbext (DrTrigonBot extensions)')
 
-		# init constants
-		self._bot_config = bot_config
-		self._template_regex = re.compile('\{\{' + self._bot_config['TemplateName'] + '(.*?)\}\}', re.S)
+		if bot_config:
+			# init constants
+			self._bot_config = bot_config
+			self._template_regex = re.compile('\{\{' + self._bot_config['TemplateName'] + '(.*?)\}\}', re.S)
 
-		# init variable/dynamic objects
-		self.site = pywikibot.getSite()
-		dtbext.pywikibot.addAttributes( self.site )		# enhance to dtbext.pywikibot.Site
+			# init variable/dynamic objects
+			self.site = pywikibot.getSite()
+			dtbext.pywikibot.addAttributes( self.site )		# enhance to dtbext.pywikibot.Site
 
 	## @since   ? (ADDED)
 	#  @remarks needed by sum_disc
