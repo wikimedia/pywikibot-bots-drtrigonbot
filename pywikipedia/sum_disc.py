@@ -684,6 +684,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		gen3 = pagegenerators.ThreadedGenerator(target=pagegenerators.PreloadingGenerator,
 							args=(gen2,),
 							qsize=60)
+		self._th_gen = gen3
 		#gen4 = pagegenerators.RedirectFilterPageGenerator(gen3)
 		# lets hope that no generator loses pages... (since sometimes this may happen)
 		for page in gen3:
@@ -763,6 +764,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			del entries
 
 		gen3.stop()
+		del self._th_gen
 
 		self.pages.end_promotion()
 
@@ -1153,13 +1155,6 @@ class PageSections(object):
 		# drop from templates included headings (are None)
 		sections = [ s for s in sections if s[0] ]
 
-		# replace 'byteoffset' by self calculated, since they do not match (parsed vs. wiki text)
-		# bug fix: DRTRIGON-82
-		pos = -1
-		for i, s in enumerate(sections):
-			pos = buf.find(s[2], pos+1)
-			sections[i] = (pos,) + s[1:]
-
 		# extract sections bodies
 		if len(sections) == 0:
 			self._entries = [ ((u'',u'',u''), buf) ]
@@ -1319,6 +1314,9 @@ def main():
 		bot.run()
 	except KeyboardInterrupt:
 		pywikibot.output('\nQuitting program...')
+	finally:
+		if hasattr(bot, '_th_gen'):  # page gen thread has to be finished
+			bot._th_gen.stop()         # if an exception or else occurs...
 
 if __name__ == "__main__":
 	try:

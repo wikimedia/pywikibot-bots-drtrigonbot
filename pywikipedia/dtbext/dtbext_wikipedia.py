@@ -25,7 +25,7 @@ __version__ = '$Id$'
 #
 
 # Standard library imports
-import difflib
+import difflib, re
 # Splitting the bot into library parts
 from dtbext_pywikibot import *
 
@@ -134,9 +134,9 @@ class Page(pywikibot.Page):
 		   This list may be empty and if sections are embedded by template, the according
 		   byteoffset and wikiline entries are None. The wikiline is the wiki text,
 		   line is the parsed text and anchor ist the (unique) link label.
-		   ATTENTION: byteoffset is according to the parsed text, and thus >= to that
-		              calculated form wiki text!
 		"""
+		# replace 'byteoffset' ALWAYS by self calculated, since parsed does not match wiki text
+		# bug fix: DRTRIGON-82
 
 		# was there already a call? already some info available?
 		if hasattr(self, '_sections'):
@@ -178,22 +178,18 @@ class Page(pywikibot.Page):
 				f.write( debug_data.encode('utf8') + '\n' )
 				f.close()
 
-			# [ JIRA ticket? ]
-			self._contents = self._contents.replace(u'\r\n', u'\n')
-
+			pos = 0
 			for i, item in enumerate(r):
 				l = int(item[u'level'])
-				if item[u'byteoffset'] and item[u'index']:
+				if item[u'byteoffset'] and item[u'line']:
 					# section on this page and index in format u"%i"
-					item[u'wikiline'] = self._findSection(item)
-					if (len(item[u'wikiline']) == 0) and (len(item[u'line'].strip()) > 0):
-						self._getSectionByteOffset(item)		# raises 'Error' if not sucessfull !
-						item[u'byteoffset'] = item[u'wikiline_bo']
-						item[u'wikiline']   = self._findSection(item)
+					self._getSectionByteOffset(item, pos)		# raises 'Error' if not sucessfull !
+					pos                 = item[u'wikiline_bo'] + len(item[u'wikiline'])
+					item[u'byteoffset'] = item[u'wikiline_bo']
 				else:
-					# section ebemdded from template (index in format u"T-%i") or the
+					# section embedded from template (index in format u"T-%i") or the
 					# parser was not able to recongnize section correct (e.g. html) at all
-					# (the byteoffset and index may be correct or not...)
+					# (the byteoffset, index, ... may be correct or not)
 					item[u'wikiline'] = None
 
 				item[u'level'] = l
@@ -208,21 +204,32 @@ class Page(pywikibot.Page):
 		r = data
 
 		# prepare resulting data
-		self._sections = [ (item[u'byteoffset'], item[u'level'], item.get(u'wikiline', None), item[u'line'], item[u'anchor']) for item in r ]
+		self._sections = [ (item[u'byteoffset'], item[u'level'], item[u'wikiline'], item[u'line'], item[u'anchor']) for item in r ]
 
 		return self._sections
 
 	## @since   r18 (ADDED)
 	#  @remarks needed by dtbext.dtbext_wikipedia.Page.getSections()
-	def _getSectionByteOffset(self, section):
+	def _getSectionByteOffset(self, section, pos):
         	"""determine the byteoffset of the given section (can be slow due another API call).
 		   ADDED METHOD: needed by 'getSections'
 		"""
-		wikitextlines = self._contents.splitlines()
+		wikitextlines = self._contents[pos:].splitlines()
 
-		# how the heading could look like
+		# how the heading should look like (re)
 		l = int(section[u'level'])
-		#header = u'%(spacer)s %(line)s %(spacer)s' % {'line': section[u'line'], 'spacer': u'=' * l}
+		headers = [ u'^(\s*)%(spacer)s(\s*)(.*?)(\s*)%(spacer)s(\s*)$' % {'line': section[u'line'], 'spacer': u'=' * l},
+			    u'^(\s*)<h%(level)i>s(\s*)(.*?)(\s*)</h%(level)i>(\s*)$' % {'line': section[u'line'], 'level': l}, ]
+
+		# try to give exact match for heading
+		possible_headers = []
+		for h in headers:
+			ph = re.search(h, self._contents[pos:], re.M)
+			if ph:
+				ph = ph.group(0).strip()
+				possible_headers += [ (ph, ph) ]
+
+		# how the heading could look like (difflib)
 		headers = [ u'%(spacer)s %(line)s %(spacer)s' % {'line': section[u'line'], 'spacer': u'=' * l},
 			    u'<h%(level)i>%(line)s</h%(level)i>' % {'line': section[u'line'], 'level': l}, ]
 
@@ -230,13 +237,12 @@ class Page(pywikibot.Page):
 		# http://stackoverflow.com/questions/2923420/fuzzy-string-matching-algorithm-in-python
 		# http://docs.python.org/library/difflib.html
 		# (http://mwh.geek.nz/2009/04/26/python-damerau-levenshtein-distance/)
-		possible_headers = []
 		for h in headers:
-			ph = difflib.get_close_matches(h, wikitextlines)	# cutoff=0.6
+			ph = difflib.get_close_matches(h, wikitextlines, cutoff=0.70)	# cutoff=0.6 (default)
 			possible_headers += [ (p, h) for p in ph ]
 			#print h, possible_headers
 
-		if len(possible_headers) == 0:		# nothing found, try 'prop=revisions (rv)'
+		if (len(possible_headers) == 0) and section[u'index']:		# nothing found, try 'prop=revisions (rv)'
 			# call the wiki to get info
 			params = {
 				u'action'	: u'query',
@@ -271,20 +277,13 @@ class Page(pywikibot.Page):
 
 		# prepare resulting data
 		section[u'wikiline']    = best_match[1]
-		section[u'wikiline_mq'] = best_match[0]					# match quality
-		section[u'wikiline_bo'] = self._contents.find(section[u'wikiline'])	# byteoffset
-
-	## @since   r18 (ADDED)
-	#  @remarks needed by dtbext.dtbext_wikipedia.Page.getSections()
-	def _findSection(self, section):
-        	"""find and extract section.
-		   ADDED METHOD: needed by 'getSections'
-		"""
-		bo  = section[u'byteoffset']
-		end = self._contents.find(u'\n', bo)
-		#l = int(section[u'level'])
-		#return self._contents[(bo+l):(end-l)].strip()
-		return self._contents[bo:end].strip()
+		section[u'wikiline_mq'] = best_match[0]	 # match quality
+		section[u'wikiline_bo'] = -1             # byteoffset
+		if section[u'wikiline']:
+			section[u'wikiline_bo'] = self._contents.find(section[u'wikiline'], pos)
+		if section[u'wikiline_bo'] < 0:		# nothing found, report/raise error !
+			#page._getexception = ...
+			raise pywikibot.Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.title(asLink=True))
 
 	## @since   ? (ADDED; non-api purge can be done with wikipedia.Page.purge_address())
 	#  @remarks needed by various bots
