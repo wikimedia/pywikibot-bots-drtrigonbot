@@ -1123,6 +1123,7 @@ class PageSections(object):
 		"""
 
 		self._entries = []
+		self._full_resolve = True
 
 		self._page = page
 		self._param = param
@@ -1135,30 +1136,24 @@ class PageSections(object):
 		dtbext.pywikibot.addAttributes(page)
 
 		# get content and sections (content was preloaded earlier)
-		force = False
-		retries = 0
-		while retries < 3:
-			try:
-				#buf = self.load(page)
-				buf = page.get(force=force)
-				#sections = page.getSections(minLevel=1, force=force)
-				sections = page.getSections(minLevel=1)
-				break
-			except pywikibot.Error:
-				# sections could not be resoled, try again by forcing (3 tries max.)
-				# or else process the whole page at once
-				sections = []
-				force = True
-				retries += 1
+		try:
+			#buf = page.get(force=True)
+			buf = page.get()
+			#sections = page.getSections(minLevel=1, force=True)
+			sections = page.getSections(minLevel=1)
+		except pywikibot.Error:
+			# sections could not be resoled process the whole page at once
+			sections = []
 
-				pywikibot.output(u'\03{lightaqua}WARNING: problem trying to retrieve section data for %s\03{default}' % page.title(asLink=True))
+			pywikibot.output(u'  Problem resolving section data, processing the whole page at once...')
 
 		# drop from templates included headings (are None)
 		sections = [ s for s in sections if s[0] ]
 
 		# extract sections bodies
-		if len(sections) == 0:
+		if not sections:
 			self._entries = [ ((u'',u'',u''), buf) ]
+			self._full_resolve = False
 		else:
 			# append 'EOF' to sections list
 			# (byteoffset, level, wikiline, line, anchor)
@@ -1247,15 +1242,16 @@ class PageSections(object):
 		if not checks['signed']:
 			return (False, checksum_cur, checks)
 
-		# check if user was last editor
-		# look at part after '\n', after each signature is at least one '\n'
-		# (small bug fix: DRTRIGON-82)
-		data = data[signs_pos[-1]:].strip()
-		(sign, data) = _REGEX_eol.split(data + u'\n', maxsplit=1)
-		checks['lasteditor'] = not (len(data.strip()) > 0) # just check for add. text (more paranoid)
+		if self._full_resolve:
+			# check if user was last editor
+			# look at part after '\n', after each signature is at least one '\n'
+			# (small bug fix: DRTRIGON-82)
+			data = data[signs_pos[-1]:].strip()
+			(sign, data) = _REGEX_eol.split(data + u'\n', maxsplit=1)
+			checks['lasteditor'] = not (len(data.strip()) > 0) # just check for add. text (more paranoid)
 
-		if checks['lasteditor']:
-			return (False, checksum_cur, checks)
+			if checks['lasteditor']:
+				return (False, checksum_cur, checks)
 
 		return (True, checksum_cur, checks)
 

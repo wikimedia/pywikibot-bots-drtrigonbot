@@ -168,7 +168,7 @@ class Page(pywikibot.Page):
 			# assign sections with wiki text and section byteoffset
 			#pywikibot.output(u"  Reading wiki page text (if not already done).")
 
-			debug_data += str(len(self._contents)) + '\n'
+			debug_data += str(len(self.get('_contents',u''))) + '\n'
 			self.get()
 			debug_data += str(len(self._contents)) + '\n'
 			debug_data += self._contents + '\n'
@@ -182,22 +182,26 @@ class Page(pywikibot.Page):
 				f.close()
 
 			pos = 0
-			for i, item in enumerate(r):
-				l = int(item[u'level'])
-				if item[u'byteoffset'] and item[u'line']:
-					# section on this page and index in format u"%i"
-					self._getSectionByteOffset(item, pos, force)		# raises 'Error' if not sucessfull !
-					pos                 = item[u'wikiline_bo'] + len(item[u'wikiline'])
-					item[u'byteoffset'] = item[u'wikiline_bo']
-				else:
-					# section embedded from template (index in format u"T-%i") or the
-					# parser was not able to recongnize section correct (e.g. html) at all
-					# (the byteoffset, index, ... may be correct or not)
-					item[u'wikiline'] = None
-
-				item[u'level'] = l
-
-				r[i] = item
+			for setting in [(0.05,0.95), (0.05,0.8)]:
+				try:
+					for i, item in enumerate(r):
+						item[u'level'] = int(item[u'level'])
+						if (item[u'byteoffset'] != None) and item[u'line']:  # byteoffset may be 0; 'None' means template
+							# section on this page and index in format u"%i"
+							self._getSectionByteOffset(item, pos, force, cutoff=setting)	# raises 'Error' if not sucessfull !
+							pos                 = item[u'wikiline_bo'] + len(item[u'wikiline'])
+							item[u'byteoffset'] = item[u'wikiline_bo']
+						else:
+							# section embedded from template (index in format u"T-%i") or the
+							# parser was not able to recongnize section correct (e.g. html) at all
+							# (the byteoffset, index, ... may be correct or not)
+							item[u'wikiline'] = None
+						r[i] = item
+					break
+				except pywikibot.Error:
+					pos = 0
+			if not pos:
+				raise
 
 		# check min. level
 		data = []
@@ -213,25 +217,26 @@ class Page(pywikibot.Page):
 
 	## @since   r18 (ADDED)
 	#  @remarks needed by dtbext.dtbext_wikipedia.Page.getSections()
-	def _getSectionByteOffset(self, section, pos, force):
+	def _getSectionByteOffset(self, section, pos, force, cutoff=(0.05, 0.95)):
         	"""determine the byteoffset of the given section (can be slow due another API call).
 		   ADDED METHOD: needed by 'getSections'
 		"""
 		wikitextlines = self._contents[pos:].splitlines()
 		possible_headers = []
+		#print section[u'line']
 
 		if not force:
 			# how the heading should look like (re)
-			l = int(section[u'level'])
-			headers = [ u'^(\s*)%(spacer)s(\s*)(.*?)(\s*)%(spacer)s((<!--(.*?)-->)?)(\s*)$' % {'line': section[u'line'], 'spacer': u'=' * l},
-				    u'^(\s*)<h%(level)i>s(\s*)(.*?)(\s*)</h%(level)i>((<!--(.*?)-->)?)(\s*)$' % {'line': section[u'line'], 'level': l}, ]
+			l = section[u'level']
+			headers = [ u'^(\s*)%(spacer)s(.*?)%(spacer)s((<!--(.*?)-->)?)(\s*)$' % {'line': section[u'line'], 'spacer': u'=' * l},
+				    u'^(\s*)<h%(level)i>(.*?)</h%(level)i>(.*?)$' % {'line': section[u'line'], 'level': l}, ]
 
 			# try to give exact match for heading
 			for h in headers:
 				ph = re.search(h, self._contents[pos:], re.M)
 				if ph:
 					ph = ph.group(0).strip()
-					possible_headers += [ (ph, h) ]
+					possible_headers += [ (ph, section[u'line']) ]
 
 			# how the heading could look like (difflib)
 			headers = [ u'%(spacer)s %(line)s %(spacer)s' % {'line': section[u'line'], 'spacer': u'=' * l},
@@ -242,11 +247,11 @@ class Page(pywikibot.Page):
 			# http://docs.python.org/library/difflib.html
 			# (http://mwh.geek.nz/2009/04/26/python-damerau-levenshtein-distance/)
 			for h in headers:
-				ph = difflib.get_close_matches(h, wikitextlines, cutoff=0.70)	# cutoff=0.6 (default)
-				possible_headers += [ (p, h) for p in ph ]
+				ph = difflib.get_close_matches(h, wikitextlines, cutoff=cutoff[1])	# cutoff=0.6 (default)
+				possible_headers += [ (p, section[u'line']) for p in ph ]
 				#print h, possible_headers
 
-		if (len(possible_headers) == 0) and section[u'index']:		# nothing found, try 'prop=revisions (rv)'
+		if not possible_headers and section[u'index']:		# nothing found, try 'prop=revisions (rv)'
 			# call the wiki to get info
 			params = {
 				u'action'	: u'query',
@@ -268,10 +273,11 @@ class Page(pywikibot.Page):
 
 		# find the most probable match for heading
 		best_match = (0.0, None)
-		for (ph, header) in possible_headers:
+		for i, (ph, header) in enumerate(possible_headers):
 			#print u'    ', difflib.SequenceMatcher(None, header, ph).ratio(), header, ph
 			mr = difflib.SequenceMatcher(None, header, ph).ratio()
 			if mr > best_match[0]: best_match = (mr, ph)
+			if (i == 0) and (mr >= cutoff[0]): break  # use exact match (re) directly (if good enough)
 		#print u'    ', best_match
 
 		# prepare resulting data
