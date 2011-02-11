@@ -53,12 +53,7 @@ import pagegenerators, catlib
 #import wikipedia as pywikibot	# for 'Timestamp'
 import dtbext			# for 'getTimeStmpNow'
 import family
-
-site = pywikibot.getSite()
-
-# may be use also https://wiki.toolserver.org/view/Database_access#namespacename
-trans_ns = family.Family().namespaces
-trans_ns.update({101: {'de': u'Portal_Diskussion'}})
+# may be best would be to get namespace info from DB?!
 
 
 # === panel HTML stylesheets === === ===
@@ -172,12 +167,12 @@ _SQL_query_cattree = [
 
 """SELECT rc_namespace, rc_title, rc_user_text, rc_timestamp, rc_comment
  FROM cat
-  INNER JOIN dewiki_p.categorylinks ON catname = cl_to
-  INNER JOIN dewiki_p.page p1 ON cl_from = page_id
-  INNER JOIN dewiki_p.page p2 ON p1.page_title = p2.page_title AND p1.page_namespace+1=p2.page_namespace
-  INNER JOIN dewiki_p.recentchanges ON p2.page_id = rc_cur_id
+  INNER JOIN %swiki_p.categorylinks ON catname = cl_to
+  INNER JOIN %swiki_p.page p1 ON cl_from = page_id
+  INNER JOIN %swiki_p.page p2 ON p1.page_title = p2.page_title AND p1.page_namespace+1=p2.page_namespace
+  INNER JOIN %swiki_p.recentchanges ON p2.page_id = rc_cur_id
  WHERE p1.page_namespace IN (0,10,14)
-  AND rc_timestamp >= DATE_SUB(CURDATE(),INTERVAL 3 DAY)
+  AND rc_timestamp >= DATE_SUB(CURDATE(),INTERVAL %s HOUR)
   AND rc_old_len < rc_new_len
  ORDER BY rc_timestamp DESC;""",
 
@@ -228,8 +223,8 @@ def get_cat_tree_rec(cat, limit=SQL_LIMIT_max):
 	return res
 
 # iterative (heavily SQL based)
-def checkRecentEdits_db_it(cat, end, limit=SQL_LIMIT_max):
-	res = []
+def checkRecentEdits_db_it(cat, end, period, limit=SQL_LIMIT_max):
+	res = set([])
 
 #	db.query(("\n".join(_SQL_query_01)) % cat.replace(' ', '_'))
 
@@ -237,14 +232,14 @@ def checkRecentEdits_db_it(cat, end, limit=SQL_LIMIT_max):
 	call_db(_SQL_query_cattree[0])
 	call_db(_SQL_query_cattree[1])
 	#call_db(_SQL_query_cattree[2], (cat.replace(' ', '_'),))
-	_SQL_query = _SQL_query_cattree[2] % ('de', '%s')  # BAD: SQL injection!
+	_SQL_query = _SQL_query_cattree[2] % (wiki, '%s')  # BAD: SQL injection!
 	call_db(_SQL_query, (cat.replace(' ', '_'),))      #
 
 #	uu = read_db(_SQL_query_cattree[8], limit=limit)
 #	res.append( uu )
 #	return res
 
-	_SQL_query = _SQL_query_cattree[5] % ('%s', 'de', 'de')  # BAD: SQL injection!
+	_SQL_query = _SQL_query_cattree[5] % ('%s', wiki, wiki)  # BAD: SQL injection!
 	for i in range(25):
 		call_db(_SQL_query_cattree[3])
 		call_db(_SQL_query_cattree[4], (i,))
@@ -254,13 +249,14 @@ def checkRecentEdits_db_it(cat, end, limit=SQL_LIMIT_max):
 
 		if (co[0][0] == 0): break
 
-	unique = set([])
-	for page in list(read_db(_SQL_query_cattree[7], limit=limit)):
-# there is a parameter 'INTERVAL 3 DAY' in '_SQL_query_cattree' is this a problem??
+	unique = {}
+	_SQL_query = _SQL_query_cattree[7] % (wiki, wiki, wiki, wiki, '%s')  # BAD: SQL injection!
+	for page in list(read_db(_SQL_query, (period,), limit=limit)):       #
 		u = page[:2] # make list items unique, BUT YOU HAVE TO TAKE THE NEWEST ONE!!!
-		if (int(page[3]) >= end) and (u not in unique):
-			res.append( [(page[1], page[0], page[3])] )
-		unique.add(u)
+		date = long(page[3])
+		if date > unique.get(u, end):
+			res.add( ((page[1], page[0], page[3]),) )
+			unique[u] = date
 
 	return res
 
@@ -271,7 +267,7 @@ def checkRecentEdits_db_rec(cat, end, limit=SQL_LIMIT_max):
 		ns = ns + (1 - (ns % 2))  # next bigger odd
 		try:
 			subrow = read_db(_SQL_query_page_info, (row[0], ns, 1))
-			if subrow and (int(subrow[0][2]) >= end):
+			if subrow and (long(subrow[0][2]) >= end):
 				res.append( subrow )
 		except _mysql_exceptions.ProgrammingError:  # are displayed later with '(!)' mark
 			res.append( [(row[0], ns, '')] )
@@ -308,11 +304,9 @@ def get_wikiinfo_db(wiki, limit=SQL_LIMIT_max):
 
 def displayhtmlpage(form):
 	cat    = form.getvalue('cat', '')
-	start  = form.getvalue('start', datetime.datetime.utcnow().strftime(wikitime))
-#	start  = form.getvalue('start', dtbext.date.getTimeStmp(full=True))
+#	start  = form.getvalue('start', datetime.datetime.utcnow().strftime(wikitime))
+	start  = form.getvalue('start', dtbext.date.getTimeStmpNow(full=True))
 	period = form.getvalue('period', '24')
-
-#	period = '10000'
 
 	s = datetime.datetime.strptime(start, wikitime)
 	p = datetime.timedelta(hours=int(period))
@@ -324,7 +318,7 @@ def displayhtmlpage(form):
 	data['output'] += "<b>End</b>: %s (%s)<br>\n" % (start, end.ctime())
 	data['output'] += "<b>Period</b>: %sh<br>\n" % period
 
-	end = int( end.strftime(wikitime) )
+	end = long( end.strftime(wikitime) )
 
 	data['output'] += "<br>\n"
 
@@ -334,20 +328,17 @@ def displayhtmlpage(form):
 #	res += str( read_db(_SQL_query_02, (cat,)) )
 #	res += "<br>\n"
 
-#	cat = 'Portal:Hund'
-#	cat = 'Baden-Württemberg'
-#	cat = ''
-
 	if cat:
 		tic = time()
-#		out = checkRecentEdits_API(cat, end)
-		out = checkRecentEdits_db_rec(cat, end)
-#		out = checkRecentEdits_db_it(cat, end)
+		#out = checkRecentEdits_API(cat, end)
+		#out = checkRecentEdits_db_rec(cat, end)                    # uses 'page_touched'
+		out = checkRecentEdits_db_it(cat, end, str(int(period)+1))  # uses 'rc_timestamp'
+		out_size = len(out)
 		toc = time()
 		if out:
 			# sort items/entries by timestamp
 			# (somehow cheap algor. - use SQL directly for sorting)
-			out_dict = dict( [(item[0][2]+item[0][0], item) for item in out] )
+			out_dict = dict( [(item[0][2]+item[0][0]+str(item[0][1]), item) for item in out] )
 			keys = out_dict.keys()
 			keys.sort()
 			out = [out_dict[key] for key in keys]
@@ -357,9 +348,8 @@ def displayhtmlpage(form):
 			for subrow in out:
 				data['output'] += "<tr>\n  <td>"
 				title = subrow[0][0]
-				if subrow[0][1] in trans_ns:
-					title = trans_ns[subrow[0][1]]['de'].encode('utf8') + ':' + title
-				data['output'] += '<a href="http://de.wikipedia.org/wiki/%s" target="_blank">%s</a>' % (title, title.replace('_', ' '))
+				title = site.namespace(subrow[0][1]).encode('utf8') + ':' + title
+				data['output'] += '<a href="http://%s.wikipedia.org/wiki/%s" target="_blank">%s</a>' % (wiki, title, title.replace('_', ' '))
 				data['output'] += "</td>\n  <td>"
 #				data['output'] += str(subrow[0][1:])
 				try:
@@ -373,7 +363,7 @@ def displayhtmlpage(form):
                 else:
                         data['output'] += "<i>No pages matching criteria found.</i><br>\n"
 		data['output'] += "<br>\n"
-                data['output'] += "Time to process: %fs\n" % (toc-tic)
+                data['output'] += "Time to process %i results: %fs\n" % (out_size, (toc-tic))
 	else:
 		data['output'] += "<i>No category (cat) defined!</i><br>\n"
 
@@ -398,11 +388,14 @@ def displayhtmlpage(form):
 
 form = cgi.FieldStorage()
 wiki = form.getvalue('wiki', 'de')
+if len(wiki) > 4: wiki = 'de'  # cheap protection for SQL injection
+
+site = pywikibot.getSite(wiki)
 
 # Establich a connection
 #db = MySQLdb.connect(db='enwiki_p', host="enwiki-p.rrdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
-db = MySQLdb.connect(db=wiki+'wiki_p', host=wiki+"wiki-p.rrdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
-#db = MySQLdb.connect(db='u_drtrigon', host="dewiki-p.userdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
+#db = MySQLdb.connect(db=wiki+'wiki_p', host=wiki+"wiki-p.rrdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
+db = MySQLdb.connect(db='u_drtrigon', host=wiki+"wiki-p.userdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
 # prepare a cursor object using cursor() method
 cursor = db.cursor()
 
