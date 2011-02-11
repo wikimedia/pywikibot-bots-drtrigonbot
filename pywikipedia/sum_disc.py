@@ -1141,6 +1141,7 @@ class PageSections(object):
 			try:
 				#buf = self.load(page)
 				buf = page.get(force=force)
+				#sections = page.getSections(minLevel=1, force=force)
 				sections = page.getSections(minLevel=1)
 				break
 			except pywikibot.Error:

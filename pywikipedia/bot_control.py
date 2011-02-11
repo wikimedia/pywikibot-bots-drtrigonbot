@@ -83,7 +83,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '8944'
+__framework_rev__ = '8947'
 __release_ver__   = '1.0'
 __release_rev__   = '%i'
 #
@@ -184,8 +184,12 @@ class BotErrorHandler:
 	def send_mailnotification(self, item):
 		pywikibot.output(u'Sending mail "%s" to "%s" as notification!' % (error_mail[1], error_mail[0]))
 		usr = userlib.User(pywikibot.getSite(), error_mail[0])
-		if not usr.sendMail(subject=error_mail[1], text=item):		# 'item' should be unicode!
-			pywikibot.output(u'!!! WARNING: mail could not be sent!')
+		try:
+			if usr.sendMail(subject=error_mail[1], text=item):		# 'item' should be unicode!
+				return
+		except:  # break exception handling recursion
+			pass
+		pywikibot.output(u'!!! WARNING: mail could not be sent!')
 
 	def gettraceback(self, exc_info):
 		(exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)

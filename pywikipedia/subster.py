@@ -126,7 +126,7 @@ class SubsterBot(dtbext.basic.BasicBot):
 						pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
 						continue
 
-					self.save(page, substed_content, u'Bot: substituting %s tags.' % (", ".join(substed_tags)))
+					self.save(page, substed_content, u'Bot: substituting %s tag(s).' % (", ".join(substed_tags)))
 				else:
 					pywikibot.output(u'NOTHING TO DO!')
 

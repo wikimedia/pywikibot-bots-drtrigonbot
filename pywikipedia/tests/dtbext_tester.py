@@ -61,6 +61,10 @@ TESTPAGE = u'Wikipedia:Auskunft'
 TESTPAGE = u'Benutzer Diskussion:MerlBot/Vermutlich verstorben'
 TESTPAGE = u'Benutzer Diskussion:Euku/2010/II. Quartal'
 TESTPAGE = u'Benutzer Diskussion:Mo4jolo/Archiv/2008'
+TESTPAGE = u'Benutzer Diskussion:Eschweiler'
+TESTPAGE = u'Benutzer Diskussion:Marilyn.hanson'
+TESTPAGE = u'Benutzer Diskussion:A.Savin'
+TESTPAGE = u'Benutzer Diskussion:W!B:/Knacknüsse'
 
 TESTBUFFER = u"""
 {{Archiv|Wikipedia Diskussion:WikiProjekt Einsatzorganisationen}}
@@ -103,6 +107,7 @@ def TEST_getSections():
 	#(sections, test) = site.getSections(minLevel=1, getter=site.get)
 	#(sections, test) = site.getSections(minLevel=1, getter=site._getFullContent)
 	sections = site.getSections(minLevel=1)
+	#sections = site.getSections(minLevel=1, force=True)
 	#(sections, test) = site.getSections()
 
 	#print "*"
@@ -275,7 +280,7 @@ dtbext.pywikibot.debug = True
 
 # wikipedia.py
 #TEST_getVersionHistory()
-#TEST_getSections()
+TEST_getSections()
 #TEST_purgeCache()
 #TEST_get()
 #TEST_getParsedContent()
@@ -304,15 +309,15 @@ dtbext.pywikibot.debug = True
 #print len(bots)
 
 
-#cat = catlib.Category(site, "%s:%s" % (site.namespace(14), u'Baden-Württemberg'))
-cat = catlib.Category(site, "%s:%s" % (site.namespace(14), u'Portal:Hund'))
-for page in pagegenerators.CategorizedPageGenerator(cat, recurse=True):
-  if not page.isTalkPage():
-    page = page.toggleTalkPage()
-#  try:
-  print page.title(), page.getVersionHistory(revCount=1)[0][1]
-#  except pywikibot.exceptions.NoPage:
-#    pass
+##cat = catlib.Category(site, "%s:%s" % (site.namespace(14), u'Baden-Württemberg'))
+#cat = catlib.Category(site, "%s:%s" % (site.namespace(14), u'Portal:Hund'))
+#for page in pagegenerators.CategorizedPageGenerator(cat, recurse=True):
+#  if not page.isTalkPage():
+#    page = page.toggleTalkPage()
+##  try:
+#  print page.title(), page.getVersionHistory(revCount=1)[0][1]
+##  except pywikibot.exceptions.NoPage:
+##    pass
 
 
 print "done."

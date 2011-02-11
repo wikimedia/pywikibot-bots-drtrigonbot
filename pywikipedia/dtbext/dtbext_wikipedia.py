@@ -120,15 +120,18 @@ class Page(pywikibot.Page):
 	#
 	#  @todo    patch needed by dtbext.dtbext_wikipedia.Page._findSection() for some pages
 	#           \n[ JIRA ticket? ]
-	def getSections(self, minLevel=2, sectionsonly=False):
+	def getSections(self, minLevel=2, sectionsonly=False, force=False):
 		"""Parses the page with API and return section information.
 		   ADDED METHOD: needed by various bots
 
 		   @param minLevel: The minimal level of heading for section to be reported.
 		   @type  minLevel: int
 		   @param sectionsonly: Report only the result from API call, do not assign
-                                        the headings to wiki text (for compression e.g.).
+                            the headings to wiki text (for compression e.g.).
 		   @type  sectionsonly: bool
+		   @param force: Use API for full section list resolution, works always but
+                     is extremely slow, since each single section has to be retrieved.
+		   @type  force: bool
 
 		   Returns a list with entries: (byteoffset, level, wikiline, line, anchor)
 		   This list may be empty and if sections are embedded by template, the according
@@ -183,7 +186,7 @@ class Page(pywikibot.Page):
 				l = int(item[u'level'])
 				if item[u'byteoffset'] and item[u'line']:
 					# section on this page and index in format u"%i"
-					self._getSectionByteOffset(item, pos)		# raises 'Error' if not sucessfull !
+					self._getSectionByteOffset(item, pos, force)		# raises 'Error' if not sucessfull !
 					pos                 = item[u'wikiline_bo'] + len(item[u'wikiline'])
 					item[u'byteoffset'] = item[u'wikiline_bo']
 				else:
@@ -210,37 +213,38 @@ class Page(pywikibot.Page):
 
 	## @since   r18 (ADDED)
 	#  @remarks needed by dtbext.dtbext_wikipedia.Page.getSections()
-	def _getSectionByteOffset(self, section, pos):
+	def _getSectionByteOffset(self, section, pos, force):
         	"""determine the byteoffset of the given section (can be slow due another API call).
 		   ADDED METHOD: needed by 'getSections'
 		"""
 		wikitextlines = self._contents[pos:].splitlines()
-
-		# how the heading should look like (re)
-		l = int(section[u'level'])
-		headers = [ u'^(\s*)%(spacer)s(\s*)(.*?)(\s*)%(spacer)s(\s*)$' % {'line': section[u'line'], 'spacer': u'=' * l},
-			    u'^(\s*)<h%(level)i>s(\s*)(.*?)(\s*)</h%(level)i>(\s*)$' % {'line': section[u'line'], 'level': l}, ]
-
-		# try to give exact match for heading
 		possible_headers = []
-		for h in headers:
-			ph = re.search(h, self._contents[pos:], re.M)
-			if ph:
-				ph = ph.group(0).strip()
-				possible_headers += [ (ph, ph) ]
 
-		# how the heading could look like (difflib)
-		headers = [ u'%(spacer)s %(line)s %(spacer)s' % {'line': section[u'line'], 'spacer': u'=' * l},
-			    u'<h%(level)i>%(line)s</h%(level)i>' % {'line': section[u'line'], 'level': l}, ]
+		if not force:
+			# how the heading should look like (re)
+			l = int(section[u'level'])
+			headers = [ u'^(\s*)%(spacer)s(\s*)(.*?)(\s*)%(spacer)s((<!--(.*?)-->)?)(\s*)$' % {'line': section[u'line'], 'spacer': u'=' * l},
+				    u'^(\s*)<h%(level)i>s(\s*)(.*?)(\s*)</h%(level)i>((<!--(.*?)-->)?)(\s*)$' % {'line': section[u'line'], 'level': l}, ]
 
-		# give possible match for heading
-		# http://stackoverflow.com/questions/2923420/fuzzy-string-matching-algorithm-in-python
-		# http://docs.python.org/library/difflib.html
-		# (http://mwh.geek.nz/2009/04/26/python-damerau-levenshtein-distance/)
-		for h in headers:
-			ph = difflib.get_close_matches(h, wikitextlines, cutoff=0.70)	# cutoff=0.6 (default)
-			possible_headers += [ (p, h) for p in ph ]
-			#print h, possible_headers
+			# try to give exact match for heading
+			for h in headers:
+				ph = re.search(h, self._contents[pos:], re.M)
+				if ph:
+					ph = ph.group(0).strip()
+					possible_headers += [ (ph, h) ]
+
+			# how the heading could look like (difflib)
+			headers = [ u'%(spacer)s %(line)s %(spacer)s' % {'line': section[u'line'], 'spacer': u'=' * l},
+				    u'<h%(level)i>%(line)s</h%(level)i>' % {'line': section[u'line'], 'level': l}, ]
+
+			# give possible match for heading
+			# http://stackoverflow.com/questions/2923420/fuzzy-string-matching-algorithm-in-python
+			# http://docs.python.org/library/difflib.html
+			# (http://mwh.geek.nz/2009/04/26/python-damerau-levenshtein-distance/)
+			for h in headers:
+				ph = difflib.get_close_matches(h, wikitextlines, cutoff=0.70)	# cutoff=0.6 (default)
+				possible_headers += [ (p, h) for p in ph ]
+				#print h, possible_headers
 
 		if (len(possible_headers) == 0) and section[u'index']:		# nothing found, try 'prop=revisions (rv)'
 			# call the wiki to get info
@@ -259,18 +263,13 @@ class Page(pywikibot.Page):
 			r = result[u'query'][u'pages'].values()[0]
 			pl = r[u'revisions'][0][u'*'].splitlines()
 
-			if len(pl) == 0:		# nothing found, report/raise error !
-				#page._getexception = ...
-				raise pywikibot.Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.title(asLink=True))
-				#pywikibot.output(...)
-				# (or create a own error, e.g. look into interwiki.py)
-			else:
+			if pl:
 				possible_headers = [ (pl[0], pl[0]) ]
 
 		# find the most probable match for heading
 		best_match = (0.0, None)
 		for (ph, header) in possible_headers:
-			#print u'    ', difflib.SequenceMatcher(None, header, ph).ratio(), ph
+			#print u'    ', difflib.SequenceMatcher(None, header, ph).ratio(), header, ph
 			mr = difflib.SequenceMatcher(None, header, ph).ratio()
 			if mr > best_match[0]: best_match = (mr, ph)
 		#print u'    ', best_match
@@ -284,6 +283,8 @@ class Page(pywikibot.Page):
 		if section[u'wikiline_bo'] < 0:		# nothing found, report/raise error !
 			#page._getexception = ...
 			raise pywikibot.Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.title(asLink=True))
+			#pywikibot.output(...)
+			# (or create a own error, e.g. look into interwiki.py)
 
 	## @since   ? (ADDED; non-api purge can be done with wikipedia.Page.purge_address())
 	#  @remarks needed by various bots
