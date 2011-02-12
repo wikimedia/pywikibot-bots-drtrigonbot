@@ -168,7 +168,7 @@ class Page(pywikibot.Page):
 			# assign sections with wiki text and section byteoffset
 			#pywikibot.output(u"  Reading wiki page text (if not already done).")
 
-			debug_data += str(len(self.get('_contents',u''))) + '\n'
+			debug_data += str(len(self.__dict__.get('_contents',u''))) + '\n'
 			self.get()
 			debug_data += str(len(self._contents)) + '\n'
 			debug_data += self._contents + '\n'

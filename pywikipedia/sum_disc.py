@@ -822,8 +822,8 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 		for item in self.maintenance_msg:
 			page = pywikibot.Page(self.site, bot_config['maintenance_page'] % "")
-			tmst = time.strftime('%H:%M, %d. %b. %Y')
-			tmst = u'%s' % re.sub(' 0', ' ', tmst)
+			dtbext.pywikibot.addAttributes(page)
+			tmst = time.strftime(pywikibot.Timestamp.ISO8601Format)
 			page.sum_disc_data = ( self._param['notify_msg'][_PS_maintmsg],
 					       None,
 					       u'DrTrigon',

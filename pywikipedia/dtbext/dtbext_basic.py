@@ -211,7 +211,7 @@ class BasicBot(basic.BasicBot):
 			pywikibot.setAction(u'reset job queue')
 			page.put(u'', minorEdit = True)
 		else:
-			pywikibot.output(u'\03{lightred}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
+			pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
 
 		queue = []
 		for line in data:
