@@ -338,6 +338,10 @@ def main():
 	getSVN_release_ver()
 	getSVN_framework_ver()
 
+	# mediawiki software version?
+	pywikibot.output(u'\nMEDIAWIKI VERSION:')
+	pywikibot.output(u'  Actual revision: %s' % pywikibot.getSite().version())
+
 	# processing of messages on bot discussion page
 	if pywikibot.getSite().messages():
 		pywikibot.output(u'====== new messages on bot discussion page =======')
