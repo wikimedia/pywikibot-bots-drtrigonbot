@@ -181,9 +181,9 @@ class Page(pywikibot.Page):
 				f.write( debug_data.encode('utf8') + '\n' )
 				f.close()
 
-			pos = 0
-			for setting in [(0.05,0.95), (0.05,0.8)]:
+			for setting in [(0.05,0.95), (0.05,0.8)]:  # 0.4 as lower border is good as well
 				try:
+					pos = 0
 					for i, item in enumerate(r):
 						item[u'level'] = int(item[u'level'])
 						if (item[u'byteoffset'] != None) and item[u'line']:  # byteoffset may be 0; 'None' means template
@@ -199,8 +199,8 @@ class Page(pywikibot.Page):
 						r[i] = item
 					break
 				except pywikibot.Error:
-					pos = 0
-			if not pos:
+					pos = None
+			if (pos == None):
 				raise
 
 		# check min. level

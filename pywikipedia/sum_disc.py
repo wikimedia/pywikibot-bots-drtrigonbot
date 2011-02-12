@@ -745,10 +745,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 			self.pages.promote_page() # hist -> news
 
 			entries = PageSections(page, self._param)
-			try:
-				page.getSections()
-			except:
-				pass
 
 			(page, page_rel, page_signed) = entries.check_rel()
 

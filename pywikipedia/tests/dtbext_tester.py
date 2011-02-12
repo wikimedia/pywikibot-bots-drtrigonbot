@@ -54,7 +54,7 @@ class TestModuleImports(unittest.TestCase):
 
 class TestFunctionStability(unittest.TestCase):
   def test_FS_getSections(self):
-    self.assertEqual( len(PAGE_SET_test_FS_getSections), 91 )
+    self.assertEqual( len(PAGE_SET_test_FS_getSections), 92 )
     count = 0
     problems = []
     for TESTPAGE in PAGE_SET_test_FS_getSections:
@@ -326,6 +326,7 @@ def experimental():
 
 
 PAGE_SET_test_FS_getSections = [
+u'Diskussion:Selbstkühlendes Bierfass',
 u'Benutzer Diskussion:P.Copp',
 u'Benutzer Diskussion:David Ludwig',
 u'Diskussion:Zufall',
