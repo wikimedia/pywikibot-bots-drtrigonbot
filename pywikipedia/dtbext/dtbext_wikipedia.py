@@ -49,7 +49,6 @@ def addAttributes(obj):
 		obj.__dict__['isRedirectPage']		= lambda *args, **kwds: Page.__dict__['isRedirectPage'](obj, *args, **kwds)
 		obj.__dict__['getSections']		= lambda *args, **kwds: Page.__dict__['getSections'](obj, *args, **kwds)
 		obj.__dict__['_getSectionByteOffset']	= lambda *args, **kwds: Page.__dict__['_getSectionByteOffset'](obj, *args, **kwds)
-		obj.__dict__['_findSection']		= lambda *args, **kwds: Page.__dict__['_findSection'](obj, *args, **kwds)
 		obj.__dict__['purgeCache']		= lambda *args, **kwds: Page.__dict__['purgeCache'](obj, *args, **kwds)
 		obj.__dict__['userNameHuman']		= lambda *args, **kwds: Page.__dict__['userNameHuman'](obj, *args, **kwds)
 		obj.__dict__['append']			= lambda *args, **kwds: Page.__dict__['append'](obj, *args, **kwds)
@@ -117,9 +116,6 @@ class Page(pywikibot.Page):
 
 	## @since   r18 (ADDED)
 	#  @remarks needed by various bots
-	#
-	#  @todo    patch needed by dtbext.dtbext_wikipedia.Page._findSection() for some pages
-	#           \n[ JIRA ticket? ]
 	def getSections(self, minLevel=2, sectionsonly=False, force=False):
 		"""Parses the page with API and return section information.
 		   ADDED METHOD: needed by various bots
@@ -181,7 +177,7 @@ class Page(pywikibot.Page):
 				f.write( debug_data.encode('utf8') + '\n' )
 				f.close()
 
-			for setting in [(0.05,0.95), (0.05,0.8)]:  # 0.4 as lower border is good as well
+			for setting in [(0.05,0.95), (0.05,0.8)]:  # 0.4 as lower border is good as well, 0.6 is default upper border
 				try:
 					pos = 0
 					for i, item in enumerate(r):
@@ -201,7 +197,7 @@ class Page(pywikibot.Page):
 				except pywikibot.Error:
 					pos = None
 			if (pos == None):
-				raise
+				raise  # re-raise
 
 		# check min. level
 		data = []
@@ -217,7 +213,7 @@ class Page(pywikibot.Page):
 
 	## @since   r18 (ADDED)
 	#  @remarks needed by dtbext.dtbext_wikipedia.Page.getSections()
-	def _getSectionByteOffset(self, section, pos, force, cutoff=(0.05, 0.95)):
+	def _getSectionByteOffset(self, section, pos, force=False, cutoff=(0.05, 0.95)):
         	"""determine the byteoffset of the given section (can be slow due another API call).
 		   ADDED METHOD: needed by 'getSections'
 		"""

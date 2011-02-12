@@ -1135,10 +1135,10 @@ class PageSections(object):
 		try:
 			#buf = page.get(force=True)
 			buf = page.get()
-			#sections = page.getSections(minLevel=1, force=True)
 			sections = page.getSections(minLevel=1)
 		except pywikibot.Error:
 			# sections could not be resoled process the whole page at once
+			#sections = page.getSections(minLevel=1, force=True)  # slow for pages with > 100 sections
 			sections = []
 
 			pywikibot.output(u'  Problem resolving section data, processing the whole page at once...')
