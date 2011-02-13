@@ -177,7 +177,7 @@ class Page(pywikibot.Page):
 				f.write( debug_data.encode('utf8') + '\n' )
 				f.close()
 
-			for setting in [(0.05,0.95), (0.05,0.8)]:  # 0.4 as lower border is good as well, 0.6 is default upper border
+			for setting in [(0.05,0.95), (0.4,0.8), (0.05,0.8)]:  # 0.6 is default upper border
 				try:
 					pos = 0
 					for i, item in enumerate(r):
@@ -224,7 +224,7 @@ class Page(pywikibot.Page):
 		if not force:
 			# how the heading should look like (re)
 			l = section[u'level']
-			headers = [ u'^(\s*)%(spacer)s(.*?)%(spacer)s((<!--(.*?)-->)?)(\s*)$' % {'line': section[u'line'], 'spacer': u'=' * l},
+			headers = [ u'^(\s*)%(spacer)s(.*?)%(spacer)s(\s*)((<!--(.*?)-->)?)(\s*)$' % {'line': section[u'line'], 'spacer': u'=' * l},
 				    u'^(\s*)<h%(level)i>(.*?)</h%(level)i>(.*?)$' % {'line': section[u'line'], 'level': l}, ]
 
 			# try to give exact match for heading
@@ -268,12 +268,13 @@ class Page(pywikibot.Page):
 				possible_headers = [ (pl[0], pl[0]) ]
 
 		# find the most probable match for heading
+		#print possible_headers
 		best_match = (0.0, None)
 		for i, (ph, header) in enumerate(possible_headers):
 			#print u'    ', difflib.SequenceMatcher(None, header, ph).ratio(), header, ph
 			mr = difflib.SequenceMatcher(None, header, ph).ratio()
 			if mr > best_match[0]: best_match = (mr, ph)
-			if (i == 0) and (mr >= cutoff[0]): break  # use exact match (re) directly (if good enough)
+			if (i in [0, 1]) and (mr >= cutoff[0]): break  # use first (exact; re) match directly (if good enough)
 		#print u'    ', best_match
 
 		# prepare resulting data

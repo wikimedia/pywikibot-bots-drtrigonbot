@@ -702,10 +702,10 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				if hasattr(page, u'_getexception'):
 					raise page._getexception
 			except pywikibot.NoPage:
-				pywikibot.output(u'\03{lightaqua}WARNING: skipping not available (deleted) page at %s\03{default}' % page.title(asLink=True))
+				pywikibot.output(u'Problem accessing not available (deleted) page at %s, skipping...' % page.title(asLink=True))
 				continue
 			except pywikibot.IsRedirectPage:
-				pywikibot.output(u'\03{lightaqua}WARNING: skipping redirect page at %s\03{default}' % page.title(asLink=True))
+				pywikibot.output(u'Problem using redirect page at %s, skipping...' % page.title(asLink=True))
 				continue
 
 			# actual/new status of page, has something changed?

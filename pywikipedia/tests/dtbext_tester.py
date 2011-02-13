@@ -54,7 +54,7 @@ class TestModuleImports(unittest.TestCase):
 
 class TestFunctionStability(unittest.TestCase):
   def test_FS_getSections(self):
-    self.assertEqual( len(PAGE_SET_test_FS_getSections), 93 )
+    self.assertEqual( len(PAGE_SET_test_FS_getSections), 98 )
     count = 0
     problems = []
     for TESTPAGE in PAGE_SET_test_FS_getSections:
@@ -326,6 +326,11 @@ def experimental():
 
 
 PAGE_SET_test_FS_getSections = [
+u'Benutzer Diskussion:Reiner Stoppok/Dachboden',
+u'Wikipedia:Löschkandidaten/12. Dezember 2009',
+u'Wikipedia:Löschkandidaten/28. Juli 2006',
+u'Wikipedia Diskussion:Persönliche Bekanntschaften/Archiv/2008',
+u'Wikipedia:WikiProjekt München',
 u'Wikipedia Diskussion:Hauptseite',
 u'Diskussion:Selbstkühlendes Bierfass',
 u'Benutzer Diskussion:P.Copp',
