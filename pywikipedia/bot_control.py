@@ -340,7 +340,7 @@ def main():
 
 	# mediawiki software version?
 	pywikibot.output(u'\nMEDIAWIKI VERSION:')
-	pywikibot.output(u'  Actual revision: %s' % pywikibot.getSite().version())
+	pywikibot.output(u'  Actual revision: %s.%s' % tuple(pywikibot.getSite().live_version()))
 
 	# processing of messages on bot discussion page
 	if pywikibot.getSite().messages():
