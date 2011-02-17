@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikibooks_family.py 8943 2011-02-08 21:20:19Z xqt $'
+__version__ = '$Id: wikibooks_family.py 8975 2011-02-17 00:20:26Z xqt $'
 
 # The Wikimedia family that is known as Wikibooks
 
@@ -11,13 +11,13 @@ class Family(family.Family):
         self.name = 'wikibooks'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'hu', 'ja', 'pt', 'nl', 'es', 'pl', 'it', 'he',
+            'en', 'de', 'fr', 'hu', 'ja', 'pt', 'nl', 'pl', 'es', 'it', 'he',
             'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'zh', 'hr', 'sv', 'tr', 'da',
             'id', 'th', 'mk', 'ko', 'fa', 'sr', 'tl', 'gl', 'ar', 'is', 'no',
             'ta', 'ka', 'lt', 'eo', 'bg', 'ro', 'sk', 'el', 'uk', 'si', 'li',
             'tt', 'la', 'ang', 'ia', 'cv', 'sl', 'mr', 'et', 'az', 'ur', 'oc',
-            'ml', 'ms', 'bn', 'eu', 'hi', 'fy', 'ie', 'tg', 'af', 'hy', 'pa',
-            'te', 'ne', 'sa', 'bs', 'ky', 'be', 'ast', 'zh-min-nan', 'mg', 'cy',
+            'ml', 'ms', 'bn', 'hi', 'eu', 'fy', 'ie', 'tg', 'af', 'hy', 'pa',
+            'ne', 'te', 'sa', 'bs', 'ky', 'be', 'ast', 'zh-min-nan', 'mg', 'cy',
             'ku', 'co', 'tk', 'su', 'uz', 'vo', 'mn', 'kk', 'my',
         ]
 
@@ -97,10 +97,10 @@ class Family(family.Family):
             'cs': u'Diskuse k Wikiknihám',
             'cv': u'Wikibooks сӳтсе явмалли',
             'cy': u'Sgwrs Wicillyfrau',
-            'da': u'Wikibooks-diskussion',
+            'da': [u'Wikibooks diskussion', u'Wikibooks-diskussion'],
             'de': u'Wikibooks Diskussion',
             'el': u'Βικιβιβλία συζήτηση',
-            'eo': u'Vikilibroj diskuto',
+            'eo': [u'Vikilibroj-Diskuto', u'Vikilibroj diskuto'],
             'es': u'Wikilibros Discusión',
             'et': u'Vikiõpikute arutelu',
             'eu': u'Wikibooks eztabaida',
@@ -141,6 +141,7 @@ class Family(family.Family):
             'ms': u'Perbincangan Wikibooks',
             'nah': u'Wikibooks Discusión',
             'nds': u'Wikibooks Diskuschoon',
+            'ne': u'Wikibooks वार्ता',
             'nl': u'Overleg Wikibooks',
             'no': u'Wikibøker-diskusjon',
             'oc': u'Discussion Wikilibres',
@@ -151,7 +152,7 @@ class Family(family.Family):
             'qu': u'Wikibooks rimanakuy',
             'ro': u'Discuție Wikimanuale',
             'ru': u'Обсуждение Викиучебника',
-            'sa': u'Wikibooksसंभाषणं',
+            'sa': [u'Wikibooksसम्भाषणम्', u'Wikibooksसंभाषणं'],
             'si': u'විකිපොත් සාකච්ඡාව',
             'sk': u'Diskusia k Wikibooks',
             'sl': u'Pogovor o Wikiknjigah',
@@ -405,7 +406,7 @@ class Family(family.Family):
         ]
 
     def version(self, code):
-        return '1.16wmf4'
+        return '1.17wmf1'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikinews_family.py 8912 2011-02-04 13:19:21Z xqt $'
+__version__ = '$Id: wikinews_family.py 8968 2011-02-16 11:47:12Z xqt $'
 
 # The Wikimedia family that is known as Wikinews
 
@@ -243,7 +243,7 @@ class Family(family.Family):
         return 'utf-8'
 
     def version(self, code):
-        return '1.16wmf4'
+        return '1.17wmf1'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

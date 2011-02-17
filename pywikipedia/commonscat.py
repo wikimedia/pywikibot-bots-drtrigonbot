@@ -50,7 +50,7 @@ TODO:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: commonscat.py 8812 2010-12-29 22:25:40Z xqt $'
+__version__ = '$Id: commonscat.py 8954 2011-02-15 12:12:05Z amir $'
 #
 
 import wikipedia as pywikibot
@@ -79,8 +79,8 @@ commonscatTemplates = {
     'es' : (u'Commonscat', [u'Ccat', u'Commons cat', u'Categoría Commons',
                             u'Commonscat-inline']),
     'eu' : (u'Commonskat', [u'Commonscat']),
-    'fa' : (u'انبار-رده', [u'Commonscat', u'Commons cat',
-                           u'انبار رده', u'Commons category']),
+    'fa' : (u'ویکی‌انبار-رده', [u'Commonscat', u'Commons cat',
+                           u'انبار رده', u'Commons category',u'انبار-رده']),
     'fr' : (u'Commonscat', [u'CommonsCat', u'Commons cat',
                             u'Commons category']),
     'frp' : (u'Commonscat', [u'CommonsCat']), 

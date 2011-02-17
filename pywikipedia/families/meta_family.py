@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: meta_family.py 8066 2010-04-09 07:55:32Z xqt $'
+__version__ = '$Id: meta_family.py 8955 2011-02-15 15:38:08Z xqt $'
 
 import family
 
@@ -13,10 +13,10 @@ class Family(family.Family):
         self.langs = {
             'meta': 'meta.wikimedia.org',
         }
-        
+
         if family.config.SSL_connection:
             self.langs ['meta'] = None
-        
+
         self.namespaces[4] = {
             '_default': [u'Meta', self.namespaces[4]['_default']],
         }
@@ -135,12 +135,13 @@ class Family(family.Family):
         self.interwiki_forward = 'wikipedia'
         self.cross_allowed = ['meta',]
         self.cross_projects = [
-            'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews', 'wikiversity',
-            'mediawiki', 'test', 'incubator', 'commons', 'species',
+            'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikisource',
+            'wikinews', 'wikiversity', 'mediawiki', 'test', 'incubator',
+            'commons', 'species',
         ]
 
     def version(self,code):
-        return '1.16wmf4'
+        return '1.17wmf1'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

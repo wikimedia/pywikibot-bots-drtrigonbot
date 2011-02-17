@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiversity_family.py 8943 2011-02-08 21:20:19Z xqt $'
+__version__ = '$Id: wikiversity_family.py 8968 2011-02-16 11:47:12Z xqt $'
 
 # The Wikimedia family that is known as Wikiversity
 
@@ -127,7 +127,7 @@ class Family(family.Family):
         ]
 
     def version(self,code):
-        return '1.16wmf4'
+        return '1.17wmf1'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

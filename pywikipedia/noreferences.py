@@ -31,7 +31,7 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 
-__version__='$Id: noreferences.py 8783 2010-12-20 05:25:30Z xqt $'
+__version__='$Id: noreferences.py 8950 2011-02-14 02:08:30Z amir $'
 
 import re, sys
 import wikipedia as pywikibot
@@ -319,7 +319,7 @@ referencesTemplates = {
         'eo': [u'Referencoj'],
         'es': ['Listaref', 'Reflist', 'muchasref'],
         'fa': [u'Reflist', u'Refs', u'FootnotesSmall', u'Reference',
-               u'پانویس', u'پانویس‌ها ', u'پانویس ۲', u'پانویس۲'],
+               u'پانویس', u'پانویس‌ها ', u'پانویس ۲', u'پانویس۲',u'فهرست منابع'],
         'fi': [u'Viitteet', u'Reflist'],
         'fr': [u'Références', u'Notes', u'References', u'Reflist'],
         'hu': [u'reflist', u'források', u'references', u'megjegyzések'],

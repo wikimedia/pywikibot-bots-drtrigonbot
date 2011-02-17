@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikisource_family.py 8926 2011-02-06 02:24:41Z alexsh $'
+__version__ = '$Id: wikisource_family.py 8974 2011-02-17 00:17:38Z xqt $'
 
 # The Wikimedia family that is known as Wikisource
 
@@ -14,7 +14,7 @@ class Family(family.Family):
             'en', 'ru', 'zh', 'pt', 'fr', 'de', 'it', 'es', 'he', 'ar', 'hu',
             'fa', 'pl', 'th', 'cs', 'ro', 'hr', 'te', 'fi', 'sv', 'bn', 'vi',
             'tr', 'nl', 'sl', 'ko', 'uk', 'sr', 'ja', 'el', 'la', 'az', 'ml',
-            'li', 'br', 'yi', 'ca', 'is', 'hy', 'bs', 'ta', 'mk', 'vec', 'id',
+            'li', 'br', 'yi', 'ca', 'is', 'hy', 'bs', 'mk', 'ta', 'vec', 'id',
             'da', 'no', 'et', 'bg', 'lt', 'gl', 'kn', 'cy', 'sk', 'zh-min-nan',
             'fo',
         ]
@@ -87,7 +87,7 @@ class Family(family.Family):
             'ca': u'Viquitexts Discussió',
             'cs': u'Diskuse k Wikizdrojům',
             'cy': u'Sgwrs Wicitestun',
-            'da': u'Wikisource-diskussion',
+            'da': [u'Wikisource diskussion', u'Wikisource-diskussion'],
             'de': u'Wikisource Diskussion',
             'el': u'Βικιθήκη συζήτηση',
             'es': u'Wikisource Discusión',
@@ -509,7 +509,7 @@ class Family(family.Family):
         }
         
     def version(self, code):
-        return '1.16wmf4'
+        return '1.17wmf1'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

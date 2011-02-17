@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiquote_family.py 8943 2011-02-08 21:20:19Z xqt $'
+__version__ = '$Id: wikiquote_family.py 8974 2011-02-17 00:17:38Z xqt $'
 
 # The Wikimedia family that is known as Wikiquote
 
@@ -12,9 +12,9 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'pl', 'it', 'de', 'ru', 'pt', 'sk', 'es', 'bg', 'bs', 'tr',
-            'fr', 'cs', 'sl', 'he', 'lt', 'el', 'id', 'zh', 'fa', 'hu', 'uk',
+            'fr', 'cs', 'sl', 'he', 'lt', 'el', 'id', 'zh', 'hu', 'fa', 'uk',
             'eo', 'fi', 'sv', 'nl', 'no', 'nn', 'ja', 'hy', 'et', 'ca', 'ar',
-            'li', 'cy', 'hr', 'ka', 'ko', 'sr', 'ku', 'ro', 'gl', 'ml', 'az',
+            'li', 'cy', 'hr', 'ka', 'ko', 'sr', 'ro', 'ku', 'gl', 'ml', 'az',
             'is', 'th', 'te', 'da', 'eu', 'af', 'sq', 'vi', 'hi', 'la', 'br',
             'mr', 'be', 'ast', 'ta', 'uz', 'ang', 'zh-min-nan', 'ur', 'gu',
             'su', 'lb', 'wo', 'kn', 'ky', 'am', 'co',
@@ -82,10 +82,10 @@ class Family(family.Family):
             'ca': u'Viquidites Discussió',
             'cs': u'Diskuse k Wikicitátům',
             'cy': u'Sgwrs Wikiquote',
-            'da': u'Wikiquote-diskussion',
+            'da': [u'Wikiquote diskussion', u'Wikiquote-diskussion'],
             'de': u'Wikiquote Diskussion',
             'el': u'Βικιφθέγματα συζήτηση',
-            'eo': u'Vikicitaro diskuto',
+            'eo': [u'Vikicitaro-Diskuto', u'Vikicitaro diskuto'],
             'es': u'Wikiquote Discusión',
             'et': u'Vikitsitaatide arutelu',
             'eu': u'Wikiquote eztabaida',
@@ -271,7 +271,7 @@ class Family(family.Family):
         }
 
     def version(self, code):
-        return '1.16wmf4'
+        return '1.17wmf1'
 
     def code2encodings(self, code):
         """

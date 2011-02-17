@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wiktionary_family.py 8912 2011-02-04 13:19:21Z xqt $'
+__version__ = '$Id: wiktionary_family.py 8973 2011-02-17 00:09:40Z xqt $'
 
 # The Wikimedia family that is known as Wiktionary
 
@@ -12,17 +12,17 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'fr', 'zh', 'lt', 'mg', 'ru', 'tr', 'vi', 'pl', 'ta', 'ko',
-            'io', 'pt', 'fi', 'hu', 'el', 'de', 'no', 'sv', 'it', 'nl', 'et',
-            'kn', 'my', 'li', 'ml', 'lo', 'ja', 'es', 'ku', 'ar', 'ro', 'te',
+            'io', 'hu', 'pt', 'fi', 'el', 'de', 'no', 'sv', 'it', 'nl', 'et',
+            'kn', 'my', 'li', 'ml', 'ja', 'lo', 'es', 'ku', 'ar', 'ro', 'te',
             'id', 'gl', 'ca', 'uk', 'bg', 'vo', 'cs', 'fa', 'is', 'hr', 'scn',
             'simple', 'oc', 'sr', 'th', 'af', 'fy', 'sw', 'br', 'he', 'eo',
             'la', 'sq', 'sl', 'hy', 'tt', 'cy', 'zh-min-nan', 'da', 'eu', 'wa',
             'lv', 'ne', 'tk', 'ast', 'ka', 'ur', 'hsb', 'az', 'kk', 'ky', 'wo',
             'nn', 'hi', 'ang', 'co', 'be', 'ga', 'mr', 'gn', 'ia', 'sk', 'tl',
-            'ms', 'csb', 'st', 'ps', 'nds', 'kl', 'sd', 'km', 'si', 'ug', 'sh',
+            'ms', 'csb', 'st', 'ps', 'nds', 'kl', 'km', 'sd', 'si', 'sh', 'ug',
             'ti', 'mk', 'bn', 'lb', 'an', 'zu', 'gu', 'ss', 'qu', 'ts', 'bs',
-            'fo', 'am', 'rw', 'chr', 'om', 'tg', 'su', 'kw', 'nah', 'iu', 'gv',
-            'mn', 'ie', 'yi', 'gd', 'pa', 'za', 'mt', 'tpi', 'dv', 'ik', 'sg',
+            'fo', 'am', 'rw', 'chr', 'om', 'tg', 'su', 'nah', 'kw', 'iu', 'gv',
+            'mn', 'ie', 'yi', 'gd', 'za', 'pa', 'mt', 'tpi', 'dv', 'ik', 'sg',
             'mi', 'so', 'roa-rup', 'uz', 'jv', 'ln', 'sm', 'ha', 'ay', 'sa',
             'na', 'fj', 'jbo', 'ks', 'tn', 'dz',
         ]
@@ -128,10 +128,10 @@ class Family(family.Family):
             'cs': u'Diskuse k Wikislovníku',
             'csb': u'Diskùsëjô Wiktionary',
             'cy': u'Sgwrs Wiciadur',
-            'da': u'Wiktionary-diskussion',
+            'da': [u'Wiktionary diskussion', u'Wiktionary-diskussion'],
             'de': u'Wiktionary Diskussion',
             'el': u'Συζήτηση βικιλεξικού',
-            'eo': u'Vikivortaro diskuto',
+            'eo': [u'Vikivortaro-Diskuto', u'Vikivortaro diskuto'],
             'es': u'Wikcionario Discusión',
             'et': u'Vikisõnastiku arutelu',
             'eu': u'Wiktionary eztabaida',
@@ -165,7 +165,7 @@ class Family(family.Family):
             'kn': u'Wiktionary ಚರ್ಚೆ',
             'ko': u'위키낱말사전토론',
             'ku': u'Wiktionary nîqaş',
-            'kw': u'Keskows Wiktionary',
+            'kw': [u'Kescows Wiktionary', u'Cows Wiktionary', u'Keskows Wiktionary'],
             'la': u'Disputatio Victionarii',
             'lb': u'Wiktionary Diskussioun',
             'li': u'Euverlèk Wiktionary',
@@ -183,6 +183,7 @@ class Family(family.Family):
             'nah': u'Wiktionary tēixnāmiquiliztli',
             'nap': [u'Wiktionary chiàcchiera', u'Discussioni Wiktionary'],
             'nds': u'Wiktionary Diskuschoon',
+            'ne': u'Wiktionary वार्ता',
             'nl': u'Overleg WikiWoordenboek',
             'nn': u'Wiktionary-diskusjon',
             'no': u'Wiktionary-diskusjon',
@@ -194,11 +195,12 @@ class Family(family.Family):
             'qu': u'Wiktionary rimanakuy',
             'ro': u'Discuție Wikţionar',
             'ru': u'Обсуждение Викисловаря',
-            'sa': u'Wiktionaryसंभाषणं',
+            'sa': [u'Wiktionaryसम्भाषणम्', u'Wiktionaryसंभाषणं'],
             'sc': u'Wiktionary discussioni',
             'scn': u'Discussioni Wikizziunariu',
             'sd': u'Wiktionary بحث',
             'sg': u'Discussion Wiktionary',
+            'sh': u'Razgovor o Wiktionary',
             'si': u'වික්ෂනරි සාකච්ඡාව',
             'sk': u'Diskusia k Wikislovníku',
             'sl': u'Pogovor o Wikislovarju',
@@ -527,7 +529,7 @@ class Family(family.Family):
         self.interwiki_attop = ['pl']
 
     def version(self, code):
-        return '1.16wmf4'
+        return '1.17wmf1'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

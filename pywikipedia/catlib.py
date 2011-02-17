@@ -12,7 +12,7 @@ Library to work with category pages on Wikipedia
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: catlib.py 8947 2011-02-10 00:14:09Z amir $'
+__version__ = '$Id: catlib.py 8961 2011-02-15 21:19:15Z amir $'
 #
 import re, time, urllib, query
 import wikipedia
@@ -464,7 +464,7 @@ class Category(wikipedia.Page):
                 talkpage=targetCat.toggleTalkPage()
                 try:
                     talktext=talkpage.get()
-                except:
+                except wikipedia.NoPage:
                     talkpage.put(u"==Authors==\n%s-~~~~" % authors, u"Bot:Listifying authors")
                 else:
                     talkpage.put(talktext+u"\n==Authors==\n%s-~~~~" % authors, u"Bot:Listifying authors")

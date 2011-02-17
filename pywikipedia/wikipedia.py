@@ -120,7 +120,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 8928 2011-02-07 08:46:04Z alexsh $'
+__version__ = '$Id: wikipedia.py 8972 2011-02-16 23:42:25Z saper $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -2585,9 +2585,9 @@ not supported by PyWikipediaBot!"""
         """Load the version history page and return history information.
 
         Return value is a list of tuples, where each tuple represents one
-        edit and is built of revision id, edit date/time, user name, and
-        edit summary. Starts with the most current revision, unless
-        reverseOrder is True.
+        edit and is built of revision id, edit date/time, user name,
+        edit summary, size and tags. Starts with the most current revision, 
+        unless reverseOrder is True.
         Defaults to getting the first revCount edits, unless getAll is True.
 
         @param revCount: iterate no more than this number of revisions in total

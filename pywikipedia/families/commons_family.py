@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: commons_family.py 8719 2010-11-12 08:30:08Z xqt $'
+__version__ = '$Id: commons_family.py 8963 2011-02-16 08:34:10Z xqt $'
 
 import family
 
@@ -77,7 +77,7 @@ class Family(family.Family):
 
 
     def version(self, code):
-        return '1.16wmf4'
+        return '1.17wmf1'
 
     def dbName(self, code):
         return 'commonswiki_p'

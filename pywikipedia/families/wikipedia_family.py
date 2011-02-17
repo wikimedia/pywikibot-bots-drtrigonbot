@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikipedia_family.py 8943 2011-02-08 21:20:19Z xqt $'
+__version__ = '$Id: wikipedia_family.py 8971 2011-02-16 23:41:35Z xqt $'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 
@@ -12,29 +12,29 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'de', 'fr', 'pl', 'it', 'ja', 'es', 'pt', 'nl', 'ru', 'sv',
-            'zh', 'ca', 'no', 'fi', 'uk', 'cs', 'hu', 'vi', 'ro', 'ko', 'tr',
+            'zh', 'ca', 'no', 'uk', 'fi', 'cs', 'hu', 'vi', 'ro', 'ko', 'tr',
             'id', 'da', 'ar', 'eo', 'sr', 'lt', 'sk', 'vo', 'fa', 'he', 'bg',
             'ms', 'sl', 'war', 'hr', 'et', 'new', 'gl', 'simple', 'hi', 'th',
             'eu', 'nn', 'roa-rup', 'el', 'az', 'ht', 'tl', 'la', 'te', 'ka',
-            'mk', 'ceb', 'sh', 'br', 'pms', 'lv', 'mr', 'lb', 'jv', 'be-x-old',
+            'mk', 'ceb', 'sh', 'br', 'pms', 'lv', 'mr', 'jv', 'lb', 'be-x-old',
             'sq', 'cy', 'is', 'bs', 'ta', 'be', 'bpy', 'an', 'oc', 'bn', 'io',
             'sw', 'lmo', 'fy', 'gu', 'af', 'nds', 'ml', 'ur', 'qu', 'scn', 'ku',
-            'zh-yue', 'su', 'ast', 'nap', 'hy', 'bat-smg', 'ga', 'yo', 'cv',
+            'zh-yue', 'su', 'ast', 'nap', 'hy', 'bat-smg', 'yo', 'ga', 'cv',
             'wa', 'ne', 'ksh', 'pnb', 'kn', 'tg', 'roa-tara', 'vec', 'yi', 'tt',
             'gd', 'zh-min-nan', 'als', 'os', 'uz', 'pam', 'sah', 'kk', 'arz',
             'am', 'mi', 'li', 'nah', 'hsb', 'glk', 'co', 'gan', 'sco', 'mn',
-            'ia', 'my', 'bcl', 'fo', 'fiu-vro', 'nds-nl', 'si', 'tk', 'vls',
-            'bug', 'sa', 'bar', 'mg', 'gv', 'ilo', 'dv', 'nrm', 'pag',
-            'map-bms', 'ckb', 'rm', 'se', 'diq', 'mzn', 'wuu', 'fur', 'ug',
+            'ia', 'my', 'bcl', 'fo', 'bug', 'fiu-vro', 'nds-nl', 'si', 'tk',
+            'vls', 'sa', 'bar', 'mg', 'gv', 'ilo', 'dv', 'nrm', 'pag',
+            'map-bms', 'ckb', 'rm', 'diq', 'se', 'mzn', 'wuu', 'fur', 'ug',
             'lij', 'mt', 'bh', 'bo', 'nov', 'ang', 'csb', 'sc', 'hif',
             'zh-classical', 'km', 'lad', 'cbk-zam', 'pi', 'frp', 'ps', 'hak',
-            'kw', 'pa', 'nv', 'szl', 'xal', 'pdc', 'haw', 'stq', 'rue', 'ie',
-            'so', 'kv', 'krc', 'to', 'crh', 'mhr', 'rw', 'ace', 'pcd', 'myv',
-            'ln', 'ext', 'udm', 'gn', 'ky', 'eml', 'arc', 'pap', 'ay', 'ce',
+            'kw', 'pa', 'nv', 'szl', 'xal', 'pdc', 'haw', 'rue', 'stq', 'ie',
+            'so', 'kv', 'krc', 'udm', 'to', 'crh', 'mhr', 'rw', 'ace', 'pcd',
+            'myv', 'ln', 'ext', 'ky', 'gn', 'eml', 'arc', 'pap', 'ay', 'ce',
             'ba', 'jbo', 'wo', 'bjn', 'frr', 'kl', 'tpi', 'kab', 'ty', 'mrj',
             'srn', 'zea', 'gag', 'koi', 'dsb', 'ab', 'ig', 'or', 'lo', 'kg',
             'mdf', 'av', 'mwl', 'rmy', 'cu', 'kaa', 'sm', 'tet', 'got', 'ks',
-            'bm', 'ik', 'sd', 'bi', 'lbe', 'na', 'pih', 'iu', 'pfl', 'pnt',
+            'bm', 'lbe', 'ik', 'sd', 'bi', 'na', 'pih', 'pfl', 'iu', 'pnt',
             'as', 'ss', 'chr', 'cdo', 'ha', 'ee', 'ti', 'om', 'zu', 'za', 've',
             'ts', 'rn', 'sg', 'cr', 'dz', 'ch', 'lg', 'tum', 'bxr', 'fj', 'ny',
             'ak', 'st', 'xh', 'ff', 'tn', 'ki', 'sn', 'tw', 'chy',
@@ -185,7 +185,7 @@ class Family(family.Family):
             'ar': u'نقاش ويكيبيديا',
             'arc': [u'ܡܡܠܠܐ ܕܘܝܩܝܦܕܝܐ', u'ܘܝܩܝܦܕܝܐ talk'],
             'arz': u'نقاش ويكيبيديا',
-            'as': u'Wikipedia বার্তা',
+            'as': [u'Wikipedia বাৰ্তা', u'Wikipedia वार्ता', u'Wikipedia বার্তা'],
             'ast': u'Uiquipedia alderique',
             'av': u'Обсуждение Wikipedia',
             'ay': u'Wikipedia Discusión',
@@ -207,7 +207,7 @@ class Family(family.Family):
             'bug': u'Pembicaraan Wikipedia',
             'ca': u'Viquipèdia Discussió',
             'cbk-zam': u'Wikipedia Discusión',
-            'ce': u'Дийцаре Википедийа',
+            'ce': [u'Википедийа дийцаре', u'Википедийа Дийца', u'Дийцаре Википедийа'],
             'ceb': [u'Hisgot sa Wikipedia', u'Hisgot saWikipedia'],
             'ch': u'Kombetsasion nu Wikipedia',
             'ckb': [u'لێدوانی ویکیپیدیا', u'لێدوانی Wikipedia'],
@@ -217,7 +217,7 @@ class Family(family.Family):
             'cu': [u'Википє́дїѩ бєсѣ́да', u'Википедїѩ бєсѣ́да'],
             'cv': u'Википеди сӳтсе явмалли',
             'cy': u'Sgwrs Wicipedia',
-            'da': u'Wikipedia-diskussion',
+            'da': [u'Wikipedia diskussion', u'Wikipedia-diskussion'],
             'de': u'Wikipedia Diskussion',
             'diq': u'Wikipedia talk',
             'dsb': u'Wikipedija diskusija',
@@ -277,7 +277,7 @@ class Family(family.Family):
             'ksh': u'Wikipedia Klaaf',
             'ku': u'Wîkîpediya nîqaş',
             'kv': u'Обсуждение Wikipedia',
-            'kw': u'Keskows Wikipedia',
+            'kw': [u'Kescows Wikipedia', u'Cows Wikipedia', u'Keskows Wikipedia'],
             'la': [u'Disputatio Vicipaediae', u'Disputatio Wikipedia'],
             'lad': u'Diskusyón de Wikipedia',
             'lb': u'Wikipedia Diskussioun',
@@ -330,12 +330,13 @@ class Family(family.Family):
             'ro': u'Discuție Wikipedia',
             'ru': u'Обсуждение Википедии',
             'rue': u'Діскузія ку Вікіпедії',
-            'sa': u'विकिपीडियासंभाषणं',
+            'sa': [u'विकिपीडियासम्भाषणम्', u'विकिपीडियासंभाषणं'],
             'sah': u'Бикипиэдьийэ ырытыыта',
             'sc': u'Cuntierra Wikipedia',
             'scn': u'Discussioni Wikipedia',
             'sd': u'Wikipedia بحث',
             'sg': u'Discussion Wikipedia',
+            'sh': u'Razgovor o Wikipedia',
             'si': u'විකිපීඩියා සාකච්ඡාව',
             'sk': u'Diskusia k Wikipédii',
             'sl': u'Pogovor o Wikipediji',
@@ -1207,7 +1208,7 @@ class Family(family.Family):
             return self.known_families
 
     def version(self, code):
-        return '1.16wmf4'
+        return '1.17wmf1'
 
     def dbName(self, code):
         # returns the name of the MySQL database

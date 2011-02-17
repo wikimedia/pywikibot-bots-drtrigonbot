@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: test_family.py 8758 2010-12-05 18:46:44Z purodha $'
+__version__ = '$Id: test_family.py 8970 2011-02-16 11:57:50Z xqt $'
 
 import family
 
@@ -132,7 +132,7 @@ class Family(family.Family):
         ]
 
     def version(self, code):
-        return '1.16wmf4'
+        return '1.17wmf1'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')
