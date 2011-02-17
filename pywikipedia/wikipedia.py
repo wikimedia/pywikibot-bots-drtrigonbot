@@ -7251,9 +7251,8 @@ u"WARNING: Could not open '%s'. Maybe the server or\n your connection is down. R
         if not hasattr(self, "_mw_version"):
             versionpage = self.getUrl(self.get_address("Special:Version"))
             htmldata = BeautifulSoup(versionpage, convertEntities="html")
-            versionstring = htmldata.findAll(text="MediaWiki"
-                                             )[1].parent.nextSibling
-            m = re.match(r"^: ([0-9]+)\.([0-9]+)(.*)$", str(versionstring))
+            versionstring = htmldata.body.table.findAll('td')[1].contents[0]
+            m = re.match(r"^([0-9]+)\.([0-9]+)(.*)$", str(versionstring))
             if m:
                 self._mw_version = (int(m.group(1)), int(m.group(2)),
                                         m.group(3))

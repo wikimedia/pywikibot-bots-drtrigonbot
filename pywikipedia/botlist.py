@@ -14,7 +14,7 @@ data.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: botlist.py 8682 2010-10-21 16:50:11Z xqt $'
+__version__='$Id: botlist.py ? 2010-10-21 16:50:11Z xqt $'
 #
  
 import re, sys, pickle
@@ -93,10 +93,10 @@ def refresh(site, sysop=False, witheditsonly=True):
 
         m1 = re.findall(u'<li>.*?</li>', text)
         for item in m1:
-            m2 = re.search(u'<li>(.*?)\((.*?),\s(.*?)\)</li>', item)
-            (bot, flag_local, flag_global) = m2.groups()
+            m2 = re.search(u'<li>(.*?)\((.*?),\s(.*?)\)(.*?)</li>', item)
+            (bot, flag_local, flag_global, auth) = m2.groups()
 
-            bot         = bot[:-2]
+            bot         = bot[:-1]
             flag_local  = (flag_local[:2] == u'<a')
             flag_global = True # since group='Global_bot'
 
