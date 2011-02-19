@@ -18,7 +18,7 @@ These parameters are supported to specify which pages titles to print:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: pagegenerators.py 8865 2011-01-21 06:38:10Z xqt $'
+__version__='$Id: pagegenerators.py 8981 2011-02-18 17:31:15Z xqt $'
 
 import wikipedia as pywikibot
 import config
@@ -120,7 +120,7 @@ parameterHelp = u"""\
 -titleregex       Work on titles that match the given regular expression.
 
 -transcludes      Work on all pages that use a certain template.
-                  Argument can also be given as "-transcludes:Template:Title".
+                  Argument can also be given as "-transcludes:Title".
 
 -unusedfiles      Work on all description pages of images/media files that are
                   not used anywhere.

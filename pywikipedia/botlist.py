@@ -14,7 +14,7 @@ data.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: botlist.py ? 2010-10-21 16:50:11Z xqt $'
+__version__='$Id: botlist.py 8985 2011-02-19 11:35:33Z xqt $'
 #
  
 import re, sys, pickle
@@ -88,15 +88,17 @@ def refresh(site, sysop=False, witheditsonly=True):
     pywikibot.put_throttle() # It actually is a get, but a heavy one.
     m1 = True
     offset = ''
+    if site.versionnumber == 17:
+        PATTERN = u'<li>(.*?) *\((.*?),\s(.*?)\)(?:.*?)</li>'
+    else:
+        PATTERN = u'<li>(.*?) *\((.*?),\s(.*?)\)</li>'
     while m1:
         text = site.getUrl(site.globalusers_address(offset=offset, group='Global_bot'))
 
         m1 = re.findall(u'<li>.*?</li>', text)
         for item in m1:
-            m2 = re.search(u'<li>(.*?)\((.*?),\s(.*?)\)(.*?)</li>', item)
-            (bot, flag_local, flag_global, auth) = m2.groups()
-
-            bot         = bot[:-1]
+            m2 = re.search(PATTERN', item)
+            (bot, flag_local, flag_global) = m2.groups()
             flag_local  = (flag_local[:2] == u'<a')
             flag_global = True # since group='Global_bot'
 

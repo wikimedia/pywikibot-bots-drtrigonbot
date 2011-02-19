@@ -177,7 +177,7 @@ badword at all but can be used for some bad-nickname.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: welcome.py 8749 2010-12-02 07:22:00Z xqt $'
+__version__ = '$Id: welcome.py 8983 2011-02-18 18:05:51Z xqt $'
 #
 
 import time, re, urllib, locale
@@ -282,11 +282,13 @@ netext = {
         'zh-yue': u'{{歡迎}}--%s',
     },
     'wikinews':{
+        'fa': u'{{خوشامد۲|%s}}',
         'it': u'{{subst:benvenuto}}',
         'zh': u'{{subst:welcome}} %s',
     },
     'wiktionary':{
         'bn': u'{{subst:User:Wikitanvir/welcome|firma=%s}}',
+        'fa': u'{{جا:خوشامد|%s}}',
         'it': u'{{subst:Utente:Filnik/Benve|firma=%s}}',
     },
     'wikiversity':{

@@ -83,7 +83,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '8976'
+__framework_rev__ = '8985'
 __release_ver__   = '1.0'
 __release_rev__   = '%i'
 #
