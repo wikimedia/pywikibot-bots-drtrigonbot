@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: family.py 8976 2011-02-17 00:54:08Z xqt $'
+__version__='$Id: family.py 8988 2011-02-20 12:02:19Z xqt $'
 
 import config
 import re

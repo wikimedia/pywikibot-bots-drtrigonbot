@@ -14,7 +14,7 @@ data.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: botlist.py 8985 2011-02-19 11:35:33Z xqt $'
+__version__='$Id: botlist.py 8989 2011-02-20 12:06:09Z xqt $'
 #
  
 import re, sys, pickle
