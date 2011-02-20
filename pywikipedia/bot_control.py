@@ -404,13 +404,13 @@ if __name__ == "__main__":
 			})
 		elif ("-compress_history:[]" in arg):		# muss alleine laufen, sollte aber mit allen 
 			do_dict['compress_history'] = True		# anderen kombiniert werden können (siehe 'else')...!
-		elif ("-subster" in arg):
-			do_dict['subster'] = True
-			logname_enh = "_subster"			# use another log than usual !!!
+		#elif ("-subster" in arg):
+		#	do_dict['subster'] = True
+		#	logname_enh = "_subster"			# use another log than usual !!!
 		else:
 			do_dict.update({ 'clean_user_sandbox': ("-clean_user_sandbox" in arg),
 			                 'sum_disc':           ("-sum_disc" in arg),
-			                 #'subster':            ("-subster" in arg),
+			                 'subster':            ("-subster" in arg),
 			                 'page_disc':          ("-page_disc" in arg),
 			})
 
