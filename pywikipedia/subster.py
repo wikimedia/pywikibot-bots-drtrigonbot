@@ -236,10 +236,12 @@ class SubsterBot(dtbext.basic.BasicBot):
 
 		# 4.) postprocessing
 		param['postproc'] = eval(param['postproc'])
-		if (param['postproc'][0] == 'list'):		# create list
+		if   (param['postproc'][0] == 'list'):					# create list
 			external_data = str(re.compile(param['postproc'][1], re.S | re.I).findall(external_data))
-		elif (param['postproc'][0] == 'wikilist'):	# create list in wiki format
+		elif (param['postproc'][0] == 'wikilist'):				# create list in wiki format
 			external_data = "* " + "\n* ".join(re.compile(param['postproc'][1], re.S | re.I).findall(external_data)) + "\n"
+		elif (param['postproc'][0] == 'wikilinkedlist'):		# create linked list in wiki format
+			external_data = "* [[" + "]]\n* [[".join(re.compile(param['postproc'][1], re.S | re.I).findall(external_data)) + "]]\n"
 		#print external_data
 
 		# 5.) subst content
