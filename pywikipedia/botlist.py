@@ -97,7 +97,7 @@ def refresh(site, sysop=False, witheditsonly=True):
 
         m1 = re.findall(u'<li>.*?</li>', text)
         for item in m1:
-            m2 = re.search(PATTERN', item)
+            m2 = re.search(PATTERN, item)
             (bot, flag_local, flag_global) = m2.groups()
             flag_local  = (flag_local[:2] == u'<a')
             flag_global = True # since group='Global_bot'
