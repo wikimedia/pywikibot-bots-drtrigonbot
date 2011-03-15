@@ -98,7 +98,7 @@ class SubsterBot(dtbext.basic.BasicBot):
 
 		for page in pagegen:
 			pywikibot.output(u'Getting page "%s" via API from %s...'
-			                 % (page, self.site))
+			                 % (page.title(asLink=True), self.site))
 
 			# setup source to get data from
 			if sim:
