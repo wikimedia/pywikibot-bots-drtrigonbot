@@ -157,8 +157,13 @@ class Page(pywikibot.Page):
 		pywikibot.output(u"Reading section info from %s via API..." % self.title(asLink=True))
 
 		result = query.GetData(params, self.site())
-		r = result[u'parse'][u'sections']
-		debug_data = str(r) + '\n'
+		try:
+			r = result[u'parse'][u'sections']
+		except KeyError:
+			print result    # sequence of sometimes occuring "KeyError: u'parse'"
+			raise pywikibot.Error('Problem occured during data retrieval for sections in %s!' % self.title(asLink=True))
+		#debug_data = str(r) + '\n'
+		debug_data = str(result) + '\n'
 
 		if not sectionsonly:
 			# assign sections with wiki text and section byteoffset
