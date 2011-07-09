@@ -97,14 +97,14 @@ class SubsterBot(dtbext.basic.BasicBot):
 		else:	pagegen = pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
 
 		for page in pagegen:
-			pywikibot.output(u'Getting page "%s" via API from %s...'
-			                 % (page.title(asLink=True), self.site))
-
 			# setup source to get data from
 			if sim:
 				content = sim['content']
 				params = [ sim ]
 			else:
+				pywikibot.output(u'Getting page "%s" via API from %s...'
+				                 % (page.title(asLink=True), self.site))
+
 				# get page content and operating mode
 				content = self.load(page)
 				params = self.loadTemplates(page, default=self._param_default)
