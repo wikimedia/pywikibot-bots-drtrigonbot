@@ -135,7 +135,7 @@ class Page(pywikibot.Page):
 		   line is the parsed text and anchor ist the (unique) link label.
 		"""
 		# replace 'byteoffset' ALWAYS by self calculated, since parsed does not match wiki text
-		# bug fix: DRTRIGON-82
+		# bug fix; JIRA: DRTRIGON-82
 
 		# was there already a call? already some info available?
 		if hasattr(self, '_sections'):
@@ -157,6 +157,7 @@ class Page(pywikibot.Page):
 		pywikibot.output(u"Reading section info from %s via API..." % self.title(asLink=True))
 
 		result = query.GetData(params, self.site())
+		# JIRA: DRTRIGON-90; catch and convert error (convert it such that the whole page gets processed later)
 		try:
 			r = result[u'parse'][u'sections']
 		except KeyError:

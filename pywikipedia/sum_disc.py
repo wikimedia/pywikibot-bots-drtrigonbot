@@ -744,7 +744,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
 			self.pages.promote_page() # hist -> news
 
-			entries = PageSections(page, self._param)
+			entries = PageSections(page, self._param, self._user)
 
 			(page, page_rel, page_signed) = entries.check_rel()
 
@@ -1107,13 +1107,15 @@ class PageSections(object):
 
 	"""
 
-	def __init__(self, page, param):
+	def __init__(self, page, param, user):
 		"""Retrieves the page content and splits it to headings and bodies ('check relevancy
 		   of page by searching specific users signature').
 
 		   @param page: Page to process.
 		   @param param: Additional parameters to use for processing.
 		   @type  param: dict
+		   @param user: Actual user.
+		   @type  user: user object
 
 		   Returns a list of tuples containing the sections with info and wiki text.
 		"""
@@ -1121,8 +1123,9 @@ class PageSections(object):
 		self._entries = []
 		self._full_resolve = True
 
-		self._page = page
+		self._page  = page
 		self._param = param
+		self._user  = user
 
 		# code debugging
 		if 'code' in debug:
@@ -1245,9 +1248,12 @@ class PageSections(object):
 			data = data[signs_pos[-1]:].strip()
 			(sign, data) = _REGEX_eol.split(data + u'\n', maxsplit=1)
 			checks['lasteditor'] = not (len(data.strip()) > 0) # just check for add. text (more paranoid)
+		else:
+			# JIRA: DRTRIGON-83
+			checks['lasteditor'] = (self._page.sum_disc_data[2] == self._user.username)
 
-			if checks['lasteditor']:
-				return (False, checksum_cur, checks)
+		if checks['lasteditor']:
+			return (False, checksum_cur, checks)
 
 		return (True, checksum_cur, checks)
 

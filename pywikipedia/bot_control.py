@@ -184,11 +184,15 @@ class BotErrorHandler:
 	def send_mailnotification(self, item):
 		pywikibot.output(u'Sending mail "%s" to "%s" as notification!' % (error_mail[1], error_mail[0]))
 		usr = userlib.User(pywikibot.getSite(), error_mail[0])
-		try:
-			if usr.sendMail(subject=error_mail[1], text=item):		# 'item' should be unicode!
-				return
-		except:  # break exception handling recursion
-			pass
+		# JIRA: DRTRIGON-87; re-try loop, output error info
+		count = 3
+		while count:
+			count -= 1
+			try:
+				if usr.sendMail(subject=error_mail[1], text=item):	# 'item' should be unicode!
+					return
+			except:  # break exception handling recursion
+				pywikibot.output(u'!!! %s' % str(sys.exc_info()))
 		pywikibot.output(u'!!! WARNING: mail could not be sent!')
 
 	def gettraceback(self, exc_info):
