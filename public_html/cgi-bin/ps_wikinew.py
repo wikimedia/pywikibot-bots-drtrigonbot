@@ -60,8 +60,8 @@ href="http://toolserver.org/" title="Home"></a></div>
 <div class="portal" id='p-navigation'><h5>navigation</h5><div class="body">
 <ul>
 <li><a href="https://wiki.toolserver.org/view/User:DrTrigon">Main Page</a></li>
-<li><a href="http://jira.ts.wikimedia.org/browse/DrTrigon">Bug tracker</a></li>
-<li><a href="http://fisheye.ts.wikimedia.org/browse/DrTrigon">SVN repository</a></li>
+<li><a href="https://jira.toolserver.org/browse/DrTrigon">Bug tracker</a></li>
+<li><a href="https://fisheye.toolserver.org/browse/drtrigon">SVN repository</a></li>
 </ul>
 </div></div>
 <div class="portal" id='p-status'><h5>status</h5><div class="body">
