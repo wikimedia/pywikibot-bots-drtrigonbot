@@ -34,7 +34,7 @@ import wikipedia as pywikibot
 
 bot_config = {	# unicode values
 		'TemplateName':		u'Benutzer:DrTrigon/Entwurf/Vorlage:Subster',
-		'ErrorTemplate':		u'\n----\n;SubsterBot Exception\n%s\n',
+		'ErrorTemplate':		u'\n----\n;SubsterBot Exception (%s)\n%s\n',
 
 		# regex values
 		'tag_regex':		re.compile('<.*?>', re.S | re.I),
@@ -152,7 +152,8 @@ class SubsterBot(dtbext.basic.BasicBot):
 		except:
 			exc_info = sys.exc_info()
 			(exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)
-			substed_content += bot_config['ErrorTemplate'] % (u' ' + result.replace(u'\n', u'\n '))
+			substed_content += bot_config['ErrorTemplate'] % ( dtbext.date.getTimeStmpNow(full=True, humanreadable=True, local=True), 
+			                                                   u' ' + result.replace(u'\n', u'\n ') )
 			substed_tags.append( u'>error:BotMagicWords<' )
 
 		if (len(params) == 1) and eval(params[0]['magicwords_only']):
@@ -166,7 +167,8 @@ class SubsterBot(dtbext.basic.BasicBot):
 			except:
 				exc_info = sys.exc_info()
 				(exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)
-				substed_content += bot_config['ErrorTemplate'] % (u' ' + result.replace(u'\n', u'\n '))
+				substed_content += bot_config['ErrorTemplate'] % ( dtbext.date.getTimeStmpNow(full=True, humanreadable=True, local=True), 
+				                                                   u' ' + result.replace(u'\n', u'\n ') )
 				substed_tags.append( u'>error:Template<' )
 
 		return (substed_content, substed_tags)
@@ -222,8 +224,11 @@ class SubsterBot(dtbext.basic.BasicBot):
 		# 3.) subst in content
 		external_data = regex.search(external_buffer)
 
-		if external_data:
+		if external_data:	# not None
 			external_data = external_data.groups()
+
+			pywikibot.output(u'Groups found by regex: %i' % len(external_data))
+
 			if (len(external_data) == 1):
 				external_data = external_data[0]
 			else:
