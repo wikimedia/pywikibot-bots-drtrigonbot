@@ -183,7 +183,7 @@ bot_config = {	# unicode values
 								u'^(Wikipedia:Kartenwerkstatt)',			#
 								u'^(Wikipedia:Kartenwerkstatt/Kartenwünsche)',		#
 								u'^(Wikipedia:Bots/.*)', ],				# DRTRIGON-11
-					# (not published yet)
+					# LIST of SIGNATUREs REGEX to USE, a LIST       (DRTRIGON-89)
 					# ev. sogar [\]\|/#] statt nur [\]\|/] ...?! dann kann Signatur auch links auf Unterabschn. enth.
 					# liefert leider aber auch falsch positive treffer... wobei seiten, die mal die aufmerksamkeit geweckt
 					# haben (auf RecentChanges-Liste waren) und links in user-namensraum enthalten, sind auch interessant!!
@@ -252,9 +252,12 @@ bot_config = {	# unicode values
 debug = []				# no write, all users
 #debug.append( 'write2wiki' )		# write to wiki (operational mode)
 #debug.append( 'user' )			# skip users
+#debug.append( 'page' )			# skip pages
 #debug.append( 'write2hist' )		# write history (operational mode)
 #debug.append( 'toolserver' )		# toolserver down
 #debug.append( 'code' )			# code debugging
+debug_params = {'user': lambda user: (user.name()  != u'DrTrigon'),
+                'page': lambda page: (page.title() != u'...'),}
 
 docuReplacements = {
 #    '&params;': pagegenerators.parameterHelp
@@ -332,7 +335,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		if 'user' in debug: pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE USERS WILL BE SKIPPED ! ===\03{default}')
 
 		for user in self._user_list:					# may be try with PreloadingGenerator?!
-			if (('user' in debug) and (user.name() != u'DrTrigon')): continue
+			if (('user' in debug) and debug_params['user'](user)): continue
 
 			# set user and init params
 			self.setUser(user)
@@ -688,6 +691,8 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		#gen4 = pagegenerators.RedirectFilterPageGenerator(gen3)
 		# lets hope that no generator loses pages... (since sometimes this may happen)
 		for page in gen3:
+			if (('page' in debug) and debug_params['page'](page)): continue
+
 			name = page.title()
 			#print ">>>", name, "<<<"
 			page.sum_disc_data = work[name].sum_disc_data
@@ -739,6 +744,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				news = True
 
 			# checkRelevancy: Check relevancy of page by splitting it into sections and searching
+			# (date in page history has changed)
 			if not news:
 				continue
 
