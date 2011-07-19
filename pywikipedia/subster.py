@@ -25,6 +25,7 @@ __version__ = '$Id$'
 
 import re, sys
 import difflib
+import BeautifulSoup
 
 import pagegenerators
 import dtbext
@@ -39,7 +40,7 @@ bot_config = {	# unicode values
 		# regex values
 		'tag_regex':		re.compile('<.*?>', re.S | re.I),
 
-		'var_regex_str':	u'<!--SUBSTER-%(var)s-->%(cont)s<!--SUBSTER-%(var)s-->',
+		'var_regex_str':	u'<!--SUBSTER-%(var1)s-->%(cont)s<!--SUBSTER-%(var2)s-->',
 
 		# bot paramater/options
 		'param_default':	{ 'url': 		'',
@@ -51,6 +52,7 @@ bot_config = {	# unicode values
 					'postproc':	'(\'\', \'\')',
 					'wiki':		'False',
 					'magicwords_only':	'False',
+					'beautifulsoup':	'False',        # DRTRIGON-88
 					}
 }
 
@@ -73,7 +75,10 @@ class SubsterBot(dtbext.basic.BasicBot):
 	_param_default  = bot_config['param_default']
 
 	_tag_regex	= bot_config['tag_regex']
-	_var_regex_str	= bot_config['var_regex_str']
+	_var_regex_str	= bot_config['var_regex_str']%{'var1':'%(var)s','var2':'%(var)s','cont':'%(cont)s'}
+
+	_BS_regex	= re.compile(u'(' + _var_regex_str%{'var':'BS:(.*?)','cont':'(.*?)'} + u')')
+	_BS_regex_str	= bot_config['var_regex_str']%{'var1':'BS:%(var)s','var2':'BS:/','cont':'%(cont)s'}
 
 	# -template and subst-tag handling taken from MerlBot
 	# -this bot could also be runned on my local wiki with an anacron-job
@@ -208,6 +213,7 @@ class SubsterBot(dtbext.basic.BasicBot):
 		"""
 
 		substed_tags = []  # DRTRIGON-73
+		prev_content = content
 
 		# 1.) getUrl or wiki text
 		if eval(param['wiki']):
@@ -215,45 +221,58 @@ class SubsterBot(dtbext.basic.BasicBot):
 		else:
 			external_buffer = self.site.getUrl(param['url'], no_hostname = True)
 
-		# 2.) regexp
-		#for subitem in param['regex']:
-		subitem = param['regex']
-		regex = re.compile(subitem, re.S | re.I)
-		var_regex = self.get_var_regex(param['value'])
+		if not eval(param['beautifulsoup']):    # DRTRIGON-88
+			# 2.) regexp
+			#for subitem in param['regex']:
+			subitem = param['regex']
+			regex = re.compile(subitem, re.S | re.I)
+			var_regex = self.get_var_regex(param['value'])
 
-		# 3.) subst in content
-		external_data = regex.search(external_buffer)
+			# 3.) subst in content
+			external_data = regex.search(external_buffer)
 
-		if external_data:	# not None
-			external_data = external_data.groups()
+			if external_data:	# not None
+				external_data = external_data.groups()
 
-			pywikibot.output(u'Groups found by regex: %i' % len(external_data))
+				pywikibot.output(u'Groups found by regex: %i' % len(external_data))
 
-			if (len(external_data) == 1):
-				external_data = external_data[0]
-			else:
-				external_data = str(external_data)
-		#print external_data
+				if (len(external_data) == 1):
+					external_data = external_data[0]
+				else:
+					external_data = str(external_data)
+			#print external_data
 
-		if param['notags']:
-			external_data = self._tag_regex.sub(param['notags'], external_data)
-		#print external_data
+			if param['notags']:
+				external_data = self._tag_regex.sub(param['notags'], external_data)
+			#print external_data
 
-		# 4.) postprocessing
-		param['postproc'] = eval(param['postproc'])
-		if   (param['postproc'][0] == 'list'):					# create list
-			external_data = str(re.compile(param['postproc'][1], re.S | re.I).findall(external_data))
-		elif (param['postproc'][0] == 'wikilist'):				# create list in wiki format
-			external_data = "* " + "\n* ".join(re.compile(param['postproc'][1], re.S | re.I).findall(external_data)) + "\n"
-		elif (param['postproc'][0] == 'wikilinkedlist'):		# create linked list in wiki format
-			external_data = "* [[" + "]]\n* [[".join(re.compile(param['postproc'][1], re.S | re.I).findall(external_data)) + "]]\n"
-		#print external_data
+			# 4.) postprocessing
+			param['postproc'] = eval(param['postproc'])
+			if   (param['postproc'][0] == 'list'):					# create list
+				external_data = str(re.compile(param['postproc'][1], re.S | re.I).findall(external_data))
+			elif (param['postproc'][0] == 'wikilist'):				# create list in wiki format
+				external_data = "* " + "\n* ".join(re.compile(param['postproc'][1], re.S | re.I).findall(external_data)) + "\n"
+			elif (param['postproc'][0] == 'wikilinkedlist'):		# create linked list in wiki format
+				external_data = "* [[" + "]]\n* [[".join(re.compile(param['postproc'][1], re.S | re.I).findall(external_data)) + "]]\n"
+			#print external_data
 
-		# 5.) subst content
-		prev_content = content
-		content = var_regex.sub((self._var_regex_str%{'var':param['value'],'cont':external_data}), content, int(param['count']))
-		if (content != prev_content):
-			substed_tags.append(param['value'])
+			# 5.) subst content
+			content = var_regex.sub((self._var_regex_str%{'var':param['value'],'cont':external_data}), content, int(param['count']))
+			if (content != prev_content):
+				substed_tags.append(param['value'])
+		else:
+			# DRTRIGON-88: Enable Beautiful Soup power for Subster
+			BS_tags = self._BS_regex.findall(content)
+
+			pywikibot.output(u'BeautifulSoup tags found by regex: %i' % len(BS_tags))
+
+			for item in BS_tags:
+				if not (item[3] == '/'): continue
+				external_data = eval('BeautifulSoup.BeautifulSoup(external_buffer).%s' % item[1])
+				content = content.replace(item[0], self._BS_regex_str%{'var':item[1],'cont':external_data}, 1)
+
+			if (content != prev_content):
+				substed_tags.append(u'BeautifulSoup')
 
 		return (content, substed_tags)
 
