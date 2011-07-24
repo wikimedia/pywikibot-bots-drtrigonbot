@@ -124,9 +124,11 @@ class BasicBot(basic.BasicBot):
 		   Returns a list of dict with the templates parameters found.
 		"""
 
-		self._content = self.load(page)
+		self._content = self.load(page) # 'None' if not existing page
 
 		templates = []
+		if not self._content: return templates  # catch empty or not existing page
+
 		for tmpl in pywikibot.extract_templates_and_params(self._content):
 			if tmpl[0] == self._bot_config['TemplateName']:
 				param_default = {}
@@ -260,7 +262,8 @@ class BasicBot(basic.BasicBot):
 				else:
 					return True
 		else:
-			content = self.load( page )
+			content = self.load( page )     # 'None' if not existing page
+		        if not content: content = u''   # (create new page)
 
 			content += u'\n\n'
 			content += text
