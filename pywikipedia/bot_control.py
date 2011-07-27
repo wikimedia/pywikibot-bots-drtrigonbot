@@ -185,8 +185,8 @@ class BotErrorHandler:
 		pywikibot.output(u'Sending mail "%s" to "%s" as notification!' % (error_mail[1], error_mail[0]))
 		# JIRA: DRTRIGON-87; output even more debug info (tip by: valhallasw@arctus.nl)
 		site = pywikibot.getSite()
-		pywikibot.output(u'!!! Allowed to send email: %r' % (site.isAllowed('sendemail'),)
-		pywikibot.output(u'!!! Permissions: %r' % (site._rights,)
+		pywikibot.output(u'!!! Allowed to send email: %r' % (site.isAllowed('sendemail'),))
+		pywikibot.output(u'!!! Permissions: %r' % (site._rights,))
 		usr = userlib.User(site, error_mail[0])
 		try:
 			if usr.sendMail(subject=error_mail[1], text=item):	# 'item' should be unicode!
