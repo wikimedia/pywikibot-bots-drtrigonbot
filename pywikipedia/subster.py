@@ -53,6 +53,7 @@ bot_config = {	# unicode values
 					'wiki':		'False',
 					'magicwords_only':	'False',
 					'beautifulsoup':	'False',        # DRTRIGON-88
+					'expandtemplates':	'False',        # DRTRIGON-93 (only with 'wiki')
 					}
 }
 
@@ -217,7 +218,10 @@ class SubsterBot(dtbext.basic.BasicBot):
 
 		# 1.) getUrl or wiki text
 		if eval(param['wiki']):
-			external_buffer = self.load( dtbext.pywikibot.Page(self.site, param['url']) )
+			if eval(param['expandtemplates']): # DRTRIGON-93 (only with 'wiki')
+				external_buffer = dtbext.pywikibot.Page(self.site, param['url']).get(expandtemplates=True)
+			else:
+				external_buffer = self.load( dtbext.pywikibot.Page(self.site, param['url']) )
 		else:
 			external_buffer = self.site.getUrl(param['url'], no_hostname = True)
 
