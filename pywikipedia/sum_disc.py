@@ -791,29 +791,32 @@ class SumDiscBot(dtbext.basic.BasicBot):
 		# check for GlobalWikiNotifications to report
 		localinterwiki = self.site.language()
 		count = 0
-		for (page, data) in globalnotify:
-			count += 1
+		try:
+			for (page, data) in globalnotify:
+				count += 1
 
-			# skip to local disc page, since this is the only page the user should watch itself
-			if (page.site().language() == localinterwiki) and \
-			   (page.site().family.name == u'wikipedia'):
-				pywikibot.output(u'\03{lightaqua}WARNING: skipping global wiki notify to local wiki %s\03{default}' % page.title(asLink=True))
-				continue
+				# skip to local disc page, since this is the only page the user should watch itself
+				if (page.site().language() == localinterwiki) and \
+				   (page.site().family.name == u'wikipedia'):
+					pywikibot.output(u'\03{lightaqua}WARNING: skipping global wiki notify to local wiki %s\03{default}' % page.title(asLink=True))
+					continue
 
-			# actual/new status of page, has something changed?
-			if (data[u'link'] in hist.keys()) and \
-			   (data[u'timestamp'] == hist[data[u'link']].sum_disc_data[3]):
-				continue
+				# actual/new status of page, has something changed?
+				if (data[u'link'] in hist.keys()) and \
+				   (data[u'timestamp'] == hist[data[u'link']].sum_disc_data[3]):
+					continue
 
-			#data = page.globalwikinotify
-			self.pages.edit_oth(page, sum_disc_data=(self._param['notify_msg'][_PS_notify], 
-								 None, # obsolete (and recursive)
-								 data['user'], 
-								 data['timestamp'], 
-								 {u'':('',True,u'')}, 
-								 _PS_notify ),
-						 title=data[u'link'])
-			#self.pages.edit_hist(self._news_list[page.title()])
+				#data = page.globalwikinotify
+				self.pages.edit_oth(page, sum_disc_data=(self._param['notify_msg'][_PS_notify], 
+									 None, # obsolete (and recursive)
+									 data['user'], 
+									 data['timestamp'], 
+									 {u'':('',True,u'')}, 
+									 _PS_notify ),
+							 title=data[u'link'])
+				#self.pages.edit_hist(self._news_list[page.title()])
+		except pywikibot.MaxTriesExceededError:
+			pywikibot.output(u'\03{lightaqua}WARNING: MaxTriesExceededError occurred, thus skipping global wiki notify!\03{default}')
 
 		if globalnotify:
 			pywikibot.output(u'\03{lightpurple}*** %i Global wiki notifications checked\03{default}' % count)

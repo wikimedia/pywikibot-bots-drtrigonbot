@@ -154,7 +154,8 @@ class BotErrorHandler:
 		if self.error_buffer:
 			#raise dtbext.pywikibot.BotError('Exception(s) occured in Bot')
 			pywikibot.output( u'\nDONE with BotError: ' + str(dtbext.pywikibot.BotError('Exception(s) occured in Bot')) )
-			exitcode = 99   # SGE: restart the job
+			#exitcode = 99   # SGE: restart the job
+			exitcode = 100  # SGE: stop in error state
 		else:
 			pywikibot.output( u'\nDONE' )
 			exitcode = 0    # successful termination
