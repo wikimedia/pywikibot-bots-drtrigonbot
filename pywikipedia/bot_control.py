@@ -154,13 +154,19 @@ class BotErrorHandler:
 		if self.error_buffer:
 			#raise dtbext.pywikibot.BotError('Exception(s) occured in Bot')
 			pywikibot.output( u'\nDONE with BotError: ' + str(dtbext.pywikibot.BotError('Exception(s) occured in Bot')) )
+			exitcode = 99   # SGE: restart the job
 		else:
 			pywikibot.output( u'\nDONE' )
+			exitcode = 0    # successful termination
+		return exitcode
 
 	# major (critical) error; in this controller script
-	def handle_exceptions(self, log):
-		self.gettraceback(sys.exc_info())
-		self.list_exceptions(log=log)
+	def handle_exceptions(self, log=None):
+		if log:
+			self.gettraceback(sys.exc_info())
+			self.list_exceptions(log=log)
+		exitcode = 100          # SGE: stop in error state
+		return exitcode
 
 	def list_exceptions(self, log=None):
 		# if Ctrl-C/BREAK/keyb-int; the 'error_buffer' should be empty
@@ -440,16 +446,22 @@ if __name__ == "__main__":
 	try:
 		main()
 		# minor error; in a sub-bot script
-		error.raise_exceptions(log)
+		exitcode = error.raise_exceptions(log)
 	except:
 		# major (critical) error; in this controller script
-		if log:
-			error.handle_exceptions(log)
-		raise #sys.exc_info()[0](sys.exc_info()[1])
+		exitcode = error.handle_exceptions(log)
+		if 'code' in debug:
+			exitcode = 0    # print traceback of re-raised errors by skipping sys.exit()
+			raise #sys.exc_info()[0](sys.exc_info()[1])
 	finally:
 		pywikibot.stopme()
 
-	if log:
-		log.close()
+		if log:
+			log.close()
 
-	#sys.exit(100)  # use exit code 100 to force SGE to send mail!
+		# use exitcode to control SGE (restart or stop with sending mail)
+		# re-raised errors occouring in 'except' clause are skipped because
+		# of raised 'SystemExit' exception by sys.exit()
+		if exitcode:
+			sys.exit(exitcode)
+
