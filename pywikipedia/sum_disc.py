@@ -820,7 +820,9 @@ class SumDiscBot(dtbext.basic.BasicBot):
 				#self.pages.edit_hist(self._news_list[page.title()])
 		except pywikibot.MaxTriesExceededError:
 			pywikibot.output(u'\03{lightaqua}WARNING: MaxTriesExceededError occurred, thus skipping global wiki notify!\03{default}')
-			self._skip_globwikinotify = True # skip for all following users to speed-up
+			self._skip_globwikinotify = True # skip for all following users to speed-up (~30min)
+		except pywikibot.urllib2.HTTPError:
+			pywikibot.output(u'\03{lightaqua}WARNING: HTTPError occurred, thus skipping global wiki notify!\03{default}')
 
 		if globalnotify:
 			pywikibot.output(u'\03{lightpurple}*** %i Global wiki notifications checked\03{default}' % count)
