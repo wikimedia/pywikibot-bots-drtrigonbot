@@ -36,6 +36,7 @@ import sys
 import time, os
 import copy
 import StringIO
+import re
 
 import config
 import dtbext
@@ -51,7 +52,11 @@ bot_config = {	# unicode values
 		'queue_security':	([u'DrTrigon'], u'Bot: exec'),
 
 		# supported and allowed bot scripts
-		'bot_list':	        [u'replace', u'template', u'templatecount'],
+		'bot_list':	        [u'replace', u'template', u'templatecount',
+		                         u'weblinkchecker', u'cosmetic_changes'],
+		                         #u'spellcheck'],                            # UNTESTED
+		# forbidden parameters
+		'bot_params_forbidden':	[u'-always'],
 
 		'msg': {
 			'de':	( u'Bot: ',
@@ -119,8 +124,12 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
 
 			out += u"== %s ==\n" % command
 
-			imp = __import__(cmd[0])
-			sys.argv = sys_argv + cmd[1:]
+			imp  = __import__(cmd[0])
+			argv = cmd[1:]
+			for item in bot_config['bot_params_forbidden']:
+				if item in argv:
+					argv.remove(item)
+			sys.argv = sys_argv + argv
 
 			sys.stderr = sys.stdout = stdout = StringIO.StringIO()
 			imp.main()
@@ -135,10 +144,34 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
 			head, msg = pywikibot.translate(self.site.lang, bot_config['msg'])
 			comment = head + msg % time.strftime("%a, %d %b %Y %H:%M:%S +0000")
 			page = pywikibot.Page(self.site, bot_config['sim_output'])
-			self.append(page, out, comment=comment)
+			self.append(page, self.terminal2wiki(out), comment=comment)
 		else:
 			pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
 			print out
+#			print self.terminal2wiki(out)
+
+	def terminal2wiki(self, text):
+		# https://fisheye.toolserver.org/browse/~raw,r=19/drtrigon/pywikipedia/replace_tmpl.py
+
+		# \n respective <br>
+#		text = re.sub('\n\x1b\[0m', '<br>\n', text)
+		text = re.sub('\n(\x1b\[0m)?', '\n\n', text)
+#		text = re.sub('\n{2,}', '', text)   # more than one '\n' -> ''
+		# color; <span style=...>
+		color = {'35': 'magenta', '91': 'red', '92': 'green'}
+		replfunc = lambda matchobj: '<span style="color:%s">%s</span>' % \
+		                            (color[matchobj.group(1)], matchobj.group(2))
+		text = re.sub('\x1b\[(.*?);1m(.*?)\x1b\[0m', replfunc, text)
+		# {{...}}
+		replfunc = lambda matchobj: '<tt><nowiki>{{</nowiki></tt>%s<tt><nowiki>}}</nowiki></tt>' % \
+		                            matchobj.group(1)
+		text = re.sub('\{\{(.*?)\}\}', replfunc, text)
+		# heading to link
+		replfunc = lambda matchobj: '>>> [[%s]] <<<' % \
+		                            matchobj.group(1)
+		text = re.sub('>>> <span style="color:magenta">(.*?)</span> <<<', replfunc, text)
+
+		return text
 
 
 def main():
