@@ -53,8 +53,13 @@ bot_config = {	# unicode values
 
 		# supported and allowed bot scripts
 		'bot_list':	        [u'replace', u'template', u'templatecount',
-		                         u'weblinkchecker', u'cosmetic_changes'],
-		                         #u'spellcheck'],                            # UNTESTED
+		                         u'weblinkchecker', #u'copyright',                  # UNTESTED
+		                         u'cosmetic_changes'], #u'spellcheck',              # UNTESTED
+		                         #u'add_text', u'table2wiki',                       # UNTESTED
+		                         #u'standardize_notes', u'redirect',                # UNTESTED
+		                         #u'image', u'imagecopy', u'imagetransfer',         # UNTESTED
+		                         #u'category', u'category_redirect', u'commonscat', # UNTESTED
+		                         #u'articlenos', u'wikilogbot', ]                   # UNTESTED
 		# forbidden parameters
 		'bot_params_forbidden':	[u'-always'],
 
@@ -154,7 +159,7 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
 		# https://fisheye.toolserver.org/browse/~raw,r=19/drtrigon/pywikipedia/replace_tmpl.py
 
 		# \n respective <br>
-#		text = re.sub('\n\x1b\[0m', '<br>\n', text)
+#		text = re.sub('\n(\x1b\[0m)?', '<br>\n', text)
 		text = re.sub('\n(\x1b\[0m)?', '\n\n', text)
 #		text = re.sub('\n{2,}', '', text)   # more than one '\n' -> ''
 		# color; <span style=...>

@@ -194,6 +194,8 @@ class BotErrorHandler:
 		site = pywikibot.getSite()
 		pywikibot.output(u'!!! Allowed to send email: %r' % (site.isAllowed('sendemail'),))
 		pywikibot.output(u'!!! Permissions: %r' % (site._rights,))
+		if not site.isAllowed('sendemail'):
+			pywikibot.output(u'!!! Try getting new token: %r' % (site.getToken(getagain=True),))
 		usr = userlib.User(site, error_mail[0])
 		try:
 			if usr.sendMail(subject=error_mail[1], text=item):	# 'item' should be unicode!
