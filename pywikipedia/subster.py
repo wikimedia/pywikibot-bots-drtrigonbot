@@ -35,7 +35,7 @@ import wikipedia as pywikibot
 
 bot_config = {	# unicode values
 		'TemplateName':		u'Benutzer:DrTrigon/Entwurf/Vorlage:Subster',
-		'ErrorTemplate':		u'\n----\n<b>SubsterBot Exception (%s)</b>\n%s\n',
+		'ErrorTemplate':		u'<noinclude>\n----\n<b>SubsterBot Exception (%s)</b>\n%s\n</noinclude>',
 
 		# regex values
 		'tag_regex':		re.compile('<.*?>', re.S | re.I),
