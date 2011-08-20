@@ -49,7 +49,7 @@ Options/parameters:
 #  sind subster.magic_words vorhanden. Um ALLES zu prüfen ist ein separater @ref subster Lauf nötig.
 #  \n(this mode uses 2 log files !!!)
 #
-#  @li Run default bot set (clean_user_sandbox, sum_disc, @ref subster, page_disc) as CRON job with output
+#  @li Run default bot set (clean_user_sandbox, sum_disc, @ref subster, script_wui) as CRON job with output
 #  to log on server:
 #  @verbatim python bot_control.py -default -cron @endverbatim
 #  CRON (toolserver):
@@ -84,15 +84,15 @@ Options/parameters:
 #
 __version__       = '$Id$'
 __framework_rev__ = '8990'
-__release_ver__   = '1.0'
+__release_ver__   = '1.1 (pre)'
 __release_rev__   = '%i'
 #
 
 # wikipedia-bot imports
 import pagegenerators, userlib, botlist, clean_sandbox
 import sys, os, re, time, codecs
-import clean_user_sandbox, sum_disc, subster, page_disc
-#import clean_user_sandbox, sum_disc, replace_tmpl
+import clean_user_sandbox, sum_disc, subster, script_wui, subster_irc
+#import page_disc
 import dtbext
 # Splitting the bot into library parts
 import wikipedia as pywikibot
@@ -116,17 +116,24 @@ infolist = [ pywikibot.__version__, pywikibot.config.__version__,	# framework
              dtbext.date.__version__, dtbext.userlib.__version__,	#
              __version__, clean_user_sandbox.__version__,		# bots
              sum_disc.__version__, subster.__version__,			#
-             page_disc.__version__, ]					#
+#             page_disc.__version__, ]				#
+             script_wui.__version__, subster_irc.__version__, ]	#
 
 # bots to run and control
 bot_list = { 'clean_user_sandbox': (clean_user_sandbox, u'clean userspace Sandboxes'),
              'sum_disc':           (sum_disc, u'discussion summary'),
              'compress_history':   (sum_disc, u'compressing discussion summary'),
-             #'replace_tmpl':       (replace_tmpl, u'replace_tmpl'),
              'subster':            (subster, u'"SubsterBot"'),
-             'page_disc':          (page_disc, u'page_disc (beta test)'), }
+#             'page_disc':          (page_disc, u'page_disc (beta)'),
+             'script_wui':         (script_wui, u'script WikiUserInterface (beta)'),
+             'subster_irc':        (subster_irc, u'"SubsterBot" IRC surveillance (beta)'), }
 #bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'subster', 'page_disc' ]
-bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'subster' ]
+bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'script_wui', 'subster', 'subster_irc' ]
+
+# SGE: exit errorlevel
+error_SGE_ok      = 0    # successful termination, nothing more to do
+error_SGE_restart = 99   # restart the job
+error_SGE_stop    = 100  # stop in error state
 
 
 # debug tools
@@ -145,8 +152,9 @@ debug.append( 'write2hist' )		# write history (operational mode)
 
 # Bot Error Handling; to prevent bot errors to stop execution of other bots
 class BotErrorHandler:
-	def __init__(self):
+	def __init__(self, error_ec):
 		self.error_buffer = []
+		self.error_ec     = error_ec
 
 	# minor error; in a sub-bot script
 	def raise_exceptions(self, log=None):
@@ -154,11 +162,10 @@ class BotErrorHandler:
 		if self.error_buffer:
 			#raise dtbext.pywikibot.BotError('Exception(s) occured in Bot')
 			pywikibot.output( u'\nDONE with BotError: ' + str(dtbext.pywikibot.BotError('Exception(s) occured in Bot')) )
-			#exitcode = 99   # SGE: restart the job
-			exitcode = 100  # SGE: stop in error state
+			exitcode = self.error_ec
 		else:
 			pywikibot.output( u'\nDONE' )
-			exitcode = 0    # successful termination
+			exitcode = error_SGE_ok
 		return exitcode
 
 	# major (critical) error; in this controller script
@@ -166,7 +173,7 @@ class BotErrorHandler:
 		if log:
 			self.gettraceback(sys.exc_info())
 			self.list_exceptions(log=log)
-		exitcode = 100          # SGE: stop in error state
+		exitcode = error_SGE_stop
 		return exitcode
 
 	def list_exceptions(self, log=None):
@@ -396,27 +403,35 @@ if __name__ == "__main__":
 		do_dict = { 'clean_user_sandbox': False,
 		            'sum_disc':           False,
 		            'compress_history':   False,
-		            'replace_tmpl':       False,
 		            'subster':            False,
-		            'page_disc':          False,
+#		            'page_disc':          False,
+		            'script_wui':         False,
+		            'subster_irc':        False,
 		}
 		logname_enh = ""		
+		error_ec    = error_SGE_stop
+		#error_ec    = error_SGE_restart
+  
 		if ("-all" in arg):
 			do_dict.update({ 'clean_user_sandbox': True,
 			                 'sum_disc':           True,
-			                 #'replace_tmpl':       False,
 			                 'subster':            True,
-			                 'page_disc':          True,
+#			                 'page_disc':          True,
+			                 'script_wui':         True,
 			})
 		elif ("-default" in arg):
 			do_dict.update({ 'clean_user_sandbox': True,
 			                 'sum_disc':           True,
-			                 #'replace_tmpl':       True,
 			                 'subster':            True,
-			                 'page_disc':          True,
+#			                 'page_disc':          True,
+			                 'script_wui':         True,
 			})
 		elif ("-compress_history:[]" in arg):		# muss alleine laufen, sollte aber mit allen 
 			do_dict['compress_history'] = True		# anderen kombiniert werden können (siehe 'else')...!
+		elif ("-subster_irc" in arg):                     # muss alleine laufen...
+			do_dict['subster_irc'] = True
+			logname_enh = "_subster_irc"		# use another log than usual !!!
+			error_ec = error_SGE_restart
 		#elif ("-subster" in arg):
 		#	do_dict['subster'] = True
 		#	logname_enh = "_subster"			# use another log than usual !!!
@@ -424,7 +439,8 @@ if __name__ == "__main__":
 			do_dict.update({ 'clean_user_sandbox': ("-clean_user_sandbox" in arg),
 			                 'sum_disc':           ("-sum_disc" in arg),
 			                 'subster':            ("-subster" in arg),
-			                 'page_disc':          ("-page_disc" in arg),
+#			                 'page_disc':          ("-page_disc" in arg),
+			                 'script_wui':         ("-script_wui" in arg),
 			})
 
 		if cron:
@@ -432,7 +448,7 @@ if __name__ == "__main__":
 
 		no_magic_words = ("-no_magic_words" in arg)
 
-		error = BotErrorHandler()
+		error = BotErrorHandler(error_ec)
 	else:
 		log = OutputLog()
 		choice = pywikibot.inputChoice('Do you want to compress the histories?', ['Yes', 'No'], ['y', 'n'])
@@ -454,7 +470,7 @@ if __name__ == "__main__":
 		# major (critical) error; in this controller script
 		exitcode = error.handle_exceptions(log)
 		if 'code' in debug:
-			exitcode = 0    # print traceback of re-raised errors by skipping sys.exit()
+			exitcode = error_SGE_ok    # print traceback of re-raised errors by skipping sys.exit()
 			raise #sys.exc_info()[0](sys.exc_info()[1])
 	finally:
 		pywikibot.stopme()

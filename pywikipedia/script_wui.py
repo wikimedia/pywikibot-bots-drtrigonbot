@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 """
-...
+Robot which runs framework scripts as (sub-)bot ...
 
 The following parameters are supported:
 
@@ -13,7 +13,7 @@ Syntax example:
         Default operating mode.
 """
 ## @package script_wui
-#  @brief   Bot script WikiUserInterface (WUI) ...
+#  @brief   Script WikiUserInterface (WUI) Robot
 #
 #  @copyright Dr. Trigon, 2011
 #
@@ -118,8 +118,7 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
 		sys_stdout = sys.stdout
 		sys_stderr = sys.stderr
 		out = u""
-#		for command in self._commandlist:  # may be try with PreloadingGenerator?!
-		for command in self._commandlist[11:]:
+		for command in self._commandlist:  # may be try with PreloadingGenerator?!
 			command = command.encode(config.console_encoding)
 			cmd = command.split(' ')
 

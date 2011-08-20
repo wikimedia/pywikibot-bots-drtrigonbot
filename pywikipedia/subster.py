@@ -35,7 +35,7 @@ import wikipedia as pywikibot
 
 bot_config = {	# unicode values
 		'TemplateName':		u'Benutzer:DrTrigon/Entwurf/Vorlage:Subster',
-		'ErrorTemplate':		u'<noinclude>\n----\n<b>SubsterBot Exception (%s)</b>\n%s\n</noinclude>',
+		'ErrorTemplate':		u'\n<noinclude>----\n<b>SubsterBot Exception (%s)</b>\n%s</noinclude>\n',
 
 		# regex values
 		'tag_regex':		re.compile('<.*?>', re.S | re.I),
@@ -92,17 +92,17 @@ class SubsterBot(dtbext.basic.BasicBot):
 		dtbext.basic.BasicBot.__init__(self, bot_config)
 
 		# init constants
-        	self._userListPage = pywikibot.Page(self.site, bot_config['TemplateName'])
+		self._userListPage = pywikibot.Page(self.site, bot_config['TemplateName'])
+		self.pagegen = pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
 
 	def run(self, sim=False):
 		'''Run SubsterBot().'''
 
 		pywikibot.output(u'\03{lightgreen}* Processing Template Backlink List:\03{default}')
 
-		if sim:	pagegen = ['dummy']
-		else:	pagegen = pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
+		if sim:	self.pagegen = ['dummy']
 
-		for page in pagegen:
+		for page in self.pagegen:
 			# setup source to get data from
 			if sim:
 				content = sim['content']
