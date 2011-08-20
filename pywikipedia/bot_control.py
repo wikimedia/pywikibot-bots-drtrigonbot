@@ -84,7 +84,7 @@ Options/parameters:
 #
 __version__       = '$Id$'
 __framework_rev__ = '8990'
-__release_ver__   = '1.1 (pre)'
+__release_ver__   = '1.1-pre'
 __release_rev__   = '%i'
 #
 

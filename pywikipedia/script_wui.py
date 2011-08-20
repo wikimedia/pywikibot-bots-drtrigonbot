@@ -37,6 +37,7 @@ import time, os
 import copy
 import StringIO
 import re
+import __builtin__
 
 import config
 import dtbext
@@ -113,7 +114,7 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
 
 		pywikibot.output(u'\03{lightgreen}* Processing Job List:\03{default}')
 
-		__builtins__.raw_input = lambda: 'n'    # overwrite 'raw_input' to run bot non-blocking and simulation mode
+		__builtin__.raw_input = lambda: 'n'    # overwrite 'raw_input' to run bot non-blocking and simulation mode
 		sys_argv = copy.deepcopy( sys.argv )
 		sys_stdout = sys.stdout
 		sys_stderr = sys.stderr
