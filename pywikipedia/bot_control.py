@@ -133,7 +133,8 @@ bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'script_wui'
 # SGE: exit errorlevel
 error_SGE_ok      = 0    # successful termination, nothing more to do
 error_SGE_restart = 99   # restart the job
-error_SGE_stop    = 100  # stop in error state
+#error_SGE_stop    = 100  # stop in error state (prevents re-starts)
+error_SGE_stop    = 1    # error, but not for SGE
 
 
 # debug tools
