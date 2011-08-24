@@ -1,6 +1,7 @@
 # -*- coding: utf-8  -*-
 """
-Robot which runs framework scripts as (sub-)bot ...
+Robot which runs framework scripts as (sub-)bot and provides a WikiUserInterface
+(WUI) for users.
 
 The following parameters are supported:
 
@@ -33,7 +34,7 @@ __version__ = '$Id$'
 
 
 import sys
-import time, os
+import time
 import copy
 import StringIO
 import re
@@ -45,39 +46,39 @@ import dtbext
 import wikipedia as pywikibot
 
 
-bot_config = {	# unicode values
-		'commandlist':		u'Benutzer:DrTrigonBot/Simon sagt',
-		'sim_output':		u'Benutzer:DrTrigonBot/Simulation',
+bot_config = {    # unicode values
+        'commandlist':        u'Benutzer:DrTrigonBot/Simon sagt',
+        'sim_output':        u'Benutzer:DrTrigonBot/Simulation',
 
-#		'queue_security':	([u'DrTrigon', u'DrTrigonBot'], u'Bot: exec'),
-		'queue_security':	([u'DrTrigon'], u'Bot: exec'),
+#        'queue_security':    ([u'DrTrigon', u'DrTrigonBot'], u'Bot: exec'),
+        'queue_security':    ([u'DrTrigon'], u'Bot: exec'),
 
-		# supported and allowed bot scripts
-		'bot_list':	        [u'replace', u'template', u'templatecount',
-		                         u'weblinkchecker', #u'copyright',                  # UNTESTED
-		                         u'cosmetic_changes'], #u'spellcheck',              # UNTESTED
-		                         #u'add_text', u'table2wiki',                       # UNTESTED
-		                         #u'standardize_notes', u'redirect',                # UNTESTED
-		                         #u'image', u'imagecopy', u'imagetransfer',         # UNTESTED
-		                         #u'category', u'category_redirect', u'commonscat', # UNTESTED
-		                         #u'articlenos', u'wikilogbot', ]                   # UNTESTED
-		# forbidden parameters
-		'bot_params_forbidden':	[u'-always'],
+        # supported and allowed bot scripts
+        'bot_list':            [u'replace', u'template', u'templatecount',
+                                 u'weblinkchecker', #u'copyright',                  # UNTESTED
+                                 u'cosmetic_changes'], #u'spellcheck',              # UNTESTED
+                                 #u'add_text', u'table2wiki',                       # UNTESTED
+                                 #u'standardize_notes', u'redirect',                # UNTESTED
+                                 #u'image', u'imagecopy', u'imagetransfer',         # UNTESTED
+                                 #u'category', u'category_redirect', u'commonscat', # UNTESTED
+                                 #u'articlenos', u'wikilogbot', ]                   # UNTESTED
+        # forbidden parameters
+        'bot_params_forbidden':    [u'-always'],
 
-		'msg': {
-			'de':	( u'Bot: ',
-				u'Simulation vom %s',
-				),
-			'en':	( u'robot ',
-				u'Simulation from %s',
-				),
-		},
+        'msg': {
+            'de':    ( u'Bot: ',
+                u'Simulation vom %s',
+                ),
+            'en':    ( u'robot ',
+                u'Simulation from %s',
+                ),
+        },
 }
 
 # debug tools
 # (look at 'bot_control.py' for more info)
-debug = []				# no write
-#debug.append( 'write2wiki' )		# write to wiki (operational mode)
+debug = []                      # no write
+#debug.append( 'write2wiki' )    # write to wiki (operational mode)
 
 docuReplacements = {
 #    '&params;': pagegenerators.parameterHelp
@@ -86,127 +87,132 @@ docuReplacements = {
 
 
 class ScriptWUIBot(dtbext.basic.BasicBot):
-	'''
-	Robot which will ...
-	'''
-	#http://de.wikipedia.org/w/index.php?limit=50&title=Spezial:Beiträge&contribs=user&target=DrTrigon&namespace=3&year=&month=-1
-	#http://de.wikipedia.org/wiki/Spezial:Beiträge/DrTrigon
+    '''
+    Robot which will run framework scripts as (sub-)bot and provides a
+    WikiUserInterface (WUI) for users.
+    '''
+    #http://de.wikipedia.org/w/index.php?limit=50&title=Spezial:Beiträge&contribs=user&target=DrTrigon&namespace=3&year=&month=-1
+    #http://de.wikipedia.org/wiki/Spezial:Beiträge/DrTrigon
 
-	def __init__(self):
-		'''Constructor of ScriptWUIBot(); setup environment, initialize needed consts and objects.'''
+    def __init__(self):
+        '''Constructor of ScriptWUIBot(); setup environment, initialize needed consts and objects.'''
 
-		pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
+        pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
 
-		dtbext.basic.BasicBot.__init__(self)
-		self.site = pywikibot.getSite()
+        dtbext.basic.BasicBot.__init__(self)
+        self.site = pywikibot.getSite()
 
-		# init constants
-		pywikibot.output(u'\03{lightred}** Receiving Job Queue\03{default}')
-		page = pywikibot.Page(self.site, bot_config['commandlist'])
-		self._commandlist = self.loadJobQueue(page, bot_config['queue_security'], debug = ('write2wiki' in debug))
-#		print self._commandlist
+        # init constants
+        pywikibot.output(u'\03{lightred}** Receiving Job Queue\03{default}')
+        page = pywikibot.Page(self.site, bot_config['commandlist'])
+        self._commandlist = self.loadJobQueue(page, bot_config['queue_security'], debug = ('write2wiki' in debug))
+#        print self._commandlist
 
-		# code debugging
-		dtbext.pywikibot.debug = ('code' in debug)
+        # code debugging
+        dtbext.pywikibot.debug = ('code' in debug)
 
-	def run(self):
-		'''Run ScriptWUIBot().'''
+    def run(self):
+        '''Run ScriptWUIBot().'''
 
-		pywikibot.output(u'\03{lightgreen}* Processing Job List:\03{default}')
+        pywikibot.output(u'\03{lightgreen}* Processing Job List:\03{default}')
 
-		__builtin__.raw_input = lambda: 'n'    # overwrite 'raw_input' to run bot non-blocking and simulation mode
-		sys_argv = copy.deepcopy( sys.argv )
-		sys_stdout = sys.stdout
-		sys_stderr = sys.stderr
-		out = u""
-		for command in self._commandlist:  # may be try with PreloadingGenerator?!
-			command = command.encode(config.console_encoding)
-			cmd = command.split(' ')
+        __builtin__.raw_input = lambda: 'n'    # overwrite 'raw_input' to run bot non-blocking and simulation mode
+        sys_argv = copy.deepcopy( sys.argv )
+        print sys_argv
+        sys_stdout = sys.stdout
+        sys_stderr = sys.stderr
+        out = u""
+        for command in self._commandlist:  # may be try with PreloadingGenerator?!
+            command = command.encode(config.console_encoding)
+            cmd = command.split(' ')
 
-			if cmd[0] not in bot_config['bot_list']: continue
+            if cmd[0] not in bot_config['bot_list']: continue
 
-			pywikibot.output('\03{lightred}** Processing Command: %s\03{default}' % command)
+            pywikibot.output('\03{lightred}** Processing Command: %s\03{default}' % command)
 
-			out += u"== %s ==\n" % command
+            out += u"== %s ==\n" % command
 
-			imp  = __import__(cmd[0])
-			argv = cmd[1:]
-			for item in bot_config['bot_params_forbidden']:
-				if item in argv:
-					argv.remove(item)
-			sys.argv = sys_argv + argv
+            imp  = __import__(cmd[0])
+            argv = cmd[1:]
+            for item in bot_config['bot_params_forbidden']:
+                if item in argv:
+                    argv.remove(item)
+            sys.argv = sys_argv + argv
 
-			sys.stderr = sys.stdout = stdout = StringIO.StringIO()
-			imp.main()
-			sys.stdout = sys_stdout
-			sys.stderr = sys_stderr
+            sys.stderr = sys.stdout = stdout = StringIO.StringIO()
+            imp.main()
+            sys.stdout = sys_stdout
+            sys.stderr = sys_stderr
 
-			sys.argv = sys_argv
-			out += stdout.getvalue().decode(config.console_encoding)
-			out += u"\n"
+            sys.argv = sys_argv
+            out += stdout.getvalue().decode(config.console_encoding)
+            out += u"\n"
 
-		if 'write2wiki' in debug:
-			head, msg = pywikibot.translate(self.site.lang, bot_config['msg'])
-			comment = head + msg % time.strftime("%a, %d %b %Y %H:%M:%S +0000")
-			page = pywikibot.Page(self.site, bot_config['sim_output'])
-			self.append(page, self.terminal2wiki(out), comment=comment)
-		else:
-			pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
-			print out
-#			print self.terminal2wiki(out)
+        if not out:
+            return
 
-	def terminal2wiki(self, text):
-		# https://fisheye.toolserver.org/browse/~raw,r=19/drtrigon/pywikipedia/replace_tmpl.py
+        if 'write2wiki' in debug:
+            head, msg = pywikibot.translate(self.site.lang, bot_config['msg'])
+            comment = head + msg % time.strftime("%a, %d %b %Y %H:%M:%S +0000")
+            page = pywikibot.Page(self.site, bot_config['sim_output'])
+            self.append(page, self.terminal2wiki(out), comment=comment)
+        else:
+            pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
+            print out
+#            print self.terminal2wiki(out)
 
-		# \n respective <br>
-#		text = re.sub('\n(\x1b\[0m)?', '<br>\n', text)
-		text = re.sub('\n(\x1b\[0m)?', '\n\n', text)
-#		text = re.sub('\n{2,}', '', text)   # more than one '\n' -> ''
-		# color; <span style=...>
-		color = {'35': 'magenta', '91': 'red', '92': 'green'}
-		replfunc = lambda matchobj: '<span style="color:%s">%s</span>' % \
-		                            (color[matchobj.group(1)], matchobj.group(2))
-		text = re.sub('\x1b\[(.*?);1m(.*?)\x1b\[0m', replfunc, text)
-		# {{...}}
-		replfunc = lambda matchobj: '<tt><nowiki>{{</nowiki></tt>%s<tt><nowiki>}}</nowiki></tt>' % \
-		                            matchobj.group(1)
-		text = re.sub('\{\{(.*?)\}\}', replfunc, text)
-		# heading to link
-		replfunc = lambda matchobj: '>>> [[%s]] <<<' % \
-		                            matchobj.group(1)
-		text = re.sub('>>> <span style="color:magenta">(.*?)</span> <<<', replfunc, text)
+    def terminal2wiki(self, text):
+        # https://fisheye.toolserver.org/browse/~raw,r=19/drtrigon/pywikipedia/replace_tmpl.py
 
-		return text
+        # \n respective <br>
+#        text = re.sub('\n(\x1b\[0m)?', '<br>\n', text)
+        text = re.sub('\n(\x1b\[0m)?', '\n\n', text)
+#        text = re.sub('\n{2,}', '', text)   # more than one '\n' -> ''
+        # color; <span style=...>
+        color = {'35': 'magenta', '91': 'red', '92': 'green'}
+        replfunc = lambda matchobj: '<span style="color:%s">%s</span>' % \
+                                    (color[matchobj.group(1)], matchobj.group(2))
+        text = re.sub('\x1b\[(.*?);1m(.*?)\x1b\[0m', replfunc, text)
+        # {{...}}
+        replfunc = lambda matchobj: '<tt><nowiki>{{</nowiki></tt>%s<tt><nowiki>}}</nowiki></tt>' % \
+                                    matchobj.group(1)
+        text = re.sub('\{\{(.*?)\}\}', replfunc, text)
+        # heading to link
+        replfunc = lambda matchobj: '>>> [[%s]] <<<' % \
+                                    matchobj.group(1)
+        text = re.sub('>>> <span style="color:magenta">(.*?)</span> <<<', replfunc, text)
+
+        return text
 
 
 def main():
-	bot = ScriptWUIBot()
-	if len(pywikibot.handleArgs()) > 0:
-		for arg in pywikibot.handleArgs():
-			if arg[:2] == "u'": arg = eval(arg)		# for 'runbotrun.py' and unicode compatibility
-			if   arg[:17] == "-compress_history":
-				bot.compressHistory( eval(arg[18:]) )
-				return
-			elif (arg[:17] == "-rollback_history"):
-				bot.rollback = int( arg[18:] )
-			elif (arg[:5] == "-auto") \
-			     or (arg[:5] == "-cron"):
-				pass
-			elif (arg == "-all") \
-			     or (arg == "-default") \
-			     or ("-script_wui" in arg):
-				pass
-			else:
-				pywikibot.showHelp()
-				return
-	try:
-		bot.run()
-	except KeyboardInterrupt:
-		pywikibot.output('\nQuitting program...')
+    bot = ScriptWUIBot()
+    if len(pywikibot.handleArgs()) > 0:
+        for arg in pywikibot.handleArgs():
+            if arg[:2] == "u'": arg = eval(arg)        # for 'runbotrun.py' and unicode compatibility
+            if   arg[:17] == "-compress_history":
+                bot.compressHistory( eval(arg[18:]) )
+                return
+            elif (arg[:17] == "-rollback_history"):
+                bot.rollback = int( arg[18:] )
+            elif (arg[:5] == "-auto") \
+                 or (arg[:5] == "-cron"):
+                pass
+            elif (arg == "-all") \
+                 or (arg == "-default") \
+                 or ("-script_wui" in arg):
+                pass
+            else:
+                pywikibot.showHelp()
+                return
+    try:
+        bot.run()
+    except KeyboardInterrupt:
+        pywikibot.output('\nQuitting program...')
 
 if __name__ == "__main__":
-	try:
-		main()
-	finally:
-		pywikibot.stopme()
+    try:
+        main()
+    finally:
+        pywikibot.stopme()
 
