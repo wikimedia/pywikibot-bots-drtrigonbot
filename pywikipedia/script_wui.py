@@ -33,7 +33,7 @@ __version__ = '$Id$'
 #
 
 
-import sys
+import sys, os
 import time
 import copy
 import StringIO
@@ -118,7 +118,7 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
 
         __builtin__.raw_input = lambda: 'n'    # overwrite 'raw_input' to run bot non-blocking and simulation mode
         sys_argv = copy.deepcopy( sys.argv )
-        print sys_argv
+        print sys.argv
         sys_stdout = sys.stdout
         sys_stderr = sys.stderr
         out = u""
@@ -133,11 +133,12 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
             out += u"== %s ==\n" % command
 
             imp  = __import__(cmd[0])
-            argv = cmd[1:]
+            argv = [ os.path.join(os.path.split(sys_argv[0])[0], cmd[0]) ] + cmd[1:]
             for item in bot_config['bot_params_forbidden']:
                 if item in argv:
                     argv.remove(item)
-            sys.argv = sys_argv + argv
+            sys.argv = argv
+            print sys.argv
 
             sys.stderr = sys.stdout = stdout = StringIO.StringIO()
             imp.main()
@@ -148,6 +149,7 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
             out += stdout.getvalue().decode(config.console_encoding)
             out += u"\n"
 
+        sys.argv = sys_argv
         if not out:
             return
 
