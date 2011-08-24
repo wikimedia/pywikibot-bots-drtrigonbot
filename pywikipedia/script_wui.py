@@ -34,7 +34,6 @@ __version__ = '$Id$'
 
 
 import sys, os
-import time
 import copy
 import StringIO
 import re
@@ -118,7 +117,7 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
 
         __builtin__.raw_input = lambda: 'n'    # overwrite 'raw_input' to run bot non-blocking and simulation mode
         sys_argv = copy.deepcopy( sys.argv )
-        print sys.argv
+        #print sys.argv
         sys_stdout = sys.stdout
         sys_stderr = sys.stderr
         out = u""
@@ -133,7 +132,7 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
             out += u"== %s ==\n" % command
 
             imp  = __import__(cmd[0])
-            argv = [ os.path.join(os.path.split(sys_argv[0])[0], cmd[0]) ] + cmd[1:]
+            argv = [ os.path.join(os.path.split(sys_argv[0])[0], cmd[0], '.py') ] + cmd[1:]
             for item in bot_config['bot_params_forbidden']:
                 if item in argv:
                     argv.remove(item)
@@ -153,15 +152,16 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
         if not out:
             return
 
+        print out
         if 'write2wiki' in debug:
             head, msg = pywikibot.translate(self.site.lang, bot_config['msg'])
-            comment = head + msg % time.strftime("%a, %d %b %Y %H:%M:%S +0000")
+            comment = head + msg % dtbext.date.getTimeStmpNow(full=True, humanreadable=True, local=True)
             page = pywikibot.Page(self.site, bot_config['sim_output'])
+            print self.terminal2wiki(out)
             self.append(page, self.terminal2wiki(out), comment=comment)
         else:
+            print self.terminal2wiki(out)
             pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
-            print out
-#            print self.terminal2wiki(out)
 
     def terminal2wiki(self, text):
         # https://fisheye.toolserver.org/browse/~raw,r=19/drtrigon/pywikipedia/replace_tmpl.py
