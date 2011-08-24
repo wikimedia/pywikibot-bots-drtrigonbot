@@ -132,12 +132,12 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
             out += u"== %s ==\n" % command
 
             imp  = __import__(cmd[0])
-            argv = [ os.path.join(os.path.split(sys_argv[0])[0], cmd[0], '.py') ] + cmd[1:]
+            argv = [ os.path.join(os.path.split(sys_argv[0])[0], cmd[0])+'.py' ] + cmd[1:]
             for item in bot_config['bot_params_forbidden']:
                 if item in argv:
                     argv.remove(item)
             sys.argv = argv
-            print sys.argv
+            #print sys.argv
 
             sys.stderr = sys.stdout = stdout = StringIO.StringIO()
             imp.main()
@@ -146,18 +146,18 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
 
             sys.argv = sys_argv
             out += stdout.getvalue().decode(config.console_encoding)
+#            out += stdout.getvalue()
+# problem here for TS and SGE, output string has another encoding, printing below does not work also!
             out += u"\n"
 
         sys.argv = sys_argv
         if not out:
             return
 
-        print out
         if 'write2wiki' in debug:
             head, msg = pywikibot.translate(self.site.lang, bot_config['msg'])
             comment = head + msg % dtbext.date.getTimeStmpNow(full=True, humanreadable=True, local=True)
             page = pywikibot.Page(self.site, bot_config['sim_output'])
-            print self.terminal2wiki(out)
             self.append(page, self.terminal2wiki(out), comment=comment)
         else:
             print self.terminal2wiki(out)
