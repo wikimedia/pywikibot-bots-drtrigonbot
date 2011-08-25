@@ -29,6 +29,18 @@ Syntax example:
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
+# --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+#  @todo Simulationen werden ausgeführt und das Resultat mit eindeutiger Id auf
+#        Ausgabeseite geschrieben, damit kann der Befehl (durch Angabe der
+#        Sim-Id) ausgeführt werden
+#  @todo In der Simulation werden alle relevanten Informationen gespeichert und
+#        bei Ausführung wieder eingelesen, so können problematische Einträge in
+#        der Simulationsausgabe noch modifiziert werden und der Bot nutzt
+#        einfach diese Angaben (-> WUI)
+#  @todo Bei jeder Botbearbeitung wird der Name des Auftraggebers vermerkt
+#  @todo Simulationen sollten jeder Stunde, die Ersetzungen 1 mal pro Tag laufen
+# --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+#
 __version__ = '$Id$'
 #
 
@@ -46,23 +58,26 @@ import wikipedia as pywikibot
 
 
 bot_config = {    # unicode values
-        'commandlist':        u'Benutzer:DrTrigonBot/Simon sagt',
-        'sim_output':        u'Benutzer:DrTrigonBot/Simulation',
+        'commandlist':          u'Benutzer:DrTrigonBot/Simon sagt',
+        'sim_output':           u'Benutzer:DrTrigonBot/Simulation',
 
-#        'queue_security':    ([u'DrTrigon', u'DrTrigonBot'], u'Bot: exec'),
-        'queue_security':    ([u'DrTrigon'], u'Bot: exec'),
+#        'queue_security':       ([u'DrTrigon', u'DrTrigonBot'], u'Bot: exec'),
+        'queue_security':       ([u'DrTrigon'], u'Bot: exec'),
 
         # supported and allowed bot scripts
-        'bot_list':            [u'replace', u'template', u'templatecount',
-                                 u'weblinkchecker', #u'copyright',                  # UNTESTED
-                                 u'cosmetic_changes'], #u'spellcheck',              # UNTESTED
-                                 #u'add_text', u'table2wiki',                       # UNTESTED
-                                 #u'standardize_notes', u'redirect',                # UNTESTED
-                                 #u'image', u'imagecopy', u'imagetransfer',         # UNTESTED
-                                 #u'category', u'category_redirect', u'commonscat', # UNTESTED
-                                 #u'articlenos', u'wikilogbot', ]                   # UNTESTED
+        'bot_list':             [u'replace',
+                                 u'template', u'templatecount',
+                                 u'weblinkchecker',
+                                 u'cosmetic_changes',
+                                 u'add_text',
+                                 u'standardize_notes',
+                                 u'image', ],
+                                 #u'copyright', u'spellcheck', u'redirect', # UNUSABLE
+                                 #u'table2wiki', u'imagetransfer',          # UNUSABLE
+                                 #u'category', u'commonscat',               # UNUSABLE
+                                 #u'articlenos', u'wikilogbot',             # UNUSABLE
         # forbidden parameters
-        'bot_params_forbidden':    [u'-always'],
+        'bot_params_forbidden': [u'-always'],
 
         'msg': {
             'de':    ( u'Bot: ',
@@ -115,7 +130,14 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
 
         pywikibot.output(u'\03{lightgreen}* Processing Job List:\03{default}')
 
-        __builtin__.raw_input = lambda: 'n'    # overwrite 'raw_input' to run bot non-blocking and simulation mode
+        builtin_raw_input = __builtin__.raw_input
+        __builtin__.raw_input = lambda: 'n'     # overwrite 'raw_input' to run bot non-blocking and simulation mode
+        def block(*args, **kwargs):
+            pywikibot.output(u'=== ! SIMULATION MODE; WIKI WRITE ATTEMPT BLOCKED ! ===')
+            return (None, None, None)
+        pywikibot_Page_put = pywikibot.Page.put
+        pywikibot.Page.put = block              # overwrite 'pywikibot.Page.put'
+        
         sys_argv = copy.deepcopy( sys.argv )
         #print sys.argv
         sys_stdout = sys.stdout
@@ -151,6 +173,7 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
             out += u"\n"
 
         sys.argv = sys_argv
+        pywikibot.Page.put = pywikibot_Page_put
         if not out:
             return
 

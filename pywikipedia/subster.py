@@ -261,8 +261,9 @@ class SubsterBot(dtbext.basic.BasicBot):
             func = param['postproc'][0]     # needed by exec call of self._code
             DATA = [ external_data ]        #
             args = param['postproc'][1:]    #
-            exec(self._code + (bot_config['CodeTemplate'] % func))
-            external_data = DATA[0]
+            if func:
+                exec(self._code + (bot_config['CodeTemplate'] % func))
+                external_data = DATA[0]
             #print external_data
 
             # 5.) subst content
