@@ -432,7 +432,7 @@ if __name__ == "__main__":
         elif ("-subster_irc" in arg):                     # muss alleine laufen...
             do_dict['subster_irc'] = True
             logname_enh = "_subster_irc"        # use another log than usual !!!
-            error_ec = error_SGE_restart
+            #error_ec = error_SGE_restart
         #elif ("-subster" in arg):
         #    do_dict['subster'] = True
         #    logname_enh = "_subster"            # use another log than usual !!!

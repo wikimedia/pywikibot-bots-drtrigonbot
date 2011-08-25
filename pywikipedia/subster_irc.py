@@ -72,7 +72,7 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
         match = self.re_edit.match(e.arguments()[0])
         if not match:
             return
-        if match.group('user') == bot_config['BotName']:
+        if match.group('user').decode(self.site.encoding()) == bot_config['BotName']:
             return
 #        print match.groups(), match.group('page'), match.group('user')
         # test actual page against list
