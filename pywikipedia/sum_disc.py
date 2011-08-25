@@ -228,18 +228,20 @@ bot_config = {    # unicode values
                     # (hidden)
                     'parse_msg': {
                         'de':    {
-                            u'*':         u'*%s: %s - letzte Bearbeitung von %s (%s)',
-                            _PS_closed:   u'*%s: %s alle Diskussionen wurden beendet (Überwachung gestoppt) - letzte Bearbeitung von %s (%s)',
-                            _PS_notify:   u'*%s: <span class="plainlinks">[%s %s]</span> - letzte Bearbeitung von [[User:%s]] (%s)',
-                            _PS_warning:  u'*Bot Warn-Nachricht: %s "\'\'%s\'\'"',
+                            u'*':         u':* %s: %s - [%s letzte Bearbeitung] von %s (%s)',
+                            _PS_closed:   u':* %s: %s alle Diskussionen wurden beendet (Überwachung gestoppt) - letzte Bearbeitung von %s (%s)',
+                            _PS_notify:   u':* %s: <span class="plainlinks">[%s %s]</span> - letzte Bearbeitung von [[User:%s]] (%s)',
+                            _PS_warning:  u':* Bot Warn-Nachricht: %s "\'\'%s\'\'"',
+                            u'start':     u'; %d. %B %Y',
                             u'end':       u'<noinclude>\nZusammenfassung erstellt von und um: ~~~~</noinclude>',
                             u'nonhuman':  u'(keinen menschlichen Bearbeiter gefunden)',
                             },
                         'en':    {
-                            u'*':         u'*%s: %s - last edit by %s (%s)',
-                            _PS_closed:   u'*%s: %s all discussions have finished (surveillance stopped) - last edit by %s (%s)',
-                            _PS_notify:   u'*%s: <span class="plainlinks">[%s %s]</span> - last edit by [[User:%s]] (%s)',
-                            _PS_warning:  u'*Bot warning message: %s "\'\'%s\'\'"',
+                            u'*':         u':* %s: %s - [%s last edit] by %s (%s)',
+                            _PS_closed:   u':* %s: %s all discussions have finished (surveillance stopped) - last edit by %s (%s)',
+                            _PS_notify:   u':* %s: <span class="plainlinks">[%s %s]</span> - last edit by [[User:%s]] (%s)',
+                            _PS_warning:  u':* Bot warning message: %s "\'\'%s\'\'"',
+                            u'start':     u'; %d. %B %Y',
                             u'end':       u'<noinclude>\nSummary generated from and at: ~~~~</noinclude>',
                             u'nonhuman':  u'(no human editor found)',
                             },
@@ -1061,11 +1063,12 @@ class SumDiscPages(object):
 
                 # default: if no subsections on page
                 item = page.title(asLink=True)
+                hist = u'http://%s.%s.org%s?title=%s&action=history' % (self.site.language(), self.site.family.name, self.site.path(), page.urlname())
                 if report:
                     # subsections on page
                     item = u'%s → %s' % (page.title(asLink=True), string.join(report, u', '))
 
-                data = (data[0], item, self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
+                data = (data[0], item, hist, self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
                 data = self.param['parse_msg'][u'*'] % data
             elif data[5] in ps_types[1]:
                 # closed
@@ -1087,8 +1090,11 @@ class SumDiscPages(object):
 
         count = len(buf)
         if (count > 0):
-            buf =  string.join(buf, u'\n')
-            buf += self.param['parse_msg'][u'end']
+            data  = [ time.strftime( self.param['parse_msg'][u'start'], 
+                                     time.gmtime()) ]
+            data += buf
+            data += self.param['parse_msg'][u'end']
+            buf   = string.join(data, u'\n')
         else:
             buf = u''
 
