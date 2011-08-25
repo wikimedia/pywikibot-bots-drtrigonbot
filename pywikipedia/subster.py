@@ -37,6 +37,10 @@ bot_config = {    # unicode values
         'TemplateName':     u'Benutzer:DrTrigon/Entwurf/Vorlage:Subster',
         'ErrorTemplate':    u'\n<noinclude>----\n<b>SubsterBot Exception (%s)</b>\n%s</noinclude>\n',
 
+        # important to use a '.css' page here since it HAS TO BE protected!!
+        'ConfigCSSPage':    u'Benutzer:DrTrigon/Benutzer:DrTrigonBot/config.css',
+        'CodeTemplate':     u'\n%s(DATA, *args)\n',
+
         # regex values
         'tag_regex':        re.compile('<.*?>', re.S | re.I),
 
@@ -93,7 +97,9 @@ class SubsterBot(dtbext.basic.BasicBot):
 
         # init constants
         self._userListPage = pywikibot.Page(self.site, bot_config['TemplateName'])
+        self._ConfigPage   = pywikibot.Page(self.site, bot_config['ConfigCSSPage'])
         self.pagegen = pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
+        self._code   = self._ConfigPage.get()
 
     def run(self, sim=False):
         '''Run SubsterBot().'''
@@ -252,12 +258,11 @@ class SubsterBot(dtbext.basic.BasicBot):
 
             # 4.) postprocessing
             param['postproc'] = eval(param['postproc'])
-            if   (param['postproc'][0] == 'list'):                    # create list
-                external_data = str(re.compile(param['postproc'][1], re.S | re.I).findall(external_data))
-            elif (param['postproc'][0] == 'wikilist'):                # create list in wiki format
-                external_data = "* " + "\n* ".join(re.compile(param['postproc'][1], re.S | re.I).findall(external_data)) + "\n"
-            elif (param['postproc'][0] == 'wikilinkedlist'):        # create linked list in wiki format
-                external_data = "* [[" + "]]\n* [[".join(re.compile(param['postproc'][1], re.S | re.I).findall(external_data)) + "]]\n"
+            func = param['postproc'][0]     # needed by exec call of self._code
+            DATA = [ external_data ]        #
+            args = param['postproc'][1:]    #
+            exec(self._code + (bot_config['CodeTemplate'] % func))
+            external_data = DATA[0]
             #print external_data
 
             # 5.) subst content
