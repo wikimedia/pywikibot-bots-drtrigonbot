@@ -2,6 +2,9 @@
 """
 Robot which will does substitutions of tags within wiki page content with external or
 other wiki text data. Like dynamic text updating.
+
+Look at http://de.wikipedia.org/wiki/Benutzer:DrTrigon/Benutzer:DrTrigonBot/config.css
+for 'postproc' example code.
 """
 ## @package subster
 #  @brief   Dynamic Text Substitutions Robot
@@ -37,7 +40,8 @@ bot_config = {    # unicode values
         'TemplateName':     u'Benutzer:DrTrigon/Entwurf/Vorlage:Subster',
         'ErrorTemplate':    u'\n<noinclude>----\n<b>SubsterBot Exception (%s)</b>\n%s</noinclude>\n',
 
-        # important to use a '.css' page here since it HAS TO BE protected!!
+        # important to use a '.css' page here, since it HAS TO BE protected to
+        # prevent malicious code injection !
         'ConfigCSSPage':    u'Benutzer:DrTrigon/Benutzer:DrTrigonBot/config.css',
         'CodeTemplate':     u'\n%s(DATA, *args)\n',
 
@@ -47,17 +51,18 @@ bot_config = {    # unicode values
         'var_regex_str':    u'<!--SUBSTER-%(var1)s-->%(cont)s<!--SUBSTER-%(var2)s-->',
 
         # bot paramater/options
-        'param_default':    { 'url':         '',
-                    'regex':    '',
-                    'value':    '',
-                    'count':    '0',
-                    'notags':    '',
-                    #'postproc':    '("","")',
-                    'postproc':    '(\'\', \'\')',
-                    'wiki':        'False',
-                    'magicwords_only':    'False',
-                    'beautifulsoup':    'False',        # DRTRIGON-88
-                    'expandtemplates':    'False',        # DRTRIGON-93 (only with 'wiki')
+        'param_default':    { 'url':   '',
+                    'regex':           '',
+                    'value':           '',
+                    'count':           '0',
+                    'notags':          '',
+                    #'postproc':        '("","")',
+                    'postproc':        '(\'\', \'\')',
+                    'wiki':            'False',
+                    'magicwords_only': 'False',
+                    'beautifulsoup':   'False',        # DRTRIGON-88
+                    'expandtemplates': 'False',        # DRTRIGON-93 (only with 'wiki')
+                    'simple':          '',             # DRTRIGON-85
                     }
 }
 
@@ -77,13 +82,13 @@ class SubsterBot(dtbext.basic.BasicBot):
     other wiki text data. Like dynamic text updating.
     '''
 
-    _param_default  = bot_config['param_default']
+    _param_default = bot_config['param_default']
 
-    _tag_regex    = bot_config['tag_regex']
-    _var_regex_str    = bot_config['var_regex_str']%{'var1':'%(var)s','var2':'%(var)s','cont':'%(cont)s'}
+    _tag_regex     = bot_config['tag_regex']
+    _var_regex_str = bot_config['var_regex_str']%{'var1':'%(var)s','var2':'%(var)s','cont':'%(cont)s'}
 
-    _BS_regex    = re.compile(u'(' + _var_regex_str%{'var':'BS:(.*?)','cont':'(.*?)'} + u')')
-    _BS_regex_str    = bot_config['var_regex_str']%{'var1':'BS:%(var)s','var2':'BS:/','cont':'%(cont)s'}
+    _BS_regex      = re.compile(u'(' + _var_regex_str%{'var':'BS:(.*?)','cont':'(.*?)'} + u')')
+    _BS_regex_str  = bot_config['var_regex_str']%{'var1':'BS:%(var)s','var2':'BS:/','cont':'%(cont)s'}
 
     # -template and subst-tag handling taken from MerlBot
     # -this bot could also be runned on my local wiki with an anacron-job
@@ -221,6 +226,11 @@ class SubsterBot(dtbext.basic.BasicBot):
 
         substed_tags = []  # DRTRIGON-73
         prev_content = content
+
+        # 0.5.) check for 'simple' mode and get additional params
+        if param['simple']:
+            p = self.site.getExpandedString(param['simple'])
+            param.update( pywikibot.extract_templates_and_params(p)[0][1] )
 
         # 1.) getUrl or wiki text
         if eval(param['wiki']):

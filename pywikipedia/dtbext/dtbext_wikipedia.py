@@ -40,409 +40,435 @@ debug = False
 ## @since   r19 (ADDED)
 #  @remarks needed to convert wikipedia.Page, Site ... objects to dtbext.dtbext_wikipedia.Page, Site, ... objects
 def addAttributes(obj):
-	"""Add methods to various classes to convert them to the dtbext modified version."""
-	# http://mousebender.wordpress.com/2007/02/17/copying-methods-in-python/
-	# http://code.activestate.com/recipes/52192-add-a-method-to-a-class-instance-at-runtime/
-	if "class 'wikipedia.Page'" in str(type(obj)):
-		# this cannot be looped because of lambda's scope (which is important for page)
-		# look also at http://www.weask.us/entry/scope-python-lambda-functions-parameters
-		obj.__dict__['isRedirectPage']		= lambda *args, **kwds: Page.__dict__['isRedirectPage'](obj, *args, **kwds)
-		obj.__dict__['getSections']		= lambda *args, **kwds: Page.__dict__['getSections'](obj, *args, **kwds)
-		obj.__dict__['_getSectionByteOffset']	= lambda *args, **kwds: Page.__dict__['_getSectionByteOffset'](obj, *args, **kwds)
-		obj.__dict__['purgeCache']		= lambda *args, **kwds: Page.__dict__['purgeCache'](obj, *args, **kwds)
-		obj.__dict__['userNameHuman']		= lambda *args, **kwds: Page.__dict__['userNameHuman'](obj, *args, **kwds)
-		obj.__dict__['append']			= lambda *args, **kwds: Page.__dict__['append'](obj, *args, **kwds)
-	elif "class 'wikipedia.Site'" in str(type(obj)):
-		obj.__dict__['getParsedString']		= lambda *args, **kwds: Site.__dict__['getParsedString'](obj, *args, **kwds)
+    """Add methods to various classes to convert them to the dtbext modified version."""
+    # http://mousebender.wordpress.com/2007/02/17/copying-methods-in-python/
+    # http://code.activestate.com/recipes/52192-add-a-method-to-a-class-instance-at-runtime/
+    if "class 'wikipedia.Page'" in str(type(obj)):
+        # this cannot be looped because of lambda's scope (which is important for page)
+        # look also at http://www.weask.us/entry/scope-python-lambda-functions-parameters
+        obj.__dict__['isRedirectPage']        = lambda *args, **kwds: Page.__dict__['isRedirectPage'](obj, *args, **kwds)
+        obj.__dict__['getSections']           = lambda *args, **kwds: Page.__dict__['getSections'](obj, *args, **kwds)
+        obj.__dict__['_getSectionByteOffset'] = lambda *args, **kwds: Page.__dict__['_getSectionByteOffset'](obj, *args, **kwds)
+        obj.__dict__['purgeCache']            = lambda *args, **kwds: Page.__dict__['purgeCache'](obj, *args, **kwds)
+        obj.__dict__['userNameHuman']         = lambda *args, **kwds: Page.__dict__['userNameHuman'](obj, *args, **kwds)
+        obj.__dict__['append']                = lambda *args, **kwds: Page.__dict__['append'](obj, *args, **kwds)
+    elif "class 'wikipedia.Site'" in str(type(obj)):
+        obj.__dict__['getParsedString']       = lambda *args, **kwds: Site.__dict__['getParsedString'](obj, *args, **kwds)
+        obj.__dict__['getExpandedString']     = lambda *args, **kwds: Site.__dict__['getExpandedString'](obj, *args, **kwds)
 
 
 ## @since   ? (MODIFIED)
 #  @remarks (look below)
 class Page(pywikibot.Page):
-	"""Page: A MediaWiki page
+    """Page: A MediaWiki page
 
-	   look at wikipedia.py for more information!
-	"""
+       look at wikipedia.py for more information!
+    """
 
-	## @since   ? (MODIFIED)
-	#  @remarks should be faster than original (look into re-write for something similar!)
-	def isRedirectPage(self):
-		"""Return True if this is a redirect, False if not or not existing.
-		   MODIFIED METHOD: should be faster than original
-		"""
+    ## @since   ? (MODIFIED)
+    #  @remarks should be faster than original (look into re-write for something similar!)
+    def isRedirectPage(self):
+        """Return True if this is a redirect, False if not or not existing.
+           MODIFIED METHOD: should be faster than original
+        """
 
-		# was there already a call? already some info available?
-		if hasattr(self, '_getexception') and (self._getexception == pywikibot.IsRedirectPage):
-			return True
+        # was there already a call? already some info available?
+        if hasattr(self, '_getexception') and (self._getexception == pywikibot.IsRedirectPage):
+            return True
 
-		if hasattr(self, '_redir'):	# prevent multiple execute of code below,
-			return self._redir	#  if page is NOT a redirect!
+        if hasattr(self, '_redir'):    # prevent multiple execute of code below,
+            return self._redir         #  if page is NOT a redirect!
 
-		# call the wiki to get info
-		params = {
-			u'action'	: u'query',
-			u'titles'	: self.title(),
-			u'prop'		: u'info',
-			u'rvlimit'	: 1,
-		}
+        # call the wiki to get info
+        params = {
+            u'action'  : u'query',
+            u'titles'  : self.title(),
+            u'prop'    : u'info',
+            u'rvlimit' : 1,
+        }
 
-		pywikibot.get_throttle()
-		pywikibot.output(u"Reading redirect info from %s." % self.title(asLink=True))
+        pywikibot.get_throttle()
+        pywikibot.output(u"Reading redirect info from %s." % self.title(asLink=True))
 
-		result = query.GetData(params, self.site())
-		r = result[u'query'][u'pages'].values()[0]
+        result = query.GetData(params, self.site())
+        r = result[u'query'][u'pages'].values()[0]
 
-		# store and return info
-		self._redir = (u'redirect' in r)
-		if self._redir:
-			self._getexception == pywikibot.IsRedirectPage
+        # store and return info
+        self._redir = (u'redirect' in r)
+        if self._redir:
+            self._getexception == pywikibot.IsRedirectPage
 
-		return self._redir
+        return self._redir
 
-	## @since   r33 (MODIFIED)
-	#  @remarks to support 'force' with dtbext.dtbext_wikipedia.Page.getSections()
-	def get(self, *args, **kwds):
-		"""Return the wiki-text of the page.
-		   MODIFIED METHOD: to support 'force' with 'getSections'
-		"""
+    ## @since   r33 (MODIFIED)
+    #  @remarks to support 'force' with dtbext.dtbext_wikipedia.Page.getSections()
+    def get(self, *args, **kwds):
+        """Return the wiki-text of the page.
+           MODIFIED METHOD: to support 'force' with 'getSections'
+        """
 
-		if kwds.get('force', False):
-			# Old exceptions and contents do not apply any more.
-			for attr in ['_sections']:
-				if hasattr(self, attr):
-					delattr(self,attr)
+        if kwds.get('force', False):
+            # Old exceptions and contents do not apply any more.
+            for attr in ['_sections']:
+                if hasattr(self, attr):
+                    delattr(self,attr)
 
-		return pywikibot.Page.get(self, *args, **kwds)
+        return pywikibot.Page.get(self, *args, **kwds)
 
-	## @since   r18 (ADDED)
-	#  @remarks needed by various bots
-	def getSections(self, minLevel=2, sectionsonly=False, force=False):
-		"""Parses the page with API and return section information.
-		   ADDED METHOD: needed by various bots
+    ## @since   r18 (ADDED)
+    #  @remarks needed by various bots
+    def getSections(self, minLevel=2, sectionsonly=False, force=False):
+        """Parses the page with API and return section information.
+           ADDED METHOD: needed by various bots
 
-		   @param minLevel: The minimal level of heading for section to be reported.
-		   @type  minLevel: int
-		   @param sectionsonly: Report only the result from API call, do not assign
-                            the headings to wiki text (for compression e.g.).
-		   @type  sectionsonly: bool
-		   @param force: Use API for full section list resolution, works always but
-                     is extremely slow, since each single section has to be retrieved.
-		   @type  force: bool
+           @param minLevel: The minimal level of heading for section to be reported.
+           @type  minLevel: int
+           @param sectionsonly: Report only the result from API call, do not assign
+                                the headings to wiki text (for compression e.g.).
+           @type  sectionsonly: bool
+           @param force: Use API for full section list resolution, works always but
+                         is extremely slow, since each single section has to be retrieved.
+           @type  force: bool
 
-		   Returns a list with entries: (byteoffset, level, wikiline, line, anchor)
-		   This list may be empty and if sections are embedded by template, the according
-		   byteoffset and wikiline entries are None. The wikiline is the wiki text,
-		   line is the parsed text and anchor ist the (unique) link label.
-		"""
-		# replace 'byteoffset' ALWAYS by self calculated, since parsed does not match wiki text
-		# bug fix; JIRA: DRTRIGON-82
+           Returns a list with entries: (byteoffset, level, wikiline, line, anchor)
+           This list may be empty and if sections are embedded by template, the according
+           byteoffset and wikiline entries are None. The wikiline is the wiki text,
+           line is the parsed text and anchor ist the (unique) link label.
+        """
+        # replace 'byteoffset' ALWAYS by self calculated, since parsed does not match wiki text
+        # bug fix; JIRA: DRTRIGON-82
 
-		# was there already a call? already some info available?
-		if hasattr(self, '_sections'):
-			return self._sections
+        # was there already a call? already some info available?
+        if hasattr(self, '_sections'):
+            return self._sections
 
-		# Old exceptions and contents do not apply any more.
-		for attr in ['_sections']:
-			if hasattr(self, attr):
-				delattr(self,attr)
+        # Old exceptions and contents do not apply any more.
+        for attr in ['_sections']:
+            if hasattr(self, attr):
+                delattr(self,attr)
 
-		# call the wiki to get info
-		params = {
-			u'action'	: u'parse',
-			u'page'		: self.title(),
-			u'prop'		: u'sections',
-		}
+        # call the wiki to get info
+        params = {
+            u'action' : u'parse',
+            u'page'   : self.title(),
+            u'prop'   : u'sections',
+        }
 
-		pywikibot.get_throttle()
-		pywikibot.output(u"Reading section info from %s via API..." % self.title(asLink=True))
+        pywikibot.get_throttle()
+        pywikibot.output(u"Reading section info from %s via API..." % self.title(asLink=True))
 
-		result = query.GetData(params, self.site())
-		# JIRA: DRTRIGON-90; catch and convert error (convert it such that the whole page gets processed later)
-		try:
-			r = result[u'parse'][u'sections']
-		except KeyError:
-			print result    # sequence of sometimes occuring "KeyError: u'parse'"
-			raise pywikibot.Error('Problem occured during data retrieval for sections in %s!' % self.title(asLink=True))
-		#debug_data = str(r) + '\n'
-		debug_data = str(result) + '\n'
+        result = query.GetData(params, self.site())
+        # JIRA: DRTRIGON-90; catch and convert error (convert it such that the whole page gets processed later)
+        try:
+            r = result[u'parse'][u'sections']
+        except KeyError:
+            print result    # sequence of sometimes occuring "KeyError: u'parse'"
+            raise pywikibot.Error('Problem occured during data retrieval for sections in %s!' % self.title(asLink=True))
+        #debug_data = str(r) + '\n'
+        debug_data = str(result) + '\n'
 
-		if not sectionsonly:
-			# assign sections with wiki text and section byteoffset
-			#pywikibot.output(u"  Reading wiki page text (if not already done).")
+        if not sectionsonly:
+            # assign sections with wiki text and section byteoffset
+            #pywikibot.output(u"  Reading wiki page text (if not already done).")
 
-			debug_data += str(len(self.__dict__.get('_contents',u''))) + '\n'
-			self.get()
-			debug_data += str(len(self._contents)) + '\n'
-			debug_data += self._contents + '\n'
+            debug_data += str(len(self.__dict__.get('_contents',u''))) + '\n'
+            self.get()
+            debug_data += str(len(self._contents)) + '\n'
+            debug_data += self._contents + '\n'
 
-			# code debugging
-			if debug:
-				#err = ''
-				#pywikibot.debugDump( 'dtbext.Page.getSections', self.site, err, debug_data.decode(config.textfile_encoding) )
-				f = open('debug.txt', 'a')
-				f.write( debug_data.encode('utf8') + '\n' )
-				f.close()
+            # code debugging
+            if debug:
+                #err = ''
+                #pywikibot.debugDump( 'dtbext.Page.getSections', self.site, err, debug_data.decode(config.textfile_encoding) )
+                f = open('debug.txt', 'a')
+                f.write( debug_data.encode('utf8') + '\n' )
+                f.close()
 
-			for setting in [(0.05,0.95), (0.4,0.8), (0.05,0.8)]:  # 0.6 is default upper border
-				try:
-					pos = 0
-					for i, item in enumerate(r):
-						item[u'level'] = int(item[u'level'])
-						if (item[u'byteoffset'] != None) and item[u'line']:  # byteoffset may be 0; 'None' means template
-							# section on this page and index in format u"%i"
-							self._getSectionByteOffset(item, pos, force, cutoff=setting)	# raises 'Error' if not sucessfull !
-							pos                 = item[u'wikiline_bo'] + len(item[u'wikiline'])
-							item[u'byteoffset'] = item[u'wikiline_bo']
-						else:
-							# section embedded from template (index in format u"T-%i") or the
-							# parser was not able to recongnize section correct (e.g. html) at all
-							# (the byteoffset, index, ... may be correct or not)
-							item[u'wikiline'] = None
-						r[i] = item
-					break
-				except pywikibot.Error:
-					pos = None
-			if (pos == None):
-				raise  # re-raise
+            for setting in [(0.05,0.95), (0.4,0.8), (0.05,0.8)]:  # 0.6 is default upper border
+                try:
+                    pos = 0
+                    for i, item in enumerate(r):
+                        item[u'level'] = int(item[u'level'])
+                        if (item[u'byteoffset'] != None) and item[u'line']:  # byteoffset may be 0; 'None' means template
+                            # section on this page and index in format u"%i"
+                            self._getSectionByteOffset(item, pos, force, cutoff=setting)    # raises 'Error' if not sucessfull !
+                            pos                 = item[u'wikiline_bo'] + len(item[u'wikiline'])
+                            item[u'byteoffset'] = item[u'wikiline_bo']
+                        else:
+                            # section embedded from template (index in format u"T-%i") or the
+                            # parser was not able to recongnize section correct (e.g. html) at all
+                            # (the byteoffset, index, ... may be correct or not)
+                            item[u'wikiline'] = None
+                        r[i] = item
+                    break
+                except pywikibot.Error:
+                    pos = None
+            if (pos == None):
+                raise  # re-raise
 
-		# check min. level
-		data = []
-		for item in r:
-			if (item[u'level'] < minLevel): continue
-			data.append( item )
-		r = data
+        # check min. level
+        data = []
+        for item in r:
+            if (item[u'level'] < minLevel): continue
+            data.append( item )
+        r = data
 
-		# prepare resulting data
-		self._sections = [ (item[u'byteoffset'], item[u'level'], item[u'wikiline'], item[u'line'], item[u'anchor']) for item in r ]
+        # prepare resulting data
+        self._sections = [ (item[u'byteoffset'], item[u'level'], item[u'wikiline'], item[u'line'], item[u'anchor']) for item in r ]
 
-		return self._sections
+        return self._sections
 
-	## @since   r18 (ADDED)
-	#  @remarks needed by dtbext.dtbext_wikipedia.Page.getSections()
-	def _getSectionByteOffset(self, section, pos, force=False, cutoff=(0.05, 0.95)):
-        	"""determine the byteoffset of the given section (can be slow due another API call).
-		   ADDED METHOD: needed by 'getSections'
-		"""
-		wikitextlines = self._contents[pos:].splitlines()
-		possible_headers = []
-		#print section[u'line']
+    ## @since   r18 (ADDED)
+    #  @remarks needed by dtbext.dtbext_wikipedia.Page.getSections()
+    def _getSectionByteOffset(self, section, pos, force=False, cutoff=(0.05, 0.95)):
+        """determine the byteoffset of the given section (can be slow due another API call).
+           ADDED METHOD: needed by 'getSections'
+        """
+        wikitextlines = self._contents[pos:].splitlines()
+        possible_headers = []
+        #print section[u'line']
 
-		if not force:
-			# how the heading should look like (re)
-			l = section[u'level']
-			headers = [ u'^(\s*)%(spacer)s(.*?)%(spacer)s(\s*)((<!--(.*?)-->)?)(\s*)$' % {'line': section[u'line'], 'spacer': u'=' * l},
-				    u'^(\s*)<h%(level)i>(.*?)</h%(level)i>(.*?)$' % {'line': section[u'line'], 'level': l}, ]
+        if not force:
+            # how the heading should look like (re)
+            l = section[u'level']
+            headers = [ u'^(\s*)%(spacer)s(.*?)%(spacer)s(\s*)((<!--(.*?)-->)?)(\s*)$' % {'line': section[u'line'], 'spacer': u'=' * l},
+                    u'^(\s*)<h%(level)i>(.*?)</h%(level)i>(.*?)$' % {'line': section[u'line'], 'level': l}, ]
 
-			# try to give exact match for heading
-			for h in headers:
-				ph = re.search(h, self._contents[pos:], re.M)
-				if ph:
-					ph = ph.group(0).strip()
-					possible_headers += [ (ph, section[u'line']) ]
+            # try to give exact match for heading
+            for h in headers:
+                ph = re.search(h, self._contents[pos:], re.M)
+                if ph:
+                    ph = ph.group(0).strip()
+                    possible_headers += [ (ph, section[u'line']) ]
 
-			# how the heading could look like (difflib)
-			headers = [ u'%(spacer)s %(line)s %(spacer)s' % {'line': section[u'line'], 'spacer': u'=' * l},
-				    u'<h%(level)i>%(line)s</h%(level)i>' % {'line': section[u'line'], 'level': l}, ]
+            # how the heading could look like (difflib)
+            headers = [ u'%(spacer)s %(line)s %(spacer)s' % {'line': section[u'line'], 'spacer': u'=' * l},
+                    u'<h%(level)i>%(line)s</h%(level)i>' % {'line': section[u'line'], 'level': l}, ]
 
-			# give possible match for heading
-			# http://stackoverflow.com/questions/2923420/fuzzy-string-matching-algorithm-in-python
-			# http://docs.python.org/library/difflib.html
-			# (http://mwh.geek.nz/2009/04/26/python-damerau-levenshtein-distance/)
-			for h in headers:
-				ph = difflib.get_close_matches(h, wikitextlines, cutoff=cutoff[1])	# cutoff=0.6 (default)
-				possible_headers += [ (p, section[u'line']) for p in ph ]
-				#print h, possible_headers
+            # give possible match for heading
+            # http://stackoverflow.com/questions/2923420/fuzzy-string-matching-algorithm-in-python
+            # http://docs.python.org/library/difflib.html
+            # (http://mwh.geek.nz/2009/04/26/python-damerau-levenshtein-distance/)
+            for h in headers:
+                ph = difflib.get_close_matches(h, wikitextlines, cutoff=cutoff[1])    # cutoff=0.6 (default)
+                possible_headers += [ (p, section[u'line']) for p in ph ]
+                #print h, possible_headers
 
-		if not possible_headers and section[u'index']:		# nothing found, try 'prop=revisions (rv)'
-			# call the wiki to get info
-			params = {
-				u'action'	: u'query',
-				u'titles'	: self.title(),
-				u'prop'		: u'revisions',
-				u'rvprop'	: u'content',
-				u'rvsection'	: section[u'index'],
-			}
+        if not possible_headers and section[u'index']:        # nothing found, try 'prop=revisions (rv)'
+            # call the wiki to get info
+            params = {
+                u'action'    : u'query',
+                u'titles'    : self.title(),
+                u'prop'      : u'revisions',
+                u'rvprop'    : u'content',
+                u'rvsection' : section[u'index'],
+            }
 
-			pywikibot.get_throttle()
-			pywikibot.output(u"  Reading section %s from %s via API..." % (section[u'index'], self.title(asLink=True)))
+            pywikibot.get_throttle()
+            pywikibot.output(u"  Reading section %s from %s via API..." % (section[u'index'], self.title(asLink=True)))
 
-			result = query.GetData(params, self.site())
-			r = result[u'query'][u'pages'].values()[0]
-			pl = r[u'revisions'][0][u'*'].splitlines()
+            result = query.GetData(params, self.site())
+            r = result[u'query'][u'pages'].values()[0]
+            pl = r[u'revisions'][0][u'*'].splitlines()
 
-			if pl:
-				possible_headers = [ (pl[0], pl[0]) ]
+            if pl:
+                possible_headers = [ (pl[0], pl[0]) ]
 
-		# find the most probable match for heading
-		#print possible_headers
-		best_match = (0.0, None)
-		for i, (ph, header) in enumerate(possible_headers):
-			#print u'    ', difflib.SequenceMatcher(None, header, ph).ratio(), header, ph
-			mr = difflib.SequenceMatcher(None, header, ph).ratio()
-			if mr > best_match[0]: best_match = (mr, ph)
-			if (i in [0, 1]) and (mr >= cutoff[0]): break  # use first (exact; re) match directly (if good enough)
-		#print u'    ', best_match
+        # find the most probable match for heading
+        #print possible_headers
+        best_match = (0.0, None)
+        for i, (ph, header) in enumerate(possible_headers):
+            #print u'    ', difflib.SequenceMatcher(None, header, ph).ratio(), header, ph
+            mr = difflib.SequenceMatcher(None, header, ph).ratio()
+            if mr > best_match[0]: best_match = (mr, ph)
+            if (i in [0, 1]) and (mr >= cutoff[0]): break  # use first (exact; re) match directly (if good enough)
+        #print u'    ', best_match
 
-		# prepare resulting data
-		section[u'wikiline']    = best_match[1]
-		section[u'wikiline_mq'] = best_match[0]	 # match quality
-		section[u'wikiline_bo'] = -1             # byteoffset
-		if section[u'wikiline']:
-			section[u'wikiline_bo'] = self._contents.find(section[u'wikiline'], pos)
-		if section[u'wikiline_bo'] < 0:		# nothing found, report/raise error !
-			#page._getexception = ...
-			raise pywikibot.Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.title(asLink=True))
-			#pywikibot.output(...)
-			# (or create a own error, e.g. look into interwiki.py)
+        # prepare resulting data
+        section[u'wikiline']    = best_match[1]
+        section[u'wikiline_mq'] = best_match[0]  # match quality
+        section[u'wikiline_bo'] = -1             # byteoffset
+        if section[u'wikiline']:
+            section[u'wikiline_bo'] = self._contents.find(section[u'wikiline'], pos)
+        if section[u'wikiline_bo'] < 0:          # nothing found, report/raise error !
+            #page._getexception = ...
+            raise pywikibot.Error('Problem occured during attempt to retrieve and resolve sections in %s!' % self.title(asLink=True))
+            #pywikibot.output(...)
+            # (or create a own error, e.g. look into interwiki.py)
 
-	## @since   ? (ADDED; non-api purge can be done with wikipedia.Page.purge_address())
-	#  @remarks needed by various bots
-	def purgeCache(self):
-		"""Purges the page cache with API.
-		   ADDED METHOD: needed by various bots
-		"""
+    ## @since   ? (ADDED; non-api purge can be done with wikipedia.Page.purge_address())
+    #  @remarks needed by various bots
+    def purgeCache(self):
+        """Purges the page cache with API.
+           ADDED METHOD: needed by various bots
+        """
 
-		# Make sure we re-raise an exception we got on an earlier attempt
-		if hasattr(self, '_getexception'):
-			return self._getexception
+        # Make sure we re-raise an exception we got on an earlier attempt
+        if hasattr(self, '_getexception'):
+            return self._getexception
 
-		# call the wiki to execute the request
-		params = {
-			u'action'	: u'purge',
-			u'titles'	: self.title(),
-		}
+        # call the wiki to execute the request
+        params = {
+            u'action'    : u'purge',
+            u'titles'    : self.title(),
+        }
 
-		pywikibot.get_throttle()
-		pywikibot.output(u"Purging page cache for %s." % self.title(asLink=True))
+        pywikibot.get_throttle()
+        pywikibot.output(u"Purging page cache for %s." % self.title(asLink=True))
 
-		result = query.GetData(params, self.site())
-		r = result[u'purge'][0]
+        result = query.GetData(params, self.site())
+        r = result[u'purge'][0]
 
-		# store and return info
-		if (u'missing' in r):
-		        self._getexception = pywikibot.NoPage
-		        raise pywikibot.NoPage(self.site(), self.title(asLink=True),"Page does not exist. Was not able to purge cache!" )
+        # store and return info
+        if (u'missing' in r):
+                self._getexception = pywikibot.NoPage
+                raise pywikibot.NoPage(self.site(), self.title(asLink=True),"Page does not exist. Was not able to purge cache!" )
 
-		return (u'purged' in r)
+        return (u'purged' in r)
 
-	## @since   r24 (ADDED)
-	#  @remarks needed by various bots
-	def userNameHuman(self):
-		"""Return name or IP address of last human/non-bot user to edit page.
-		   ADDED METHOD: needed by various bots
+    ## @since   r24 (ADDED)
+    #  @remarks needed by various bots
+    def userNameHuman(self):
+        """Return name or IP address of last human/non-bot user to edit page.
+           ADDED METHOD: needed by various bots
 
-		   Returns the most recent human editor out of the last revisions
-		   (optimal used with getAll()). If it was not able to retrieve a
-		   human user returns None.
-		"""
+           Returns the most recent human editor out of the last revisions
+           (optimal used with getAll()). If it was not able to retrieve a
+           human user returns None.
+        """
 
-		# was there already a call? already some info available?
-		if hasattr(self, '_userNameHuman'):
-			return self._userNameHuman
+        # was there already a call? already some info available?
+        if hasattr(self, '_userNameHuman'):
+            return self._userNameHuman
 
-		# get history (use preloaded if available)
-		(revid, timestmp, username, comment) = self.getVersionHistory(revCount=1)[0][:4]
+        # get history (use preloaded if available)
+        (revid, timestmp, username, comment) = self.getVersionHistory(revCount=1)[0][:4]
 
-		# is the last/actual editor already a human?
-		import botlist # like watchlist
-		if not botlist.isBot(username):
-			self._userNameHuman = username
-			return username
+        # is the last/actual editor already a human?
+        import botlist # like watchlist
+        if not botlist.isBot(username):
+            self._userNameHuman = username
+            return username
 
-		# search the last human
-		self._userNameHuman = None
-		for vh in self.getVersionHistory()[1:]:
-			(revid, timestmp, username, comment) = vh[:4]
+        # search the last human
+        self._userNameHuman = None
+        for vh in self.getVersionHistory()[1:]:
+            (revid, timestmp, username, comment) = vh[:4]
 
-			if username and (not botlist.isBot(username)):
-				# user is a human (not a bot)
-				self._userNameHuman = username
-				break
+            if username and (not botlist.isBot(username)):
+                # user is a human (not a bot)
+                self._userNameHuman = username
+                break
 
-		# store and return info
-		return self._userNameHuman
+        # store and return info
+        return self._userNameHuman
 
-	## @since   r49 (ADDED)
-	#  @remarks to support appending to single sections
-	#
-	#  @todo    submit upstream and include into framework, maybe in wikipedia.Page.put()
-	#           (this function is very simple and not mature/worked out yet, has to be completed)
-	#           \n[ JIRA: ticket? ]
-	def append(self, newtext, comment=None, minorEdit=True, section=0):
-		"""Append the wiki-text to the page.
-		   ADDED METHOD: to support appending to single sections
+    ## @since   r49 (ADDED)
+    #  @remarks to support appending to single sections
+    #
+    #  @todo    submit upstream and include into framework, maybe in wikipedia.Page.put()
+    #           (this function is very simple and not mature/worked out yet, has to be completed)
+    #           \n[ JIRA: ticket? ]
+    def append(self, newtext, comment=None, minorEdit=True, section=0):
+        """Append the wiki-text to the page.
+           ADDED METHOD: to support appending to single sections
 
-		   Returns the result of text append to page section number 'section'.
-		   0 for the top section, 'new' for a new section.
-		"""
+           Returns the result of text append to page section number 'section'.
+           0 for the top section, 'new' for a new section.
+        """
 
-        	# If no comment is given for the change, use the default
-        	comment = comment or pywikibot.action
+        # If no comment is given for the change, use the default
+        comment = comment or pywikibot.action
 
-		# send mail by POST request
-		params = {
-		    'action'		: 'edit',
-		    #'title'		: self.title().encode(self.site().encoding()),
-		    'title'		: self.title(),
-		    'section'		: '%i' % section,
-		    'appendtext'	: self._encodeArg(newtext, 'text'),
-		    'token'		: self.site().getToken(),
-		    'summary'		: self._encodeArg(comment, 'summary'),
-		    'bot'		: 1,
-		    }
+        # send mail by POST request
+        params = {
+            'action'     : 'edit',
+            #'title'      : self.title().encode(self.site().encoding()),
+            'title'      : self.title(),
+            'section'    : '%i' % section,
+            'appendtext' : self._encodeArg(newtext, 'text'),
+            'token'      : self.site().getToken(),
+            'summary'    : self._encodeArg(comment, 'summary'),
+            'bot'        : 1,
+            }
 
-		if minorEdit:
-			params['minor'] = 1
-		else:
-			params['notminor'] = 1
+        if minorEdit:
+            params['minor'] = 1
+        else:
+            params['notminor'] = 1
 
-                response, data = query.GetData(params, self.site(), back_response = True)
+        response, data = query.GetData(params, self.site(), back_response = True)
 
-		if not (data['edit']['result'] == u"Success"):
-			raise PageNotSaved('Bad result returned: %s' % data['edit']['result'])
+        if not (data['edit']['result'] == u"Success"):
+            raise PageNotSaved('Bad result returned: %s' % data['edit']['result'])
 
-		return response.code, response.msg, data
+        return response.code, response.msg, data
 
 
 ## @since   r19 (ADDED)
 #  @remarks needed by various bots
 class Site(object):
-	"""A MediaWiki site.
+    """A MediaWiki site.
 
-	   look at wikipedia.py for more information!
-	"""
+       look at wikipedia.py for more information!
+    """
 
-	## @since   r19 (ADDED)
-	#  @remarks needed by various bots
-	def getParsedString(self, string, keeptags = [u'*']):
-		"""Parses the string with API and return html content.
-		   ADDED METHOD: needed by various bots
+    ## @since   r19 (ADDED)
+    #  @remarks needed by various bots
+    def getParsedString(self, string, keeptags = [u'*']):
+        """Parses the string with API and return html content.
+           ADDED METHOD: needed by various bots
 
-		   @param string: String that should be parsed.
-		   @type  string: string
-		   @param keeptags: Defines which tags (wiki, HTML) should be NOT removed.
-		   @type  keeptags: list
+           @param string: String that should be parsed.
+           @type  string: string
+           @param keeptags: Defines which tags (wiki, HTML) should be NOT removed.
+           @type  keeptags: list
 
-		   Returns the string given, parsed through the wiki parser.
-		"""
+           Returns the string given, parsed through the wiki parser.
+        """
 
-		# call the wiki to get info
-		params = {
-			u'action'	: u'parse',
-			u'text'		: string,
-		}
+        # call the wiki to get info
+        params = {
+            u'action' : u'parse',
+            u'text'   : string,
+        }
 
-		pywikibot.get_throttle()
-		pywikibot.output(u"Parsing string through the wiki parser.")
+        pywikibot.get_throttle()
+        pywikibot.output(u"Parsing string through the wiki parser.")
 
-		result = query.GetData(params, self)
-		r = result[u'parse'][u'text'][u'*']
+        result = query.GetData(params, self)
+        r = result[u'parse'][u'text'][u'*']
 
-		r = pywikibot.removeDisabledParts(r, tags = ['comments']).strip()		# disable/remove comments
+        r = pywikibot.removeDisabledParts(r, tags = ['comments']).strip()        # disable/remove comments
 
-		if not (keeptags == [u'*']):							# disable/remove ALL tags
-			r = removeHTMLParts(r, keeptags = keeptags).strip()	#
+        if not (keeptags == [u'*']):                               # disable/remove ALL tags
+            r = removeHTMLParts(r, keeptags = keeptags).strip()    #
 
-		return r
+        return r
 
+    ## @since   r158 (ADDED)
+    #  @remarks needed by various bots
+    def getExpandedString(self, string):
+        """Expands the string with API and return wiki content.
+           ADDED METHOD: needed by various bots
+
+           @param string: String that should be expanded.
+           @type  string: string
+
+           Returns the string given, expanded through the wiki parser.
+        """
+
+        # call the wiki to get info
+        params = {
+            u'action' : u'expandtemplates',
+            u'text'   : string,
+        }
+
+        pywikibot.get_throttle()
+        pywikibot.output(u"Expanding string through the wiki parser.")
+
+        result = query.GetData(params, self)
+        r = result[u'expandtemplates'][u'*']
+
+        return r
 

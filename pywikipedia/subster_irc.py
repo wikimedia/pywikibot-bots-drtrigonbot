@@ -32,6 +32,7 @@ import wikipedia as pywikibot
 
 import articlenos
 import subster
+import botlist
 from collections import deque
 import time
 import thread
@@ -72,8 +73,11 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
         match = self.re_edit.match(e.arguments()[0])
         if not match:
             return
-        if match.group('user').decode(self.site.encoding()) == bot_config['BotName']:
+        user = match.group('user').decode(self.site.encoding())
+        if user == bot_config['BotName']:
             return
+        #if botlist.isBot(user):
+        #    return
 #        print match.groups(), match.group('page'), match.group('user')
         # test actual page against list
         if match.group('page') in self.refs:
