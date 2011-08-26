@@ -236,7 +236,7 @@ bot_config = {    # unicode values
                             _PS_notify:   u':* %s: <span class="plainlinks">[%s %s]</span> - letzte Bearbeitung von [[User:%s]] (%s)',
                             _PS_warning:  u':* Bot Warn-Nachricht: %s "\'\'%s\'\'"',
                             u'start':     u'; %d. %B %Y',
-                            u'end':       u'<noinclude>\nZusammenfassung erstellt von und um: ~~~~</noinclude>',
+                            u'end':       u'<noinclude>\n\nZusammenfassung erstellt von und um: ~~~~</noinclude>',
                             u'nonhuman':  u'(keinen menschlichen Bearbeiter gefunden)',
                             },
                         'en':    {
@@ -245,7 +245,7 @@ bot_config = {    # unicode values
                             _PS_notify:   u':* %s: <span class="plainlinks">[%s %s]</span> - last edit by [[User:%s]] (%s)',
                             _PS_warning:  u':* Bot warning message: %s "\'\'%s\'\'"',
                             u'start':     u'; %d. %B %Y',
-                            u'end':       u'<noinclude>\nSummary generated from and at: ~~~~</noinclude>',
+                            u'end':       u'<noinclude>\n\nSummary generated from and at: ~~~~</noinclude>',
                             u'nonhuman':  u'(no human editor found)',
                             },
                         }
@@ -1138,8 +1138,8 @@ class SumDiscPages(object):
             data  = [ time.strftime( self.param['parse_msg'][u'start'], 
                                      time.gmtime()) ]
             data += buf
-            data += [ self.param['parse_msg'][u'end'] ]
             buf   = string.join(data, u'\n')
+            buf  += self.param['parse_msg'][u'end']
         else:
             buf = u''
 
