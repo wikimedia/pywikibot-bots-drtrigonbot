@@ -142,10 +142,12 @@ bot_config = {    # unicode values
             'de':    ( u'Bot: ',
                 u'Diskussions-Zusammenfassung hinzugefügt (%i Einträge)',
                 u'Diskussions-Zusammenfassung aktualisiert (%i Einträge in %s)',
+                u'Diskussions-Zusammenfassung hinzugefügt und bereinigt (%i Einträge)',
                 ),
             'en':    ( u'robot ',
                 u'Discussion summary added: %i entries',
                 u'Discussion summary updated: %i entries in %s',
+                u'Discussion summary added with clean up: %i entries',
                 ),
         },
 
@@ -157,6 +159,7 @@ bot_config = {    # unicode values
                     'reportwarn_switch':     True,          # (not published yet)
                     'globwikinotify_switch': False,         # GET OTHER WIKIS NOTIFICATIONS additionally, a SWITCH
                     'reportclosed_switch':   True,          # (not published yet)
+                    'cleanup_count':         0,             # (not published yet)
                     # LIST of talks/discussions to SEARCH, a LIST
                     'checkedit_list':    [ '^(.*?Diskussion:.*)',
                                 u'^(Wikipedia:Löschkandidaten/.*)',
@@ -866,18 +869,29 @@ class SumDiscBot(dtbext.basic.BasicBot):
             pywikibot.output(u'[%i entries]' % count )
 
             if 'write2wiki' in debug:
-                head, add, mod = pywikibot.translate(self.site.lang, bot_config['msg'])
+                head, add, mod, clean = pywikibot.translate(self.site.lang, bot_config['msg'])
                 if not self._mode:
                     # default: write direct to user disc page
                     comment = head + add % count
-                    self.append(self._userPage, buf, comment=comment, minorEdit=False)
+                    #self.append(self._userPage, buf, comment=comment, minorEdit=False)
+                    (page, text, minEd) = (self._userPage, buf, False)
                 else:
                     # enhanced (with template): update user disc page and write to user specified page
                     tmplsite = pywikibot.Page(self.site, self._tmpl_data)
                     comment = head + mod % (count, tmplsite.title(asLink=True))
                     self.save(self._userPage, self._content, comment=comment, minorEdit=False)
                     comment = head + add % count
-                    self.append(tmplsite, buf, comment=comment)
+                    #self.append(tmplsite, buf, comment=comment)
+                    (page, text, minEd) = (tmplsite, buf, True) # 'True' is default
+                if not self._param['cleanup_count']:
+                    # default mode, w/o cleanup
+                    self.append(page, text, comment=comment, minorEdit=minEd)
+                else:
+                    # append with cleanup
+                    text = self.cleanupDiscSum( self.load(page), 
+                                                days=self._param['cleanup_count'] ) + u'\n\n' + text
+                    comment = head + clean % count
+                    self.save(page, text, comment=comment, minorEdit=minEd)
                 dtbext.pywikibot.addAttributes(self._userPage)
                 purge = self._userPage.purgeCache()
 
@@ -891,6 +905,37 @@ class SumDiscBot(dtbext.basic.BasicBot):
                 pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO HISTORY ! ===\03{default}')
         else:
             pywikibot.output(u'\03{lightpurple}*** Discussion up to date: NOTHING TO DO\03{default}')
+
+    # JIRA: DRTRIGON-23
+    def cleanupDiscSum(self, text, days=7):
+        """Clean-up discussion summary page of specific user in order to support
+           auto maintenance without user invention.
+
+           Returns the text stripped from entries older than days and footers.
+        """
+
+        # drop entries older than 'days'
+        today = datetime.datetime.now()
+        diff  = 0
+        buf   = []
+        for line in text.splitlines():
+            try:
+                #date = time.strptime(u'abc', u'; %d. %B %Y')
+                date = time.strptime(line, str(self._param['parse_msg'][u'start']))
+                #date = time.strptime(str(line), str(self._param['parse_msg'][u'start']))
+                date = datetime.datetime.fromtimestamp(time.mktime(date))
+                diff = (today - date).days
+            except ValueError:
+                pass
+            if (diff <= days):
+                buf.append(line)
+        buf = string.join(buf, u'\n')
+        
+        # remove bot signature and other 'footer'
+        buf = re.sub(self._param['parse_msg'][u'end'].replace(u'~~~~', u'(.*?)'), u'', buf)
+        buf = buf.strip()
+
+        return buf
 
 
 class SumDiscPages(object):
@@ -1093,7 +1138,7 @@ class SumDiscPages(object):
             data  = [ time.strftime( self.param['parse_msg'][u'start'], 
                                      time.gmtime()) ]
             data += buf
-            data += self.param['parse_msg'][u'end']
+            data += [ self.param['parse_msg'][u'end'] ]
             buf   = string.join(data, u'\n')
         else:
             buf = u''
