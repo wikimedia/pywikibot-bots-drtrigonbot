@@ -91,6 +91,7 @@ __release_rev__   = '%i'
 # wikipedia-bot imports
 import pagegenerators, userlib, botlist, clean_sandbox
 import sys, os, re, time, codecs
+#import thread
 import clean_user_sandbox, sum_disc, subster, script_wui, subster_irc
 #import page_disc
 import dtbext
@@ -341,6 +342,26 @@ def getSVN_release_ver():
         pywikibot.output(u'  WARNING: could not retrieve information!')
 
 
+# Define a function for the status thread
+def main_status():
+    # Echo server program
+    import socket
+    
+    HOST = ''                 # Symbolic name meaning all available interfaces
+    PORT = 50007              # Arbitrary non-privileged port
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind((HOST, PORT))
+    s.listen(1)
+    while 1:
+        conn, addr = s.accept()
+        print 'Connected by', addr
+        data = conn.recv(1024)
+        #if not data: break
+        conn.send(data)
+        conn.send(str(infolist))
+    conn.close()
+
+
 # main procedure
 def main():
 #    global log, error
@@ -427,12 +448,13 @@ if __name__ == "__main__":
 #                             'page_disc':          True,
                              'script_wui':         True,
             })
-        elif ("-compress_history:[]" in arg):        # muss alleine laufen, sollte aber mit allen 
-            do_dict['compress_history'] = True        # anderen kombiniert werden können (siehe 'else')...!
-        elif ("-subster_irc" in arg):                     # muss alleine laufen...
+        elif ("-compress_history:[]" in arg):          # muss alleine laufen, sollte aber mit allen 
+            do_dict['compress_history'] = True         # anderen kombiniert werden können (siehe 'else')...!
+        elif ("-subster_irc" in arg):                  # muss alleine laufen...
             do_dict['subster_irc'] = True
-            logname_enh = "_subster_irc"        # use another log than usual !!!
+            logname_enh = "_subster_irc"               # use another log than usual !!!
             #error_ec = error_SGE_restart
+#            thread.start_new_thread( main_status, () ) # start status thread (for 'panel.py')
         #elif ("-subster" in arg):
         #    do_dict['subster'] = True
         #    logname_enh = "_subster"            # use another log than usual !!!

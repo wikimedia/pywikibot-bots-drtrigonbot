@@ -187,6 +187,28 @@ def graph(xdata, *args, **kwargs):
 	#output to browser
 	return "Content-type: image/png\n\n" + f.read()
 
+# http://docs.python.org/library/socket.html
+def irc_status():
+	# Echo client program
+	import socket
+
+	HOST    = ''                 # The remote host
+	PORT    = 50007              # The same port as used by the server
+	request = hex(int(time()))
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	try:
+		s.connect((HOST, PORT))
+		s.send(request)
+		data = s.recv(1024)
+		check = (data == request)
+		if check:
+			data = s.recv(1024)
+		s.close()
+	except socket.error:
+		(check, data) = (False, '')
+
+	return (check, data)
+
 
 # === CGI/HTML page view user interfaces === === ===
 #
@@ -235,6 +257,12 @@ def displaystate(form):
 			color = html_color['green']
 			state_text = "running"
 
+#	check = irc_status()[0]
+	check = 'n/a'
+
+	status  = "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': color, 'bot': 'all:', 'state': state_text}
+	status += "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': html_color['green'], 'bot': 'irc:', 'state': check}
+
 	data.update({	'time':		asctime(localtime(time())),
 			'oldlog':	buf.join(files),
 			'oldlink':	r"http://toolserver.org/~drtrigon/DrTrigonBot/",
@@ -244,7 +272,7 @@ def displaystate(form):
 			'title':	'DrTrigonBot status panel',
 			'tsnotice': 	style.print_tsnotice(),
 			#'content':	displaystate_content,
-			'p-status':	"<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': color, 'bot': 'all:', 'state': state_text},
+			'p-status':	status,
 			#'footer': 	style.footer + style.footer_w3c + style.footer_w3c_css,
 			'footer': 	style.footer + style.footer_w3c, # wiki (new) not CSS 2.1 compilant
 	})
