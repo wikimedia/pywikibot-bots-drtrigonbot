@@ -159,7 +159,7 @@ bot_config = {    # unicode values
                     'reportwarn_switch':     True,          # (not published yet)
                     'globwikinotify_switch': False,         # GET OTHER WIKIS NOTIFICATIONS additionally, a SWITCH
                     'reportclosed_switch':   True,          # (not published yet)
-                    'cleanup_count':         0,             # (not published yet)
+                    'cleanup_count':         0,             # DELETE/CLEAN-UP all older entries, a COUNT
                     # LIST of talks/discussions to SEARCH, a LIST
                     'checkedit_list':    [ '^(.*?Diskussion:.*)',
                                 u'^(Wikipedia:Löschkandidaten/.*)',
@@ -231,7 +231,7 @@ bot_config = {    # unicode values
                     # (hidden)
                     'parse_msg': {
                         'de':    {
-                            u'*':         u':* %s: %s - [%s letzte Bearbeitung] von %s (%s)',
+                            u'*':         u':* %s: %s - [%s letzte Bearbeitung] ({{PAGESIZE:%s}} Bytes) von %s (%s)',
                             _PS_closed:   u':* %s: %s alle Diskussionen wurden beendet (Überwachung gestoppt) - letzte Bearbeitung von %s (%s)',
                             _PS_notify:   u':* %s: <span class="plainlinks">[%s %s]</span> - letzte Bearbeitung von [[User:%s]] (%s)',
                             _PS_warning:  u':* Bot Warn-Nachricht: %s "\'\'%s\'\'"',
@@ -240,7 +240,7 @@ bot_config = {    # unicode values
                             u'nonhuman':  u'(keinen menschlichen Bearbeiter gefunden)',
                             },
                         'en':    {
-                            u'*':         u':* %s: %s - [%s last edit] by %s (%s)',
+                            u'*':         u':* %s: %s - [%s last edit] ({{PAGESIZE:%s}} bytes) by %s (%s)',
                             _PS_closed:   u':* %s: %s all discussions have finished (surveillance stopped) - last edit by %s (%s)',
                             _PS_notify:   u':* %s: <span class="plainlinks">[%s %s]</span> - last edit by [[User:%s]] (%s)',
                             _PS_warning:  u':* Bot warning message: %s "\'\'%s\'\'"',
@@ -1113,7 +1113,7 @@ class SumDiscPages(object):
                     # subsections on page
                     item = u'%s → %s' % (page.title(asLink=True), string.join(report, u', '))
 
-                data = (data[0], item, hist, self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
+                data = (data[0], item, hist, page.title(), self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
                 data = self.param['parse_msg'][u'*'] % data
             elif data[5] in ps_types[1]:
                 # closed
