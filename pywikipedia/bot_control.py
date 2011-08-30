@@ -93,7 +93,6 @@ import pagegenerators, userlib, botlist, clean_sandbox
 import sys, os, re, time, codecs
 #import thread
 import clean_user_sandbox, sum_disc, subster, script_wui, subster_irc
-#import page_disc
 import dtbext
 # Splitting the bot into library parts
 import wikipedia as pywikibot
@@ -117,7 +116,6 @@ infolist = [ pywikibot.__version__, pywikibot.config.__version__,     # framewor
              dtbext.date.__version__, dtbext.userlib.__version__,     #
              __version__, clean_user_sandbox.__version__,             # bots
              sum_disc.__version__, subster.__version__,               #
-#             page_disc.__version__, ]                                 #
              script_wui.__version__, subster_irc.__version__, ]       #
 
 # bots to run and control
@@ -125,10 +123,8 @@ bot_list = { 'clean_user_sandbox': (clean_user_sandbox, u'clean userspace Sandbo
              'sum_disc':           (sum_disc, u'discussion summary'),
              'compress_history':   (sum_disc, u'compressing discussion summary'),
              'subster':            (subster, u'"SubsterBot"'),
-#             'page_disc':          (page_disc, u'page_disc (beta)'),
              'script_wui':         (script_wui, u'script WikiUserInterface (beta)'),
              'subster_irc':        (subster_irc, u'"SubsterBot" IRC surveillance (beta)'), }
-#bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'subster', 'page_disc' ]
 bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'script_wui', 'subster', 'subster_irc' ]
 
 # SGE: exit errorlevel
@@ -426,7 +422,6 @@ if __name__ == "__main__":
                     'sum_disc':           False,
                     'compress_history':   False,
                     'subster':            False,
-#                    'page_disc':          False,
                     'script_wui':         False,
                     'subster_irc':        False,
         }
@@ -438,14 +433,12 @@ if __name__ == "__main__":
             do_dict.update({ 'clean_user_sandbox': True,
                              'sum_disc':           True,
                              'subster':            True,
-#                             'page_disc':          True,
                              'script_wui':         True,
             })
         elif ("-default" in arg):
             do_dict.update({ 'clean_user_sandbox': True,
                              'sum_disc':           True,
                              'subster':            True,
-#                             'page_disc':          True,
                              'script_wui':         True,
             })
         elif ("-compress_history:[]" in arg):          # muss alleine laufen, sollte aber mit allen 
@@ -462,7 +455,6 @@ if __name__ == "__main__":
             do_dict.update({ 'clean_user_sandbox': ("-clean_user_sandbox" in arg),
                              'sum_disc':           ("-sum_disc" in arg),
                              'subster':            ("-subster" in arg),
-#                             'page_disc':          ("-page_disc" in arg),
                              'script_wui':         ("-script_wui" in arg),
             })
 

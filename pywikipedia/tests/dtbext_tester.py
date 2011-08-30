@@ -299,6 +299,8 @@ def productive():
 
 
 def experimental():
+  site = pywikibot.getSite()
+    
   #a_str = r'<strong class="error">Referenz-Fehler: Einzelnachweisfehler: <code>&lt;ref&gt;</code>-Tags existieren, jedoch wurde kein <code>&lt;references&#160;/&gt;</code>-Tag gefunden.</strong>'
   #site = dtbext.pywikibot.Page(pywikibot.getSite(), TESTPAGE)
   #buf = site.get(mode='parse')
