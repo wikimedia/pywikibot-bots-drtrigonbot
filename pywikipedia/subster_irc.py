@@ -38,6 +38,12 @@ import time
 import thread
 
 bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang],
+
+                  # this is still VERY "HACKY" first approach to satisfy
+                  # http://de.wikipedia.org/wiki/Benutzer_Diskussion:Grip99#Subster
+                  'difflink':   [ ( 'Benutzer:Grip99/PRD-subst',    # target (with template)
+                                    'Wikipedia:Projektdiskussion',  # source (url in template)
+                                    {'subpages': True} ), ],        # link params: ext. source with subpages?
 }
 
 # debug tools
@@ -73,13 +79,13 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
         match = self.re_edit.match(e.arguments()[0])
         if not match:
             return
+#        print match.groups(), match.group('page'), match.group('user')
         user = match.group('user').decode(self.site.encoding())
         if user == bot_config['BotName']:
             return
         #if botlist.isBot(user):
         #    return
-#        print match.groups(), match.group('page'), match.group('user')
-        # test actual page against list
+        # test actual page against (template incl.) list
         if match.group('page') in self.refs:
             self.do_check(match.group('page'))
         else:
@@ -93,6 +99,16 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
                 page = self.queue.popleft()
                 if page in self.refs:
                     self.do_check(page)
+        # test actual page against 'difflink' list ("HACKY")
+        p = match.group('page')
+        for (target, source, params) in bot_config['difflink']:
+            if params['subpages']:
+                p = p.split('/')
+            else:
+                p = [p]
+            if (source == p[0]):
+                pywikibot.output(u'DIFFLINK: target=%s, source=%s, params=%s' % (target, source, params))
+                self.do_check(target)
 
     def do_refresh_References(self):
 #        print "refresh"
