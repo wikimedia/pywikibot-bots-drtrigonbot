@@ -62,9 +62,9 @@ class _GetDataHTML(HTMLParser):
     def handle_endtag(self, tag):
         if tag in self.keeptags: self.textdata += u"</%s>" % tag
 
-#----------------------------------
+#--------------------------------------------
 # Functions dealing with templates
-#----------------------------------
+#--------------------------------------------
 
 ## @since   r20 (ADDED)
 #  @remarks needed by various bots
@@ -83,4 +83,26 @@ def glue_template_and_params(template_and_params):
 
     return u'{{%s\n%s}}' % (template, text)
 
+#--------------------------------------------
+# Functions dealing with interwiki links
+#--------------------------------------------
+
+## @since   r165 (ADDED)
+#  @remarks needed by various bots
+def dblink2wikilink(site, dblink):
+    """Return interwiki link to page.
+
+    You can use DB links like used on the toolserver and convert
+    them to valid interwiki links.
+    """
+
+    link = dblink
+    for family in site.fam().get_known_families(site).values():
+        title = link.replace(u'%s:' % family.decode('unicode_escape'), u':')    # e.g. 'dewiki:...' --> 'de:...'
+        if not (title == link):
+            dblink = u'%s:%s' % (family, title)
+            # [ 'wiki' in framework/interwiki is not the same as in TS DB / JIRA: DRTRIGON-60 ]
+            dblink = dblink.replace(u'wiki:', u'')  # may be better to use u'wikipedia:' or u'w:'
+
+    return dblink
 

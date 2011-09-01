@@ -28,6 +28,8 @@ __version__ = '$Id$'
 import urllib, time
 from xml.etree.cElementTree import XML
 # or if cElementTree not found, you can use BeautifulStoneSoup instead
+# Splitting the bot into library parts
+from dtbext_pywikibot import *
 
 # Application specific imports
 import userlib
@@ -95,13 +97,7 @@ class User(userlib.User):
             data[u'timestamp'] =  str(pywikibot.Timestamp.fromtimestampformat(data[u'timestamp']))
 
             # convert link to valid interwiki link
-            link = data[u'link']
-            for family in self.site().fam().get_known_families(self.site()).values():
-                title = link.replace(u'%s:' % family.decode('unicode_escape'), u':')    # e.g. 'dewiki:...' --> 'de:...'
-                if not (title == link):
-                    data[u'link'] = u'%s:%s' % (family, title)
-                    # [ 'wiki' in framework/interwiki is not the same as in TS DB / JIRA: DRTRIGON-60 ]
-                    data[u'link'] = data[u'link'].replace(u'wiki:', u'')
+            data[u'link'] = dtbext_pywikibot.dblink2wikilink(self.site(), data[u'link'])
 
             # return page object with additional data
             try:
