@@ -187,27 +187,46 @@ def graph(xdata, *args, **kwargs):
 	#output to browser
 	return "Content-type: image/png\n\n" + f.read()
 
-# http://docs.python.org/library/socket.html
+# http://oreilly.com/pub/h/1968
+# http://forum.codecall.net/python-tutorials/33361-developing-basic-irc-bot-python.html
 def irc_status():
-	# Echo client program
 	import socket
+	import string
 
-	HOST    = ''                 # The remote host
-	PORT    = 50007              # The same port as used by the server
-	request = hex(int(time()))
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	try:
-		s.connect((HOST, PORT))
-		s.send(request)
-		data = s.recv(1024)
-		check = (data == request)
-		if check:
-			data = s.recv(1024)
-		s.close()
-	except socket.error:
-		(check, data) = (False, '')
+	HOST     = "irc.wikimedia.org"
+	PORT     = 6667
+	NICK     = "DrTrigonBot_panel"
+	IDENT    = NICK.lower()
+	REALNAME = NICK
+	CHAN     = "#de.wikipedia"
+	readbuffer=""
 
-	return (check, data)
+	s=socket.socket( )
+	s.connect((HOST, PORT))
+	s.send("NICK %s\r\n" % NICK)
+	s.send("USER %s %s bla :%s\r\n" % (IDENT, HOST, REALNAME))
+	#s.send('JOIN ' + CHAN + '\r\n') # Join the pre defined channel
+	s.send('NAMES ' + CHAN + '\r\n') # Show all Nicks in channel
+
+	users = []
+	while (not users):
+		readbuffer=readbuffer+s.recv(1024)
+		temp=string.split(readbuffer, "\n")
+		readbuffer=temp.pop( )
+
+		for line in temp:
+			line=string.rstrip(line)
+			line=string.split(line)
+
+			if (line[1] == "353"):  # answer to 'NAMES' request
+				i = line.index(CHAN)
+				users = line[(i+1):]
+
+	del s
+
+	botname = "DrTrigonBot"
+	return ((botname in users) or
+		(":"+botname in users), users)
 
 
 # === CGI/HTML page view user interfaces === === ===
@@ -257,11 +276,15 @@ def displaystate(form):
 			color = html_color['green']
 			state_text = "running"
 
-#	check = irc_status()[0]
-	check = 'n/a'
+	if irc_status()[0]:
+		irc_color = html_color['green']
+		irc_state_text = "OK"
+	else:
+		irc_color = html_color['orange']
+		irc_state_text = "problem"
 
 	status  = "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': color, 'bot': 'all:', 'state': state_text}
-	status += "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': html_color['green'], 'bot': 'irc:', 'state': check}
+	status += "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': irc_color, 'bot': 'irc:', 'state': irc_state_text}
 
 	data.update({	'time':		asctime(localtime(time())),
 			'oldlog':	buf.join(files),
