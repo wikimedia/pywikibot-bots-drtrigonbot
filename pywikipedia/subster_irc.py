@@ -108,10 +108,7 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
                 p = [p]
             if (source == p[0]):
                 pywikibot.output(u'DIFFLINK: target=%s, source=%s, params=%s' % (target, source, params))
-#                msg = subster.bot_config['msg'][self.site.lang]
-#                msg = (msg[0], match.group('summary') + u' (%s).')
-#                subster.bot_config['msg'][self.site.lang] = msg
-                self.do_check(target)
+                self.do_check(target, comment=match.group('summary'))
 
     def do_refresh_References(self):
 #        print "refresh"
@@ -121,17 +118,21 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
                                              onlyTemplateInclusion=True):
             self.refs[page.title()] = page
 
-    def do_check(self, page_title):
+    def do_check(self, page_title, comment=None):
         # Create two threads as follows
         # (simple 'thread' for more sophisticated code use 'threading')
         pywikibot.output(u"CHECK: %s" % page_title)
         try:
-            thread.start_new_thread( main_subster, (self.refs[page_title], ) )
+            thread.start_new_thread( main_subster, (self.refs[page_title], comment) )
         except:
             pywikibot.output(u"WARNING: unable to start thread")
 
 # Define a function for the thread
-def main_subster(page):
+def main_subster(page, comment=None):
+#    if comment:
+#        msg = subster.bot_config['msg'][self.site.lang]
+#        msg = (msg[0], comment + u' (%s).')
+#        subster.bot_config['msg'][self.site.lang] = msg
     bot = subster.SubsterBot()
     page.get(force=True)     # refresh page content
     bot.silent  = True

@@ -63,7 +63,7 @@ bot_config = {    # unicode values
                     'beautifulsoup':   'False',        # DRTRIGON-88
                     'expandtemplates': 'False',        # DRTRIGON-93 (only with 'wiki')
                     'simple':          '',             # DRTRIGON-85
-                    }
+                    },
 
         'msg': {
             'de': ( u'Bot: ',
