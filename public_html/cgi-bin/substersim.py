@@ -78,19 +78,110 @@ maindisplay_content = \
 Version:<br>
 panel: %(panel_ver)s<br>
 bot: %(subster_bot_ver)s<br><br>
+Modus:
+<form action="" name="ModusForm">
+<script type="text/javascript">
+function switch_mode () {
+  if        (document.ModusForm.mode[0].checked == true) {
+    document.SubsterBotForm.regex.disabled = false;
+    document.SubsterBotForm.value.disabled = false;
+    document.SubsterBotForm.count.disabled = false;
+    document.SubsterBotForm.notags.disabled = false;
+    document.SubsterBotForm.postproc.disabled = false;
+    document.SubsterBotForm.wiki.disabled = false;
+    document.SubsterBotForm.expandtemplates.disabled = false;
+    document.SubsterBotForm.beautifulsoup.disabled = true;
+    document.SubsterBotForm.simple.disabled = true;
+  } else if (document.ModusForm.mode[1].checked == true) {
+    document.SubsterBotForm.regex.disabled = true;
+    document.SubsterBotForm.value.disabled = true;
+    document.SubsterBotForm.count.disabled = true;
+    document.SubsterBotForm.notags.disabled = true;
+    document.SubsterBotForm.postproc.disabled = true;
+    document.SubsterBotForm.wiki.disabled = true;
+    document.SubsterBotForm.expandtemplates.disabled = true;
+    document.SubsterBotForm.beautifulsoup.disabled = false;
+    document.SubsterBotForm.simple.disabled = true;
+  } else if (document.ModusForm.mode[2].checked == true) {
+    document.SubsterBotForm.regex.disabled = false;
+    document.SubsterBotForm.value.disabled = false;
+    document.SubsterBotForm.count.disabled = false;
+    document.SubsterBotForm.notags.disabled = false;
+    document.SubsterBotForm.postproc.disabled = false;
+    document.SubsterBotForm.wiki.disabled = false;
+    document.SubsterBotForm.expandtemplates.disabled = false;
+    document.SubsterBotForm.beautifulsoup.disabled = false;
+    document.SubsterBotForm.simple.disabled = false;
+  }
+}
+switch_mode();
+</script>
+<p>
+  <input type="radio" name="mode" value="regex" onclick="switch_mode();"> regex<br>
+  <input type="radio" name="mode" value="beautifulsoup" onclick="switch_mode();"> beautifulsoup<br>
+  <input type="radio" name="mode" value="simple" onclick="switch_mode();"> simple
+</p>
+</form>
 Simulation:
-<form action="substersim.py">
-  <p>
+<form action="substersim.py" name="SubsterBotForm">
     <input type="hidden" name="action" value="runsim">
-    url=<input name="url" type="text" size="60" maxlength="200" value="%(url)s"><br>
-    regex=<input name="regex" type="text" size="60" maxlength="200" value="%(regex)s"><br>
-    value=<input name="value" type="text" size="60" maxlength="200" value="%(value)s"><br>
-    count=<input name="count" type="text" size="60" maxlength="200" value="%(count)s"><br>
-    notags=<input name="notags" type="text" size="60" maxlength="200" value="%(notags)s"><br>
-    postproc=<input name="postproc" type="text" size="60" maxlength="200" value="%(postproc)s"><br>
-    wiki=<input name="wiki" type="text" size="60" maxlength="200" value="%(wiki)s"><br>
-    (add. params) <input name="add_params" type="text" size="60" maxlength="200" value="%(add_params)s"><br>
-  </p>
+    <table>
+      <tr>
+        <td>url</td>
+        <td>=</td>
+        <td><input name="url" type="text" size="60" maxlength="200" value="%(url)s"></td>
+      </tr>
+      <tr>
+        <td>regex</td>
+        <td>=</td>
+        <td><input name="regex" type="text" size="60" maxlength="200" value="%(regex)s"></td>
+      </tr>
+      <tr>
+        <td>value</td>
+        <td>=</td>
+        <td><input name="value" type="text" size="60" maxlength="200" value="%(value)s"></td>
+      </tr>
+      <tr>
+        <td>count</td>
+        <td>=</td>
+        <td><input name="count" type="text" size="60" maxlength="200" value="%(count)s"></td>
+      </tr>
+      <tr>
+        <td>notags</td>
+        <td>=</td>
+        <td><input name="notags" type="text" size="60" maxlength="200" value="%(notags)s"></td>
+      </tr>
+      <tr>
+        <td>postproc</td>
+        <td>=</td>
+        <td><input name="postproc" type="text" size="60" maxlength="200" value="%(postproc)s"></td>
+      </tr>
+      <tr>
+        <td>wiki</td>
+        <td>=</td>
+        <td><input name="wiki" type="text" size="60" maxlength="200" value="%(wiki)s"></td>
+      </tr>
+      <tr>
+        <td>expandtemplates</td>
+        <td>=</td>
+        <td><input name="expandtemplates" type="text" size="60" maxlength="200" value="%(expandtemplates)s"></td>
+      </tr>
+      <tr>
+        <td>beautifulsoup</td>
+        <td>=</td>
+        <td><input name="beautifulsoup" type="text" size="60" maxlength="200" value="%(beautifulsoup)s"></td>
+      </tr>
+      <tr>
+        <td>simple</td>
+        <td>=</td>
+        <td><input name="simple" type="text" size="60" maxlength="200" value="%(simple)s"></td>
+      </tr>
+      <tr>
+        <td>(add. params)</td>
+        <td>=</td>
+        <td><input name="add_params" type="text" size="60" maxlength="200" value="%(add_params)s"></td>
+      </tr>
+    </table>
   <p>
     content: <textarea name="content" cols="60" rows="10">%(content)s</textarea>
   </p>
