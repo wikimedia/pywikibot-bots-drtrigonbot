@@ -160,6 +160,7 @@ bot_config = {    # unicode values
                     'globwikinotify_switch': False,         # GET OTHER WIKIS NOTIFICATIONS additionally, a SWITCH
                     'reportclosed_switch':   True,          # (not published yet)
                     'cleanup_count':         0,             # DELETE/CLEAN-UP all older entries, a COUNT
+                    'mainsignneeded_switch': False,         # (not published yet; DRTRIGON-99)
                     # LIST of talks/discussions to SEARCH, a LIST
                     'checkedit_list':    [ '^(.*?Diskussion:.*)',
                                 u'^(Wikipedia:Löschkandidaten/.*)',
@@ -480,9 +481,9 @@ class SumDiscBot(dtbext.basic.BasicBot):
         self._datfilename = pywikibot.config.datafilepath(self._bot_config['data_path'], 'sum_disc-%s-%s-%s.dat' % (self.site.family.name, self.site.lang, self._user.name()))
 
         # substitute variables for use in user defined parameters/options
-        param_vars = {    'username':    self._user.name(),
-                'userdiscpage':    userdiscpage,
-                }
+        param_vars = { 'username':     self._user.name(),
+                       'userdiscpage': userdiscpage,
+                     }
         for item in bot_config['vars_subst']:
             self._param[item] = [ subitem % param_vars for subitem in self._param[item] ]
 
@@ -1256,6 +1257,8 @@ class PageSections(object):
 
             # check relevancy of section
             (rel, checksum_cur, checks) = self._check_sect_rel(body, checksum, anchor)
+            if self._param['mainsignneeded_switch']:    # DRTRIGON-99
+                rel = rel and checks['mainsign']
 
             # is page signed?
             page_signed = page_signed or checks['signed'] # signature check
@@ -1290,6 +1293,7 @@ class PageSections(object):
         # per default assume relevancy
         checks = { 'changed':    True,
                'signed':     True,
+               'mainsign':   False,
                'lasteditor': False, }
 
         # check if thread has changed
@@ -1301,8 +1305,9 @@ class PageSections(object):
             return (False, checksum_cur, checks)
 
         # search for signature in section/thread
-        (signs_pos, signs) = self._search_sign(data)
-        checks['signed'] = (len(signs_pos) > 0) # are signatures present
+        (signed, signs_pos, signs, main) = self._search_sign(data)
+        checks['signed']   = signed # are signatures present
+        checks['mainsign'] = main   # is main signature present
 
         if not checks['signed']:
             return (False, checksum_cur, checks)
@@ -1337,15 +1342,19 @@ class PageSections(object):
         sign_list  = self._param['altsign_list']
         check_list = self._param['checksign_list']
 
+        mainsign = sign_list[-1]   # last sign in list is main sign
+
         signs = {}
+        main  = False
         for user in sign_list:
             for check in check_list:
                 for m in re.finditer(check % {'usersig':user}, text):
                     signs[m.start()] = m
+                    main = (mainsign == user) or main
         signs_pos = signs.keys()
         signs_pos.sort()
 
-        return (signs_pos, signs)
+        return ((len(signs_pos) > 0), signs_pos, signs, main)
 
 
 # idea: may be create a class for storage of sum_disc_data and for
