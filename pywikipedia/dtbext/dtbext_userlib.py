@@ -97,7 +97,7 @@ class User(userlib.User):
             data[u'timestamp'] =  str(pywikibot.Timestamp.fromtimestampformat(data[u'timestamp']))
 
             # convert link to valid interwiki link
-            data[u'link'] = dtbext_pywikibot.dblink2wikilink(self.site(), data[u'link'])
+            data[u'link'] = dblink2wikilink(self.site(), data[u'link'])
 
             # return page object with additional data
             try:
