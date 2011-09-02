@@ -108,6 +108,9 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
                 p = [p]
             if (source == p[0]):
                 pywikibot.output(u'DIFFLINK: target=%s, source=%s, params=%s' % (target, source, params))
+#                msg = subster.bot_config['msg'][self.site.lang]
+#                msg = (msg[0], match.group('summary') + u' (%s).')
+#                subster.bot_config['msg'][self.site.lang] = msg
                 self.do_check(target)
 
     def do_refresh_References(self):

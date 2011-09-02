@@ -64,6 +64,15 @@ bot_config = {    # unicode values
                     'expandtemplates': 'False',        # DRTRIGON-93 (only with 'wiki')
                     'simple':          '',             # DRTRIGON-85
                     }
+
+        'msg': {
+            'de': ( u'Bot: ',
+                    u'substituiere %s tag(s).',
+                  ),
+            'en': ( u'robot ',
+                    u'substituting %s tag(s).',
+                  ),
+        },
 }
 
 ## used/defined magic words, look also at bot_control
@@ -143,7 +152,8 @@ class SubsterBot(dtbext.basic.BasicBot):
                         pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
                         continue
 
-                    self.save(page, substed_content, u'Bot: substituting %s tag(s).' % (", ".join(substed_tags)))
+                    head, mod = pywikibot.translate(self.site.lang, bot_config['msg'])
+                    self.save(page, substed_content, head + mod % (", ".join(substed_tags)))
                 else:
                     pywikibot.output(u'NOTHING TO DO!')
 
