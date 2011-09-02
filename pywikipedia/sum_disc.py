@@ -160,7 +160,7 @@ bot_config = {    # unicode values
                     'globwikinotify_switch': False,         # GET OTHER WIKIS NOTIFICATIONS additionally, a SWITCH
                     'reportclosed_switch':   True,          # (not published yet)
                     'cleanup_count':         0,             # DELETE/CLEAN-UP all older entries, a COUNT
-                    'mainsignneeded_switch': False,         # (not published yet; DRTRIGON-99)
+                    'mainsignneeded_switch': True,          # (not published yet; DRTRIGON-99)
                     # LIST of talks/discussions to SEARCH, a LIST
                     'checkedit_list':    [ '^(.*?Diskussion:.*)',
                                 u'^(Wikipedia:Löschkandidaten/.*)',
