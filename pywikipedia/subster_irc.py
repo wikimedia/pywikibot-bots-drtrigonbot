@@ -36,6 +36,7 @@ import botlist
 from collections import deque
 import time
 import thread
+import copy
 
 bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang],
 
@@ -44,6 +45,8 @@ bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.fami
                   'difflink':   [ ( 'Benutzer:Grip99/PRD-subst',    # target (with template)
                                     'Wikipedia:Projektdiskussion',  # source (url in template)
                                     {'subpages': True} ), ],        # link params: ext. source with subpages?
+
+                  'msg':        copy.deepcopy(subster.bot_config['msg']),
 }
 
 # debug tools
@@ -108,7 +111,7 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
                 p = [p]
             if (source == p[0]):
                 pywikibot.output(u'DIFFLINK: target=%s, source=%s, params=%s' % (target, source, params))
-                self.do_check(target, comment=match.group('summary'))
+                self.do_check(target, comment=(match.group('summary'), self.site.lang))
 
     def do_refresh_References(self):
 #        print "refresh"
@@ -129,16 +132,18 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
 
 # Define a function for the thread
 def main_subster(page, comment=None):
-#    if comment:
-#        msg = subster.bot_config['msg'][self.site.lang]
-#        msg = (msg[0], comment + u' (%s).')
-#        subster.bot_config['msg'][self.site.lang] = msg
+    if comment:
+        msg = subster.bot_config['msg'][comment[1]]
+        msg = (msg[0], comment[0] + u' (%s).')
+        subster.bot_config['msg'][comment[1]] = msg
     bot = subster.SubsterBot()
     page.get(force=True)     # refresh page content
     bot.silent  = True
     bot.pagegen = [ page ]   # single page, according to pagegenerators.py
     bot.run()
     del bot
+    if comment:
+        subster.bot_config['msg'] = bot_config['msg']
 
 def main():
     subster.debug = debug
