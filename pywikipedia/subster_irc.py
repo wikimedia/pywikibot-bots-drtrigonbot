@@ -135,7 +135,7 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
 def main_subster(page, comment=None):
     if comment:
         msg = subster.bot_config['msg'][comment[1]]
-        msg = (msg[0], comment[0] + u' (%s)')
+        msg = (msg[0], comment[0] + u' / %s')
         subster.bot_config['msg'][comment[1]] = msg
     bot = subster.SubsterBot()
     page.get(force=True)     # refresh page content

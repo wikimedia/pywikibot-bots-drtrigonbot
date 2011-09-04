@@ -159,7 +159,7 @@ bot_config = {    # unicode values
                     'reportwarn_switch':     True,          # (not published yet)
                     'globwikinotify_switch': False,         # GET OTHER WIKIS NOTIFICATIONS additionally, a SWITCH
                     'reportclosed_switch':   True,          # (not published yet)
-                    'cleanup_count':         0,             # DELETE/CLEAN-UP all older entries, a COUNT
+                    'cleanup_count':         -1,            # DELETE/CLEAN-UP all older entries, a COUNT
                     'mainsignneeded_switch': True,          # (not published yet; DRTRIGON-99)
                     # LIST of talks/discussions to SEARCH, a LIST
                     'checkedit_list':    [ '^(.*?Diskussion:.*)',
@@ -884,7 +884,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
                     comment = head + add % count
                     #self.append(tmplsite, buf, comment=comment)
                     (page, text, minEd) = (tmplsite, buf, True) # 'True' is default
-                if not self._param['cleanup_count']:
+                if (self._param['cleanup_count'] < 0):
                     # default mode, w/o cleanup
                     self.append(page, text, comment=comment, minorEdit=minEd)
                 else:

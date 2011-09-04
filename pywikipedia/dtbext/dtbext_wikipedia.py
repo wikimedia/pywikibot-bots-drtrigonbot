@@ -67,6 +67,8 @@ class Page(pywikibot.Page):
 
     ## @since   ? (MODIFIED)
     #  @remarks should be faster than original (look into re-write for something similar!)
+    #  @remarks can be uncorrect (dangerous) according to xqt the database can contain invalid flags
+    #           (http://lists.wikimedia.org/pipermail/pywikipedia-l/2011-September/006953.html)
     def isRedirectPage(self):
         """Return True if this is a redirect, False if not or not existing.
            MODIFIED METHOD: should be faster than original
