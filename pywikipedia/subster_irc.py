@@ -136,7 +136,7 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
 # Define a function for the thread
 def main_subster(page, comment=None):
     if comment:
-        msg = subster.bot_config['msg'][comment[1]]
+        msg = copy.deepcopy(subster.bot_config['msg'][comment[1]])
         msg = (msg[0], comment[0] + u' / %s')
         subster.bot_config['msg'][comment[1]] = msg
     bot = subster.SubsterBot()
@@ -146,7 +146,7 @@ def main_subster(page, comment=None):
     bot.run()
     del bot
     if comment:
-        subster.bot_config['msg'] = bot_config['msg']
+        subster.bot_config['msg'] = copy.deepcopy(bot_config['msg'])
 
 def main():
     subster.debug = debug

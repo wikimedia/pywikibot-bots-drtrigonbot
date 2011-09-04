@@ -237,7 +237,7 @@ bot_config = {    # unicode values
                             _PS_notify:   u':* %s: <span class="plainlinks">[%s %s]</span> - letzte Bearbeitung von [[User:%s]] (%s)',
                             _PS_warning:  u':* Bot Warn-Nachricht: %s "\'\'%s\'\'"',
                             u'start':     u'; %d. %B %Y',
-                            u'end':       u'<noinclude>\n\nZusammenfassung erstellt von und um: ~~~~</noinclude>',
+                            u'end':       u'<noinclude>\n\nZusammenfassung erstellt von und um: ~~~~</noinclude>',  # ev. '~~~ um ~~~~~'
                             u'nonhuman':  u'(keinen menschlichen Bearbeiter gefunden)',
                             },
                         'en':    {
