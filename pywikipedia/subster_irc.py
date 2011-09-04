@@ -111,7 +111,8 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
                 p = [p]
             if (source == p[0]):
                 pywikibot.output(u'DIFFLINK: target=%s, source=%s, params=%s' % (target, source, params))
-                self.do_check(target, comment=(match.group('summary'), self.site.lang))
+                text = '%s / %s / %s' % (match.group('page'), match.group('user'), match.group('summary'))
+                self.do_check(target, comment=(text, self.site.lang))
 
     def do_refresh_References(self):
 #        print "refresh"
@@ -134,7 +135,7 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
 def main_subster(page, comment=None):
     if comment:
         msg = subster.bot_config['msg'][comment[1]]
-        msg = (msg[0], comment[0] + u' (%s).')
+        msg = (msg[0], comment[0] + u' (%s)')
         subster.bot_config['msg'][comment[1]] = msg
     bot = subster.SubsterBot()
     page.get(force=True)     # refresh page content
