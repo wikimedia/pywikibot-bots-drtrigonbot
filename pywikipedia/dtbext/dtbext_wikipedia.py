@@ -238,7 +238,7 @@ class Page(pywikibot.Page):
 
             # try to give exact match for heading
             for h in headers:
-                ph = re.search(h, self._contents[pos:], re.M)
+                ph = re.search(h, pywikibot.removeDisabledParts(self._contents[pos:]), re.M)
                 if ph:
                     ph = ph.group(0).strip()
                     possible_headers += [ (ph, section[u'line']) ]
