@@ -73,6 +73,9 @@ bot_config = {    # unicode values
                     u'substituting %s tag(s).',
                   ),
         },
+
+        # this is a system parameter and should not be changed!
+        'EditFlags':        {'minorEdit': True, 'botflag': True},
 }
 
 ## used/defined magic words, look also at bot_control
@@ -153,7 +156,7 @@ class SubsterBot(dtbext.basic.BasicBot):
                         continue
 
                     head, mod = pywikibot.translate(self.site.lang, bot_config['msg'])
-                    self.save(page, substed_content, head + mod % (", ".join(substed_tags)))
+                    self.save(page, substed_content, head + mod % (", ".join(substed_tags)), **bot_config['EditFlags'])
                 else:
                     pywikibot.output(u'NOTHING TO DO!')
 

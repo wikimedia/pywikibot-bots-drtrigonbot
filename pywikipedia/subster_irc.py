@@ -47,6 +47,7 @@ bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.fami
                                     {'subpages': True} ), ],        # link params: ext. source with subpages?
 
                   'msg':        copy.deepcopy(subster.bot_config['msg']),
+                  'EditFlags':  copy.deepcopy(subster.bot_config['EditFlags']),
 }
 
 # debug tools
@@ -135,18 +136,20 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
 
 # Define a function for the thread
 def main_subster(page, comment=None):
+    page.get(force=True)     # refresh page content
     if comment:
         msg = copy.deepcopy(subster.bot_config['msg'][comment[1]])
         msg = (msg[0], comment[0] + u' / %s')
         subster.bot_config['msg'][comment[1]] = msg
+        subster.bot_config['EditFlags'] = {'minorEdit': False, 'botflag': False}
     bot = subster.SubsterBot()
-    page.get(force=True)     # refresh page content
     bot.silent  = True
     bot.pagegen = [ page ]   # single page, according to pagegenerators.py
     bot.run()
-    del bot
     if comment:
+        subster.bot_config['EditFlags'] = copy.deepcopy(bot_config['EditFlags'])
         subster.bot_config['msg'] = copy.deepcopy(bot_config['msg'])
+    del bot
 
 def main():
     subster.debug = debug

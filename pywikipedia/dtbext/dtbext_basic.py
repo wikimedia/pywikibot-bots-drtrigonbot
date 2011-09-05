@@ -222,7 +222,7 @@ class BasicBot(basic.BasicBot):
 
     ## @since   ? (MODIFIED)
     #  @remarks needed by various bots
-    def save(self, page, text, comment=None, minorEdit=True):
+    def save(self, page, text, comment=None, minorEdit=True, botflag=True):
         pywikibot.output(u'\03{lightblue}Writing to wiki on %s...\03{default}' % page.title(asLink=True))
 
         comment_output = comment or pywikibot.action
@@ -233,7 +233,7 @@ class BasicBot(basic.BasicBot):
         for i in range(3): # try max. 3 times
             try:
                 # Save the page
-                page.put(text, comment=comment, minorEdit=minorEdit)
+                page.put(text, comment=comment, minorEdit=minorEdit, botflag=botflag)
             except pywikibot.LockedPage:
                 pywikibot.output(u"\03{lightblue}Page %s is locked; skipping.\03{default}" % page.aslink())
             except pywikibot.EditConflict:
