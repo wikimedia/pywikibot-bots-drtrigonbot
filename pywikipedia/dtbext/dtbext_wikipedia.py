@@ -236,7 +236,7 @@ class Page(pywikibot.Page):
             headers = [ u'^(\s*)%(spacer)s(.*?)%(spacer)s(\s*)((<!--(.*?)-->)?)(\s*)$' % {'line': section[u'line'], 'spacer': u'=' * l},
                     u'^(\s*)<h%(level)i>(.*?)</h%(level)i>(.*?)$' % {'line': section[u'line'], 'level': l}, ]
 
-            # try to give exact match for heading
+            # try to give exact match for heading (remove HTML comments)
             for h in headers:
                 ph = re.search(h, pywikibot.removeDisabledParts(self._contents[pos:]), re.M)
                 if ph:

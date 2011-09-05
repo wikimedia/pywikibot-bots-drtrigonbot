@@ -91,6 +91,7 @@ import config, pagegenerators, userlib
 import dtbext
 # Splitting the bot into library parts
 import wikipedia as pywikibot
+from pywikibot import i18n 
 
 
 _PS_warning    = 1    # serious or no classified warnings/errors that should be reported
@@ -138,18 +139,11 @@ bot_config = {    # unicode values
         # which lists should be translated according to site's lang
         'translate':         [ 'notify_msg', 'parse_msg' ],
 
-        'msg': {
-            'de':    ( u'Bot: ',
-                u'Diskussions-Zusammenfassung hinzugefügt (%i Einträge)',
-                u'Diskussions-Zusammenfassung aktualisiert (%i Einträge in %s)',
-                u'Diskussions-Zusammenfassung hinzugefügt und bereinigt (%i Einträge)',
-                ),
-            'en':    ( u'robot ',
-                u'Discussion summary added: %i entries',
-                u'Discussion summary updated: %i entries in %s',
-                u'Discussion summary added with clean up: %i entries',
-                ),
-        },
+        # 'msg' moved to i18n (translatewiki.org), key names:
+        #'thirdparty-drtrigonbot-sum_disc-summary-head'
+        #'thirdparty-drtrigonbot-sum_disc-summary-add'
+        #'thirdparty-drtrigonbot-sum_disc-summary-mod'
+        #'thirdparty-drtrigonbot-sum_disc-summary-clean'
 
         # bot paramater/options (modifiable by user)
         'param_default':    { 'checkedit_count':    500,    # CHECK recent EDITs, a COUNT
@@ -214,42 +208,22 @@ bot_config = {    # unicode values
 
                     # (hidden)
                     'notify_msg': {
-                        'de':    {
-                            _PS_changed:  u'Diskussion verändert',
-                            _PS_new:      u'Neue Diskussion',
-                            _PS_closed:   u'Diskussion abgeschlossen', 
-                            _PS_maintmsg: u'BOT MESSAGE',
-                            _PS_notify:   u'Benachrichtigung',
+                            _PS_changed:  'thirdparty-drtrigonbot-sum_disc-notify-changed',
+                            _PS_new:      'thirdparty-drtrigonbot-sum_disc-notify-new',
+                            _PS_closed:   'thirdparty-drtrigonbot-sum_disc-notify-closed', 
+                            _PS_maintmsg: 'thirdparty-drtrigonbot-sum_disc-notify-maintmsg',
+                            _PS_notify:   'thirdparty-drtrigonbot-sum_disc-notify-notify',
                             },
-                        'en':    {
-                            _PS_changed:  u'Discussion changed',
-                            _PS_new:      u'New Discussion',
-                            _PS_closed:   u'Discussion closed', 
-                            _PS_maintmsg: u'BOT MESSAGE',
-                            _PS_notify:   u'Notification',
-                            },
-                        },
                     # (hidden)
                     'parse_msg': {
-                        'de':    {
-                            u'*':         u':* %s: %s - [%s letzte Bearbeitung] ({{PAGESIZE:%s}} Bytes) von %s (%s)',
-                            _PS_closed:   u':* %s: %s alle Diskussionen wurden beendet (Überwachung gestoppt) - letzte Bearbeitung von %s (%s)',
-                            _PS_notify:   u':* %s: <span class="plainlinks">[%s %s]</span> - letzte Bearbeitung von [[User:%s]] (%s)',
-                            _PS_warning:  u':* Bot Warn-Nachricht: %s "\'\'%s\'\'"',
-                            u'start':     u'; %d. %B %Y',
-                            u'end':       u'<noinclude>\n\nZusammenfassung erstellt von und um: ~~~~</noinclude>',  # ev. '~~~ um ~~~~~'
-                            u'nonhuman':  u'(keinen menschlichen Bearbeiter gefunden)',
+                            u'*':         'thirdparty-drtrigonbot-sum_disc-parse',
+                            _PS_closed:   'thirdparty-drtrigonbot-sum_disc-parse-closed',
+                            _PS_notify:   'thirdparty-drtrigonbot-sum_disc-parse-notify',
+                            _PS_warning:  'thirdparty-drtrigonbot-sum_disc-parse-warning',
+                            u'start':     'thirdparty-drtrigonbot-sum_disc-parse-start',
+                            u'end':       'thirdparty-drtrigonbot-sum_disc-parse-end',  # ev. '~~~ um ~~~~~'
+                            u'nonhuman':  'thirdparty-drtrigonbot-sum_disc-parse-nonhuman',
                             },
-                        'en':    {
-                            u'*':         u':* %s: %s - [%s last edit] ({{PAGESIZE:%s}} bytes) by %s (%s)',
-                            _PS_closed:   u':* %s: %s all discussions have finished (surveillance stopped) - last edit by %s (%s)',
-                            _PS_notify:   u':* %s: <span class="plainlinks">[%s %s]</span> - last edit by [[User:%s]] (%s)',
-                            _PS_warning:  u':* Bot warning message: %s "\'\'%s\'\'"',
-                            u'start':     u'; %d. %B %Y',
-                            u'end':       u'<noinclude>\n\nSummary generated from and at: ~~~~</noinclude>',
-                            u'nonhuman':  u'(no human editor found)',
-                            },
-                        }
                     },
 }
 
@@ -494,7 +468,10 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
         # translate according to site's lang
         for item in bot_config['translate']:
-            self._param[item] = pywikibot.translate(self.site.lang, self._param[item])
+            for key in self._param[item]:
+                self._param[item][key] = i18n.twtranslate(self.site,
+                                                          self._param[item][key])
+                                                          #{})
 
     ## @todo the error correctors 'old history' and 'notify tag error' can be removed if
     #        they do not appear in bot logs anymore!
@@ -870,18 +847,25 @@ class SumDiscBot(dtbext.basic.BasicBot):
             pywikibot.output(u'[%i entries]' % count )
 
             if 'write2wiki' in debug:
-                head, add, mod, clean = pywikibot.translate(self.site.lang, bot_config['msg'])
+                head  = i18n.twtranslate(self.site,
+                                         'thirdparty-drtrigonbot-sum_disc-summary-head')
+                add   = i18n.twtranslate(self.site,
+                                         'thirdparty-drtrigonbot-sum_disc-summary-add')
+                mod   = i18n.twtranslate(self.site,
+                                         'thirdparty-drtrigonbot-sum_disc-summary-mod')
+                clean = i18n.twtranslate(self.site,
+                                         'thirdparty-drtrigonbot-sum_disc-summary-clean')
                 if not self._mode:
                     # default: write direct to user disc page
-                    comment = head + add % count
+                    comment = head + add % {'num':count}
                     #self.append(self._userPage, buf, comment=comment, minorEdit=False)
                     (page, text, minEd) = (self._userPage, buf, False)
                 else:
                     # enhanced (with template): update user disc page and write to user specified page
                     tmplsite = pywikibot.Page(self.site, self._tmpl_data)
-                    comment = head + mod % (count, tmplsite.title(asLink=True))
+                    comment = head + mod % {'num':count, 'page':tmplsite.title(asLink=True)}
                     self.save(self._userPage, self._content, comment=comment, minorEdit=False)
-                    comment = head + add % count
+                    comment = head + add % {'num':count}
                     #self.append(tmplsite, buf, comment=comment)
                     (page, text, minEd) = (tmplsite, buf, True) # 'True' is default
                 if (self._param['cleanup_count'] < 0):
@@ -891,7 +875,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
                     # append with cleanup
                     text = self.cleanupDiscSum( self.load(page), 
                                                 days=self._param['cleanup_count'] ) + u'\n\n' + text
-                    comment = head + clean % count
+                    comment = head + clean % {'num':count}
                     self.save(page, text, comment=comment, minorEdit=minEd)
                 dtbext.pywikibot.addAttributes(self._userPage)
                 purge = self._userPage.purgeCache()
@@ -933,7 +917,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
         buf = string.join(buf, u'\n')
         
         # remove bot signature and other 'footer'
-        buf = re.sub(self._param['parse_msg'][u'end'].replace(u'~~~~', u'(.*?)'), u'', buf)
+        buf = re.sub(self._param['parse_msg'][u'end'] % {'sign':u'(.*?)'}, u'', buf)
         buf = buf.strip()
 
         return buf
@@ -1114,21 +1098,34 @@ class SumDiscPages(object):
                     # subsections on page
                     item = u'%s → %s' % (page.title(asLink=True), string.join(report, u', '))
 
-                data = (data[0], item, hist, page.title(), self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
+                data = { 'notify':        data[0], 
+                         'page_sections': item, 
+                         'history_link':  hist, 
+                         'page':          page.title(),
+                         'user':          self._getLastEditor(page, data[2]), 
+                         'time':          dtbext.date.getTime(data[3]) }
                 data = self.param['parse_msg'][u'*'] % data
             elif data[5] in ps_types[1]:
                 # closed
-                data = (data[0], page.title(asLink=True), self._getLastEditor(page, data[2]), dtbext.date.getTime(data[3]))
+                data = { 'notify': data[0], 
+                         'page':   page.title(asLink=True),
+                         'user':   self._getLastEditor(page, data[2]), 
+                         'time':   dtbext.date.getTime(data[3]) }
                 data = self.param['parse_msg'][_PS_closed] % data
             #elif data[5] in [_PS_warning]:
             #    # warnings
-            #    data = (page.title(asLink=True), data[0])
+            #    data = { 'page':    page.title(asLink=True),
+            #             'warning': data[0] }
             #    data = self.param['parse_msg'][_PS_warning] % data
             #    self._global_warn.append( (self._user.name(), data) )
             #    if not param['reportwarn_switch']: continue
             elif data[5] in [_PS_notify]:
                 # global wiki notifications
-                data = (data[0], page.globalwikinotify['url'], page.title(), data[2], dtbext.date.getTime(data[3]))
+                data = { 'notify':    data[0], 
+                         'page_link': page.globalwikinotify['url'], 
+                         'page':      page.title(),
+                         'user':      data[2], 
+                         'time':      dtbext.date.getTime(data[3]) }
                 data = self.param['parse_msg'][_PS_notify] % data
             else:
                 continue # skip append
@@ -1140,7 +1137,7 @@ class SumDiscPages(object):
                                      time.gmtime()) ]
             data += buf
             buf   = string.join(data, u'\n')
-            buf  += self.param['parse_msg'][u'end']
+            buf  += self.param['parse_msg'][u'end'] % {'sign':u'~~~~'}
         else:
             buf = u''
 
