@@ -118,7 +118,7 @@ class SubsterBot(dtbext.basic.BasicBot):
         self.pagegen = pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
         self._code   = self._ConfigPage.get()
 
-    def run(self, sim=False):
+    def run(self, sim=False, msg=bot_config['msg'], EditFlags=bot_config['EditFlags']):
         '''Run SubsterBot().'''
 
         pywikibot.output(u'\03{lightgreen}* Processing Template Backlink List:\03{default}')
@@ -155,8 +155,8 @@ class SubsterBot(dtbext.basic.BasicBot):
                         pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
                         continue
 
-                    head, mod = pywikibot.translate(self.site.lang, bot_config['msg'])
-                    self.save(page, substed_content, head + mod % (", ".join(substed_tags)), **bot_config['EditFlags'])
+                    head, mod = pywikibot.translate(self.site.lang, msg)
+                    self.save(page, substed_content, head + mod % (", ".join(substed_tags)), **EditFlags)
                 else:
                     pywikibot.output(u'NOTHING TO DO!')
 
