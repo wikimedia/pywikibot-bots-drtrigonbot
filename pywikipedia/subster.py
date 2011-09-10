@@ -29,6 +29,7 @@ __version__ = '$Id$'
 import re, sys
 import difflib
 import BeautifulSoup
+import urllib, StringIO, zipfile
 
 import pagegenerators
 import dtbext
@@ -63,6 +64,7 @@ bot_config = {    # unicode values
                     'beautifulsoup':   'False',        # DRTRIGON-88
                     'expandtemplates': 'False',        # DRTRIGON-93 (only with 'wiki')
                     'simple':          '',             # DRTRIGON-85
+                    'zip':             'False',
                     },
 
         'msg': {
@@ -246,11 +248,16 @@ class SubsterBot(dtbext.basic.BasicBot):
             param.update( pywikibot.extract_templates_and_params(p)[0][1] )
 
         # 1.) getUrl or wiki text
-        if eval(param['wiki']):
+        if   eval(param['wiki']):
             if eval(param['expandtemplates']): # DRTRIGON-93 (only with 'wiki')
                 external_buffer = dtbext.pywikibot.Page(self.site, param['url']).get(expandtemplates=True)
             else:
                 external_buffer = self.load( dtbext.pywikibot.Page(self.site, param['url']) )
+        elif eval(param['zip']):
+            external_buffer = urllib.urlopen(param['url']).read()
+            zip_buffer = zipfile.ZipFile(StringIO.StringIO(external_buffer))
+            data_file  = zip_buffer.namelist()[0]
+            external_buffer = zip_buffer.open(data_file).read().decode('latin-1')
         else:
             external_buffer = self.site.getUrl(param['url'], no_hostname = True)
 

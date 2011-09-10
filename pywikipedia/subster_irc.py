@@ -44,7 +44,10 @@ bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.fami
                   # http://de.wikipedia.org/wiki/Benutzer_Diskussion:Grip99#Subster
                   'difflink':   [ ( 'Benutzer:Grip99/PRD-subst',    # target (with template)
                                     'Wikipedia:Projektdiskussion',  # source (url in template)
-                                    {'subpages': True} ), ],        # link params: ext. source with subpages?
+                                    {'subpages':  True,             # link params: ext. source with subpages?
+                                     'flags':     {'minorEdit': False, 'botflag': False}, # link params: edit flags?
+                                    } ),
+                                ],
 }
 
 # debug tools
@@ -112,7 +115,7 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
                 text = u'[[%s]] / [[User:%s]] / %s' % ( match.group('page').decode(self.site.encoding()), 
                                            match.group('user').decode(self.site.encoding()), 
                                            match.group('summary').decode(self.site.encoding()) )
-                self.do_check(target, comment=(text, self.site.lang))
+                self.do_check(target, params=(text, self.site.lang, params['flags']))
 
     def do_refresh_References(self):
 #        print "refresh"
@@ -122,25 +125,25 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
                                              onlyTemplateInclusion=True):
             self.refs[page.title()] = page
 
-    def do_check(self, page_title, comment=None):
+    def do_check(self, page_title, params=None):
         # Create two threads as follows
         # (simple 'thread' for more sophisticated code use 'threading')
         pywikibot.output(u"CHECK: %s" % page_title)
         try:
-            thread.start_new_thread( main_subster, (self.refs[page_title], comment) )
+            thread.start_new_thread( main_subster, (self.refs[page_title], params) )
         except:
             pywikibot.output(u"WARNING: unable to start thread")
 
 # Define a function for the thread
-def main_subster(page, comment=None):
+def main_subster(page, params=None):
     bot = subster.SubsterBot()
     page.get(force=True)     # refresh page content
     bot.silent  = True
     bot.pagegen = [ page ]   # single page, according to pagegenerators.py
-    if comment:
+    if params:
         msg = copy.deepcopy(subster.bot_config['msg'])
-        msg[comment[1]] = (msg[comment[1]][0], comment[0] + u' / %s')
-        bot.run(msg=msg, EditFlags={'minorEdit': False, 'botflag': False})
+        msg[params[1]] = (msg[params[1]][0], params[0] + u' / %s')
+        bot.run(msg=msg, EditFlags=params[2])
     else:
         bot.run()
     del bot
