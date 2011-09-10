@@ -39,40 +39,16 @@ import cgi
 #
 
 
-# === CGI/HTML page view user interfaces === === ===
+# === panel HTML stylesheets === === ===
+# MAY BE USING Cheetah (http://www.cheetahtemplate.org/) WOULD BE BETTER (or needed at any point...)
 #
+import ps_plain as style   # panel-stylesheet 'plain'
 
 
-# === Main procedure entry point === === ===
+# === page HTML contents === === ===
 #
-form = cgi.FieldStorage()
-
-# operational mode
-url  = form.getvalue('url', '')
-xslt = form.getvalue('xslt', '')
-
-content_type = "Content-Type: text/html; charset=UTF-8"
-print content_type
-
-if url and xslt:
-    # http://docs.python.org/library/urllib.html#examples
-    import urllib
-    f = urllib.urlopen(url)
-    #print f.read()
-
-    # http://lxml.de/xpathxslt.html
-    from lxml import etree
-    doc = etree.parse(f)
-    xslt_root = etree.XML( open(xslt).read() )
-    transform = etree.XSLT(xslt_root)
-    result = transform(doc)
-    #print str(result)
-    #print result.getroot().text
-    print result
-else:
-    print \
-"""
-<?xml version="1.0" encoding="UTF-8" ?>
+default_content = \
+"""<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -81,17 +57,7 @@ else:
 </head>
 <body>
 <h3>XSaLT: XSL/XSLT Simple and Lightweight Tool</h3>
-<p><small><img src="https://wiki.toolserver.org/favicon.ico" border="0" 
-alt="Toolserver"> <a href="http://tools.wikimedia.de/">Powered by Wikimedia Toolserver</a>
--
-<img src="http://de.selfhtml.org/src/favicon.ico" border="0" width="16" 
-height="16" alt="SELFHTML"> <a href="http://de.selfhtml.org/xml/darstellung/xslgrundlagen.htm">Thanks to SELFHTML</a>
--
-<a href="http://validator.w3.org/check?uri=referer"><img 
-src="http://www.w3.org/Icons/valid-html401-blue" 
-alt="Valid HTML 4.01 Transitional" height="16" width="44" 
-border="0"></a>
-</small></p>
+<p>%(footer)s</p>
 <form action="xsalt.py" name="">
   <table>
   <tr>
@@ -109,4 +75,37 @@ border="0"></a>
   <input type="submit" value=" OK ">
 </form>
 </body>
-</html>""" % {'url': url, 'xslt': xslt}
+</html>"""
+
+
+# === CGI/HTML page view user interfaces === === ===
+#
+
+
+# === Main procedure entry point === === ===
+#
+form = cgi.FieldStorage()
+
+# operational mode
+url  = form.getvalue('url', '')
+xslt = form.getvalue('xslt', '')
+
+print style.content_type
+
+if url and xslt:
+    # http://docs.python.org/library/urllib.html#examples
+    import urllib
+    f = urllib.urlopen(url)
+    #print f.read()
+
+    # http://lxml.de/xpathxslt.html
+    from lxml import etree
+    doc = etree.parse(f)
+    xslt_root = etree.XML( open(xslt).read() )
+    transform = etree.XSLT(xslt_root)
+    result = transform(doc)
+    #print str(result)
+    #print result.getroot().text
+    print result
+else:
+    print default_content % {'url': url, 'xslt': xslt, 'footer': style.footer + style.footer_w3c}
