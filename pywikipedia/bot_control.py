@@ -250,9 +250,11 @@ class Logger:
     _REGEX_eoc = re.compile('\x03\{.*?\}')  # EndOfColor
     _REGEX_eol = re.compile('\n')           # EndOfLine
     def __init__(self, filename, **param):
-        self.file = codecs.open(filename, **param)
         self._filename = filename
-        self._param = param
+        self._param    = param
+        self._time     = dtbext.date.getTimeStmpNow()   # actual date (no time)
+        self.file = codecs.open(logname % (self._time + self._filename),
+                                **self._param)
         if logger_tmsp:
             self.file.write( self._get_tmsp() )
     def write(self, string):
@@ -262,6 +264,8 @@ class Logger:
             string = self._REGEX_eol.sub('\n' + self._get_tmsp(), string)
         res = self.file.write( str(string).decode('latin-1') )
         #self.flush()  # paranoid since it's a logger
+        if not (self._time == dtbext.date.getTimeStmpNow()):
+            self._switch_file()
         return res
     def close(self):
         self.file.write( '\n' )
@@ -274,15 +278,20 @@ class Logger:
         return self.file.flush()
     def _get_tmsp(self):
         return dtbext.date.getTimeStmpNow(full = True, humanreadable = True, local = True) + ':: '
+    def _switch_file(self):
+        self.file.write( '\n\n>> SWITCHING TO NEW LOG-FILE; please look there... <<' )
+        self.close()
+        self.__init__(self._filename, **self._param)
+        self.file.write( '>> SWITCHED FROM OLD LOG-FILE; please look there... <<\n' )
 
 class OutputLog:
     def __init__(self, addlogname=None):
         if addlogname == None:
             self.logfile = None
         else:
-            self.logfile = Logger(logname % dtbext.date.getTimeStmpNow() + addlogname,
-                              encoding=pywikibot.config.textfile_encoding,
-                              mode='a+')
+            self.logfile = Logger(addlogname,
+                                  encoding=pywikibot.config.textfile_encoding,
+                                  mode='a+')
 
         (self.stdout, self.stderr) = (sys.stdout, sys.stderr)
 
@@ -424,11 +433,11 @@ if __name__ == "__main__":
             do_dict['compress_history'] = True         # anderen kombiniert werden können (siehe 'else')...!
         elif ("-subster_irc" in arg):                  # muss alleine laufen...
             do_dict['subster_irc'] = True
-            logname_enh = "_subster_irc"               # use another log than usual !!!
+            logname_enh = ".subster_irc"               # use another log than usual !!!
             #error_ec = error_SGE_restart
         #elif ("-subster" in arg):
         #    do_dict['subster'] = True
-        #    logname_enh = "_subster"            # use another log than usual !!!
+        #    logname_enh = ".subster"            # use another log than usual !!!
         else:
             do_dict.update({ 'clean_user_sandbox': ("-clean_user_sandbox" in arg),
                              'sum_disc':           ("-sum_disc" in arg),
