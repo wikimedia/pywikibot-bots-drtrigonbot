@@ -36,8 +36,9 @@ page = content_type + """
   <title>%(title)s</title>
   <!-- Idea to use Wiki stylesheet from: http://toolserver.org/~vvv/sulutil.php 
   BUT this is the new!! (done by myself) -->
-  <link rel="stylesheet" href="http://bits.wikimedia.org/skins-1.5/vector/main-ltr.css?283-19" type="text/css" media="screen">
-  <link rel="stylesheet" href="http://bits.wikimedia.org/skins-1.5/common/shared.css?283-19" type="text/css" media="screen">
+  <!--<link rel="stylesheet" href="http://bits.wikimedia.org/skins-1.5/vector/main-ltr.css?283-19" type="text/css" media="screen">-->
+  <!--<link rel="stylesheet" href="http://bits.wikimedia.org/skins-1.5/common/shared.css?283-19" type="text/css" media="screen">-->
+  <link rel="stylesheet" href="http://bits.wikimedia.org/de.wikipedia.org/load.php?debug=false&amp;lang=de&amp;modules=ext%%21wikihiero%%7Cmediawiki%%21legacy%%21commonPrint%%7Cmediawiki%%21legacy%%21shared%%7Cskins%%21vector&amp;only=styles&amp;skin=vector" type="text/css" media="all" />
   <link rel="stylesheet" href="../tsnotice.css">
   <meta http-equiv="refresh" content="%(refresh)s">
 </head>
