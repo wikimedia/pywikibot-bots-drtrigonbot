@@ -248,7 +248,15 @@ class SubsterBot(dtbext.basic.BasicBot):
             param.update( pywikibot.extract_templates_and_params(p)[0][1] )
 
         # 1.) getUrl or wiki text
-        if   eval(param['wiki']):
+        # (security: check url not to point to a local file on the server,
+        #  e.g. 'file://' - same as used in xsalt.py)
+        secure = False
+        for item in [u'http://', u'https://']:
+            secure = secure or (param['url'][:len(item)] == item)
+        param['wiki'] = eval(param['wiki'])
+        if (not secure) and (not param['wiki']):
+            return (content, substed_tags)
+        if   param['wiki']:
             if eval(param['expandtemplates']): # DRTRIGON-93 (only with 'wiki')
                 external_buffer = dtbext.pywikibot.Page(self.site, param['url']).get(expandtemplates=True)
             else:
