@@ -288,11 +288,14 @@ class SubsterBot(dtbext.basic.BasicBot):
 
             # 4.) postprocessing
             param['postproc'] = eval(param['postproc'])
-            func = param['postproc'][0]     # needed by exec call of self._code
-            DATA = [ external_data ]        #
-            args = param['postproc'][1:]    #
+            func  = param['postproc'][0]    # needed by exec call of self._code
+            DATA  = [ external_data ]       #
+            args  = param['postproc'][1:]   #
+            scope = {}                      # (scope to run in)
+            scope.update( locals() )        # (add DATA, *args, ...)
+            scope.update( globals() )       # (add imports and else)
             if func:
-                exec(self._code + (bot_config['CodeTemplate'] % func))
+                exec(self._code + (bot_config['CodeTemplate'] % func), scope, scope)
                 external_data = DATA[0]
             #print external_data
 
