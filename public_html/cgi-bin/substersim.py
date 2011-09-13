@@ -177,6 +177,11 @@ Simulation:
         <td><input name="simple" type="text" size="60" maxlength="200" value="%(simple)s"></td>
       </tr>
       <tr>
+        <td>zip</td>
+        <td>=</td>
+        <td><input name="zip" type="text" size="60" maxlength="200" value="%(zip)s"></td>
+      </tr>
+      <tr>
         <td>(add. params)</td>
         <td>=</td>
         <td><input name="add_params" type="text" size="60" maxlength="200" value="%(add_params)s"></td>
