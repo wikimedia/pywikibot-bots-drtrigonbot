@@ -40,6 +40,7 @@ from time import *
 # http://www.ibm.com/developerworks/aix/library/au-python/
 import datetime
 import os, re, sys
+import locale
 
 
 import MySQLdb, _mysql_exceptions 
@@ -192,7 +193,9 @@ _SQL_query_wiki_info = \
 
 SQL_LIMIT_max = 1000
 
-wikitime = "%Y%m%d%H%M%S"
+wikitime    = "%Y%m%d%H%M%S"
+
+asctime_fmt = "%a %b %d %H:%M:%S %Y"
 
 
 def call_db(query, args=(), limit=SQL_LIMIT_max):
@@ -308,14 +311,17 @@ def displayhtmlpage(form):
 	start  = form.getvalue('start', dtbext.date.getTimeStmpNow(full=True))
 	period = form.getvalue('period', '24')
 
+	lang = locale.locale_alias.get(wiki, locale.locale_alias['en']).split('.')[0]
+	locale.setlocale(locale.LC_TIME, lang)
+
 	s = datetime.datetime.strptime(start, wikitime)
 	p = datetime.timedelta(hours=int(period))
 	end = s - p
 
 	data = {'output': ''}
 
-	data['output'] += "<b>Start</b>: %s (%s)<br>\n" % (start, asctime(strptime(start, wikitime)))
-	data['output'] += "<b>End</b>: %s (%s)<br>\n" % (start, end.ctime())
+	data['output'] += "<b>Start</b>: %s (%s)<br>\n" % (start, strftime(asctime_fmt, strptime(start, wikitime)))
+	data['output'] += "<b>End</b>: %s (%s)<br>\n" % (end.strftime(wikitime), end.strftime(asctime_fmt))
 	data['output'] += "<b>Period</b>: %sh<br>\n" % period
 
 	end = long( end.strftime(wikitime) )
@@ -353,7 +359,7 @@ def displayhtmlpage(form):
 				data['output'] += "</td>\n  <td>"
 #				data['output'] += str(subrow[0][1:])
 				try:
-					tmsp = asctime(strptime(subrow[0][2], wikitime)) + " (UTC)"
+					tmsp = strftime(asctime_fmt, strptime(subrow[0][2], wikitime)) + " (UTC)"
 				except ValueError:
 					tmsp = subrow[0][2] + " (!)"
 				data['output'] += tmsp
