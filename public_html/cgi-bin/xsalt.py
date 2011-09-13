@@ -90,9 +90,22 @@ form = cgi.FieldStorage()
 url  = form.getvalue('url', '')
 xslt = form.getvalue('xslt', '')
 
+# security
+# check url not to point to a local file on the server, e.g. 'file://'
+# (same code as used in subster.py)
+s1 = False
+for item in ['http://', 'https://']:
+    s1 = s1 or (url[:len(item)] == item)
+# check xslt does point to allowed local files on the server (the
+# '.xslt' in same directory as script) and not any other, e.g. '../'
+import os
+allowed = [item for item in os.listdir('.') if '.xslt' in item]
+s2 = (xslt in allowed)
+secure = s1 and s2
+
 print style.content_type
 
-if url and xslt:
+if secure and url and xslt:
     # http://docs.python.org/library/urllib.html#examples
     import urllib
     f = urllib.urlopen(url)
