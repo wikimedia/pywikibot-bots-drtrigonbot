@@ -258,7 +258,7 @@ def checkRecentEdits_db_it(cat, end, period, limit=SQL_LIMIT_max):
 		u = page[:2] # make list items unique, BUT YOU HAVE TO TAKE THE NEWEST ONE!!!
 		date = long(page[3])
 		if date > unique.get(u, end):
-			res.add( ((page[1], page[0], page[3]),) )
+			res.add( ((page[1], page[0], page[3], page[2], page[4]),) )
 			unique[u] = date
 
 	return res
@@ -363,6 +363,10 @@ def displayhtmlpage(form):
 				except ValueError:
 					tmsp = subrow[0][2] + " (!)"
 				data['output'] += tmsp
+				data['output'] += "</td>\n  <td>"
+				data['output'] += '<a href="http://%s.wikipedia.org/wiki/User:%s" target="_blank">%s</a>' % (wiki, subrow[0][3], subrow[0][3])
+				data['output'] += "</td>\n  <td>"
+				data['output'] += subrow[0][4]
 				data['output'] += "</td>\n</tr>\n"
 
 			data['output'] += "</table>\n"
