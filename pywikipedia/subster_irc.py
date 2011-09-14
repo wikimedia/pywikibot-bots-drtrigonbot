@@ -42,6 +42,7 @@ bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.fami
 
                   # this is still VERY "HACKY" first approach to satisfy
                   # http://de.wikipedia.org/wiki/Benutzer_Diskussion:Grip99#Subster
+                  # may be use: Benutzer:DrTrigon/Benutzer:DrTrigonBot/config.css
                   'difflink':   [ ( 'Wikipedia:Projektdiskussion/PRD-subst',  # target (with template)
                                     'Wikipedia:Projektdiskussion',  # source (url in template)
                                     {'subpages':  True,             # link params: ext. source with subpages?
@@ -90,21 +91,22 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
         #if botlist.isBot(user):
         #    return
         # test actual page against (template incl.) list
-        if match.group('page') in self.refs:
-            self.do_check(match.group('page'))
+        page = match.group('page').decode(self.site.encoding())
+        if page in self.refs:
+            self.do_check(page)
         else:
-            self.queue.append( match.group('page') ) # check later
+            self.queue.append( page ) # check later
         # refresh list and test (queued) old pages against new list
         (size, age) = ( len(self.queue), (time.time()-self.time) )
         if (size > 1000) or (age > 300):
             pywikibot.output(u'QUEUE: size=%i, age=%f' % (size, age))
             self.do_refresh_References()
             while self.queue:
-                page = self.queue.popleft()
-                if page in self.refs:
-                    self.do_check(page)
+                pop = self.queue.popleft()
+                if pop in self.refs:
+                    self.do_check(pop)
         # test actual page against 'difflink' list ("HACKY")
-        p = match.group('page')
+        p = page
         for (target, source, params) in bot_config['difflink']:
             if params['subpages']:
                 p = p.split('/')
@@ -112,8 +114,8 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
                 p = [p]
             if (source == p[0]):
                 pywikibot.output(u'DIFFLINK: target=%s, source=%s, params=%s' % (target, source, params))
-                text = u'[[%s]] / [[User:%s]] / %s' % ( match.group('page').decode(self.site.encoding()), 
-                                           match.group('user').decode(self.site.encoding()), 
+                text = u'[[%s]] / [[User:%s]] / %s' % ( page, 
+                                                        user, 
                                            match.group('summary').decode(self.site.encoding()) )
                 self.do_check(target, params=(text, self.site.lang, params['flags']))
 
