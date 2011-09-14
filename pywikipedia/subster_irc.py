@@ -42,7 +42,7 @@ bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.fami
 
                   # this is still VERY "HACKY" first approach to satisfy
                   # http://de.wikipedia.org/wiki/Benutzer_Diskussion:Grip99#Subster
-                  'difflink':   [ ( 'Benutzer:Grip99/PRD-subst',    # target (with template)
+                  'difflink':   [ ( 'Wikipedia:Projektdiskussion/PRD-subst',  # target (with template)
                                     'Wikipedia:Projektdiskussion',  # source (url in template)
                                     {'subpages':  True,             # link params: ext. source with subpages?
                                      'flags':     {'minorEdit': False, 'botflag': False}, # link params: edit flags?
