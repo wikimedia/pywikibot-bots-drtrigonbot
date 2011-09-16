@@ -467,7 +467,7 @@ class Site(object):
         }
 
         pywikibot.get_throttle()
-        pywikibot.output(u"Expanding string through the wiki parser.")
+        pywikibot.output(u"Expanding string through the wiki parser via API.")
 
         result = query.GetData(params, self)
         r = result[u'expandtemplates'][u'*']

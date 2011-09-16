@@ -848,7 +848,8 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
             if 'write2wiki' in debug:
                 head  = i18n.twtranslate(self.site,
-                                         'thirdparty-drtrigonbot-sum_disc-summary-head')
+                                         'thirdparty-drtrigonbot-sum_disc-summary-head') \
+                        + u' '
                 add   = i18n.twtranslate(self.site,
                                          'thirdparty-drtrigonbot-sum_disc-summary-add')
                 mod   = i18n.twtranslate(self.site,
@@ -1101,7 +1102,8 @@ class SumDiscPages(object):
                 data = { 'notify':        data[0], 
                          'page_sections': item, 
                          'history_link':  hist, 
-                         'page':          page.title(),
+                         'page':          page.title(), # backward compatibility (can be removed some time - may be)
+                         'page_size':     u'{{subst:PAGESIZE:%s}}' % page.title()
                          'user':          self._getLastEditor(page, data[2]), 
                          'time':          dtbext.date.getTime(data[3]) }
                 data = self.param['parse_msg'][u'*'] % data

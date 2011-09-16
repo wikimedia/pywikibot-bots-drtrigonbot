@@ -1,7 +1,7 @@
 # coding=utf-8
 msg = {
 'en': {
-'thirdparty-drtrigonbot-sum_disc-summary-head': u'robot ',
+'thirdparty-drtrigonbot-sum_disc-summary-head': u'robot',
 'thirdparty-drtrigonbot-sum_disc-summary-add': u'Discussion summary added: %(num)i entries',
 'thirdparty-drtrigonbot-sum_disc-summary-mod': u'Discussion summary updated: %(num)i entries in %(page)s',
 'thirdparty-drtrigonbot-sum_disc-summary-clean': u'Discussion summary added with clean up: %(num)i entries',
@@ -10,7 +10,9 @@ msg = {
 'thirdparty-drtrigonbot-sum_disc-notify-closed': u'Discussion closed',
 'thirdparty-drtrigonbot-sum_disc-notify-maintmsg': u'BOT MESSAGE',
 'thirdparty-drtrigonbot-sum_disc-notify-notify': u'Notification',
-'thirdparty-drtrigonbot-sum_disc-parse': u':* %(notify)s: %(page_sections)s - [%(history_link)s last edit] ({{PAGESIZE:%(page)s}} bytes) by %(user)s (%(time)s)',
+#'thirdparty-drtrigonbot-sum_disc-parse': u':* %(notify)s: %(page_sections)s - [%(history_link)s last edit] ({{PAGESIZE:%(page)s}} bytes) by %(user)s (%(time)s)',
+# change in TW either; by hands, with 'replace.py' or by re-import from svn:
+'thirdparty-drtrigonbot-sum_disc-parse': u':* %(notify)s: %(page_sections)s - [%(history_link)s last edit] (%(page_size)s bytes) by %(user)s (%(time)s)',
 'thirdparty-drtrigonbot-sum_disc-parse-closed': u':* %(notify)s: %(page)s all discussions have finished (surveillance stopped) - last edit by %(user)s (%(time)s)',
 'thirdparty-drtrigonbot-sum_disc-parse-notify': u':* %(notify)s: <span class="plainlinks">[%(page_link)s %(page)s]</span> - last edit by [[User:%(user)s]] (%(time)s)',
 'thirdparty-drtrigonbot-sum_disc-parse-warning': u':* Bot warning message: %(page)s "\'\'%(warning)s\'\'"',
@@ -19,7 +21,7 @@ msg = {
 'thirdparty-drtrigonbot-sum_disc-parse-nonhuman': u'(no human editor found)',
 },
 'de': {
-'thirdparty-drtrigonbot-sum_disc-summary-head': u'Bot: ',
+'thirdparty-drtrigonbot-sum_disc-summary-head': u'Bot:',
 'thirdparty-drtrigonbot-sum_disc-summary-add': u'Diskussions-Zusammenfassung hinzugefügt (%(num)i Einträge)',
 'thirdparty-drtrigonbot-sum_disc-summary-mod': u'Diskussions-Zusammenfassung aktualisiert (%(num)i Einträge in %(page)s)',
 'thirdparty-drtrigonbot-sum_disc-summary-clean': u'Diskussions-Zusammenfassung hinzugefügt und bereinigt (%(num)i Einträge)',
@@ -28,7 +30,8 @@ msg = {
 'thirdparty-drtrigonbot-sum_disc-notify-closed': u'Diskussion abgeschlossen',
 'thirdparty-drtrigonbot-sum_disc-notify-maintmsg': u'BOT MESSAGE',
 'thirdparty-drtrigonbot-sum_disc-notify-notify': u'Benachrichtigung',
-'thirdparty-drtrigonbot-sum_disc-parse': u':* %(notify)s: %(page_sections)s - [%(history_link)s letzte Bearbeitung] ({{PAGESIZE:%(page)s}} Bytes) von %(user)s (%(time)s)',
+#'thirdparty-drtrigonbot-sum_disc-parse': u':* %(notify)s: %(page_sections)s - [%(history_link)s letzte Bearbeitung] ({{PAGESIZE:%(page)s}} Bytes) von %(user)s (%(time)s)',
+'thirdparty-drtrigonbot-sum_disc-parse': u':* %(notify)s: %(page_sections)s - [%(history_link)s letzte Bearbeitung] (%(page_size)s Bytes) von %(user)s (%(time)s)',
 'thirdparty-drtrigonbot-sum_disc-parse-closed': u':* %(notify)s: %(page)s alle Diskussionen wurden beendet (Überwachung gestoppt) - letzte Bearbeitung von %(user)s (%(time)s)',
 'thirdparty-drtrigonbot-sum_disc-parse-notify': u':* %(notify)s: <span class="plainlinks">[%(page_link)s %(page)s]</span> - letzte Bearbeitung von [[User:%(user)s]] (%(time)s)',
 'thirdparty-drtrigonbot-sum_disc-parse-warning': u':* Bot Warn-Nachricht: %(page)s "\'\'%(warning)s\'\'"',
