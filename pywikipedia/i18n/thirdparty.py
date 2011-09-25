@@ -10,8 +10,6 @@ msg = {
 'thirdparty-drtrigonbot-sum_disc-notify-closed': u'Discussion closed',
 'thirdparty-drtrigonbot-sum_disc-notify-maintmsg': u'BOT MESSAGE',
 'thirdparty-drtrigonbot-sum_disc-notify-notify': u'Notification',
-#'thirdparty-drtrigonbot-sum_disc-parse': u':* %(notify)s: %(page_sections)s - [%(history_link)s last edit] ({{PAGESIZE:%(page)s}} bytes) by %(user)s (%(time)s)',
-# change in TW either; by hands, with 'replace.py' or by re-import from svn:
 'thirdparty-drtrigonbot-sum_disc-parse': u':* %(notify)s: %(page_sections)s - [%(history_link)s last edit] (%(page_size)s bytes) by %(user)s (%(time)s)',
 'thirdparty-drtrigonbot-sum_disc-parse-closed': u':* %(notify)s: %(page)s all discussions have finished (surveillance stopped) - last edit by %(user)s (%(time)s)',
 'thirdparty-drtrigonbot-sum_disc-parse-notify': u':* %(notify)s: <span class="plainlinks">[%(page_link)s %(page)s]</span> - last edit by [[User:%(user)s]] (%(time)s)',
@@ -30,7 +28,6 @@ msg = {
 'thirdparty-drtrigonbot-sum_disc-notify-closed': u'Diskussion abgeschlossen',
 'thirdparty-drtrigonbot-sum_disc-notify-maintmsg': u'BOT MESSAGE',
 'thirdparty-drtrigonbot-sum_disc-notify-notify': u'Benachrichtigung',
-#'thirdparty-drtrigonbot-sum_disc-parse': u':* %(notify)s: %(page_sections)s - [%(history_link)s letzte Bearbeitung] ({{PAGESIZE:%(page)s}} Bytes) von %(user)s (%(time)s)',
 'thirdparty-drtrigonbot-sum_disc-parse': u':* %(notify)s: %(page_sections)s - [%(history_link)s letzte Bearbeitung] (%(page_size)s Bytes) von %(user)s (%(time)s)',
 'thirdparty-drtrigonbot-sum_disc-parse-closed': u':* %(notify)s: %(page)s alle Diskussionen wurden beendet (Überwachung gestoppt) - letzte Bearbeitung von %(user)s (%(time)s)',
 'thirdparty-drtrigonbot-sum_disc-parse-notify': u':* %(notify)s: <span class="plainlinks">[%(page_link)s %(page)s]</span> - letzte Bearbeitung von [[User:%(user)s]] (%(time)s)',

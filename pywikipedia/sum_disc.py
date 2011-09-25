@@ -1102,7 +1102,7 @@ class SumDiscPages(object):
                 data = { 'notify':        data[0], 
                          'page_sections': item, 
                          'history_link':  hist, 
-                         'page':          page.title(), # backward compatibility (can be removed some time - may be)
+                         'page':          page.title(), # backward compatibility (can be removed depending on TW/i18n)
                          'page_size':     u'{{subst:PAGESIZE:%s}}' % page.title(),
                          'user':          self._getLastEditor(page, data[2]), 
                          'time':          dtbext.date.getTime(data[3]) }
