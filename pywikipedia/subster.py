@@ -358,9 +358,10 @@ class SubsterBot(dtbext.basic.BasicBot):
 
 
 def main():
-    bot = SubsterBot()    # for several user's, but what about complete automation (continous running...)
-    if len(pywikibot.handleArgs()) > 0:
-        for arg in pywikibot.handleArgs():
+    args = pywikibot.handleArgs()
+    bot  = SubsterBot()   # for several user's, but what about complete automation (continous running...)
+    if len(args) > 0:
+        for arg in args:
             if arg[:2] == "u'": arg = eval(arg)        # for 'bot_control.py' and unicode compatibility
             if   (arg[:5] == "-auto") \
                  or (arg[:5] == "-cron"):

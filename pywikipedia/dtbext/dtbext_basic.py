@@ -73,7 +73,7 @@ class BasicBot(basic.BasicBot):
             self._template_regex = re.compile('\{\{' + self._bot_config['TemplateName'] + '(.*?)\}\}', re.S)
 
             # init variable/dynamic objects
-            self.site = pywikibot.getSite()
+            self.site = pywikibot.getSite(code=pywikibot.default_code)
             dtbext.pywikibot.addAttributes( self.site )        # enhance to dtbext.pywikibot.Site
 
     ## @since   ? (ADDED)
