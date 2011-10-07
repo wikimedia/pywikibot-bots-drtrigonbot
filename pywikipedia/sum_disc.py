@@ -733,13 +733,17 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
             self.pages.promote_page() # hist -> news
 
-            entries = PageSections(page, self._param, self._user)
+            try:
+                entries = PageSections(page, self._param, self._user)
 
-            (page, page_rel, page_signed) = entries.check_rel()
+                (page, page_rel, page_signed) = entries.check_rel()
 
-            # update sum_disc_data in page (checksums, relevancies, ...)
-            self.pages.edit_news(page)
-            self.pages.edit_hist(page)
+                # update sum_disc_data in page (checksums, relevancies, ...)
+                self.pages.edit_news(page)
+                self.pages.edit_hist(page)
+            except pywikibot.IsRedirectPage:
+                pywikibot.output(u'Problem using redirect page at %s, tagging irrelevant...' % page.title(asLink=True))
+                (page_rel, page_signed) = (False, False)
 
             # if page is not relevant, don't list discussion
             if not page_rel:
