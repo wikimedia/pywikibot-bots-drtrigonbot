@@ -271,10 +271,13 @@ def displaystate(form):
 			data['botstate'] = botstate_img['orange']
 			color = html_color['orange']
 			state_text = "problem"
-		elif (lastrun <= 60):  # during run is also green (thus: lastrun <= 60)
+		elif (lastrun <= 5*60):  # during run is also green (thus: lastrun <= 5*60)
 			data['botstate'] = botstate_img['green']
 			color = html_color['green']
 			state_text = "running"
+		else:
+			data['botstate'] = botstate_img['orange']
+			color = html_color['orange']
 
 	if irc_status()[0]:
 		irc_color = html_color['green']
