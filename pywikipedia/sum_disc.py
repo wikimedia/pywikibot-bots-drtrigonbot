@@ -1201,9 +1201,9 @@ class PageSections(object):
         dtbext.pywikibot.addAttributes(page)
 
         # get content and sections (content was preloaded earlier)
+        #buf = page.get(force=True)
+        buf = page.get()
         try:
-            #buf = page.get(force=True)
-            buf = page.get()
             sections = page.getSections(minLevel=1)
         except pywikibot.Error:
             # sections could not be resoled process the whole page at once
