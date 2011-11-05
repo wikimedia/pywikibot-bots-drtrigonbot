@@ -273,7 +273,7 @@ class SubsterBot(dtbext.basic.BasicBot):
             data_file  = zip_buffer.namelist()[0]
             external_buffer = zip_buffer.open(data_file).read().decode('latin-1')
         elif (param['url'][:7] == u'mail://'):
-            mbox = SubsterMailbox(os.path.join(bot_config['data_path'], bot_config['mbox_file']))
+            mbox = SubsterMailbox(pywikibot.config.datafilepath(bot_config['data_path'], bot_config['mbox_file'], ''))
             # !!! access to full data (all attachements) should be possible too !!!
             external_buffer = mbox.find_data(param['url'], full=False)
             mbox.close()
