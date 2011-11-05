@@ -26,10 +26,12 @@ __version__ = '$Id$'
 #
 
 
-import re, sys
+import re, sys, os
 import difflib
 import BeautifulSoup
-import urllib, StringIO, zipfile
+import urllib, StringIO, zipfile, csv
+import mailbox, mimetypes, datetime, locale
+import openpyxl.reader.excel
 
 import pagegenerators
 import dtbext
@@ -51,6 +53,9 @@ bot_config = {    # unicode values
 
         'var_regex_str':    u'<!--SUBSTER-%(var1)s-->%(cont)s<!--SUBSTER-%(var2)s-->',
 
+        'mbox_file':         'mail_inbox',    # "drtrigon+subster@toolserver.org"
+        'data_path':         '../data/subster',
+
         # bot paramater/options
         'param_default':    { 'url':   '',
                     'regex':           '',
@@ -65,6 +70,7 @@ bot_config = {    # unicode values
                     'expandtemplates': 'False',        # DRTRIGON-93 (only with 'wiki')
                     'simple':          '',             # DRTRIGON-85
                     'zip':             'False',
+                    'excel':           'False',        # (beta)
                     },
 
         'msg': {
@@ -251,7 +257,7 @@ class SubsterBot(dtbext.basic.BasicBot):
         # (security: check url not to point to a local file on the server,
         #  e.g. 'file://' - same as used in xsalt.py)
         secure = False
-        for item in [u'http://', u'https://']:
+        for item in [u'http://', u'https://', u'mail://']:
             secure = secure or (param['url'][:len(item)] == item)
         param['wiki'] = eval(param['wiki'])
         if (not secure) and (not param['wiki']):
@@ -266,8 +272,18 @@ class SubsterBot(dtbext.basic.BasicBot):
             zip_buffer = zipfile.ZipFile(StringIO.StringIO(external_buffer))
             data_file  = zip_buffer.namelist()[0]
             external_buffer = zip_buffer.open(data_file).read().decode('latin-1')
+        elif (param['url'][:7] == u'mail://'):
+            mbox = SubsterMailbox(os.path.join(bot_config['data_path'], bot_config['mbox_file']))
+            # !!! access to full data (all attachements) should be possible too !!!
+            external_buffer = mbox.find_data(param['url'], full=False)
+            mbox.close()
         else:
             external_buffer = self.site.getUrl(param['url'], no_hostname = True)
+
+        # some intermediate processing (unzip, excel2csv, ...)
+        if not (param['excel'].lower() == 'false'):
+            external_buffer = self.xlsx2csv(param['excel'], external_buffer)
+        # !!! does zip deflate work with 'self.site.getUrl' ??!! (has to be make working!)
 
         if not eval(param['beautifulsoup']):    # DRTRIGON-88
             # 2.) regexp
@@ -355,6 +371,112 @@ class SubsterBot(dtbext.basic.BasicBot):
            Return the according (and compiled) regex object.
         """
         return re.compile((self._var_regex_str%{'var':var,'cont':cont}), re.S | re.I)
+
+    def xlsx2csv(self, sheet, content):
+        """Convert xlsx (EXCEL) data to csv format.
+        """
+
+        wb = openpyxl.reader.excel.load_workbook(StringIO.StringIO(content), use_iterators = True)
+
+        sheet_ranges = wb.get_sheet_by_name(name = sheet)
+
+        output = StringIO.StringIO()
+        spamWriter = csv.writer(output)
+
+        for row in sheet_ranges.iter_rows(): # it brings a new method: iter_rows()
+            spamWriter.writerow([ cell.internal_value for cell in row ])
+
+        content = output.getvalue()
+        output.close()
+
+        return content
+
+
+class SubsterMailbox(mailbox.mbox):
+    def __init__(self, mbox_file):
+        mailbox.mbox.__init__(self, mbox_file)
+        self.lock()
+
+        self.remove_duplicates()
+
+    def remove_duplicates(self):
+        """Find mails with same 'From' (sender) and remove all
+        except the most recent one.
+        """
+
+        unique = {}
+        remove = []
+        for i, message in enumerate(self):
+            sender   = message['from']       # Could possibly be None.
+            timestmp = message['date']       # Could possibly be None.
+
+            locale.setlocale(locale.LC_TIME, 'en_US')   # datetime in mails saved in 'en_US' by toolserver
+            timestmp = re.split('[+-]', timestmp)[0][:-1]
+            timestmp = datetime.datetime.strptime(timestmp, '%a, %d %b %Y %H:%M:%S')
+
+            if sender in unique:
+                (j, timestmp_j) = unique[sender]
+
+                if (timestmp >= timestmp_j): 
+                    remove.append( j )
+                else:
+                    remove.append( i )
+            else:
+                unique[sender] = (i, timestmp)
+
+        remove.reverse()
+        for i in remove:
+            self.remove(i)
+
+        self.flush()
+        #self.close()
+
+        if remove:
+            pywikibot.output('Removed %i depreciated email data source(s).' % len(remove))
+
+    def find_data(self, url, full=True):
+        """Find mail according to given 'From' (sender).
+        """
+
+        url = (url[:7], url[7:])
+        content = ''
+
+        for i, message in enumerate(self):
+            sender   = message['from']          # Could possibly be None.
+            subject  = message['subject']       # Could possibly be None.
+            timestmp = message['date']       # Could possibly be None.
+
+            if sender and url[1] in sender:
+                # data found
+                pywikibot.output('Found email data source:')
+                pywikibot.output('%i / %s / %s / %s' % (i, sender, subject, timestmp))
+
+                counter = 1
+                content = ''
+                for part in message.walk():
+                    # multipart/* are just containers
+                    if part.get_content_maintype() == 'multipart':
+                        continue
+                    # Applications should really sanitize the given filename so that an
+                    # email message can't be used to overwrite important files
+                    filename = part.get_filename()
+                    if filename or full:
+                        if not filename:
+                            ext = mimetypes.guess_extension(part.get_content_type())
+                            if not ext:
+                                # Use a generic bag-of-bits extension
+                                ext = '.bin'
+                            filename = 'part-%03d%s' % (counter, ext)
+                        counter += 1
+
+                        content += part.get_payload(decode=True)
+                        pywikibot.output('Found attachment: "' + filename + '"')
+
+                        if not full: break
+
+                break
+
+        return content
 
 
 def main():
