@@ -260,6 +260,7 @@ class SubsterBot(dtbext.basic.BasicBot):
         for item in [u'http://', u'https://', u'mail://']:
             secure = secure or (param['url'][:len(item)] == item)
         param['wiki'] = eval(param['wiki'])
+        param['zip']  = eval(param['zip'])
         if (not secure) and (not param['wiki']):
             return (content, substed_tags)
         if   param['wiki']:
@@ -267,23 +268,23 @@ class SubsterBot(dtbext.basic.BasicBot):
                 external_buffer = dtbext.pywikibot.Page(self.site, param['url']).get(expandtemplates=True)
             else:
                 external_buffer = self.load( dtbext.pywikibot.Page(self.site, param['url']) )
-        elif eval(param['zip']):
-            external_buffer = urllib.urlopen(param['url']).read()
-            zip_buffer = zipfile.ZipFile(StringIO.StringIO(external_buffer))
-            data_file  = zip_buffer.namelist()[0]
-            external_buffer = zip_buffer.open(data_file).read().decode('latin-1')
         elif (param['url'][:7] == u'mail://'):
             mbox = SubsterMailbox(pywikibot.config.datafilepath(bot_config['data_path'], bot_config['mbox_file'], ''))
             # !!! access to full data (all attachements) should be possible too !!!
             external_buffer = mbox.find_data(param['url'], full=False)
             mbox.close()
+        elif param['zip']:
+            # !!! does zip deflate work with 'self.site.getUrl' ??!! (has to be made working!)
+            external_buffer = urllib.urlopen(param['url']).read()
         else:
             external_buffer = self.site.getUrl(param['url'], no_hostname = True)
 
         # some intermediate processing (unzip, xlsx2csv, ...)
+        if param['zip']:
+            # !!! pass no. of file to extract (or may be name) in "param['zip']" !
+            external_buffer = self.unzip(external_buffer, 0)
         if not (param['xlsx'].lower() == 'false'):
-            external_buffer = self.xlsx2csv(param['xlsx'], external_buffer)
-        # !!! does zip deflate work with 'self.site.getUrl' ??!! (has to be make working!)
+            external_buffer = self.xlsx2csv(external_buffer, param['xlsx'])
 
         if not eval(param['beautifulsoup']):    # DRTRIGON-88
             # 2.) regexp
@@ -372,11 +373,21 @@ class SubsterBot(dtbext.basic.BasicBot):
         """
         return re.compile((self._var_regex_str%{'var':var,'cont':cont}), re.S | re.I)
 
-    def xlsx2csv(self, sheet, content):
+    def unzip(self, external_buffer, i):
+        """Convert zip data to plain format.
+        """
+
+        zip_buffer = zipfile.ZipFile(StringIO.StringIO(external_buffer))
+        data_file  = zip_buffer.namelist()[i]
+        external_buffer = zip_buffer.open(data_file).read().decode('latin-1')
+
+        return external_buffer
+
+    def xlsx2csv(self, external_buffer, sheet):
         """Convert xlsx (EXCEL) data to csv format.
         """
 
-        wb = openpyxl.reader.excel.load_workbook(StringIO.StringIO(content), use_iterators = True)
+        wb = openpyxl.reader.excel.load_workbook(StringIO.StringIO(external_buffer), use_iterators = True)
 
         sheet_ranges = wb.get_sheet_by_name(name = sheet)
 
@@ -386,10 +397,10 @@ class SubsterBot(dtbext.basic.BasicBot):
         for row in sheet_ranges.iter_rows(): # it brings a new method: iter_rows()
             spamWriter.writerow([ cell.internal_value for cell in row ])
 
-        content = output.getvalue()
+        external_buffer = output.getvalue()
         output.close()
 
-        return content
+        return external_buffer
 
 
 class SubsterMailbox(mailbox.mbox):
@@ -411,7 +422,7 @@ class SubsterMailbox(mailbox.mbox):
             timestmp = message['date']       # Could possibly be None.
 
             locale.setlocale(locale.LC_TIME, 'en_US')   # datetime in mails saved in 'en_US' by toolserver
-            timestmp = re.split('[+-]', timestmp)[0][:-1]
+            timestmp = re.split('[+-]', timestmp)[0].strip()
             timestmp = datetime.datetime.strptime(timestmp, '%a, %d %b %Y %H:%M:%S')
 
             if sender in unique:
