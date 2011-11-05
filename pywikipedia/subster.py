@@ -70,7 +70,7 @@ bot_config = {    # unicode values
                     'expandtemplates': 'False',        # DRTRIGON-93 (only with 'wiki')
                     'simple':          '',             # DRTRIGON-85
                     'zip':             'False',
-                    'excel':           'False',        # (beta)
+                    'xlsx':            'False',        # (beta)
                     },
 
         'msg': {
@@ -280,9 +280,9 @@ class SubsterBot(dtbext.basic.BasicBot):
         else:
             external_buffer = self.site.getUrl(param['url'], no_hostname = True)
 
-        # some intermediate processing (unzip, excel2csv, ...)
-        if not (param['excel'].lower() == 'false'):
-            external_buffer = self.xlsx2csv(param['excel'], external_buffer)
+        # some intermediate processing (unzip, xlsx2csv, ...)
+        if not (param['xlsx'].lower() == 'false'):
+            external_buffer = self.xlsx2csv(param['xlsx'], external_buffer)
         # !!! does zip deflate work with 'self.site.getUrl' ??!! (has to be make working!)
 
         if not eval(param['beautifulsoup']):    # DRTRIGON-88
