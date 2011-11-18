@@ -99,7 +99,8 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
         if page in self.refs:
             self.do_check(page)
         else:
-            self.queue.append( page ) # check later
+            if page not in self.queue:
+                self.queue.append( page ) # check later
         # refresh list and test (queued) old pages against new list
         (size, age) = ( len(self.queue), (time.time()-self.time) )
         if (size > 1000) or (age > 300):
