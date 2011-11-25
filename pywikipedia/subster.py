@@ -449,7 +449,7 @@ class SubsterMailbox(mailbox.mbox):
         """Find mail according to given 'From' (sender).
         """
 
-        url = (url[:7], url[7:])
+        url = (url[:7], ) + tuple(url[7:].split('/'))
         content = ''
 
         for i, message in enumerate(self):
@@ -462,30 +462,33 @@ class SubsterMailbox(mailbox.mbox):
                 pywikibot.output('Found email data source:')
                 pywikibot.output('%i / %s / %s / %s' % (i, sender, subject, timestmp))
 
-                counter = 1
-                content = ''
-                for part in message.walk():
-                    # multipart/* are just containers
-                    if part.get_content_maintype() == 'multipart':
-                        continue
-                    # Applications should really sanitize the given filename so that an
-                    # email message can't be used to overwrite important files
-                    filename = part.get_filename()
-                    if filename or full:
-                        if not filename:
-                            ext = mimetypes.guess_extension(part.get_content_type())
-                            if not ext:
-                                # Use a generic bag-of-bits extension
-                                ext = '.bin'
-                            filename = 'part-%03d%s' % (counter, ext)
-                        counter += 1
+                if   (url[2] == 'all'):
+                    content = message.as_string(True)
+                elif (url[2] == 'attachment'):
+                    counter = 1
+                    content = ''
+                    for part in message.walk():
+                        # multipart/* are just containers
+                        if part.get_content_maintype() == 'multipart':
+                            continue
+                        # Applications should really sanitize the given filename so that an
+                        # email message can't be used to overwrite important files
+                        filename = part.get_filename()
+                        if filename or full:
+                            if not filename:
+                                ext = mimetypes.guess_extension(part.get_content_type())
+                                if not ext:
+                                    # Use a generic bag-of-bits extension
+                                    ext = '.bin'
+                                filename = 'part-%03d%s' % (counter, ext)
+                            counter += 1
 
-                        content += part.get_payload(decode=True)
-                        pywikibot.output('Found attachment: "' + filename + '"')
+                            content += part.get_payload(decode=True)
+                            pywikibot.output('Found attachment: "' + filename + '"')
 
-                        if not full: break
+                            if not full: break
 
-                break
+                    break
 
         return content
 
