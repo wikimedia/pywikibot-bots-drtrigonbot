@@ -23,7 +23,7 @@ to make it usable from server, use: 'chmod 755 panel.py', which results in
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__='$Id: panel.py 203 2011-10-07 15:18:59Z drtrigon $'
+__version__='$Id$'
 #
 
 
@@ -120,7 +120,7 @@ def content(form):
 
         for i, message in enumerate(mbox):
             if (i != no): continue
-            text = cgi.escape(message.as_string())
+            text = cgi.escape(message.as_string(True))
             text = text.replace("\n", "<br>\n")
             buf.append( text )
         buf.append( '\n' )
