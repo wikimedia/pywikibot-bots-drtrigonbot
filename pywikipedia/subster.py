@@ -5,6 +5,14 @@ other wiki text data. Like dynamic text updating.
 
 Look at http://de.wikipedia.org/wiki/Benutzer:DrTrigon/Benutzer:DrTrigonBot/config.css
 for 'postproc' example code.
+
+Look at https://wiki.toolserver.org/view/Mail how to setup mail handling. The
+following code was used in file '$HOME/.forward+subster':
+--- --- --- --- --- --- --- --- --- --- 
+> ~/data/subster/mail_inbox
+--- --- --- --- --- --- --- --- --- --- 
+in order to enable mail (mbox style) storage in given file for address:
+drtrigon+subster@toolserver.org
 """
 ## @package subster
 #  @brief   Dynamic Text Substitutions Robot
