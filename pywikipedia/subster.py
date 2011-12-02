@@ -25,6 +25,10 @@ drtrigon+subster@toolserver.org
 #  @see http://pywikipediabot.sourceforge.net/
 #  @see http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
+#  External code / other modules used are listed here.
+#  @see https://bitbucket.org/ericgazoni/openpyxl/wiki/Home
+#  @see http://pypi.python.org/pypi/crontab/.11
+#
 #  @section LICENSE
 #
 #  Distributed under the terms of the MIT license.
@@ -40,6 +44,7 @@ import BeautifulSoup
 import urllib, StringIO, zipfile, csv
 import mailbox, mimetypes, datetime, locale
 import openpyxl.reader.excel
+import crontab
 
 import pagegenerators
 import dtbext
@@ -55,6 +60,7 @@ bot_config = {    # unicode values
         # prevent malicious code injection !
         'ConfigCSSPage':    u'Benutzer:DrTrigon/Benutzer:DrTrigonBot/config.css',
         'CodeTemplate':     u'\n%s(DATA, *args)\n',
+        'CRONMaxDelay':     1*24*60*60,       # bot runs daily
 
         # regex values
         'tag_regex':        re.compile('<.*?>', re.S | re.I),
@@ -79,6 +85,7 @@ bot_config = {    # unicode values
                     'simple':          '',             # DRTRIGON-85
                     'zip':             'False',
                     'xlsx':            'False',        # (beta)
+                    'cron':            '',             # (beta)
                     },
 
         'msg': {
@@ -100,8 +107,8 @@ magic_words = {} # no magic word substitution (for empty dict)
 
 # debug tools
 # (look at 'bot_control.py' for more info)
-debug = []                # no write, all users
-#debug.append( 'write2wiki' )        # write to wiki (operational mode)
+debug = []                       # no write, all users
+#debug.append( 'write2wiki' )    # write to wiki (operational mode)
 
 
 class SubsterBot(dtbext.basic.BasicBot):
@@ -255,6 +262,21 @@ class SubsterBot(dtbext.basic.BasicBot):
 
         substed_tags = []  # DRTRIGON-73
         prev_content = content
+
+        # 0.2.) check cron/date
+        if param['cron']:
+            # [min] [hour] [day of month] [month] [day of week]
+            # (date supported only, thus [min] and [hour] dropped)
+            if not (param['cron'][0] == '@'):
+                param['cron'] = '* * ' + param['cron']
+            entry = crontab.CronTab(param['cron'])
+            # find the delay from midnight (does not return 0.0 - but next)
+            delay = entry.next(datetime.datetime.now().replace(hour=0,minute=0,second=0,microsecond=0))
+
+            pywikibot.output(u'CRON delay for execution: %.3f (<= %i)' % (delay, bot_config['CRONMaxDelay']))
+
+            if not (delay <= bot_config['CRONMaxDelay']):
+                return (content, substed_tags)
 
         # 0.5.) check for 'simple' mode and get additional params
         if param['simple']:
