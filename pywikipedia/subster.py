@@ -271,7 +271,7 @@ class SubsterBot(dtbext.basic.BasicBot):
                 param['cron'] = '* * ' + param['cron']
             entry = crontab.CronTab(param['cron'])
             # find the delay from midnight (does not return 0.0 - but next)
-            delay = entry.next(datetime.datetime.now().replace(hour=0,minute=0,second=0,microsecond=0))
+            delay = entry.next(datetime.datetime.now().replace(hour=0,minute=0,second=0,microsecond=0)-datetime.timedelta(microseconds=1))
 
             pywikibot.output(u'CRON delay for execution: %.3f (<= %i)' % (delay, bot_config['CRONMaxDelay']))
 
