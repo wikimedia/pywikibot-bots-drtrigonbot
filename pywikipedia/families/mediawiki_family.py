@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: mediawiki_family.py 8955 2011-02-15 15:38:08Z xqt $'
+__version__ = '$Id: mediawiki_family.py 9574 2011-10-03 14:36:41Z xqt $'
 
 import family
 
@@ -59,10 +59,6 @@ class Family(family.Family):
             'wikinews', 'wikiversity', 'meta', 'test', 'incubator', 'commons',
             'species',
         ]
-
-
-    def version(self, code):
-        return '1.17wmf1'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

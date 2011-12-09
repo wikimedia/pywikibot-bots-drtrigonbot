@@ -20,7 +20,7 @@ to the older method using regular expressions.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: xmlreader.py 8589 2010-09-22 05:07:29Z xqt $'
+__version__='$Id: xmlreader.py 9042 2011-03-13 10:14:47Z xqt $'
 #
 
 import threading
@@ -193,10 +193,10 @@ class MediaWikiXmlHandler(xml.sax.handler.ContentHandler):
                          self.timestamp[17:19])
             self.title = self.title.strip()
             # Report back to the caller
-            entry = XmlEntry(self.title, self.id, 
-                             text, self.username, 
-                             self.ipedit, timestamp, 
-                             self.editRestriction, self.moveRestriction, 
+            entry = XmlEntry(self.title, self.id,
+                             text, self.username,
+                             self.ipedit, timestamp,
+                             self.editRestriction, self.moveRestriction,
                              self.revisionid, self.comment, self.isredirect)
             self.inRevisionTag = False
             self.callback(entry)
@@ -337,7 +337,7 @@ Consider installing the python-celementtree package.''')
             yield self._create_revision(elem)
             elem.clear()
             self.root.clear()
-    
+
     def _headers(self, elem):
         self.title = elem.findtext("{%s}title" % self.uri)
         self.pageid = elem.findtext("{%s}id" % self.uri)

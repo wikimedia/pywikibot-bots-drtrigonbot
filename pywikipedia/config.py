@@ -7,7 +7,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: config.py 8813 2010-12-29 22:27:03Z xqt $'
+__version__ = '$Id: config.py 9496 2011-09-03 15:42:26Z xqt $'
 
 import os, re
 import sys as __sys
@@ -74,7 +74,7 @@ authenticate = {}
 
 #    Secure Connection to all Wikimedia Projects
 SSL_connection = False
-    
+
 # password_file = ".passwd"
 # A password file with default passwords. For more information, please
 # see LoginManager.readPassword in login.py.
@@ -116,6 +116,11 @@ textfile_encoding = 'utf-8'
 
 # tkinter isn't yet ready
 userinterface = 'terminal'
+
+# i18n setting for user interface language
+# default is config.mylang or 'en'
+# isn't yet ready
+userinterface_lang = None
 
 # Should we transliterate characters that do not exist in the console
 # character set?

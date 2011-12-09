@@ -159,18 +159,17 @@ class BasicBot(basic.BasicBot):
                 #item[1] = re.compile((self._REGEX_subster_tag%{'var':'.*?','cont':'.*?'}), re.S | re.I).sub(u'', item[1])
                 item[1] = re.compile((self._REGEX_subster_tag%{u'var':u'.*?'}), re.S | re.I).sub(u'', item[1])
             try:    param = eval(item[1])
-            except:    param = {}
+            except: param = {}
             item = item[0]
             try:
-                if not (item[0] == u'*'):    continue
-            except:    continue
+                if not (item[0] == u'*'): continue
+            except: continue
             item = item[1:]
-            item = re.sub(u'\[', u'', item)
-            item = re.sub(u'\]', u'', item)
-            item = re.sub(u'Benutzer:', u'', item)
-            subitem = re.split(u'\/', item)        # recognize extended user entries with ".../..."
-            if len(subitem) > 1:            #  "
-                param[u'userResultPage'] = item    # save extended user info (without duplicates)
+            item = re.sub(u'[\[\]]', u'', item)
+            item = re.split(u':', item, maxsplit=1)[-1] # remove 'Benutzer(in)?:', 'User:', ...
+            subitem = re.split(u'\/', item)             # recognize extended user entries with ".../..."
+            if len(subitem) > 1:                        #  "
+                param[u'userResultPage'] = item         # save extended user info (without duplicates)
                 item = subitem[0]
             #users[item] = param            # drop duplicates directly
             user = userlib.User(self.site, item)

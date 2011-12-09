@@ -22,7 +22,7 @@ This module allow you to use the API in a simple and easy way.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: query.py 8619 2010-10-07 08:51:35Z xqt $'
+__version__ = '$Id: query.py 9750 2011-11-11 08:50:34Z xqt $'
 #
 
 import wikipedia, time
@@ -30,21 +30,22 @@ try:
     #For Python 2.6 newer
     import json
     if not hasattr(json, 'loads'):
-        # 'json' can also be the name in for 
+        # 'json' can also be the name in for
         # http://pypi.python.org/pypi/python-json
         raise ImportError
 except ImportError:
     import simplejson as json
-    
 
-def GetData(params, site = None, useAPI = True, retryCount = 5, encodeTitle = True, sysop = False, back_response = False):
+
+def GetData(params, site=None, useAPI=True, retryCount=5, encodeTitle=True,
+            sysop=False, back_response=False):
     """Get data from the query api, and convert it into a data object
     """
     if not site:
         site = wikipedia.getSite()
     data = {}
     titlecount = 0
-    
+
     for k,v in params.iteritems():
         if k == u'file':
             data[k] = v
@@ -55,8 +56,8 @@ def GetData(params, site = None, useAPI = True, retryCount = 5, encodeTitle = Tr
                 data[k] = unicode(ListToParam(v))
             else:
                 params[k] = unicode(ListToParam(v))
-            
-        elif not IsString(v):
+
+        elif not isinstance(v,basestring):
             params[k] = unicode(v)
         elif type(v) == unicode:
             params[k] = ToUtf8(v)
@@ -66,16 +67,16 @@ def GetData(params, site = None, useAPI = True, retryCount = 5, encodeTitle = Tr
 
     if not useAPI:
         params['noprofile'] = ''
-    
+
     if data:
         for k in data:
-            del params[k] 
-    
+            del params[k]
+
     if wikipedia.verbose: #dump params info.
         wikipedia.output(u"==== API action:%s ====" % params[u'action'])
         if data and 'file' not in data:
-            wikipedia.output(u"%s: (%d items)" % (data.keys()[0], titlecount ) )
-        
+            wikipedia.output(u"%s: (%d items)" % (data.keys()[0], titlecount))
+
         for k, v in params.iteritems():
             if k not in ['action', 'format', 'file', 'xml', 'text']:
                 if k == 'lgpassword' and wikipedia.verbose == 1:
@@ -84,12 +85,15 @@ def GetData(params, site = None, useAPI = True, retryCount = 5, encodeTitle = Tr
                     v = v.decode('utf-8')
                 wikipedia.output(u"%s: %s" % (k, v) )
         wikipedia.output(u'-' * 16 )
-        
+
 
     postAC = [
-        'edit', 'login', 'purge', 'rollback', 'delete', 'undelete', 'protect', 'parse',
-        'block', 'unblock', 'move', 'emailuser','import', 'userrights', 'upload',
+        'edit', 'login', 'purge', 'rollback', 'delete', 'undelete', 'protect',
+        'parse', 'block', 'unblock', 'move', 'emailuser','import', 'userrights',
+        'upload', 'patrol'
     ]
+    if site.versionnumber() >= 18:
+        postAC.append('watch')
     if useAPI:
         if params['action'] in postAC:
             path = site.api_address()
@@ -102,7 +106,8 @@ def GetData(params, site = None, useAPI = True, retryCount = 5, encodeTitle = Tr
 
     if wikipedia.verbose:
         if titlecount > 1:
-            wikipedia.output(u"Requesting %d %s from %s" % (titlecount, data.keys()[0], site))
+            wikipedia.output(u"Requesting %d %s from %s"
+                             % (titlecount, data.keys()[0], site))
         else:
             wikipedia.output(u"Requesting API query from %s" % site)
 
@@ -128,7 +133,7 @@ def GetData(params, site = None, useAPI = True, retryCount = 5, encodeTitle = Tr
 
             # This will also work, but all unicode strings will need to be converted from \u notation
             # decodedObj = eval( jsontext )
-            
+
             jsontext = json.loads( jsontext )
 
             if "error" in jsontext:
@@ -137,7 +142,7 @@ def GetData(params, site = None, useAPI = True, retryCount = 5, encodeTitle = Tr
                     wikipedia.output('Received a bad login token error from the server.  Attempting to refresh.')
                     params['token'] = site.getToken(sysop = sysop, getagain = True)
                     continue
-            
+
             if back_response:
                 return res, jsontext
             else:
@@ -149,7 +154,7 @@ def GetData(params, site = None, useAPI = True, retryCount = 5, encodeTitle = Tr
 
             if 'Wikimedia Error' in jsontext: #wikimedia server error
                 raise wikipedia.ServerError
-            
+
             retryCount -= 1
             wikipedia.output(u"Error downloading data: %s" % error)
             wikipedia.output(u"Request %s:%s" % (site.lang, path))
@@ -163,9 +168,6 @@ def GetData(params, site = None, useAPI = True, retryCount = 5, encodeTitle = Tr
                     retry_idle_time = 30
             else:
                 wikipedia.debugDump('ApiGetDataParse', site, str(error) + '\n%s\n%s' % (site.hostname(), path), jsontext)
-
-
-
     raise lastError
 
 def GetInterwikies(site, titles, extraParams = None ):
@@ -249,13 +251,15 @@ def ConvToList( item ):
     """
     if item is None:
         return []
-    elif IsString(item):
+    elif isinstance(item,basestring):
         return [item]
     else:
         return item
 
 def ListToParam( list ):
-    """Convert a list of unicode strings into a UTF8 string separated by the '|' symbols
+    """Convert a list of unicode strings into a UTF8 string separated by the '|'
+    symbols
+
     """
     list = ConvToList( list )
     if len(list) == 0:
@@ -263,10 +267,24 @@ def ListToParam( list ):
 
     encList = ''
     # items may not have one symbol - '|'
-    for l in list:
-        if type(l) == str and u'|' in l:
-            raise wikipedia.Error("item '%s' contains '|' symbol" % l )
-        encList += ToUtf8(l) + u'|'
+    for item in list:
+        if isinstance(item, basestring):
+            if u'|' in item:
+                raise wikipedia.Error(u"item '%s' contains '|' symbol" % item)
+            encList += ToUtf8(item) + u'|'
+        elif type(item) == int:
+            encList += ToUtf8(item) + u'|'
+        elif isinstance(item, wikipedia.Page):
+            encList += ToUtf8(item.title()) + u'|'
+        elif item.__class__.__name__ == 'User':
+            # delay loading this until it is needed
+            import userlib
+            encList += ToUtf8(item.name()) + u'|'
+        else:
+            raise wikipedia.Error(u'unknown item class %s'
+                                  % item.__class__.__name__)
+
+    # strip trailing '|' before returning
     return encList[:-1]
 
 def ToUtf8(s):
@@ -277,5 +295,14 @@ def ToUtf8(s):
             s = s.decode(wikipedia.config.console_encoding)
     return s
 
-def IsString(s):
-    return type( s ) in [str, unicode]
+if __name__ == '__main__':
+    """
+    Testing code for this module
+    """
+    wikipedia.output("""
+    This module is not for direct usage from the command prompt.
+    """)
+    # unit tests
+    import tests.test_query
+    import unittest
+    unittest.main(tests.test_query)

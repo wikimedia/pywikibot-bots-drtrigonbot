@@ -19,12 +19,13 @@ All other parameters will be regarded as part of the title of a single page,
 and the bot will only work on that single page.
 """
 #
-# (C) Pywikipedia bot team, 2008-2010
+# (C) Pywikipedia bot team, 2008-2011
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: djvutext.py 8520 2010-09-11 10:40:05Z xqt $'
+__version__ = '$Id: djvutext.py 9692 2011-10-30 15:03:29Z xqt $'
 import wikipedia as pywikibot
+from pywikibot import i18n
 import os, sys
 import config, codecs
 
@@ -35,24 +36,6 @@ docuReplacements = {
 
 
 class DjVuTextBot:
-    # Edit summary message that should be used.
-    # NOTE: Put a good description here, and add translations, if possible!
-    msg = {
-        'ar': u'روبوت: إنشاء صفحة بنص مستخرج من DjVu',
-        'en': u'Robot: Creating page with text extracted from DjVu',
-        'fa': u'ربات: ایجاد صفحه با متنی که از دژاوو استخراج شد',
-        'fr': u'Bot: Creating page with texte extracted from DjVu',
-        'nl': u'Bot: pagina aangemaakt met tekst geëxtraheerd uit DjVu-bestand',
-        'pt': u'Bot: criando página com texto extraído do DjVu',
-    }
-    # On English Wikisource, {{blank page}} is used to track blank pages.
-    # It may be omitted by adding an empty string like has been done for 'fr'.
-    blank = {
-        'en': u'{{blank page}}',
-        'fa': u'',
-        'fr': u'',
-        'pt': u'',
-    }
 
     def __init__(self, djvu, index, pages, ask=False, debug=False):
         """
@@ -92,15 +75,16 @@ class DjVuTextBot:
 
     def run(self):
         # Set the edit summary message
-        pywikibot.setAction(pywikibot.translate(pywikibot.getSite(), self.msg))
+        pywikibot.setAction(i18n.twtranslate(pywikibot.getSite(),
+                                             'djvutext-creating'))
 
         linkingPage = pywikibot.Page(pywikibot.getSite(), self.index)
-        self.prefix = linkingPage.titleWithoutNamespace()
+        self.prefix = linkingPage.title(withNamespace=False)
         if self.prefix[0:6] == 'Liber:':
             self.prefix = self.prefix[6:]
         pywikibot.output(u"Using prefix %s" % self.prefix)
         gen = self.PagesGenerator()
-   
+
         site = pywikibot.getSite()
         self.username = config.usernames[site.family.name][site.lang]
 
@@ -116,7 +100,7 @@ class DjVuTextBot:
         s = f.read()
         f.close()
         return s.find('TXTz') >= 0
-      
+
     def get_page(self, pageno):
         pywikibot.output(unicode("fetching page %d" % (pageno)))
         cmd = u"djvutxt --page=%d \"%s\" \"%s.out\"" \
@@ -138,13 +122,17 @@ class DjVuTextBot:
                               % (page_namespace, self.prefix, pageno))
         exists = page.exists()
         djvutxt = self.get_page(pageno)
-        if not djvutxt:
-            djvutxt = pywikibot.translate(pywikibot.getSite(), self.blank)
-        text = u'<noinclude>{{PageQuality|1|%s}}<div class="pagetext">\n\n\n</noinclude>%s<noinclude><references/></div></noinclude>' % (self.username,djvutxt)
 
-        # convert to wikisyntax
-        # this adds a second line feed, which makes a new paragraph
-        text = text.replace('', "\n")
+        if not djvutxt:
+            text = u'<noinclude><pagequality level="0" user="%s" /><div class="pagetext">\n\n\n</noinclude><noinclude><references/></div></noinclude>' % (self.username)
+        else:
+            text = u'<noinclude><pagequality level="1" user="%s" /><div class="pagetext">\n\n\n</noinclude>%s<noinclude><references/></div></noinclude>' % (self.username,djvutxt)
+
+            # convert to wikisyntax
+            # this adds a second line feed, which makes a new paragraph
+            text = text.replace('', "\n") # US /x1F
+            text = text.replace('', "\n") # GS /x1D
+            text = text.replace('', "\n") # FF /x0C
 
         # only save if something was changed
         # automatically ask if overwriting an existing page
@@ -154,7 +142,8 @@ class DjVuTextBot:
             ask = True
             old_text = page.get()
             if old_text == text:
-                pywikibot.output(u"No changes were needed on %s" % page.aslink())
+                pywikibot.output(u"No changes were needed on %s"
+                                 % page.title(asLink=True))
                 return
         else:
             old_text = ''
@@ -174,7 +163,8 @@ class DjVuTextBot:
                 # Save the page
                 page.put_async(text)
             except pywikibot.LockedPage:
-                pywikibot.output(u"Page %s is locked; skipping." % page.aslink())
+                pywikibot.output(u"Page %s is locked; skipping."
+                                 % page.title(asLink=True))
             except pywikibot.EditConflict:
                 pywikibot.output(u'Skipping %s because of edit conflict' % (page.title()))
             except pywikibot.SpamfilterError, error:
@@ -227,7 +217,8 @@ def main():
                                         u"%s:%s" % (index_namespace, index))
         if not index_page.exists():
             raise pywikibot.NoPage(u"Page '%s' does not exist" % index)
-        pywikibot.output(u"uploading text from %s to %s" % (djvu, index_page.aslink()) )
+        pywikibot.output(u"uploading text from %s to %s"
+                         % (djvu, index_page.title(asLink=True)) )
         bot = DjVuTextBot(djvu, index, pages, ask, dry)
         if not bot.has_text():
             raise ValueError("No text layer in djvu file")

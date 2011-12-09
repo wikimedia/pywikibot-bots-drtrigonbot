@@ -9,8 +9,8 @@ TODO:
 *Error checking
 """
 import sys, re
-sys.path.append(re.sub('/[^/]*$', '', sys.path[0])) 
-sys.path.append('..')
+sys.path.append(re.sub('/[^/]*$', '', sys.path[0]))
+sys.path.insert(1, '..')
 import wikipedia, config, userlib
 
 
@@ -38,7 +38,7 @@ def readtalk(lang, familyName, sysop = False):
 def main():
     # Get a dictionary of all the usernames
     all = sysop = False
-    
+
     for arg in wikipedia.handleArgs():
         if arg.startswith('-all'):
             all = True

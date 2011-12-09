@@ -54,13 +54,13 @@ python blockpageschecker.py -show -protectedpages:4
 """
 #
 # (C) Monobi a.k.a. Wikihermit, 2007
-# (C) Filnik, 2007-2010
+# (C) Filnik, 2007-2011
 # (C) NicDumZ, 2008-2009
 # (C) Pywikipedia bot team, 2007-2010
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: blockpageschecker.py 8711 2010-11-07 21:00:57Z xqt $'
+__version__ = '$Id: blockpageschecker.py 9696 2011-10-30 17:02:05Z xqt $'
 #
 
 import re, webbrowser
@@ -267,7 +267,7 @@ def main():
                 generator.append(pageCat)
         pywikibot.output(u'Categories loaded, start!')
     # Main Loop
-    preloadingGen = pagegenerators.PreloadingGenerator(generator, pageNumber = 60)
+    preloadingGen = pagegenerators.PreloadingGenerator(generator, pageNumber=60)
     for page in preloadingGen:
         pagename = page.title(asLink=True)
         pywikibot.output('Loading %s...' % pagename)
@@ -356,9 +356,12 @@ def main():
             # We tried to fix edit-protection templates, but it did not work.
             pywikibot.output('Warning : No edit-protection template could be found')
 
-        if moveBlockCheck:
+        if moveBlockCheck and changes > -1:
             # checking move protection now
-            moveRestr = restrictions['move']
+            try:
+                moveRestr = restrictions['move']
+            except KeyError:
+                moveRestr = False
             changes = -1
 
             if not moveRestr:

@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: meta_family.py 8955 2011-02-15 15:38:08Z xqt $'
+__version__ = '$Id: meta_family.py 9749 2011-11-11 03:29:50Z xqt $'
 
 import family
 
@@ -131,6 +131,19 @@ class Family(family.Family):
         self.namespaces[201] = {
             '_default': u'Grants talk',
         }
+        self.namespaces[202] = {
+            '_default': u'Research',
+            'meta': [u'Research', u'R'],
+        }
+        self.namespaces[203] = {
+            '_default': u'Research talk',
+        }
+        self.namespaces[1198] = {
+            '_default': u'Translations',
+        }
+        self.namespaces[1199] = {
+            '_default': u'Translations talk',
+        }
 
         self.interwiki_forward = 'wikipedia'
         self.cross_allowed = ['meta',]
@@ -139,9 +152,6 @@ class Family(family.Family):
             'wikinews', 'wikiversity', 'mediawiki', 'test', 'incubator',
             'commons', 'species',
         ]
-
-    def version(self,code):
-        return '1.17wmf1'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

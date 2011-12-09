@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: incubator_family.py 8970 2011-02-16 11:57:50Z xqt $'
+__version__ = '$Id: incubator_family.py 9588 2011-10-06 07:22:29Z xqt $'
 
 import family
 
@@ -33,9 +33,6 @@ class Family(family.Family):
             'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews', 'wikiversity',
             'meta', 'mediawiki', 'test', 'commons', 'species',
         ]
-
-    def version(self, code):
-        return '1.17wmf1'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

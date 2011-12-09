@@ -19,7 +19,7 @@ Options/parameters:
 ## @package bot_control
 #  @brief   General DrTrigonBot Robot(s) Caller
 #
-#  @copyright Dr. Trigon, 2008-2010
+#  @copyright Dr. Trigon, 2008-2011
 #
 #  @todo      look also at and learn from daemonize.py (@ref daemonize)
 #
@@ -83,8 +83,8 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '8990'
-__release_ver__   = '1.1-pre'
+__framework_rev__ = '9793'
+__release_ver__   = '1.1'
 __release_rev__   = '%i'
 #
 

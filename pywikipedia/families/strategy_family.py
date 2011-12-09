@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: strategy_family.py 8963 2011-02-16 08:34:10Z xqt $'
+__version__ = '$Id: strategy_family.py 9574 2011-10-03 14:36:41Z xqt $'
 
 import family, config
 
@@ -30,9 +30,6 @@ class Family(family.Family):
         }
 
         self.interwiki_forward = 'wikipedia'
-
-    def version(self, code):
-        return '1.17wmf1'
 
     def dbName(self, code):
         return 'strategywiki_p'

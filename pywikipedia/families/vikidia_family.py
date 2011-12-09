@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-__version__ = '$Id: vikidia_family.py 8799 2010-12-26 12:27:05Z xqt $'
+__version__ = '$Id: vikidia_family.py 9015 2011-02-28 17:57:55Z lcawte $'
 
 import family
 
@@ -96,7 +96,7 @@ class Family(family.Family):
     # Which version of MediaWiki is used? REQUIRED
     def version(self, code):
         # Replace with the actual version being run on your wiki
-        return '1.15.2'
+        return '1.16.0'
 
     def code2encoding(self, code):
         """Return the encoding for a specific language wiki"""

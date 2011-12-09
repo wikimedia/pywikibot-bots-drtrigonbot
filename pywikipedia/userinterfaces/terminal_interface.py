@@ -4,7 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: terminal_interface.py 7214 2009-09-06 14:16:31Z alexsh $'
+__version__ = '$Id: terminal_interface.py 9044 2011-03-13 10:26:54Z xqt $'
 
 import config, transliteration
 import traceback, re, sys
@@ -269,7 +269,7 @@ class UI:
     def editText(self, text, jumpIndex = None, highlight = None):
         """
         Uses a Tkinter edit box because we don't have a console editor
-        
+
         Parameters:
             * text      - a Unicode string
             * jumpIndex - an integer: position at which to put the caret

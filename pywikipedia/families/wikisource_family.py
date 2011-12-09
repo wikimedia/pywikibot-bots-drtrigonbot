@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikisource_family.py 8974 2011-02-17 00:17:38Z xqt $'
+__version__ = '$Id: wikisource_family.py 9790 2011-12-08 06:02:41Z xqt $'
 
 # The Wikimedia family that is known as Wikisource
 
@@ -11,12 +11,12 @@ class Family(family.Family):
         self.name = 'wikisource'
 
         self.languages_by_size = [
-            'en', 'ru', 'zh', 'pt', 'fr', 'de', 'it', 'es', 'he', 'ar', 'hu',
-            'fa', 'pl', 'th', 'cs', 'ro', 'hr', 'te', 'fi', 'sv', 'bn', 'vi',
-            'tr', 'nl', 'sl', 'ko', 'uk', 'sr', 'ja', 'el', 'la', 'az', 'ml',
-            'li', 'br', 'yi', 'ca', 'is', 'hy', 'bs', 'mk', 'ta', 'vec', 'id',
-            'da', 'no', 'et', 'bg', 'lt', 'gl', 'kn', 'cy', 'sk', 'zh-min-nan',
-            'fo',
+            'en', 'ru', 'fr', 'zh', 'pt', 'de', 'it', 'es', 'he', 'fa', 'ar',
+            'pl', 'hu', 'cs', 'th', 'ro', 'ko', 'hr', 'te', 'fi', 'sv', 'sl',
+            'vi', 'nl', 'bn', 'tr', 'el', 'sa', 'sr', 'uk', 'ja', 'ml', 'la',
+            'br', 'ca', 'hy', 'li', 'yi', 'az', 'mk', 'vec', 'ta', 'is', 'bs',
+            'no', 'da', 'id', 'eo', 'et', 'bg', 'sah', 'lt', 'gl', 'kn', 'cy',
+            'sk', 'fo', 'zh-min-nan',
         ]
 
         if family.config.SSL_connection:
@@ -29,85 +29,135 @@ class Family(family.Family):
             self.langs['-'] = 'wikisource.org'
 
         # Override defaults
-        self.namespaces[2]['pl'] = 'Wikiskryba'
-        self.namespaces[3]['pl'] = 'Dyskusja wikiskryby'
+        self.namespaces[10]['zh'] = [u'Template', u'模板', u'样板', u'樣板']
+        self.namespaces[12]['zh'] = [u'Help', u'帮助', u'幫助']
+        self.namespaces[14]['zh'] = [u'Category', u'分类', u'分類']
+        self.namespaces[3]['ca'] = [u'Usuari Discussió']
+        self.namespaces[2]['ca'] = [u'Usuari']
+        self.namespaces[3]['cs'] = [u'Diskuse s uživatelem', u'Diskuse s uživatelkou', u'Uživatel diskuse', u'Uživatelka diskuse']
+        self.namespaces[2]['cs'] = [u'Uživatel', u'Uživatelka']
+        self.namespaces[12]['nl'] = [u'Help']
+        self.namespaces[3]['pt'] = [u'Utilizador Discussão', u'Usuário Discussão', u'Utilizadora Discussão']
+        self.namespaces[2]['pt'] = [u'Utilizador', u'Usuário', u'Utilizadora']
+        self.namespaces[6]['vec'] = [u'File', u'Imagine']
+        self.namespaces[3]['pl'] = [u'Dyskusja wikiskryby', u'Dyskusja użytkownika', u'Dyskusja użytkowniczki']
+        self.namespaces[2]['pl'] = [u'Wikiskryba', u'Użytkownik', u'Użytkowniczka']
+        self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisateur']
+        self.namespaces[2]['fr'] = [u'Utilisateur']
+        self.namespaces[15]['bn'] = [u'বিষয়শ্রেণী আলোচনা']
+        self.namespaces[14]['bn'] = [u'বিষয়শ্রেণী']
+        self.namespaces[3]['de'] = [u'Benutzer Diskussion', u'Benutzerin Diskussion']
+        self.namespaces[13]['de'] = [u'Hilfe Diskussion']
+        self.namespaces[12]['de'] = [u'Hilfe']
+        self.namespaces[9]['da'] = [u'MediaWiki diskussion', u'MediaWiki-diskussion']
+        self.namespaces[13]['da'] = [u'Hjælp diskussion', u'Hjælp-diskussion']
+        self.namespaces[3]['ro'] = [u'Discuție Utilizator', u'Discuţie Utilizator']
 
         # Most namespaces are inherited from family.Family.
         # Translation used on all wikis for the different namespaces.
         # (Please sort languages alphabetically)
         # You only need to enter translations that differ from _default.
         self.namespaces[4] = {
-            '_default': [u'Wikisource', self.namespaces[4]['_default']],
+            '_default': self.namespaces[4]['_default'],
+            '-': u'Wikisource',
             'ang': u'Wicifruma',
-            'ar': u'ويكي مصدر',
+            'ar': [u'ويكي مصدر', u'وم'],
             'az': u'VikiMənbə',
             'bg': u'Уикиизточник',
-            'bn': u'উইকিসংকলন',
+            'bn': [u'উইকিসংকলন', u'Wikisource'],
             'br': u'Wikimammenn',
-            'bs': u'Wikizvor',
+            'bs': [u'Wikizvor', u'Wikisource'],
             'ca': u'Viquitexts',
-            'cs': u'Wikizdroje',
-            'cy': u'Wicitestun',
+            'cs': [u'Wikizdroje', u'WS', u'WZ', u'Wikisource'],
+            'cy': [u'Wicitestun', u'Wikisource'],
+            'da': u'Wikisource',
+            'de': [u'Wikisource', u'WS'],
             'el': u'Βικιθήκη',
+            'en': u'Wikisource',
+            'eo': [u'Vikifontaro', u'Wikisource'],
+            'es': u'Wikisource',
             'et': u'Vikitekstid',
             'fa': u'ویکی‌نبشته',
-            'fi': u'Wikiaineisto',
-            'fo': u'Wikiheimild',
+            'fi': [u'Wikiaineisto', u'Wikisource'],
+            'fo': [u'Wikiheimild', u'Wikisource'],
+            'fr': u'Wikisource',
+            'gl': u'Wikisource',
             'he': u'ויקיטקסט',
             'hr': u'Wikizvor',
             'ht': u'Wikisòrs',
             'hu': u'Wikiforrás',
             'hy': u'Վիքիդարան',
-            'is': u'Wikiheimild',
-            'ko': u'위키문헌',
-            'la': u'Vicifons',
-            'li': u'Wikibrónne',
-            'lt': u'Vikišaltiniai',
+            'id': u'Wikisource',
+            'is': [u'Wikiheimild', u'Wikisource'],
+            'it': u'Wikisource',
+            'ja': u'Wikisource',
+            'kn': u'Wikisource',
+            'ko': [u'위키문헌', u'Wikisource'],
+            'la': [u'Vicifons', u'Wikisource'],
+            'li': [u'Wikibrónne', u'Wikisource'],
+            'lt': [u'Vikišaltiniai', u'Wikisource'],
+            'mk': u'Wikisource',
             'ml': u'വിക്കിഗ്രന്ഥശാല',
             'nb': u'Wikikilden',
+            'nl': u'Wikisource',
             'no': u'Wikikilden',
-            'pl': u'Wikiźródła',
+            'pl': [u'Wikiźródła', u'WS'],
+            'pt': u'Wikisource',
+            'ro': u'Wikisource',
             'ru': u'Викитека',
+            'sa': u'Wikisource',
+            'sah': [u'Бикитиэкэ', u'Wikisource'],
+            'sk': u'Wikisource',
             'sl': u'Wikivir',
-            'sr': u'Викизворник',
-            'th': u'วิกิซอร์ซ',
+            'sr': [u'Викизворник', u'Wikisource'],
+            'sv': u'Wikisource',
+            'ta': [u'Wikisource', u'விக்கிபீடியா'],
+            'te': u'Wikisource',
+            'th': [u'วิกิซอร์ซ', u'Wikisource'],
             'tr': u'VikiKaynak',
+            'uk': [u'Wikisource', u'ВД'],
+            'vec': u'Wikisource',
+            'vi': u'Wikisource',
             'yi': [u'װיקיביבליאָטעק', u'וויקיביבליאטעק'],
-            'zh': [u'Wikisource', u'维基文库'],
+            'zh': u'Wikisource',
+            'zh-min-nan': u'Wikisource',
         }
         self.namespaces[5] = {
-            '_default': [u'Wikisource talk', self.namespaces[5]['_default']],
+            '_default': self.namespaces[5]['_default'],
+            '-': u'Wikisource talk',
             'ang': u'Wicifruma talk',
-            'ar': u'نقاش ويكي مصدر',
+            'ar': [u'نقاش ويكي مصدر', u'نو'],
             'az': u'VikiMənbə müzakirəsi',
             'bg': u'Уикиизточник беседа',
-            'bn': u'উইকিসংকলন আলোচনা',
+            'bn': [u'উইকিসংকলন আলোচনা', u'উইকিসংকলন আলাপ'],
             'br': u'Kaozeadenn Wikimammenn',
             'bs': u'Razgovor s Wikizvor',
             'ca': u'Viquitexts Discussió',
-            'cs': u'Diskuse k Wikizdrojům',
+            'cs': [u'Diskuse k Wikizdrojům', u'Wikisource diskuse', u'Wikisource talk', u'Wikizdroje diskuse'],
             'cy': u'Sgwrs Wicitestun',
             'da': [u'Wikisource diskussion', u'Wikisource-diskussion'],
             'de': u'Wikisource Diskussion',
             'el': u'Βικιθήκη συζήτηση',
-            'es': u'Wikisource Discusión',
-            'et': u'Vikitekstide arutelu',
+            'en': u'Wikisource talk',
+            'eo': u'Vikifontaro diskuto',
+            'es': u'Wikisource discusión',
+            'et': [u'Vikitekstide arutelu', u'Vikitekstid arutelu'],
             'fa': u'بحث ویکی‌نبشته',
             'fi': u'Keskustelu Wikiaineistosta',
-            'fo': u'Wikiheimild-kjak',
+            'fo': [u'Wikiheimild-kjak', u'Wikiheimild kjak'],
             'fr': u'Discussion Wikisource',
             'gl': u'Conversa Wikisource',
             'he': u'שיחת ויקיטקסט',
             'hr': u'Razgovor o Wikizvoru',
             'ht': u'Diskisyon Wikisòrs',
-            'hu': u'Wikiforrás-vita',
+            'hu': [u'Wikiforrás-vita', u'Wikiforrás vita'],
             'hy': u'Վիքիդարանի քննարկում',
             'id': u'Pembicaraan Wikisource',
             'is': u'Wikiheimildspjall',
             'it': u'Discussioni Wikisource',
-            'ja': u'Wikisource・トーク',
+            'ja': [u'Wikisource・トーク', u'Wikisource‐ノート'],
             'kn': u'Wikisource ಚರ್ಚೆ',
-            'ko': u'위키문헌토론',
+            'ko': [u'위키문헌토론', u'Wikisource talk'],
             'la': u'Disputatio Vicifontis',
             'li': u'Euverlèk Wikibrónne',
             'lt': u'Vikišaltiniai aptarimas',
@@ -118,13 +168,15 @@ class Family(family.Family):
             'no': u'Wikikilden-diskusjon',
             'pl': u'Dyskusja Wikiźródeł',
             'pt': u'Wikisource Discussão',
-            'ro': u'Discuție Wikisource',
+            'ro': [u'Discuție Wikisource', u'Discuţie Wikisource'],
             'ru': u'Обсуждение Викитеки',
-            'sk': u'Diskusia k Wikisource',
+            'sa': [u'Wikisourceसम्भाषणम्', u'Wikisourceसंभाषणं'],
+            'sah': u'Бикитиэкэ Ырытыы',
+            'sk': [u'Diskusia k Wikisource', u'Komentár k Wikipédii'],
             'sl': u'Pogovor o Wikiviru',
-            'sr': u'Разговор о Викизворнику',
+            'sr': [u'Разговор о Викизворнику', u'Razgovor o Викизворник'],
             'sv': u'Wikisourcediskussion',
-            'ta': u'Wikisource பேச்சு',
+            'ta': [u'Wikisource பேச்சு', u'விக்கிபீடியா பேச்சு'],
             'te': u'Wikisource చర్చ',
             'th': u'คุยเรื่องวิกิซอร์ซ',
             'tr': u'VikiKaynak tartışma',
@@ -132,9 +184,10 @@ class Family(family.Family):
             'vec': u'Discussion Wikisource',
             'vi': u'Thảo luận Wikisource',
             'yi': [u'װיקיביבליאָטעק רעדן', u'וויקיביבליאטעק רעדן'],
-            'zh': [u'Wikisource talk', u'维基文库讨论'],
+            'zh': u'Wikisource talk',
+            'zh-min-nan': u'Wikisource talk',
         }
-        
+
         self.namespaces[90] = {
             'sv': u'Tråd',
         }
@@ -153,13 +206,14 @@ class Family(family.Family):
 
         self.namespaces[100] = {
             'ar': u'بوابة',
+            'az': u'Portal',
             'bg': u'Автор',
             'bn': u'লেখক',
             'br': u'Meneger',
             'cs': u'Autor',
             'el': u'Σελίδα',
             'en': u'Portal',
-            'fa': [u'درگاه', u'Portal'],
+            'fa': u'درگاه',
             'fr': u'Transwiki',
             'he': u'קטע',
             'hr': u'Autor',
@@ -181,13 +235,14 @@ class Family(family.Family):
 
         self.namespaces[101] = {
             'ar': u'نقاش البوابة',
+            'az': u'Portal müzakirəsi',
             'bg': u'Автор беседа',
             'bn': u'লেখক আলাপ',
             'br': u'Kaozeadenn meneger',
             'cs': u'Diskuse k autorovi',
             'el': u'Συζήτηση σελίδας',
             'en': u'Portal talk',
-            'fa': [u'بحث درگاه', u'Portal talk'],
+            'fa': u'بحث درگاه',
             'fr': u'Discussion Transwiki',
             'he': u'שיחת קטע',
             'hr': u'Razgovor o autoru',
@@ -209,27 +264,31 @@ class Family(family.Family):
 
         self.namespaces[102] = {
             'ar': u'مؤلف',
+            'az': u'Müəllif',
             'br': u'Pajenn',
             'ca': u'Pàgina',
-            'da': [u'Forfatter', u'Author'],
+            'da': u'Forfatter',
             'de': u'Seite',
             'el': u'Βιβλίο',
             'en': u'Author',
+            'eo': u'Aŭtoro',
             'es': u'Página',
             'et': u'Lehekülg',
-            'fa': [u'مؤلف', u'Author'],
+            'fa': u'مؤلف',
             'fr': u'Auteur',
             'hr': u'Stranica',
             'hy': u'Պորտալ',
             'id': u'Indeks',
             'it': u'Autore',
             'la': u'Scriptor',
+            'mk': u'Автор',
             'ml': u'കവാടം',
             'nb': u'Forfatter',
             'nl': u'Auteur',
             'no': u'Forfatter',
             'pl': u'Indeks',
             'pt': u'Autor',
+            'ro': u'Autor',
             'te': u'రచయిత',
             'vec': u'Pagina',
             'vi': u'Tác gia',
@@ -238,27 +297,31 @@ class Family(family.Family):
 
         self.namespaces[103] = {
             'ar': u'نقاش المؤلف',
+            'az': u'Müəllif müzakirəsi',
             'br': u'Kaozeadenn pajenn',
             'ca': u'Pàgina Discussió',
-            'da': [u'Forfatterdiskussion', u'Author talk'],
+            'da': u'Forfatterdiskussion',
             'de': u'Seite Diskussion',
             'el': u'Συζήτηση βιβλίου',
             'en': u'Author talk',
+            'eo': u'Aŭtoro-Diskuto',
             'es': u'Página Discusión',
             'et': u'Lehekülje arutelu',
-            'fa': [u'بحث مؤلف', u'Author talk'],
+            'fa': u'بحث مؤلف',
             'fr': u'Discussion Auteur',
             'hr': u'Razgovor o stranici',
             'hy': u'Պորտալի քննարկում',
             'id': u'Pembicaraan Indeks',
             'it': u'Discussioni autore',
             'la': u'Disputatio Scriptoris',
+            'mk': u'Разговор за автор',
             'ml': u'കവാടത്തിന്റെ സംവാദം',
             'nb': u'Forfatterdiskusjon',
             'nl': u'Overleg auteur',
             'no': u'Forfatterdiskusjon',
             'pl': u'Dyskusja indeksu',
             'pt': u'Autor Discussão',
+            'ro': u'Discuție Autor',
             'te': u'రచయిత చర్చ',
             'vec': u'Discussion pagina',
             'vi': u'Thảo luận Tác gia',
@@ -266,65 +329,67 @@ class Family(family.Family):
         }
 
         self.namespaces[104] = {
-            '-': u'Page',
+            '_default': u'Page',
             'ar': u'صفحة',
-            'br': u'Oberour',
-            'ca': u'Llibre',
+            'br': [u'Oberour', u'Author'],
+            'ca': [u'Llibre', u'Index'],
             'da': u'Side',
             'de': u'Index',
-            'en': u'Page',
+            'eo': u'Paĝo',
             'es': u'Índice',
-            'et': u'Register',
+            'et': [u'Register', u'Index'],
             'fa': [u'برگه', u'Page'],
-            'fr': u'Page',
             'he': u'עמוד',
-            'hr': u'Sadržaj',
+            'hr': [u'Sadržaj', u'Index'],
             'hu': u'Oldal',
             'hy': u'Էջ',
             'id': u'Halaman',
             'it': u'Progetto',
             'la': u'Pagina',
-            'ml': u'സൂചിക',
+            'ml': [u'സൂചിക', u'Index'],
             'no': u'Side',
-            'pl': u'Autor',
-            'pt': u'Galeria',
+            'pl': [u'Autor', u'Author'],
+            'pt': [u'Galeria', u'Index'],
+            'ro': u'Pagină',
             'ru': u'Страница',
-            'sl': u'Kazalo',
+            'sa': u'पुटम्',
+            'sl': [u'Kazalo', u'Index'],
             'sv': u'Sida',
-            'te': [u'పుట', u'పేజీ', u'Page'],
-            'vec': u'Indice',
+            'te': [u'పుట', u'పేజీ'],
+            'vec': [u'Indice', u'Index'],
             'vi': u'Trang',
-            'zh': u'Page',
         }
 
         self.namespaces[105] = {
-            '-': u'Page talk',
+            '_default': u'Page talk',
             'ar': u'نقاش الصفحة',
-            'br': u'Kaozeadenn oberour',
-            'ca': u'Llibre Discussió',
+            'br': [u'Kaozeadenn oberour', u'Author talk'],
+            'ca': [u'Llibre Discussió', u'Index talk'],
             'da': u'Sidediskussion',
-            'de': u'Index Diskussion',
-            'en': u'Page talk',
+            'de': [u'Index Diskussion', u'Index talk'],
+            'eo': u'Paĝo-Diskuto',
             'es': u'Índice Discusión',
-            'et': u'Registri arutelu',
-            'fa': [u'بحث برگه', u'Page talk'],
+            'et': [u'Registri arutelu', u'Index talk'],
+            'fa': u'گفتگوی برگه',
             'fr': u'Discussion Page',
             'he': u'שיחת עמוד',
-            'hr': u'Razgovor o sadržaju',
+            'hr': [u'Razgovor o sadržaju', u'Index talk'],
             'hu': u'Oldal vita',
             'hy': u'Էջի քննարկում',
             'id': u'Pembicaraan Halaman',
             'it': u'Discussioni progetto',
             'la': u'Disputatio Paginae',
-            'ml': u'സൂചികയുടെ സംവാദം',
+            'ml': [u'സൂചികയുടെ സംവാദം', u'Index talk'],
             'no': u'Sidediskusjon',
-            'pl': u'Dyskusja autora',
-            'pt': u'Galeria Discussão',
+            'pl': [u'Dyskusja autora', u'Author talk'],
+            'pt': [u'Galeria Discussão', u'Index talk'],
+            'ro': u'Discuție Pagină',
             'ru': u'Обсуждение страницы',
-            'sl': u'Pogovor o kazalu',
+            'sa': u'पुटसंवाद',
+            'sl': [u'Pogovor o kazalu', u'Index talk'],
             'sv': u'Siddiskussion',
-            'te': [u'పుట చర్చ', u'పేజీ చర్చ', u'Page talk'],
-            'vec': u'Discussion indice',
+            'te': [u'పుట చర్చ', u'పేజీ చర్చ'],
+            'vec': [u'Discussion indice', u'Index talk'],
             'vi': u'Thảo luận Trang',
             'zh': u'Page talk',
         }
@@ -332,19 +397,25 @@ class Family(family.Family):
         self.namespaces[106] = {
             '-': u'Index',
             'ar': u'فهرس',
+            'ca': u'Autor',
             'da': u'Indeks',
             'en': u'Index',
+            'eo': u'Indekso',
             'et': u'Autor',
+            'fa': u'فهرست',
             'fr': u'Portail',
             'he': u'ביאור',
             'hu': u'Index',
             'hy': u'Ինդեքս',
+            'id': u'Portal',
             'it': u'Portale',
             'la': u'Liber',
             'ml': u'താൾ',
             'no': u'Indeks',
             'pt': u'Página',
+            'ro': u'Index',
             'ru': u'Индекс',
+            'sa': u'अनुक्रमणिका',
             'sv': u'Författare',
             'te': u'సూచిక',
             'vi': u'Mục lục',
@@ -354,19 +425,25 @@ class Family(family.Family):
         self.namespaces[107] = {
             '-': u'Index talk',
             'ar': u'نقاش الفهرس',
+            'ca': u'Autor Discussió',
             'da': u'Indeksdiskussion',
             'en': u'Index talk',
+            'eo': u'Indekso-Diskuto',
             'et': u'Autori arutelu',
+            'fa': u'گفتگوی فهرست',
             'fr': u'Discussion Portail',
             'he': u'שיחת ביאור',
             'hu': u'Index vita',
             'hy': u'Ինդեքսի քննարկում',
+            'id': u'Pembicaraan Portal',
             'it': u'Discussioni portale',
             'la': u'Disputatio Libri',
             'ml': u'താളിന്റെ സംവാദം',
             'no': u'Indeksdiskusjon',
             'pt': u'Página Discussão',
+            'ro': u'Discuție Index',
             'ru': u'Обсуждение индекса',
+            'sa': u'अनुक्रमणिकासंवाद',
             'sv': u'Författardiskussion',
             'te': u'సూచిక చర్చ',
             'vi': u'Thảo luận Mục lục',
@@ -374,6 +451,7 @@ class Family(family.Family):
         }
 
         self.namespaces[108] = {
+            '-': u'Author',
             'he': u'מחבר',
             'it': u'Pagina',
             'pt': u'Em Tradução',
@@ -381,6 +459,7 @@ class Family(family.Family):
         }
 
         self.namespaces[109] = {
+            '-': u'Author talk',
             'he': u'שיחת מחבר',
             'it': u'Discussioni pagina',
             'pt': u'Discussão Em Tradução',
@@ -443,7 +522,7 @@ class Family(family.Family):
         ]
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
-            'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikinews', 'wikiversity', 
+            'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikinews', 'wikiversity',
             'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
         ]
 
@@ -499,17 +578,14 @@ class Family(family.Family):
             'vi': self.authornamespaces,
             'zh': self.authornamespaces,
         }
-        
+
         self.crossnamespace[104] = {
             'pl': self.authornamespaces,
         }
-        
+
         self.crossnamespace[106] = {
             'sv': self.authornamespaces,
         }
-        
-    def version(self, code):
-        return '1.17wmf1'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')
@@ -524,7 +600,7 @@ class Family(family.Family):
         def scriptpath(self, code):
             if code == '-':
                 return '/wikipedia/sources/w'
-            
+
             return '/%s/%s/w' % (self.name, code)
 
         def nicepath(self, code):

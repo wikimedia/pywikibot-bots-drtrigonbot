@@ -51,11 +51,11 @@ Command-line options:
 """
 #
 # (C) Andre Engels, 2005
-# (C) Pywikipedia bot team, 2006-2010
+# (C) Pywikipedia bot team, 2006-2011
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: spellcheck.py 8630 2010-10-09 19:32:57Z xqt $'
+__version__ = '$Id: spellcheck.py 9367 2011-07-11 04:50:03Z xqt $'
 #
 
 import re, sys
@@ -64,15 +64,16 @@ import wikipedia as pywikibot
 import pagegenerators
 
 msg={
-    'ar':u'تدقيق إملائي بمساعدة البوت',
-    'en':u'Bot-aided spell checker',
-    'es':u'Bot asistido de correción ortográfica',
-    'fr':u'Correction orthographique par robot',
-    'he':u'בדיקת איות באמצעות בוט',
-    'ia':u'Correction de orthographia per robot',
-    'nl':u'Spellingscontrole',
-    'pl':u'Wspomagane przez robota sprawdzanie pisowni',
-    'pt':u'Bot de correção ortográfica',
+    'ar': u'تدقيق إملائي بمساعدة البوت',
+    'de': u'Bot-unterstützte Rechtschreibprüfung',
+    'en': u'Bot-aided spell checker',
+    'es': u'Bot asistido de correción ortográfica',
+    'fr': u'Correction orthographique par robot',
+    'he': u'בדיקת איות באמצעות בוט',
+    'ia': u'Correction de orthographia per robot',
+    'nl': u'Spellingscontrole',
+    'pl': u'Wspomagane przez robota sprawdzanie pisowni',
+    'pt': u'Bot de correção ortográfica',
 }
 
 
@@ -112,12 +113,7 @@ def getalternatives(string):
     for i in xrange(11):
         simwords[i] = []
     for alt in knownwords.keys():
-        if basetext:
-            if basetext not in alt.lower() == -1:
-                dothis = False
-            else:
-                dothis = True
-        else: dothis = True
+        dothis = not basetext or basetext in alt.lower()
         if dothis:
             diff = distance(string,alt)
             if diff < 11:
@@ -142,10 +138,10 @@ def cap(string):
     # uncapitalize the first word of the string
     return string[0].upper()+string[1:]
 
-def askAlternative(word,context=None):
+def askAlternative(word, context=None, title=''):
     correct = None
     pywikibot.output(u"="*60)
-    pywikibot.output(u"Found unknown word '%s'"%word)
+    pywikibot.output(u"Found unknown word '%s' in '%s'" % (word, title))
     if context:
         pywikibot.output(u"Context:")
         pywikibot.output(u""+context)
@@ -260,7 +256,7 @@ def removeHTML(page):
     result = result.replace('&deg;',u'°')
     return result
 
-def spellcheck(page, checknames = True, knownonly = False):
+def spellcheck(page, checknames = True, knownonly = False, title=''):
     pageskip = []
     text = page
     if correct_html_codes:
@@ -278,7 +274,8 @@ def spellcheck(page, checknames = True, knownonly = False):
         if not Word(smallword).isCorrect(checkalternative = knownonly) and \
            (checknames or not smallword[0].isupper()):
             replacement = askAlternative(smallword,
-                                         context=text[max(0,loc-40):loc + len(match.group(2))+40])
+                                         context=text[max(0,loc-40):loc + len(match.group(2))+40],
+                                         title=title)
             if replacement == edit:
                 import editarticle
                 editor = editarticle.TextEditor()
@@ -508,7 +505,7 @@ try:
                 pass
             else:
                 text = spellcheck(text, checknames=checknames,
-                                  knownonly=knownonly)
+                                  knownonly=knownonly, title=page.title())
                 if text != page.get():
                     page.put(text)
     elif start:
@@ -519,7 +516,7 @@ try:
                 pass
             else:
                 text = spellcheck(text, checknames=checknames,
-                                  knownonly=knownonly)
+                                  knownonly=knownonly, title=page.title())
                 if text != page.get():
                     page.put(text)
 
@@ -531,7 +528,7 @@ try:
                 pass
             else:
                 text = spellcheck(text, checknames=checknames,
-                                  knownonly=knownonly)
+                                  knownonly=knownonly, title=page.title())
                 if text != page.get():
                     page.put(text)
 
@@ -546,7 +543,7 @@ try:
             except pywikibot.IsRedirectPage:
                 print "Page is a redirect page"
             else:
-                text = spellcheck(text,knownonly=knownonly)
+                text = spellcheck(text,knownonly=knownonly, title=page.title())
                 if text != page.get():
                     page.put(text)
             title = pywikibot.input(u"Which page to check now? (enter to stop)")

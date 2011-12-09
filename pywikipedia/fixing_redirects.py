@@ -20,7 +20,7 @@ options -file, -ref, -links, ...
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: fixing_redirects.py 8589 2010-09-22 05:07:29Z xqt $'
+__version__='$Id: fixing_redirects.py 9042 2011-03-13 10:14:47Z xqt $'
 #
 import wikipedia as pywikibot
 import pagegenerators
@@ -181,7 +181,7 @@ def workon(page):
     else:
         pywikibot.output('Nothing left to do.')
         return
-    
+
     for page2 in links:
         try:
             target = page2.getRedirectTarget()

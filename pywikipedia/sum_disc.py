@@ -64,7 +64,7 @@ Syntax example:
 ## @package sum_disc
 #  @brief   Summarize Discussions Robot
 #
-#  @copyright Dr. Trigon, 2008-2010
+#  @copyright Dr. Trigon, 2008-2011
 #
 #  @section FRAMEWORK
 #
@@ -91,7 +91,7 @@ import config, pagegenerators, userlib
 import dtbext
 # Splitting the bot into library parts
 import wikipedia as pywikibot
-from pywikibot import i18n 
+from pywikibot import i18n, tools
 
 
 _PS_warning    = 1    # serious or no classified warnings/errors that should be reported
@@ -436,8 +436,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
         # thanks to http://mail.python.org/pipermail/python-list/2005-September/339147.html
         # and http://docs.python.org/library/copy.html
         self._user  = user
-        #self._userPage = pywikibot.Page(self.site, "User_Discussion:%s" % self._user.name())        # LANG. PROB. HERE??? (...also? to be causious)
-        self._userPage = pywikibot.Page(self.site, u'Benutzer_Diskussion:%s' % self._user.name())    #
+        self._userPage = self._user.getUserTalkPage()
         userdiscpage = self._userPage.title()
         #self._param = dict(self._param_default)
         self._param = copy.deepcopy(self._param_default)
@@ -565,9 +564,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
         check_list = self._param['checkedit_list']
         count = self._param['checkedit_count']
 
-        # [ JIRA: DRTRIGON-59 ]
-        pywikibot.output(u'Getting latest contributions from user "%s" via API...' % self._user.name())
-
         # thanks to http://www.amk.ca/python/howto/regex/ and http://bytes.com/forum/thread24382.html
         #usersumList = [p.title() for p in pagegenerators.UserContributionsGenerator(self._user.name(), number = count)]
         usersumList = [p[0].title() for p in self._user.contributions(limit = count)]
@@ -667,7 +663,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
         # Preloads _contents and _versionhistory / [ JIRA: ticket? ]
         # WithoutInterwikiPageGenerator, 
         #gen3 = pagegenerators.PreloadingGenerator(gen2)
-        gen3 = pagegenerators.ThreadedGenerator(target=pagegenerators.PreloadingGenerator,
+        gen3 = tools.ThreadedGenerator(target=pagegenerators.PreloadingGenerator,
                             args=(gen2,),
                             qsize=60)
         self._th_gen = gen3
@@ -951,7 +947,12 @@ class SumDiscPages(object):
         # create work list (out of page instances)
         work = {}
         for name in hist.keys():
-            page = pywikibot.Page(self.site, name)
+            try:
+                page = pywikibot.Page(self.site, name)
+            except pywikibot.exceptions.NoPage, e:
+                pywikibot.output(u'%s' %e)
+                continue
+
             page.sum_disc_data = hist[name]
             hist[name] = page
 

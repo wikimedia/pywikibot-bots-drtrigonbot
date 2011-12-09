@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: i18n_family.py 8823 2011-01-11 13:24:20Z siebrand $'
+__version__ = '$Id: i18n_family.py 9300 2011-06-18 23:51:32Z siebrand $'
 
 import family
 
@@ -44,6 +44,24 @@ class Family(family.Family):
         }
         self.namespaces[101] = {
             '_default': [u'Portal talk'],
+        }
+        self.namespaces[202] = {
+            '_default': [u'Property'],
+        }
+        self.namespaces[203] = {
+            '_default': [u'Property talk'],
+        }
+        self.namespaces[206] = {
+            '_default': [u'Form'],
+        }
+        self.namespaces[207] = {
+            '_default': [u'Form talk'],
+        }
+        self.namespaces[208] = {
+            '_default': [u'Concept'],
+        }
+        self.namespaces[209] = {
+            '_default': [u'Concept talk'],
         }
         self.namespaces[420] = {
             '_default': [u'Layer'],
@@ -171,6 +189,35 @@ class Family(family.Family):
         self.namespaces[1235] = {
             '_default': [u'OpenImages talk'],
         }
-
+        self.namespaces[1236] = {
+            '_default': [u'Europeana'],
+        }
+        self.namespaces[1237] = {
+            '_default': [u'Europeana talk'],
+        }
+        self.namespaces[1238] = {
+            '_default': [u'Pywikipedia'],
+        }
+        self.namespaces[1239] = {
+            '_default': [u'Pywikipedia talk'],
+        }
+        self.namespaces[1240] = {
+            '_default': [u'Toolserver'],
+        }
+        self.namespaces[1241] = {
+            '_default': [u'Toolserver talk'],
+        }
+        self.namespaces[1242] = {
+            '_default': [u'EOL'],
+        }
+        self.namespaces[1243] = {
+            '_default': [u'EOL talk'],
+        }
+        self.namespaces[1244] = {
+            '_default': [u'Kiwix'],
+        }
+        self.namespaces[1245] = {
+            '_default': [u'Kiwix talk'],
+        }
     def version(self, code):
-        return "1.18alpha"
+        return "1.19alpha"

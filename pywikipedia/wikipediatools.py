@@ -1,9 +1,9 @@
-__version__ = '$Id: wikipediatools.py 8464 2010-08-26 12:06:34Z purodha $'
+__version__ = '$Id: wikipediatools.py 9080 2011-03-14 16:58:40Z saper $'
 import os, sys
 
-def create_user_config_file():
+def create_user_config_file(base_dir):
     import generate_user_files
-    generate_user_files.create_user_config()
+    generate_user_files.create_user_config(base_dir)
 
 def get_base_dir():
     """Return the directory in which user-specific information is stored.
@@ -48,5 +48,5 @@ def get_base_dir():
     if not os.path.exists(os.path.join(base_dir, "user-config.py")):
         print("No user-config.py found in directory '%s'" % base_dir)
         print("Creating...\n")
-        create_user_config_file()
+        create_user_config_file(base_dir)
     return base_dir

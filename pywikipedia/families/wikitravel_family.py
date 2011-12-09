@@ -6,7 +6,7 @@ import family, config
 # Translation used on all wikitravels for the 'article' text.
 # A language not mentioned here is not known by the robot
 
-__version__ = '$Id: wikitravel_family.py 7551 2009-10-27 21:12:35Z alexsh $'
+__version__ = '$Id: wikitravel_family.py 9052 2011-03-13 12:19:20Z xqt $'
 
 class Family(family.Family):
     def __init__(self):
@@ -458,7 +458,7 @@ class Family(family.Family):
         }
         self.crossnamespace[14] = {
             'wts': {
-                '_default': [0], 
+                '_default': [0],
             },
         }
 

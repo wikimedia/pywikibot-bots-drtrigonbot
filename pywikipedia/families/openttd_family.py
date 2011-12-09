@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: openttd_family.py 5066 2008-02-21 19:42:30Z russblau $'
+__version__ = '$Id: openttd_family.py 9015 2011-02-28 17:57:55Z lcawte $'
 
 import family
 
@@ -32,7 +32,7 @@ class Family(family.Family):
         return ''
 
     def version(self, code):
-        return "1.9.1"
+        return "1.12.0"
 
     def apipath(self, code):
         raise NotImplementedError(

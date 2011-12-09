@@ -17,11 +17,11 @@ def xuniqueCombinations(items, n):
                 yield [items[i]]+cc
 # End of permutation code
 #
-# (C) Pywikipedia bot team, 2006-2010
+# (C) Pywikipedia bot team, 2006-2011
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: casechecker.py 8240 2010-06-03 07:19:33Z xqt $'
+__version__ = '$Id: casechecker.py 9692 2011-10-30 15:03:29Z xqt $'
 
 #
 # Windows Concose colors
@@ -296,8 +296,8 @@ class CaseChecker( object ):
                                                 dst = pywikibot.Page(self.site,
                                                                      newTitle)
                                                 bot = category.CategoryMoveRobot(
-                                                    src.titleWithoutNamespace(),
-                                                    dst.titleWithoutNamespace(),
+                                                    src.title(withNamespace=False),
+                                                    dst.title(withNamespace=False),
                                                     self.autonomous,
                                                     editSummary, True)
                                                 bot.run()

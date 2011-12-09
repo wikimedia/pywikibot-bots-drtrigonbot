@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: wikia_family.py 7706 2009-11-28 20:16:07Z alexsh $'
+__version__ = '$Id: wikia_family.py 9439 2011-08-19 13:02:42Z lcawte $'
 
 import family
 
@@ -34,12 +34,12 @@ class Family(family.Family):
         self.namespaces[113] = {
             '_default': u'Mini talk',
         }
-        
+
     def hostname(self, code):
         return u'www.wikia.com'
-    
+
     def version(self, code):
-        return "1.15.1"
+        return "1.16.5"
 
     def scriptpath(self, code):
         return ''

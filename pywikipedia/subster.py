@@ -84,8 +84,8 @@ bot_config = {    # unicode values
                     'expandtemplates': 'False',        # DRTRIGON-93 (only with 'wiki')
                     'simple':          '',             # DRTRIGON-85
                     'zip':             'False',
-                    'xlsx':            'False',        # (beta)
-                    'cron':            '',             # (beta)
+                    'xlsx':            'False',        #
+                    'cron':            '',             # DRTRIGON-102
                     },
 
         'msg': {
@@ -123,6 +123,8 @@ class SubsterBot(dtbext.basic.BasicBot):
     _var_regex_str = bot_config['var_regex_str']%{'var1':'%(var)s','var2':'%(var)s','cont':'%(cont)s'}
 
     _BS_regex      = re.compile(u'(' + _var_regex_str%{'var':'BS:(.*?)','cont':'(.*?)'} + u')')
+    # !!! access to full data (all attachements) should be possible too !!!
+    #_BS_regex      = bot_config['var_regex_str']%{'var1':'%(var)s-BS:(.*?)','var2':'BS:(.*?)','cont':'(.*?)'}
     _BS_regex_str  = bot_config['var_regex_str']%{'var1':'BS:%(var)s','var2':'BS:/','cont':'%(cont)s'}
 
     # -template and subst-tag handling taken from MerlBot
@@ -298,10 +300,9 @@ class SubsterBot(dtbext.basic.BasicBot):
                 external_buffer = dtbext.pywikibot.Page(self.site, param['url']).get(expandtemplates=True)
             else:
                 external_buffer = self.load( dtbext.pywikibot.Page(self.site, param['url']) )
-        elif (param['url'][:7] == u'mail://'):
+        elif (param['url'][:7] == u'mail://'): # DRTRIGON-101
             mbox = SubsterMailbox(pywikibot.config.datafilepath(bot_config['data_path'], bot_config['mbox_file'], ''))
-            # !!! access to full data (all attachements) should be possible too !!!
-            external_buffer = mbox.find_data(param['url'], full=False)
+            external_buffer = mbox.find_data(param['url'])
             mbox.close()
         elif param['zip']:
             # !!! does zip deflate work with 'self.site.getUrl' ??!! (has to be made working!)
@@ -311,8 +312,8 @@ class SubsterBot(dtbext.basic.BasicBot):
 
         # some intermediate processing (unzip, xlsx2csv, ...)
         if param['zip']:
-            # !!! pass no. of file to extract (or may be name) in "param['zip']" !
-            external_buffer = self.unzip(external_buffer, 0)
+            fileno          = 0 if (param['zip'] == True) else (param['zip']-1)
+            external_buffer = self.unzip(external_buffer, fileno)
         if not (param['xlsx'].lower() == 'false'):
             external_buffer = self.xlsx2csv(external_buffer, param['xlsx'])
 
@@ -475,7 +476,7 @@ class SubsterMailbox(mailbox.mbox):
         if remove:
             pywikibot.output('Removed %i depreciated email data source(s).' % len(remove))
 
-    def find_data(self, url, full=True):
+    def find_data(self, url):
         """Find mail according to given 'From' (sender).
         """
 
@@ -492,9 +493,10 @@ class SubsterMailbox(mailbox.mbox):
                 pywikibot.output('Found email data source:')
                 pywikibot.output('%i / %s / %s / %s' % (i, sender, subject, timestmp))
 
+                full = (url[2] == 'attachment-full')
                 if   (url[2] == 'all'):
                     content = message.as_string(True)
-                elif (url[2] == 'attachment'):
+                elif (url[2] == 'attachment') or full:
                     counter = 1
                     content = ''
                     for part in message.walk():

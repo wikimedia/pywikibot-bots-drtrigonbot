@@ -34,7 +34,7 @@ Furthermore, the following command line parameters are supported:
 
 -save             Saves the titles of the articles to a file instead of
                   modifying the articles. This way you may collect titles to
-                  work on in automatic mode, and process them later with 
+                  work on in automatic mode, and process them later with
                   -file. Opens the file for append, if exists.
                   If you insert the contents of the file into a wikipage, it
                   will appear as a numbered list, and may be used with -links.
@@ -47,7 +47,7 @@ Furthermore, the following command line parameters are supported:
 
 -excepttitle:XYZ  Skip pages with titles that contain XYZ. If the -regex
                   argument is given, XYZ will be regarded as a regular
-                  expression.
+                  expression. Use multiple times to ignore multiple pages.
 
 -requiretitle:XYZ Only do pages with titles that contain XYZ. If the -regex
                   argument is given, XYZ will be regarded as a regular
@@ -80,8 +80,9 @@ Furthermore, the following command line parameters are supported:
 -fix:XYZ          Perform one of the predefined replacements tasks, which are
                   given in the dictionary 'fixes' defined inside the file
                   fixes.py.
-                  The -regex and -nocase argument and given replacements will
-                  be ignored if you use -fix.
+                  The -regex, -recursive and -nocase argument and given 
+                  replacements and exceptions will be ignored if you use -fix
+                  and they are present in the 'fixes' dictionary.
                   Currently available predefined fixes are:
 &fixes-help;
 
@@ -99,6 +100,14 @@ other:            First argument is the old text, second argument is the new
                   argument might contain expressions like \\1 or \g<name>.
                   It is possible to introduce more than one pair of old text
                   and replacement.
+
+-replacementfile  Lines from the given file name(s) will be read as if they
+                  were added to the command line at that point. I.e. a file
+                  containing lines "a" and "b", used as
+                  python replace.py -page:X -replacementfile:file c d
+                  will replace 'a' with 'b' and 'c' with 'd'. However, using
+                  python replace.py -page:X c -replacementfile:file d will
+                  also work, and will replace 'c' with 'a' and 'b' with 'd'.
 
 Examples:
 
@@ -131,14 +140,14 @@ This command will change 'referer' to 'referrer', but not in pages which
 talk about HTTP, where the typo has become part of the standard:
 
     python replace.py referer referrer -file:typos.txt -excepttext:HTTP
-    
+
 Please type "replace.py -help | more" if you can't read the top of the help.
 """
 from __future__ import generators
 #
-# (C) Daniel Herding & the Pywikipedia team, 2004-2010
+# (C) Daniel Herding & the Pywikipedia team, 2004-2011
 #
-__version__='$Id: replace.py 8920 2011-02-05 16:42:52Z xqt $'
+__version__='$Id: replace.py 9781 2011-11-28 19:14:13Z valhallasw $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -147,6 +156,7 @@ import sys, re, time, codecs
 import wikipedia as pywikibot
 import pagegenerators
 import editarticle
+from pywikibot import i18n
 import webbrowser
 
 # Imports predefined replacements tasks from fixes.py
@@ -157,67 +167,6 @@ import fixes
 docuReplacements = {
     '&params;':     pagegenerators.parameterHelp,
     '&fixes-help;': fixes.help,
-}
-
-
-# Summary messages in different languages
-# NOTE: Predefined replacement tasks might use their own dictionary, see 'fixes'
-# below.
-msg = {
-    'als': u'Bot: het dr Text automatisch uustuscht: %s',
-    'ar': u'%s بوت: استبدال تلقائي للنص',
-    'be-tarask': u'Робат: аўтаматызаваная замена тэксту %s',
-    'br': u'Robot : Erlec\'hiañ testenn emgefre %s',
-    'bs': u'Bot: Automatska zamjena teksta %s',
-    'ca': u'Robot: Reemplaçament automàtic de text %s',
-    'cs': u'Robot automaticky nahradil text: %s',
-    'de': u'Bot: Automatisierte Textersetzung %s',
-    'el': u'Ρομπότ: Αυτόματη αντικατάσταση κειμένου %s',
-    'en': u'Bot: Automated text replacement %s',
-    'eo': u'Roboto: Automata tekst-anstataŭigo: %s',
-    'es': u'Robot: Reemplazo automático de texto %s',
-    'fa': u'ربات: تغییر خودکار متن %s',
-    'fi': u'Botti korvasi automaattisesti tekstin %s',
-    'fr': u'Robot : Remplacement de texte automatisé %s',
-    'frp': u'Bot : remplacement de tèxto ôtomatisâ %s',
-    'frr': u'Bot: Automatisiaret ütjwakselt tekst %s',
-    'gl': u'Bot: Substitución automática de texto %s',
-    'he': u'בוט: החלפת טקסט אוטומטית %s',
-    'hsb': u'Boćik: Awtomatiske narunanje teksta %s',
-    'hu': u'Robot: Automatikus szövegcsere %s',
-    'hy': u'Ռոբոտ․ Տեքստի ավտոմատ փոխարինում %s',
-    'ia': u'Robot: Reimplaciamento automatic de texto %s',
-    'id': u'Bot: Penggantian teks otomatis %s',
-    'is': u'Vélmenni: breyti texta %s',
-    'it': u'Bot: Sostituzione automatica %s',
-    'ja': u'ロボットによる: 文字置き換え %s',
-    'ka': u'რობოტი: ტექსტის ავტომატური შეცვლა %s',
-    'kk': u'Бот: Мәтінді өздікті алмастырды: %s',
-    'ksh': u'Bot: hät outomatesch Täx jetuusch: %s',
-    'la': u'automaton: mutans textum automatice: %s',
-    'lb': u'Bot: Automatescht Ersetze vun Text %s',
-    'lt': u'robotas: Automatinis teksto keitimas %s',
-    'mk': u'Бот: Автоматизирана замена на текст %s',
-    'ms': u'Bot: Penggantian teks automatik %s',
-    'nds': u'Bot: Text automaatsch utwesselt: %s',
-    'nds-nl': u'Bot: autematisch tekse vervungen %s',
-    'ne': u'बोट: स्वचालित रुपमा हरफहरु परिवर्तन गरिएको %s',
-    'nl': u'Robot: automatisch tekst vervangen %s',
-    'nn': u'robot: automatisk teksterstatning: %s',
-    'no': u'robot: automatisk teksterstatning: %s',
-    'pl': u'Robot automatycznie zamienia tekst %s',
-    'pt': u'Bot: Mudança automática %s',
-    'ro': u'Robot. Înlocuire automată de text %s',
-    'ru': u'Робот: Автоматизированная замена текста %s',
-    'rue': u'Робот: Автоматізована заміна тексту: %s',
-    'sl': u'Bot: Samodejna zamenjava besedila %s',
-    'sr': u'Бот: Аутоматска замена текста %s',
-    'sv': u'Bot: Automatisk textersättning: %s',
-    'tr': u'Bot: Otomatik metin değiştirme %s',
-    'tt-cyrl': u'Робот: %s текстын автомат алмаштыру',
-    'uk': u'Бот: Автоматизована заміна тексту: %s',
-    'vi': u'Rôbốt: Tự động thay thế văn bản %s',
-    'zh': u'機器人:執行文字代換作業 %s',
 }
 
 
@@ -353,8 +302,8 @@ class ReplaceRobot:
         # Some function to set default editSummary should probably be added
         self.editSummary = editSummary
         self.articles = articles
-        
-        #An edit counter to split the file by 100 titles if -save or -savenew 
+
+        #An edit counter to split the file by 100 titles if -save or -savenew
         #is on, and to display the number of edited articles otherwise.
         self.editcounter = 0
 
@@ -441,7 +390,7 @@ class ReplaceRobot:
             try:
                 # Load the page's text from the wiki
                 original_text = page.get(get_redirect=True)
-                if not page.canBeEdited():
+                if not (self.articles or page.canBeEdited()):
                     pywikibot.output(u"You can't edit page %s"
                                      % page.title(asLink=True))
                     continue
@@ -496,7 +445,12 @@ class ReplaceRobot:
                         page.site().nice_get_address(page.title())
                     ))
                     pywikibot.input("Press Enter when finished in browser.")
-                    original_text = page.get(get_redirect=True, force=True)
+                    try:
+                        original_text = page.get(get_redirect=True, force=True)
+                    except pywikibot.NoPage:
+                        pywikibot.output(u'Page %s has been deleted.'
+                                         % page.title())
+                        break
                     new_text = original_text
                     continue
                 if choice == 'q':
@@ -508,7 +462,7 @@ class ReplaceRobot:
                     if not self.articles:
                         #Primary behaviour: working on wiki
                         page.put_async(new_text, self.editSummary)
-                        self.editcounter += 1 
+                        self.editcounter += 1
                         #Bug: this increments even if put_async fails
                         #This is separately in two clauses of if for
                         #future purposes to get feedback form put_async
@@ -605,7 +559,7 @@ def main(*args):
     allowoverlap = False
     # Do not recurse replacement
     recursive = False
-    # This is the maximum number of pages to load per query    
+    # This is the maximum number of pages to load per query
     maxquerysize = 60
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
@@ -613,7 +567,8 @@ def main(*args):
     genFactory = pagegenerators.GeneratorFactory()
     # Load default summary message.
     # BUG WARNING: This is probably incompatible with the -lang parameter.
-    editSummary = pywikibot.translate(pywikibot.getSite(), msg)
+    editSummary = i18n.twtranslate(pywikibot.getSite(), 'replace-replacing',
+                                   {'description': u''})
     # Between a regex and another (using -fix) sleep some time (not to waste
     # too much CPU
     sleep = None
@@ -648,18 +603,25 @@ def main(*args):
             else:
                 PageTitles.append(arg[6:])
         elif arg.startswith('-savenew'):
+            append = False
             if len(arg) == 8:
                 filename = pywikibot.input(
 u'Please enter the filename to save the titles \n(will be deleted if exists):')
             else:
                 filename = arg[9:]
         elif arg.startswith('-save'):
-            append = False
             if len(arg) == 5:
                 filename = pywikibot.input(
                     u'Please enter the filename to save the titles:')
             else:
                 filename = arg[6:]
+        elif arg.startswith('-replacementfile'):
+            if len(arg) == len('-replacementfile'):
+                replacefile = pywikibot.input(
+u"""Please enter the filename to read replacements from:""")
+            else:
+                replacefile = arg[len('-replacementfile')+1:]
+            commandline_replacements.extend([x.lstrip(u'\uFEFF').rstrip('\r\n') for x in codecs.open(replacefile, 'r', 'utf-8')])
         elif arg.startswith('-excepttitle:'):
             exceptions['title'].append(arg[13:])
         elif arg.startswith('-requiretitle:'):
@@ -697,15 +659,20 @@ u'Please enter the filename to save the titles \n(will be deleted if exists):')
             if not genFactory.handleArg(arg):
                 commandline_replacements.append(arg)
 
+    if pywikibot.verbose:
+        pywikibot.output(u"commandline_replacements: %r" % commandline_replacements)
+
     if (len(commandline_replacements) % 2):
         raise pywikibot.Error, 'require even number of replacements.'
     elif (len(commandline_replacements) == 2 and fix is None):
         replacements.append((commandline_replacements[0],
                              commandline_replacements[1]))
         if not summary_commandline:
-            editSummary = pywikibot.translate(pywikibot.getSite(), msg ) % (
-                                   ' (-%s +%s)' % (commandline_replacements[0],
-                                                   commandline_replacements[1]))
+            editSummary = i18n.twtranslate(pywikibot.getSite(),
+                                           'replace-replacing',
+                                           {'description': ' (-%s +%s)'
+                                            % (commandline_replacements[0],
+                                               commandline_replacements[1])})
     elif (len(commandline_replacements) > 1):
         if (fix is None):
             for i in xrange (0, len(commandline_replacements), 2):
@@ -717,8 +684,10 @@ u'Please enter the filename to save the titles \n(will be deleted if exists):')
                          for i in range(0, len(commandline_replacements), 2)]
                 replacementsDescription = '(%s)' % ', '.join(
                     [('-' + pair[0] + ' +' + pair[1]) for pair in pairs])
-                editSummary = pywikibot.translate(pywikibot.getSite(), msg ) \
-                              % replacementsDescription
+                editSummary = i18n.twtranslate(pywikibot.getSite(),
+                                               'replace-replacing',
+                                               {'description':
+                                                replacementsDescription})
         else:
            raise pywikibot.Error(
                'Specifying -fix with replacements is undefined')
@@ -731,13 +700,15 @@ u'Please enter the filename to save the titles \n(will be deleted if exists):')
             old = pywikibot.input(
 u'Please enter another text that should be replaced, or press Enter to start:')
             if old == '':
-                change = change + ')'
+                change += ')'
                 break
             new = pywikibot.input(u'Please enter the new text:')
-            change = change + ' & -' + old + ' +' + new
+            change += ' & -' + old + ' +' + new
             replacements.append((old, new))
         if not summary_commandline:
-            default_summary_message =  pywikibot.translate(pywikibot.getSite(), msg) % change
+            default_summary_message = i18n.twtranslate(pywikibot.getSite(),
+                                                       'replace-replacing',
+                                                       {'description': change})
             pywikibot.output(u'The summary message will default to: %s'
                              % default_summary_message)
             summary_message = pywikibot.input(
@@ -757,12 +728,23 @@ u'Press Enter to use this default message, or enter a description of the\nchange
         if "regex" in fix:
             regex = fix['regex']
         if "msg" in fix:
-            editSummary = pywikibot.translate(pywikibot.getSite(), fix['msg'])
+            if isinstance(fix['msg'], basestring):
+                editSummary = i18n.twtranslate(pywikibot.getSite(),
+                                               str(fix['msg']))
+            else:
+                editSummary = pywikibot.translate(pywikibot.getSite(),
+                                                  fix['msg'])
         if "exceptions" in fix:
             exceptions = fix['exceptions']
+        if "recursive" in fix:
+            recursive = fix['recursive']
         if "nocase" in fix:
             caseInsensitive = fix['nocase']
-        replacements = fix['replacements']
+        try:
+            replacements = fix['replacements']
+        except KeyError:
+            pywikibot.output(u"No replacements given in fix, don't joke with me!")
+            return
 
     #Set the regular expression flags
     flags = re.UNICODE
@@ -824,20 +806,15 @@ LIMIT 200""" % (whereClause, exceptClause)
         # syntax error, show help text from the top of this file
         pywikibot.showHelp('replace')
         return
-    if xmlFilename:
-        # XML parsing can be quite slow, so use smaller batches and
-        # longer lookahead.
-        preloadingGen = pagegenerators.PreloadingGenerator(gen,
-                                            pageNumber=20, lookahead=100)
-    else:
-        preloadingGen = pagegenerators.PreloadingGenerator(gen, 
-                        pageNumber=maxquerysize)
+
+    preloadingGen = pagegenerators.PreloadingGenerator(gen,
+                                                       pageNumber=maxquerysize)
 
     #Finally we open the file for page titles or set article to None
     if filename:
         try:
             #This opens in strict error mode, that means bot will stop
-            #on encoding errors with ValueError. 
+            #on encoding errors with ValueError.
             #See http://docs.python.org/library/codecs.html#codecs.open
             titlefile = codecs.open(filename, encoding='utf-8',
                                     mode=(lambda x: x and 'a' or 'w')(append))
@@ -853,7 +830,7 @@ LIMIT 200""" % (whereClause, exceptClause)
     finally:
         if titlefile:
             #Just for the spirit of programming (it was flushed)
-            titlefile.close() 
+            titlefile.close()
 
 
 if __name__ == "__main__":

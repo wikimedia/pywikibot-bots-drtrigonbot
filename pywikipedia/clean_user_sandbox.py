@@ -29,29 +29,34 @@ import wikipedia as pywikibot
 
 # overwrite bot default
 clean_sandbox.content = {
-	'de': u'{{Benutzer:DrTrigon/Entwurf/Vorlage:Spielwiese}}',
-	}
+                'de':       u'{{Benutzer:DrTrigon/Entwurf/Vorlage:Spielwiese}}',
+}
 
-bot_config = {	# unicode values
-		'userlist':		u'Benutzer:DrTrigonBot/Diene_Mir!',
+bot_config = {  # unicode values
+                'userlist': u'Benutzer:DrTrigonBot/Diene_Mir!',
 }
 
 
 class UserSandboxBot(clean_sandbox.SandboxBot, dtbext.basic.BasicBot):
-	'''
-	Robot which will clean per user sandbox pages.
-	'''
+    '''
+    Robot which will clean per user sandbox pages.
+    '''
 
-	def __init__(self, hours, no_repeat, delay, userListPage):
-		'''Constructor of UserSandboxBot(); setup environment, initialize needed consts and objects.'''
+    def __init__(self, hours, no_repeat, delay, userListPage):
+        '''Constructor of UserSandboxBot(); setup environment, initialize needed
+           consts and objects.
+        '''
 
-		pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
+        pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
 
-		dtbext.basic.BasicBot.__init__(self)  # setting TZ
+        dtbext.basic.BasicBot.__init__(self)  # setting TZ
 
-		pywikibot.output(u'\03{lightred}** Receiving User List (wishes): [[%s]]\03{default}' % userListPage)
+        pywikibot.output(u'\03{lightred}** Receiving User List (wishes): [[%s]]\03{default}' \
+                            % userListPage)
 
-		clean_sandbox.SandboxBot.__init__(self, hours, no_repeat, delay, userListPage)
+        clean_sandbox.SandboxBot.__init__(self,
+                                          hours, no_repeat, delay, userListPage)
+
 
 def main():
     hours = 1

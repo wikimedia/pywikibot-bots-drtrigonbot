@@ -40,21 +40,23 @@ This script understands the following command-line arguments:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: clean_sandbox.py 8958 2011-02-15 16:48:42Z xqt $'
+__version__ = '$Id: clean_sandbox.py 9636 2011-10-16 21:18:24Z valhallasw $'
 #
 
 import time
 import wikipedia as pywikibot
+from pywikibot import i18n
 
 content = {
     'commons': u'{{Sandbox}}\n<!-- Please edit only below this line. -->',
     'als':u'{{subst:/Vorlage}}',
-    'ar': u'{{من فضلك اترك هذا السطر ولا تعدله (عنوان ساحة التجربة)}}\n<!-- مرحبا! خذ راحتك في تجربة مهارتك في التنسيق والتحرير أسفل هذا السطر. هذه الصفحة لتجارب التعديل ، سيتم تفريغ هذه الصفحة كل 6 ساعات. -->',
+    'ar': u'{{عنوان الملعب}}\n<!-- مرحبا! خذ راحتك في تجربة مهارتك في التنسيق والتحرير أسفل هذا السطر. هذه الصفحة لتجارب التعديل ، سيتم تفريغ هذه الصفحة كل 12 ساعة. -->',
+    'az': u'<!--- LÜTFƏN, BU SƏTRƏ TOXUNMAYIN --->\n{{Qaralama dəftəri}}\n<!-- AŞAĞIDAKI XƏTTİN ALTINDAN YAZA BİLƏRSİNİZ --->',
     'bar':u'{{Bitte erst NACH dieser Zeile schreiben! (Begrüßungskasten)}}\r\n',
     'cs': u'{{subst:/uhrabat}}',
     'da': u'{{subst:Sandkasse tekst}}',
     'de': u'{{Bitte erst NACH dieser Zeile schreiben! (Begrüßungskasten)}}\r\n',
-    'en': u'{{Please leave this line alone (sandbox heading)}}\n<!-- Hello! Feel free to try your formatting and editing skills below this line. As this page is for editing experiments, this page will automatically be cleaned every 12 hours. -->',
+    'en': u'{{Sandbox heading}}\n<!-- Hello! Feel free to try your formatting and editing skills below this line. As this page is for editing experiments, this page will automatically be cleaned every 12 hours. -->',
     'fa': u'{{subst:User:Amirobot/sandbox}}',
     'fi': u'{{subst:Hiekka}}',
     'he': u'{{ארגז חול}}\n<!-- נא לערוך מתחת לשורה זו בלבד, תודה. -->',
@@ -70,45 +72,20 @@ content = {
     'pl': u'{{Prosimy - NIE ZMIENIAJ, NIE KASUJ, NIE PRZENOŚ tej linijki - pisz niżej}}',
     'pt': u'<!--não apague esta linha-->{{página de testes}}<!--não apagar-->\r\n',
     'ru': u'{{/Пишите ниже}}\n<!-- Не удаляйте, пожалуйста, эту строку, тестируйте ниже -->',
+    'simple': u'{{Please leave this line alone (sandbox heading)}}\n<!-- Hello! Feel free to try your formatting and editing skills below this line. As this page is for editing experiments, this page will automatically be cleaned every 2 hours. -->',
+    'sco': u'Feel free tae test here',
     'sr': u'{{песак}}\n<!-- Молимо, испробавајте испод ове линије. Хвала. -->',
     'sv': u'{{subst:Sandlådan}}',
     'th': u'{{กระบะทราย}}\n<!-- กรุณาอย่าแก้ไขบรรทัดนี้ ขอบคุณครับ/ค่ะ -- Please leave this line as they are. Thank you! -->',
+    'tr': u'{{/Bu satırı değiştirmeden bırakın}}',
     'zh': u'{{subst:User:Sz-iwbot/sandbox}}\r\n',
-    }
-
-msg = {
-    'commons': u'Bot: This page will automatically be cleaned.',
-    'als':u'Bötli: Sandchaschte iigebnet.',
-    'ar': u'روبوت: هذه الصفحة سيتم تفريغها تلقائيا',
-    'bar':u'Bot: Spielwiesn gmaht.',
-    'cs': u'Uhrabání pískoviště',
-    'da': u'Bot: Nyt sand (fra[[Skabelon:Sandkasse tekst]])',
-    'de': u'Bot: Setze Spielwiese zurück.',
-    'en': u'Robot: Automatically cleaned',
-    'fa': u'ربات: صفحه به طور خودکار تميز شد',
-    'fi': u'Botti siivosi hiekkalaatikon.',
-    'he': u'בוט: דף זה ינוקה אוטומטית.',
-    'id': u'Bot: Tata ulang',
-    'it': u'Bot: pulitura sandbox',
-    'ja': u'ロボットによる: 砂場ならし',
-    'ko': u'로봇: 연습장 비움',
-    'ksh':u'Bot: allt Zeush fott gedunn.',
-    'nds':u'Bot: Speelwisch leddig maakt.',
-    'nl': u'Bot: automatisch voorzien van schoon zand.',
-    'no': u'bot: Rydder sandkassa.',
-    'pl': u'Robot czyści brudnopis',
-    'pt': u'Bot: Limpeza da página de testes',
-    'ru': u'Бот: очистка песочницы',
-    'sr': u'Чишћење песка',
-    'sv': u'Robot krattar sandlådan.',
-    'th': u'โรบอต: กำลังจะเก็บกวาดหน้านี้โดยอัตโนมัติ',
-    'zh': u'Bot: 本页被自动清理',
     }
 
 sandboxTitle = {
     'commons': u'Project:Sandbox',
     'als':u'Project:Sandchaschte',
-    'ar': u'Project:ساحة التجربة',
+    'ar': u'Project:ملعب',
+    'az': u'Vikipediya:Qaralama dəftəri',
     'bar':u'Project:Spielwiese',
     'cs': u'Project:Pískoviště',
     'da': u'Project:Sandkassen',
@@ -129,9 +106,12 @@ sandboxTitle = {
     'pl': u'Project:Brudnopis',
     'pt': u'Project:Página de testes',
     'ru': u'Project:Песочница',
+    'simple': u'Project:Sandbox',
+    'sco': u'Project:Saundpit',
     'sr': u'Project:Песак',
     'sv': u'Project:Sandlådan',
     'th': u'Project:ทดลองเขียน',
+    'tr': u'Vikipedi:Deneme tahtası',
     'zh': u'Project:沙盒',
     }
 
@@ -150,7 +130,7 @@ class SandboxBot:
             self.userlist = [page.title().split(u'/')[0] for page in pywikibot.Page(self.site, userlist).linkedPages()]
 
     def run(self):
-        
+
         def minutesDiff(time1, time2):
             if type(time1) in [long, int]:
                 time1 = str(time1)
@@ -183,7 +163,8 @@ class SandboxBot:
                 try:
                     text = sandboxPage.get()
                     translatedContent = pywikibot.translate(mySite, content)
-                    translatedMsg = pywikibot.translate(mySite, msg)
+                    translatedMsg = i18n.twtranslate(mySite,
+                                                     'clean_sandbox-cleaned')
                     subst = 'subst:' in translatedContent
                     pos = text.find(translatedContent.strip())
                     if text.strip() == translatedContent.strip():

@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: supertux_family.py 5919 2008-09-26 12:28:58Z multichill $'
+__version__ = '$Id: supertux_family.py 9015 2011-02-28 17:57:55Z lcawte $'
 
 import family
 
@@ -25,4 +25,4 @@ class Family(family.Family):
         return '/wiki'
 
     def version(self, code):
-        return "1.13.1"
+        return "1.13.3"

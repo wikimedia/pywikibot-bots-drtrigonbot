@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: commons_family.py 8963 2011-02-16 08:34:10Z xqt $'
+__version__ = '$Id: commons_family.py 9654 2011-10-24 04:46:13Z xqt $'
 
 import family
 
@@ -18,6 +18,7 @@ class Family(family.Family):
 
         self.namespaces[4] = {
             '_default': [u'Commons', 'Project'],
+            'commons': [u'Commons', u'COM'],
         }
         self.namespaces[5] = {
             '_default': [u'Commons talk', 'Project talk'],
@@ -42,9 +43,11 @@ class Family(family.Family):
         }
         self.namespaces[106] = {
             '_default': [u'Institution'],
+            'commons': [u'Institution', u'Museum'],
         }
         self.namespaces[107] = {
             '_default': [u'Institution talk'],
+            'commons': [u'Institution talk', u'Museum talk'],
         }
 
         self.interwiki_forward = 'wikipedia'
@@ -74,10 +77,6 @@ class Family(family.Family):
             'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews', 'wikiversity',
             'meta', 'mediawiki', 'test', 'incubator', 'species',
         ]
-
-
-    def version(self, code):
-        return '1.17wmf1'
 
     def dbName(self, code):
         return 'commonswiki_p'
