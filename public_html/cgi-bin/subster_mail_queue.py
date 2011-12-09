@@ -8,7 +8,7 @@ to make it usable from server, use: 'chmod 755 panel.py', which results in
 # http://www.gpcom.de/support/python
 
 ## @package subster_mail_queue.py
-#  @brief   DrTrigonBot subster mail queue (BETA)
+#  @brief   DrTrigonBot subster mail queue
 #
 #  @copyright Dr. Trigon, 2011
 #
@@ -99,7 +99,7 @@ def displaystate(form):
 
 	data.update({   'oldlog':	"\n".join(buf),
 			'refresh':	'',
-			'title':	'DrTrigonBot subster mail queue (BETA)',
+			'title':	'DrTrigonBot subster mail queue',
 			'tsnotice': 	style.print_tsnotice(),
 			'p-status':	"<tr><td><td></tr>",
 			'footer': 	style.footer + style.footer_w3c, # wiki (new) not CSS 2.1 compilant
@@ -127,7 +127,7 @@ def content(form):
 
 	data.update({   'oldlog':	"\n".join(buf),
 			'refresh':	'',
-			'title':	'DrTrigonBot subster mail queue (BETA)',
+			'title':	'DrTrigonBot subster mail queue',
 			'tsnotice': 	style.print_tsnotice(),
 			'p-status':	"<tr><td><td></tr>",
 			'footer': 	style.footer + style.footer_w3c, # wiki (new) not CSS 2.1 compilant
