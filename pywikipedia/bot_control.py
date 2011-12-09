@@ -84,7 +84,7 @@ Options/parameters:
 #
 __version__       = '$Id$'
 __framework_rev__ = '9793'
-__release_ver__   = '1.1'
+__release_ver__   = '1.1'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
 
