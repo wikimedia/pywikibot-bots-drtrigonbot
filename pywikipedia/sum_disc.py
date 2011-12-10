@@ -186,10 +186,11 @@ bot_config = {    # unicode values
                     # liefert leider aber auch falsch positive treffer... wobei seiten, die mal die aufmerksamkeit geweckt
                     # haben (auf RecentChanges-Liste waren) und links in user-namensraum enthalten, sind auch interessant!!
                     # (und eher selten, etwa 1 pro user bei ca. 100 in history)
-                    'checksign_list':    [ '--\s?\[\[Benutzer:%(usersig)s[\]\|/]',            
-                                '--\s?\[\[Benutzer[ _]Diskussion:%(usersig)s[\]\|/]',
+                    'checksign_list':    [ '--\s?\[\[Benutzer(in)?:%(usersig)s[\]\|/]',            
+                                '--\s?\[\[Benutzer(in)?[ _]Diskussion:%(usersig)s[\]\|/]',
                                 '--\s?\[\[User:%(usersig)s[\]\|/]',            
                                 '--\s?\[\[User[ _]talk:%(usersig)s[\]\|/]', ],
+                                # '--\s?\[\[(.*?):%(usersig)s[\]\|/]', ],
                     # LIST of SIGNATUREs to USE, a LIST
                     'altsign_list':      [ '%(username)s' ],
                     # LIST of PAGEs to IGNORE, a LIST
