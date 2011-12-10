@@ -186,11 +186,7 @@ bot_config = {    # unicode values
                     # liefert leider aber auch falsch positive treffer... wobei seiten, die mal die aufmerksamkeit geweckt
                     # haben (auf RecentChanges-Liste waren) und links in user-namensraum enthalten, sind auch interessant!!
                     # (und eher selten, etwa 1 pro user bei ca. 100 in history)
-                    'checksign_list':    [ '--\s?\[\[Benutzer(in)?:%(usersig)s[\]\|/]',            
-                                '--\s?\[\[Benutzer(in)?[ _]Diskussion:%(usersig)s[\]\|/]',
-                                '--\s?\[\[User:%(usersig)s[\]\|/]',            
-                                '--\s?\[\[User[ _]talk:%(usersig)s[\]\|/]', ],
-                                # '--\s?\[\[(.*?):%(usersig)s[\]\|/]', ],
+                    'checksign_list':    [ '--\s?\[\[%(ns)s:%(usersig)s[\]\|/]', ],
                     # LIST of SIGNATUREs to USE, a LIST
                     'altsign_list':      [ '%(username)s' ],
                     # LIST of PAGEs to IGNORE, a LIST
@@ -1200,6 +1196,11 @@ class PageSections(object):
         self._param = param
         self._user  = user
 
+        # for signature later
+        site = page.site()
+        self._ns_list  = site.family.namespace(site.lang, 2, all=True)
+        self._ns_list += site.family.namespace(site.lang, 3, all=True)
+
         # code debugging
         if 'code' in debug:
             pywikibot.output(page.title())
@@ -1354,9 +1355,10 @@ class PageSections(object):
         main  = False
         for user in sign_list:
             for check in check_list:
-                for m in re.finditer(check % {'usersig':user}, text):
-                    signs[m.start()] = m
-                    main = (mainsign == user) or main
+                for n in self._ns_list:
+                    for m in re.finditer(check % {'ns':n, 'usersig':user}, text):
+                        signs[m.start()] = m
+                        main = (mainsign == user) or main
         signs_pos = signs.keys()
         signs_pos.sort()
 
