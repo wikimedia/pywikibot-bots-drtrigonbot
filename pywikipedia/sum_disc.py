@@ -827,7 +827,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
                            None,
                            u'DrTrigon',
                            tmst,
-                           { pywikibot.sectionencode(item,self.site.encoding()):('',True,item) },
+                           { item:('',True,item) },
                            _PS_maintmsg )
             self.pages.edit_news(page)
             self.pages.edit_hist(page)
