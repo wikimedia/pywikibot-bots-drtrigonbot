@@ -186,9 +186,9 @@ bot_config = {    # unicode values
                     # liefert leider aber auch falsch positive treffer... wobei seiten, die mal die aufmerksamkeit geweckt
                     # haben (auf RecentChanges-Liste waren) und links in user-namensraum enthalten, sind auch interessant!!
                     # (und eher selten, etwa 1 pro user bei ca. 100 in history)
-                    'checksign_list':    [ '--\s?\[\[%(ns)s:%(usersig)s[\]\|/]', ],
+                    'checksign_list':    [ u'--\s?\[\[%(ns)s:%(usersig)s[\]\|/]', ],
                     # LIST of SIGNATUREs to USE, a LIST
-                    'altsign_list':      [ '%(username)s' ],
+                    'altsign_list':      [ u'%(username)s' ],
                     # LIST of PAGEs to IGNORE, a LIST
                     # Alles mit '.*/Archiv.*' könnte man ruhig ausschließen - da passiert ja eh nichts
                     # und der Bot muss sich nicht mit so großen Seiten rumschlagen. -- Merlissimo 14:03, 31. Jan. 2009 (CET)
@@ -196,7 +196,7 @@ bot_config = {    # unicode values
                     'ignorepage_list':   [ u'(.*?)/Archiv', ],                 # + weitere 
                     # LIST of SIGNATUREs to USE, a LIST
                     'backlinks_list':    [ u'%(userdiscpage)s',
-                                u'Benutzer:%(username)s', ],
+                                u'%(userpage)s', ],
                     # (hidden)
                     #userResultPage: default is NOT DEFINED - this is a SPECIAL PARAM it is not
                     #         thought to be used explicit, it is defined by the page link (implicit).
@@ -452,6 +452,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
         # substitute variables for use in user defined parameters/options
         param_vars = { 'username':     self._user.name(),
+                       'userpage':     self._user.getUserPage().title(),
                        'userdiscpage': userdiscpage,
                      }
         for item in bot_config['vars_subst']:
