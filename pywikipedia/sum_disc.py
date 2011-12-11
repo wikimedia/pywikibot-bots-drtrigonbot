@@ -470,6 +470,16 @@ class SumDiscBot(dtbext.basic.BasicBot):
                                                           self._param[item][key])
                                                           #{})
 
+        # generate all possible signatures and drop duplicates
+        ns_list  = self.site.family.namespace(self.site.lang, 2, all=True)
+        ns_list += self.site.family.namespace(self.site.lang, 3, all=True)
+        signs = set()
+        #for user in self._param['altsign_list']:
+        for check in self._param['checksign_list']:
+            for ns in ns_list:
+                signs.add( check % {'ns':ns, 'usersig':'%(usersig)s'} )
+        self._param['checksign_list'] = list(signs)
+
     ## @todo the error correctors 'old history' and 'notify tag error' can be removed if
     #        they do not appear in bot logs anymore!
     #        \n[ JIRA: e.g. DRTRIGON-68 ]
@@ -1197,11 +1207,6 @@ class PageSections(object):
         self._param = param
         self._user  = user
 
-        # for signature later
-        site = page.site()
-        self._ns_list  = site.family.namespace(site.lang, 2, all=True)
-        self._ns_list += site.family.namespace(site.lang, 3, all=True)
-
         # code debugging
         if 'code' in debug:
             pywikibot.output(page.title())
@@ -1356,10 +1361,9 @@ class PageSections(object):
         main  = False
         for user in sign_list:
             for check in check_list:
-                for n in self._ns_list:
-                    for m in re.finditer(check % {'ns':n, 'usersig':user}, text):
-                        signs[m.start()] = m
-                        main = (mainsign == user) or main
+                for m in re.finditer(check % {'usersig':user}, text):
+                    signs[m.start()] = m
+                    main = (mainsign == user) or main
         signs_pos = signs.keys()
         signs_pos.sort()
 
