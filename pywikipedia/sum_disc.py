@@ -959,6 +959,7 @@ class SumDiscPages(object):
                 page = pywikibot.Page(self.site, name)
             except pywikibot.exceptions.NoPage, e:
                 pywikibot.output(u'%s' %e)
+                del hist[name]
                 continue
 
             page.sum_disc_data = hist[name]
