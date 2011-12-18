@@ -288,10 +288,10 @@ class TestWorkerFunction(unittest.TestCase):
 
 PAGE_SET_test_FS_getSections = [
 u'Benutzer Diskussion:Reiner Stoppok/Dachboden',
-u'Wikipedia:Löschkandidaten/12. Dezember 2009',
+u'Wikipedia:Löschkandidaten/12. Dezember 2009',     # https://bugzilla.wikimedia.org/show_bug.cgi?id=32753
 u'Wikipedia:Löschkandidaten/28. Juli 2006',
 u'Wikipedia Diskussion:Persönliche Bekanntschaften/Archiv/2008',
-u'Wikipedia:WikiProjekt München',
+u'Wikipedia:WikiProjekt München',                   # bugzilla:32753
 u'Wikipedia Diskussion:Hauptseite',
 u'Diskussion:Selbstkühlendes Bierfass',
 u'Benutzer Diskussion:P.Copp',
@@ -305,7 +305,7 @@ u'Diskussion:K.-o.-Tropfen',
 u'Portal Diskussion:Fußball/Archiv6',
 u'Benutzer Diskussion:Roland.M/Archiv2006-2007',
 u'Benutzer Diskussion:Tigerente/Archiv2006',
-u'Wikipedia:WikiProjekt Bremen/Beobachtungsliste',
+u'Wikipedia:WikiProjekt Bremen/Beobachtungsliste',  # bugzilla:32753
 u'Diskussion:Wirtschaft Chiles',
 u'Benutzer Diskussion:Ausgangskontrolle',
 u'Benutzer Diskussion:Amnesty.tina',
@@ -332,7 +332,7 @@ u'Benutzer Diskussion:Qniemiec',
 u'Benutzer Diskussion:Ilikeriri',
 u'Benutzer Diskussion:Casinoroyal',
 u'Benutzer Diskussion:Havanabua',
-u'Benutzer Diskussion:Euku/2010/II. Quartal',
+u'Benutzer Diskussion:Euku/2010/II. Quartal',       # bugzilla:32753
 u'Benutzer Diskussion:Mo4jolo/Archiv/2008',
 u'Benutzer Diskussion:Eschweiler',
 u'Benutzer Diskussion:Marilyn.hanson',

@@ -39,11 +39,6 @@ if __name__ == '__main__':
 #    print bots
 #    print len(bots)
 
-#(1, Page{[[Wikipedia:Löschkandidaten/12. Dezember 2009]]}) - bug in mw or pwb 'Begriff' section has no 'index'...
-#(4, Page{[[Wikipedia:WikiProjekt München]]})
-#(18, Page{[[Wikipedia:WikiProjekt Bremen/Beobachtungsliste]]})
-#(43, Page{[[Benutzer Diskussion:Euku/2010/II. Quartal]]})
-
 #    # test_FS_getSections - further investigation on: getSections #
 #    TESTPAGE = PAGE_SET_test_FS_getSections[1]
 #    page = pywikibot.Page(site, TESTPAGE)

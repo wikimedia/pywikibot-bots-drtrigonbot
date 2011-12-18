@@ -191,8 +191,10 @@ class Page(pywikibot.Page):
                     pos = 0
                     for i, item in enumerate(r):
                         item[u'level'] = int(item[u'level'])
-                        # byteoffset may be 0; 'None' means template - empty index means also template (may be a bug?)
+                        # byteoffset may be 0; 'None' means template
                         #if (item[u'byteoffset'] != None) and item[u'line']:
+                        # (empty index means also template - workaround for bug:
+                        # https://bugzilla.wikimedia.org/show_bug.cgi?id=32753)
                         if (item[u'byteoffset'] != None) and item[u'line'] and item[u'index']:
                             # section on this page and index in format u"%i"
                             self._getSectionByteOffset(item, pos, force, cutoff=setting)    # raises 'Error' if not sucessfull !
