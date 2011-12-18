@@ -191,7 +191,9 @@ class Page(pywikibot.Page):
                     pos = 0
                     for i, item in enumerate(r):
                         item[u'level'] = int(item[u'level'])
-                        if (item[u'byteoffset'] != None) and item[u'line']:  # byteoffset may be 0; 'None' means template
+                        # byteoffset may be 0; 'None' means template - empty index means also template (may be a bug?)
+                        #if (item[u'byteoffset'] != None) and item[u'line']:
+                        if (item[u'byteoffset'] != None) and item[u'line'] and item[u'index']:
                             # section on this page and index in format u"%i"
                             self._getSectionByteOffset(item, pos, force, cutoff=setting)    # raises 'Error' if not sucessfull !
                             pos                 = item[u'wikiline_bo'] + len(item[u'wikiline'])
@@ -238,7 +240,8 @@ class Page(pywikibot.Page):
 
             # try to give exact match for heading (remove HTML comments)
             for h in headers:
-                ph = re.search(h, pywikibot.removeDisabledParts(self._contents[pos:]), re.M)
+                #ph = re.search(h, pywikibot.removeDisabledParts(self._contents[pos:]), re.M)
+                ph = re.search(h, self._contents[pos:], re.M)
                 if ph:
                     ph = ph.group(0).strip()
                     possible_headers += [ (ph, section[u'line']) ]
@@ -280,7 +283,7 @@ class Page(pywikibot.Page):
         #print possible_headers
         best_match = (0.0, None)
         for i, (ph, header) in enumerate(possible_headers):
-            #print u'    ', difflib.SequenceMatcher(None, header, ph).ratio(), header, ph
+            #print u'    ', i, difflib.SequenceMatcher(None, header, ph).ratio(), header, ph
             mr = difflib.SequenceMatcher(None, header, ph).ratio()
             if mr > best_match[0]: best_match = (mr, ph)
             if (i in [0, 1]) and (mr >= cutoff[0]): break  # use first (exact; re) match directly (if good enough)
