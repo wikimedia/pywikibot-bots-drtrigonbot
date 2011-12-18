@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 
+# This test script is intended to be used with mature unittest code.
+#
+# This script contains important unittests in order to ensure the function
+# and stability of core dtbext (DrTrigonBot framework) code and methods.
+# You should not change code here except you want to add a new test case
+# for a function, mechanism or else.
+
 import unittest
 import __main__
 
@@ -13,6 +20,7 @@ import dtbext
 
 import pagegenerators, catlib
 import userlib
+import botlist
 # Splitting the bot into library parts
 import wikipedia as pywikibot
 
@@ -23,51 +31,58 @@ site = pywikibot.getSite()
 # http://docs.python.org/library/unittest.html
 class TestModuleImports(unittest.TestCase):
   def test_MI_framework(self):
-    self.assertEqual( "pagegenerators" in __main__.__dict__, True )
-    self.assertEqual( "catlib" in __main__.__dict__, True )
-    self.assertEqual( "userlib" in __main__.__dict__, True )
-    self.assertEqual( "pywikibot" in __main__.__dict__, True )
+    self.assertTrue( "pagegenerators" in __main__.__dict__ )
+    self.assertTrue( "catlib" in __main__.__dict__ )
+    self.assertTrue( "userlib" in __main__.__dict__ )
+    self.assertTrue( "pywikibot" in __main__.__dict__ )
+    self.assertTrue( "botlist" in __main__.__dict__ )
     # ... (e.g. sub modules, ...)
 
   def test_MI_dtbext(self):
-    self.assertEqual( "dtbext" in __main__.__dict__, True )
+    self.assertTrue( "dtbext" in __main__.__dict__ )
     # ...
+
+  def test_MI_botlist(self):
+    bots = botlist.get()
+    self.assertTrue( len(bots) > 0 )    # check if there is at least one bot in list
+    print "Number of bots total:", len(bots)
 
   def test_WF_addAttributes(self):
     site = pywikibot.getSite()
     dtbext.pywikibot.addAttributes( site )
-    self.assertEqual( hasattr(site, "getParsedString"), True )  # how to check if callable???
+    self.assertTrue( hasattr(site, "getParsedString") )  # how to check if callable???
     site.getParsedString(TESTBUFFER)                     #
 
     page = pywikibot.Page(pywikibot.getSite(), TESTPAGE)
     #print page.getSections()
     dtbext.pywikibot.addAttributes( page )
-    self.assertEqual( hasattr(page, "getSections"), True )
+    self.assertTrue( hasattr(page, "getSections") )
     page.getSections()
 
     page2 = pywikibot.Page(pywikibot.getSite(), u'Benutzer Diskussion:Karsten11')
     #print page.getSections()
     dtbext.pywikibot.addAttributes( page2 )
-    self.assertEqual( hasattr(page, "getSections"), True )
+    self.assertTrue( hasattr(page, "getSections") )
     page2.getSections()
 
 
 class TestFunctionStability(unittest.TestCase):
   def test_FS_getSections(self):
-    self.assertEqual( len(PAGE_SET_test_FS_getSections), 98 )
+    self.assertEqual( len(PAGE_SET_test_FS_getSections), 137 )
     count = 0
     problems = []
-    for TESTPAGE in PAGE_SET_test_FS_getSections:
+    for i, TESTPAGE in enumerate(PAGE_SET_test_FS_getSections):
       page = pywikibot.Page(site, TESTPAGE)
       dtbext.pywikibot.addAttributes(page)
       try:
         sections = page.getSections(minLevel=1)
       except pywikibot.exceptions.Error:
         count += 1
-        problems.append(page)
+        problems.append( (i, page) )
     print "Number of pages total:", len(PAGE_SET_test_FS_getSections)
     print "Number of problematic pages:", count
-    print "Problematic pages:", problems
+    #print "Problematic pages:", problems
+    print "Problematic pages:\n", "\n".join( map(str, problems) )
     #self.assertLessEqual( count, 4 )
     self.assertTrue( count <= 4 )
 
@@ -271,62 +286,6 @@ class TestWorkerFunction(unittest.TestCase):
     #page.isRedirectPage()
 
 
-def productive():
-  suite = unittest.TestLoader().loadTestsFromTestCase(TestModuleImports)
-  unittest.TextTestRunner(verbosity=2).run(suite)
-
-  suite = unittest.TestLoader().loadTestsFromTestCase(TestFunctionStability)
-  unittest.TextTestRunner(verbosity=2).run(suite)
-
-  #suite = unittest.TestLoader().loadTestsFromTestCase(TestWorkerFunction)
-  suite = unittest.TestSuite()
-  # wikipedia.py
-  dtbext.pywikibot.debug = True
-  #suite.addTest(TestWorkerFunction('test_WF_getVersionHistory'))
-  #suite.addTest(TestWorkerFunction('test_WF_getSections'))
-  #suite.addTest(TestWorkerFunction('test_WF_purgeCache'))
-  #suite.addTest(TestWorkerFunction('test_WF_get'))
-  #suite.addTest(TestWorkerFunction('test_WF_getParsedContent'))
-  #print pywikibot.getSite().getUrl('/w/api.php?action=query&meta=userinfo&uiprop=blockinfo|hasmsg|groups|rights|options|preferencestoken|editcount|ratelimits|email&formal=xml')
-  #suite.addTest(TestWorkerFunction('test_WF_globalnotifications'))
-  #suite.addTest(TestWorkerFunction('test_WF_addAttributes'))
-  #pywikibot.debug = True
-  #suite.addTest(TestWorkerFunction('test_WF_PreloadingGenerator'))
-  #suite.addTest(TestWorkerFunction('test_WF_VersionHistoryGenerator'))
-  unittest.TextTestRunner(verbosity=2).run(suite)
-
-  return
-
-
-def experimental():
-  site = pywikibot.getSite()
-    
-  #a_str = r'<strong class="error">Referenz-Fehler: Einzelnachweisfehler: <code>&lt;ref&gt;</code>-Tags existieren, jedoch wurde kein <code>&lt;references&#160;/&gt;</code>-Tag gefunden.</strong>'
-  #site = dtbext.pywikibot.Page(pywikibot.getSite(), TESTPAGE)
-  #buf = site.get(mode='parse')
-  #import re
-  #if re.search(a_str, buf): print "<references />-Tag Fehler"
-
-  #print userlib.User(pywikibot.getSite(), u'º_the_Bench_º')
-
-  #import botlist
-  #bots = botlist.get()
-  #print bots
-  #print len(bots)
-
-  ##cat = catlib.Category(site, "%s:%s" % (site.namespace(14), u'Baden-Württemberg'))
-  #cat = catlib.Category(site, "%s:%s" % (site.namespace(14), u'Portal:Hund'))
-  #for page in pagegenerators.CategorizedPageGenerator(cat, recurse=True):
-  #  if not page.isTalkPage():
-  #    page = page.toggleTalkPage()
-  ##  try:
-  #  print page.title(), page.getVersionHistory(revCount=1)[0][1]
-  ##  except pywikibot.exceptions.NoPage:
-  ##    pass
-
-  return
-
-
 PAGE_SET_test_FS_getSections = [
 u'Benutzer Diskussion:Reiner Stoppok/Dachboden',
 u'Wikipedia:Löschkandidaten/12. Dezember 2009',
@@ -351,7 +310,7 @@ u'Diskussion:Wirtschaft Chiles',
 u'Benutzer Diskussion:Ausgangskontrolle',
 u'Benutzer Diskussion:Amnesty.tina',
 u'Diskussion:Chicagoer Schule',
-u'Wikipedia Diskussion:Hausaufgabenhilfe',
+#u'Wikipedia Diskussion:Hausaufgabenhilfe',         # [ DELETED ]
 u'Benutzer Diskussion:Niemot',
 u'Benutzer Diskussion:Computer356',
 u'Benutzer Diskussion:Bautsch',
@@ -364,7 +323,7 @@ u'Benutzer Diskussion:Paulusschinew',
 u'Benutzer Diskussion:Hollister71',
 u'Benutzer Diskussion:Schott-PR',
 u'Benutzer Diskussion:RoBoVsKi',
-u'Benutzer Diskussion:Tjaraaa',
+#u'Benutzer Diskussion:Tjaraaa',                    # [ REDIRECTED ]
 u'Benutzer Diskussion:Jason Hits',
 u'Benutzer Diskussion:Fit-Fabrik',
 u'Benutzer Diskussion:SpaceRazor',
@@ -373,14 +332,14 @@ u'Benutzer Diskussion:Qniemiec',
 u'Benutzer Diskussion:Ilikeriri',
 u'Benutzer Diskussion:Casinoroyal',
 u'Benutzer Diskussion:Havanabua',
-u'Benutzer Diskussion:Euku/2010/II. Quartal',  # !
-u'Benutzer Diskussion:Mo4jolo/Archiv/2008',  # !
+u'Benutzer Diskussion:Euku/2010/II. Quartal',
+u'Benutzer Diskussion:Mo4jolo/Archiv/2008',
 u'Benutzer Diskussion:Eschweiler',
-u'Benutzer Diskussion:Marilyn.hanson' , # !
+u'Benutzer Diskussion:Marilyn.hanson',
 u'Benutzer Diskussion:A.Savin',
 u'Benutzer Diskussion:W!B:/Knacknüsse',
 u'Benutzer Diskussion:Euku/2009/II. Halbjahr',
-u'Benutzer Diskussion:Gamma',  # !
+u'Benutzer Diskussion:Gamma',
 u'Hilfe Diskussion:Captcha',
 u'Benutzer Diskussion:Zacke/Kokytos',
 u'Benutzer Diskussion:Wolfgang1018',
@@ -389,7 +348,7 @@ u'Benutzer Diskussion:Janneman/Orkus',
 u'Wikipedia Diskussion:Shortcuts',
 u'Benutzer Diskussion:PDD',
 u'Wikipedia:WikiProjekt Vorlagen/Werkstatt',
-u'Wikipedia Diskussion:WikiProjekt Wuppertal/2008',  # !
+u'Wikipedia Diskussion:WikiProjekt Wuppertal/2008',
 u'Benutzer Diskussion:SchirmerPower',
 u'Benutzer Diskussion:Stefan Kühn/Check Wikipedia',
 u'Benutzer Diskussion:Elian',
@@ -399,8 +358,8 @@ u'Benutzer Diskussion:Drahreg01',
 u'Wikipedia:Vandalismusmeldung',
 u'Benutzer Diskussion:Jesusfreund',
 u'Benutzer Diskussion:Velipp28',
-u'Benutzer Diskussion:Jotge' , # !
-u'Benutzer Diskussion:DAJ',  # !
+u'Benutzer Diskussion:Jotge',
+u'Benutzer Diskussion:DAJ',
 u'Benutzer Diskussion:Karl-G. Walther',
 u'Benutzer Diskussion:Pincerno',
 u'Benutzer Diskussion:Polluks',
@@ -408,24 +367,65 @@ u'Portal:Serbien/Nachrichtenarchiv',
 u'Benutzer Diskussion:Elly200253',
 u'Benutzer Diskussion:Yak',
 u'Wikipedia:Auskunft',
-u'Benutzer Diskussion:Toolittle',  # !
+u'Benutzer Diskussion:Toolittle',
 u'Benutzer Diskussion:He3nry',
 u'Benutzer Diskussion:Euku/2009/I. Halbjahr',
-u'Benutzer Diskussion:Elchbauer' , # !
+u'Benutzer Diskussion:Elchbauer' ,
 u'Benutzer Diskussion:Matthiasb',
 u'Benutzer Diskussion:Gripweed',
 u'Wikipedia:Löschkandidaten/10. Februar 2011',
 u'Benutzer Diskussion:Funkruf',
 u'Benutzer Diskussion:Vux',
-u'Benutzer Diskussion:Zollernalb/Archiv/2008' , # !
+u'Benutzer Diskussion:Zollernalb/Archiv/2008' ,
 u'Benutzer Diskussion:Geiserich77/Archiv2009',
-u'Benutzer Diskussion:Markus Mueller/Archiv' , # !
+u'Benutzer Diskussion:Markus Mueller/Archiv' ,
 u'Benutzer Diskussion:Capaci34/Archiv/2009',
 u'Wikipedia Diskussion:Persönliche Bekanntschaften/Archiv/2010',
 u'Benutzer Diskussion:Leithian/Archiv/2009/Aug',
 u'Benutzer Diskussion:Lady Whistler/Archiv/2010',
-u'Benutzer Diskussion:Jens Liebenau/Archiv1',  # !
+u'Benutzer Diskussion:Jens Liebenau/Archiv1',
 u'Benutzer Diskussion:Tilla/Archiv/2009/Juli',
+u'Benutzer Diskussion:Xqt',
+u'Vorlage Diskussion:Benutzerdiskussionsseite',
+u'Wikipedia Diskussion:Meinungsbilder/Gestaltung von Signaturen',
+u'Benutzer Diskussion:JvB1953',
+u'Benutzer Diskussion:J.-H. Janßen',
+u'Benutzer Diskussion:Xqt/Archiv/2009-1',
+u'Hilfe Diskussion:Weiterleitung/Archiv/001',
+u'Benutzer Diskussion:Raymond/Archiv 2006-2',
+u'Wikipedia Diskussion:Projektneuheiten/Archiv/2009',
+u'Vorlage Diskussion:Erledigt',
+u'Wikipedia:Bots/Anfragen/Archiv/2008-2',
+u'Diskussion:Golfschläger/Archiv',
+u'Wikipedia:Löschkandidaten/9. Januar 2006',
+u'Benutzer Diskussion:Church of emacs/Archiv5',
+u'Wikipedia:WikiProjekt Vorlagen/Werkstatt/Archiv 2006',
+u'Wikipedia Diskussion:Löschkandidaten/Archiv7',
+u'Benutzer Diskussion:Physikr',
+u'Benutzer Diskussion:Haring/Archiv, Dez. 2005',
+u'Benutzer Diskussion:Seewolf/Archiv 7',
+u'Benutzer Diskussion:Mipago/Archiv',
+u'Wikipedia Diskussion:WikiProjekt Syntaxkorrektur/Archiv/2009',
+u'Benutzer Diskussion:PDD/monobook.js',
+u'Wikipedia:Löschkandidaten/9. April 2010',
+u'Benutzer Diskussion:Augiasstallputzer/Archiv',
+u'Hilfe Diskussion:Variablen',
+u'Benutzer Diskussion:Merlissimo/Archiv/2009',
+u'Benutzer Diskussion:Elya/Archiv 2007-01',
+u'Benutzer Diskussion:Merlissimo/Archiv/2010',
+u'Benutzer Diskussion:Jonathan Groß/Archiv 2006',
+u'Benutzer Diskussion:Erendissss',
+u'Diskussion:Ilse Elsner',
+u'Diskussion:Pedro Muñoz',
+u'Diskussion:Stimmkreis Nürnberg-Süd',
+u'Diskussion:Geschichte der Sozialversicherung in Deutschland',
+u'Diskussion:Josef Kappius',
+u'Diskussion:Bibra (Adelsgeschlecht)',
+u'Diskussion:Stimmkreis Regensburg-Land-Ost',
+u'Diskussion:Volkmar Kretkowski',
+u'Diskussion:KS Cracovia',
+u'Diskussion:Livingston (Izabal)',
+u'Wikipedia Diskussion:WikiProjekt Gesprochene Wikipedia/Howto',
 ]
 
 
@@ -493,6 +493,25 @@ fällt mir auf, dass es diesen artikel noch gar nicht gibt und dennoch schmeisst
 
 
 if __name__ == '__main__':
-  productive()
-  experimental()
+  suite = unittest.TestLoader().loadTestsFromTestCase(TestModuleImports)
+  unittest.TextTestRunner(verbosity=2).run(suite)
 
+  suite = unittest.TestLoader().loadTestsFromTestCase(TestFunctionStability)
+  unittest.TextTestRunner(verbosity=2).run(suite)
+
+  #suite = unittest.TestLoader().loadTestsFromTestCase(TestWorkerFunction)
+  suite = unittest.TestSuite()
+  # wikipedia.py
+  dtbext.pywikibot.debug = True
+  #suite.addTest(TestWorkerFunction('test_WF_getVersionHistory'))
+  #suite.addTest(TestWorkerFunction('test_WF_getSections'))
+  #suite.addTest(TestWorkerFunction('test_WF_purgeCache'))
+  #suite.addTest(TestWorkerFunction('test_WF_get'))
+  #suite.addTest(TestWorkerFunction('test_WF_getParsedContent'))
+  #print pywikibot.getSite().getUrl('/w/api.php?action=query&meta=userinfo&uiprop=blockinfo|hasmsg|groups|rights|options|preferencestoken|editcount|ratelimits|email&formal=xml')
+  #suite.addTest(TestWorkerFunction('test_WF_globalnotifications'))
+  #suite.addTest(TestWorkerFunction('test_WF_addAttributes'))
+  #pywikibot.debug = True
+  #suite.addTest(TestWorkerFunction('test_WF_PreloadingGenerator'))
+  #suite.addTest(TestWorkerFunction('test_WF_VersionHistoryGenerator'))
+  unittest.TextTestRunner(verbosity=2).run(suite)

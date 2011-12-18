@@ -1,0 +1,53 @@
+# -*- coding: utf-8 -*-
+
+# This test script is intended to be used with EXPERIMENTAL code.
+#
+# You can add, remove or modify the code in here more or less freely
+# to test what ever you need to test... enjoy!
+
+import test_utils
+
+from test_dtbext import *
+
+import dtbext
+
+import pagegenerators, catlib
+import userlib
+# Splitting the bot into library parts
+import wikipedia as pywikibot
+
+
+site = pywikibot.getSite()
+
+
+# 'TESTPAGE', 'TESTPAGES', ... imported from 'test_dtbext.py'
+
+
+if __name__ == '__main__':
+    site = pywikibot.getSite()
+
+    #a_str = r'<strong class="error">Referenz-Fehler: Einzelnachweisfehler: <code>&lt;ref&gt;</code>-Tags existieren, jedoch wurde kein <code>&lt;references&#160;/&gt;</code>-Tag gefunden.</strong>'
+    #site = dtbext.pywikibot.Page(pywikibot.getSite(), TESTPAGE)
+    #buf = site.get(mode='parse')
+    #import re
+    #if re.search(a_str, buf): print "<references />-Tag Fehler"
+
+    #print userlib.User(pywikibot.getSite(), u'º_the_Bench_º')
+
+#    # test_MI_botlist - further investigation on: botlist.get #
+#    bots = botlist.get()
+#    print bots
+#    print len(bots)
+
+#(1, Page{[[Wikipedia:Löschkandidaten/12. Dezember 2009]]}) - bug in mw or pwb 'Begriff' section has no 'index'...
+#(4, Page{[[Wikipedia:WikiProjekt München]]})
+#(18, Page{[[Wikipedia:WikiProjekt Bremen/Beobachtungsliste]]})
+#(43, Page{[[Benutzer Diskussion:Euku/2010/II. Quartal]]})
+
+#    # test_FS_getSections - further investigation on: getSections #
+#    TESTPAGE = PAGE_SET_test_FS_getSections[1]
+#    page = pywikibot.Page(site, TESTPAGE)
+#    dtbext.pywikibot.addAttributes(page)
+#    sections = page.getSections(minLevel=1)
+#    for s in sections:
+#        print s
