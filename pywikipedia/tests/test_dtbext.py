@@ -68,7 +68,7 @@ class TestModuleImports(unittest.TestCase):
 
 class TestFunctionStability(unittest.TestCase):
   def test_FS_getSections(self):
-    self.assertEqual( len(PAGE_SET_test_FS_getSections), 137 )
+    self.assertEqual( len(PAGE_SET_test_FS_getSections), 138 )
     count = 0
     problems = []
     for i, TESTPAGE in enumerate(PAGE_SET_test_FS_getSections):
@@ -84,7 +84,7 @@ class TestFunctionStability(unittest.TestCase):
     #print "Problematic pages:", problems
     print "Problematic pages:\n", "\n".join( map(str, problems) )
     #self.assertLessEqual( count, 4 )
-    self.assertTrue( count <= 4 )
+    self.assertTrue( count <= 0 )
 
     return
 
@@ -426,6 +426,7 @@ u'Diskussion:Volkmar Kretkowski',
 u'Diskussion:KS Cracovia',
 u'Diskussion:Livingston (Izabal)',
 u'Wikipedia Diskussion:WikiProjekt Gesprochene Wikipedia/Howto',
+u'Benutzer Diskussion:Otfried Lieberknecht',
 ]
 
 

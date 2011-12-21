@@ -287,7 +287,7 @@ class Page(pywikibot.Page):
         for i, (ph, header) in enumerate(possible_headers):
             #print u'    ', i, difflib.SequenceMatcher(None, header, ph).ratio(), header, ph
             mr = difflib.SequenceMatcher(None, header, ph).ratio()
-            if mr > best_match[0]: best_match = (mr, ph)
+            if mr >= best_match[0]: best_match = (mr, ph)
             if (i in [0, 1]) and (mr >= cutoff[0]): break  # use first (exact; re) match directly (if good enough)
         #print u'    ', best_match
 
