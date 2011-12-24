@@ -85,7 +85,7 @@ import re, sys
 import time, codecs, os, calendar
 import threading
 import copy #, zlib
-import string, datetime, hashlib
+import string, datetime, hashlib, locale
 
 import config, pagegenerators, userlib
 import dtbext
@@ -263,6 +263,9 @@ class SumDiscBot(dtbext.basic.BasicBot):
         pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
 
         dtbext.basic.BasicBot.__init__(self, bot_config)
+
+        lang = locale.locale_alias.get(self.site.lang, locale.locale_alias['en']).split('.')[0]
+        locale.setlocale(locale.LC_TIME, lang)
 
         # init constants
         self._userListPage = pywikibot.Page(self.site, bot_config['userlist'])
