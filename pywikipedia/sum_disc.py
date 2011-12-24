@@ -561,8 +561,6 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
         pywikibot.output(u'\03{lightpurple}*** History updated\03{default}')
 
-    ## @todo should be done in framework, in userlib.User.contributions() or else
-    #        \n[ JIRA: DRTRIGON-59 ]
     def checkRecentEdits(self):
         """Check wiki on recent contributions of specific user.
 

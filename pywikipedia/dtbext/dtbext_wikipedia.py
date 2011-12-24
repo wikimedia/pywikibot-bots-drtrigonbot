@@ -34,7 +34,7 @@ import wikipedia as pywikibot
 import query, config
 
 
-debug = False
+debug = pywikibot.debug
 
 
 ## @since   r19 (ADDED)
@@ -163,8 +163,8 @@ class Page(pywikibot.Page):
         # JIRA: DRTRIGON-90; catch and convert error (convert it such that the whole page gets processed later)
         try:
             r = result[u'parse'][u'sections']
-        except KeyError:
-            print result    # sequence of sometimes occuring "KeyError: u'parse'"
+        except KeyError:    # sequence of sometimes occuring "KeyError: u'parse'"
+            pywikibot.output(u'Query result: %r' % result)
             raise pywikibot.Error('Problem occured during data retrieval for sections in %s!' % self.title(asLink=True))
         #debug_data = str(r) + '\n'
         debug_data = str(result) + '\n'
