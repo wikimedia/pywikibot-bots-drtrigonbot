@@ -147,6 +147,8 @@ class SubsterBot(dtbext.basic.BasicBot):
     def run(self, sim=False, msg=bot_config['msg'], EditFlags=bot_config['EditFlags']):
         '''Run SubsterBot().'''
 
+        logging.basicConfig(level=logging.DEBUG if ('code' in debug) else logging.INFO)
+
         pywikibot.output(u'\03{lightgreen}* Processing Template Backlink List:\03{default}')
 
         if sim:    self.pagegen = ['dummy']

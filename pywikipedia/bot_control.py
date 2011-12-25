@@ -147,8 +147,7 @@ debug.append( 'write2wiki' )  # write to wiki (operational mode)
 #debug.append( 'user' )        # skip users
 debug.append( 'write2hist' )  # write history (operational mode)
 #debug.append( 'toolserver' )  # toolserver down
-if pywikibot.debug:
-    debug.append( 'code' )     # code debugging
+# code debugging look below; debug.append( 'code' )
 
 
 ## Bot Error Handling; to prevent bot errors to stop execution of other bots
@@ -254,7 +253,7 @@ class BotController:
 class BotLogger:
     def __init__(self, filename, console=True):
         # http://docs.python.org/howto/logging-cookbook.html#logging-to-multiple-destinations
-        logger = logging.getLogger('bot_control')
+        logger = logging.getLogger()    # root logger
         logger.setLevel(logging.DEBUG)
         # create file handler which logs even debug messages
         fh = logging.handlers.TimedRotatingFileHandler(filename, when='midnight', utc=False)#, encoding='bz2-codec')
@@ -270,6 +269,7 @@ class BotLogger:
         logger.addHandler(fh)
         if console: logger.addHandler(ch)
 
+        logger = logging.getLogger('bot_control')
         self.stdlog = BotLoggerObject(logger, color=False)
         self.errlog = BotLoggerObject(logger, color=False, err=False)
 
@@ -401,6 +401,9 @@ def main():
 
 if __name__ == "__main__":
     arg = pywikibot.handleArgs()
+    if pywikibot.debug:
+        debug.append( 'code' ) # code debugging
+
     log = None
     logfile = logname % dtbext.date.getTimeStmpNow()    # actual date (no time)
     if len(arg) > 0:
