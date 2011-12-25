@@ -88,9 +88,12 @@ __release_ver__   = '1.1'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
 
+import sys, os, re, time, codecs
+import logging
+import logging.handlers
+
 # wikipedia-bot imports
 import pagegenerators, userlib, botlist, clean_sandbox
-import sys, os, re, time, codecs
 import clean_user_sandbox, sum_disc, subster, script_wui, subster_irc
 import dtbext
 # Splitting the bot into library parts
@@ -144,10 +147,12 @@ debug.append( 'write2wiki' )  # write to wiki (operational mode)
 #debug.append( 'user' )        # skip users
 debug.append( 'write2hist' )  # write history (operational mode)
 #debug.append( 'toolserver' )  # toolserver down
-#debug.append( 'code' )        # code debugging
+if pywikibot.debug:
+    debug.append( 'code' )     # code debugging
 
 
-# Bot Error Handling; to prevent bot errors to stop execution of other bots
+## Bot Error Handling; to prevent bot errors to stop execution of other bots
+#
 class BotErrorHandler:
     def __init__(self, error_ec):
         self.error_buffer = []
@@ -181,7 +186,7 @@ class BotErrorHandler:
         pywikibot.output(u'\nEXCEPTIONS/ERRORS:')
 
         item = u'\n'.join([u'%s:\n%s' % (str(item[0]), item[2]) for item in self.error_buffer])
-        pywikibot.output(item)
+        logging.getLogger('bot_control').error(item)
 
         # if runned as CRON-job mail occuring exception and traceback to bot admin
         if cron and error_mail_fromwiki:
@@ -206,7 +211,7 @@ class BotErrorHandler:
                 return
         except:  # break exception handling recursion
             pass
-        pywikibot.output(u'!!! WARNING: mail could not be sent!')
+        logging.getLogger('bot_control').warning(u'mail could not be sent!')
 
     def gettraceback(self, exc_info):
         (exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)
@@ -244,68 +249,63 @@ class BotController:
             self.ErrorHandler.gettraceback(sys.exc_info())
 
 
-# Bot Output Redirecting And Logging; to assure all output is logged into file
-class Logger:
+## Bot Output Redirecting And Logging; to assure all output is logged into file
+#
+class BotLogger:
+    def __init__(self, filename, console=True):
+        # http://docs.python.org/howto/logging-cookbook.html#logging-to-multiple-destinations
+        logger = logging.getLogger('bot_control')
+        logger.setLevel(logging.DEBUG)
+        # create file handler which logs even debug messages
+        fh = logging.handlers.TimedRotatingFileHandler(filename, when='midnight', utc=False)#, encoding='bz2-codec')
+        fh.setLevel(logging.DEBUG if ('code' in debug) else logging.INFO)
+        # create console handler with a higher log level
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        # create formatter and add it to the handlers
+        formatter = logging.Formatter('%(asctime)s %(name)-20s %(levelname)-8s %(message)s')
+        #ch.setFormatter(formatter)
+        fh.setFormatter(formatter)
+        # add the handlers to logger
+        logger.addHandler(fh)
+        if console: logger.addHandler(ch)
+
+        self.stdlog = BotLoggerObject(logger, color=False)
+        self.errlog = BotLoggerObject(logger, color=False, err=False)
+
+        (self.stdout, self.stderr) = (sys.stdout, sys.stderr)
+        (sys.stdout, sys.stderr)   = (self.stdlog, self.errlog)
+
+    def close(self):
+        (sys.stdout, sys.stderr)   = (self.stdout, self.stderr)
+        
+        logging.shutdown()
+
+class BotLoggerObject:
     _REGEX_boc = re.compile('\x1B\[.*?m')   # BeginOfColor
     _REGEX_eoc = re.compile('\x03\{.*?\}')  # EndOfColor
     _REGEX_eol = re.compile('\n')           # EndOfLine
-    def __init__(self, filename, **param):
-        self._filename = filename
-        self._param    = param
-        self._time     = dtbext.date.getTimeStmpNow()   # actual date (no time)
-        self.file = codecs.open(logname % (self._time + self._filename),
-                                **self._param)
-        if logger_tmsp:
-            self.file.write( self._get_tmsp() )
-    def write(self, string):
-        string = self._REGEX_boc.sub('', string)  # make more readable
-        string = self._REGEX_eoc.sub('', string)  #
-        if logger_tmsp:
-            string = self._REGEX_eol.sub('\n' + self._get_tmsp(), string)
-        res = self.file.write( str(string).decode('latin-1') )
-        #self.flush()  # paranoid since it's a logger
-        if not (self._time == dtbext.date.getTimeStmpNow()):
-            self._switch_file()
-        return res
-    def close(self):
-        self.file.write( '\n' )
-        self.flush()
-        res = self.file.close()
-        #del self.file
-        self.file = None
-        return res
-    def flush(self):
-        return self.file.flush()
-    def _get_tmsp(self):
-        return dtbext.date.getTimeStmpNow(full = True, humanreadable = True, local = True) + ':: '
-    def _switch_file(self):
-        self.file.write( '\n\n>> SWITCHING TO NEW LOG-FILE; please look there... <<' )
-        self.close()
-        self.__init__(self._filename, **self._param)
-        self.file.write( '>> SWITCHED FROM OLD LOG-FILE; please look there... <<\n' )
-
-class OutputLog:
-    def __init__(self, addlogname=None):
-        if addlogname == None:
-            self.logfile = None
+    def __init__(self, logger, color=False, err=False):
+        self._logger = logger
+        self._color  = color
+        if err:
+            self._func = self._logger.error
         else:
-            self.logfile = Logger(addlogname,
-                                  encoding=pywikibot.config.textfile_encoding,
-                                  mode='a+')
-
-        (self.stdout, self.stderr) = (sys.stdout, sys.stderr)
-
-        if self.logfile:
-            (sys.stdout, sys.stderr) = (self.logfile, self.logfile)
-
+            self._func = self._logger.info
+    def write(self, string):
+        if not self._color:
+            string = self._REGEX_boc.sub('', string)  # make more readable
+            string = self._REGEX_eoc.sub('', string)  #
+        for string in self._REGEX_eol.split(string.rstrip()):
+            self._func(string)
     def close(self):
-        (sys.stdout, sys.stderr) = (self.stdout, self.stderr)
+        pass
+    def flush(self):
+        pass
 
-        if self.logfile:
-            self.logfile.close()
 
-
-# Retrieve revision number of pywikibedia framework
+## Retrieve revision number of pywikibedia framework
+#
 def getSVN_framework_ver():
     # framework revision?
     buf = pywikibot.getSite().getUrl( 'http://svn.wikimedia.org/viewvc/pywikipedia/trunk/pywikipedia/', no_hostname = True, retry = False )
@@ -327,7 +327,8 @@ def getSVN_framework_ver():
     else:
         pywikibot.output(u'  WARNING: could not retrieve information!')
 
-# Retrieve revision number of pywikibedia framework
+## Retrieve revision number of pywikibedia framework
+#
 def getSVN_release_ver():
     global __release_rev__
     # local release revision?
@@ -346,7 +347,8 @@ def getSVN_release_ver():
         pywikibot.output(u'  WARNING: could not retrieve information!')
 
 
-# main procedure
+## main procedure
+#
 def main():
 #    global log, error
 #    global do_dict        # alle anderen NICHT noetig, warum diese hier ?!?????
@@ -400,6 +402,7 @@ def main():
 if __name__ == "__main__":
     arg = pywikibot.handleArgs()
     log = None
+    logfile = logname % dtbext.date.getTimeStmpNow()    # actual date (no time)
     if len(arg) > 0:
         #arg = pywikibot.handleArgs()[0]
         #print sys.argv[0]    # who am I?
@@ -413,7 +416,6 @@ if __name__ == "__main__":
                     'script_wui':         False,
                     'subster_irc':        False,
         }
-        logname_enh = ""        
         error_ec    = error_SGE_stop
         #error_ec    = error_SGE_restart
   
@@ -433,11 +435,11 @@ if __name__ == "__main__":
             do_dict['compress_history'] = True         # anderen kombiniert werden können (siehe 'else')...!
         elif ("-subster_irc" in arg):                  # muss alleine laufen...
             do_dict['subster_irc'] = True
-            logname_enh = ".subster_irc"               # use another log than usual !!!
+            logfile = logname % "subster_irc"          # use another log than usual !!!
             #error_ec = error_SGE_restart
         #elif ("-subster" in arg):
         #    do_dict['subster'] = True
-        #    logname_enh = ".subster"            # use another log than usual !!!
+        #    logfile = logname % "subster"              # use another log than usual !!!
         else:
             do_dict.update({ 'clean_user_sandbox': ("-clean_user_sandbox" in arg),
                              'sum_disc':           ("-sum_disc" in arg),
@@ -445,14 +447,13 @@ if __name__ == "__main__":
                              'script_wui':         ("-script_wui" in arg),
             })
 
-        if cron:
-            log = OutputLog(addlogname=logname_enh)
+        log = BotLogger(logfile, not cron)
 
         no_magic_words = ("-no_magic_words" in arg)
 
         error = BotErrorHandler(error_ec)
     else:
-        log = OutputLog()
+        log = BotLogger(logfile)
         choice = pywikibot.inputChoice('Do you want to compress the histories?', ['Yes', 'No'], ['y', 'n'])
         if choice == 'y':
             logs = os.listdir(u'logs')

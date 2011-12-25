@@ -25,16 +25,13 @@ __version__ = '$Id$'
 #
 
 # Standard library imports
-import difflib, re
+import difflib, re, logging
 # Splitting the bot into library parts
 from dtbext_pywikibot import *
 
 # Application specific imports
 import wikipedia as pywikibot
 import query, config
-
-
-debug = pywikibot.debug
 
 
 ## @since   r19 (ADDED)
@@ -164,7 +161,7 @@ class Page(pywikibot.Page):
         try:
             r = result[u'parse'][u'sections']
         except KeyError:    # sequence of sometimes occuring "KeyError: u'parse'"
-            pywikibot.output(u'Query result: %r' % result)
+            logging.getLogger('dtbext.wikipedia').warning(u'Query result: %r' % result)
             raise pywikibot.Error('Problem occured during data retrieval for sections in %s!' % self.title(asLink=True))
         #debug_data = str(r) + '\n'
         debug_data = str(result) + '\n'
@@ -179,14 +176,10 @@ class Page(pywikibot.Page):
             debug_data += self._contents + '\n'
 
             # code debugging
-            if debug:
-                #err = ''
-                #pywikibot.debugDump( 'dtbext.Page.getSections', self.site, err, debug_data.decode(config.textfile_encoding) )
-                f = open('debug.txt', 'a')
-                f.write( debug_data.encode('utf8') + '\n' )
-                f.close()
+            #pywikibot.debugDump( 'dtbext.Page.getSections', self.site, err, debug_data.decode(config.textfile_encoding) )
+            logging.getLogger('dtbext.wikipedia').debug( debug_data.encode('utf8') )
 
-            for setting in [(0.05,0.95), (0.4,0.8), (0.05,0.8)]:  # 0.6 is default upper border
+            for setting in [(0.05,0.95), (0.4,0.8), (0.05,0.8), (0.0,0.8)]:  # 0.6 is default upper border
                 try:
                     pos = 0
                     for i, item in enumerate(r):

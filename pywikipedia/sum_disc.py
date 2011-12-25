@@ -86,6 +86,7 @@ import time, codecs, os, calendar
 import threading
 import copy #, zlib
 import string, datetime, hashlib, locale
+import logging
 
 import config, pagegenerators, userlib
 import dtbext
@@ -794,7 +795,9 @@ class SumDiscBot(dtbext.basic.BasicBot):
                 # skip to local disc page, since this is the only page the user should watch itself
                 if (page.site().language() == localinterwiki) and \
                    (page.site().family.name == u'wikipedia'):
-                    pywikibot.output(u'\03{lightaqua}WARNING: skipping global wiki notify to local wiki %s\03{default}' % page.title(asLink=True))
+                    logging.getLogger('sum_disc').warning(
+                          u'skipping global wiki notify to local wiki %s' %
+                          page.title(asLink=True) )
                     continue
 
                 # actual/new status of page, has something changed?
@@ -812,10 +815,12 @@ class SumDiscBot(dtbext.basic.BasicBot):
                              title=data[u'link'])
                 #self.pages.edit_hist(self._news_list[page.title()])
         except pywikibot.MaxTriesExceededError:
-            pywikibot.output(u'\03{lightaqua}WARNING: MaxTriesExceededError occurred, thus skipping global wiki notify!\03{default}')
+            logging.getLogger('sum_disc').warning(
+                  u'MaxTriesExceededError occurred, thus skipping global wiki notify!')
             self._skip_globwikinotify = True # skip for all following users to speed-up (~30min)
         except pywikibot.urllib2.HTTPError:
-            pywikibot.output(u'\03{lightaqua}WARNING: HTTPError occurred, thus skipping global wiki notify!\03{default}')
+            logging.getLogger('sum_disc').warning(
+                  u'HTTPError occurred, thus skipping global wiki notify!')
 
         if globalnotify:
             pywikibot.output(u'\03{lightpurple}*** %i Global wiki notifications checked\03{default}' % count)

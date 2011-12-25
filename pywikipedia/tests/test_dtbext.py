@@ -68,7 +68,7 @@ class TestModuleImports(unittest.TestCase):
 
 class TestFunctionStability(unittest.TestCase):
   def test_FS_getSections(self):
-    self.assertEqual( len(PAGE_SET_test_FS_getSections), 138 )
+    self.assertEqual( len(PAGE_SET_test_FS_getSections), 139 )
     count = 0
     problems = []
     for i, TESTPAGE in enumerate(PAGE_SET_test_FS_getSections):
@@ -427,6 +427,7 @@ u'Diskussion:KS Cracovia',
 u'Diskussion:Livingston (Izabal)',
 u'Wikipedia Diskussion:WikiProjekt Gesprochene Wikipedia/Howto',
 u'Benutzer Diskussion:Otfried Lieberknecht',
+u'Benutzer Diskussion:Jahn Henne',
 ]
 
 

@@ -45,6 +45,7 @@ import urllib, StringIO, zipfile, csv
 import mailbox, mimetypes, datetime, locale
 import openpyxl.reader.excel
 import crontab
+import logging
 
 import pagegenerators
 import dtbext
@@ -336,11 +337,11 @@ class SubsterBot(dtbext.basic.BasicBot):
                     external_data = external_data[0]
                 else:
                     external_data = str(external_data)
-            #print external_data
+            logging.getLogger('subster').debug( external_data )
 
             if param['notags']:
                 external_data = self._tag_regex.sub(param['notags'], external_data)
-            #print external_data
+            logging.getLogger('subster').debug( external_data )
 
             # 4.) postprocessing
             param['postproc'] = eval(param['postproc'])
@@ -353,7 +354,7 @@ class SubsterBot(dtbext.basic.BasicBot):
             if func:
                 exec(self._code + (bot_config['CodeTemplate'] % func), scope, scope)
                 external_data = DATA[0]
-            #print external_data
+            logging.getLogger('subster').debug( external_data )
 
             # 5.) subst content
             content = var_regex.sub((self._var_regex_str%{'var':param['value'],'cont':external_data}), content, int(param['count']))
