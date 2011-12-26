@@ -29,7 +29,7 @@ import wikipedia as pywikibot
 
 # overwrite bot default
 clean_sandbox.content = {
-                'de':       u'{{Benutzer:DrTrigon/Entwurf/Vorlage:Spielwiese}}',
+                'de':       u'{{Benutzer:DrTrigonBot/Spielwiese}}',
 }
 
 bot_config = {  # unicode values

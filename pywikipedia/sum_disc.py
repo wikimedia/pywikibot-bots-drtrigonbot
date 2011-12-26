@@ -108,10 +108,10 @@ _REGEX_eol     = re.compile('\n')
 
 
 bot_config = {    # unicode values
-        'TemplateName':      u'Benutzer:DrTrigon/Entwurf/Vorlage:SumDisc',
-        'userlist':          u'Benutzer:DrTrigonBot/Diene_Mir!',
-        'maintenance_queue': u'Benutzer:DrTrigonBot/Maintenance',
-        'maintenance_page':  u'Benutzer Diskussion:DrTrigon#%s',
+        'TemplateName':      u'User:DrTrigonBot/SumDisc',
+        'userlist':          u'User:DrTrigonBot/Diene_Mir!',
+        'maintenance_queue': u'User:DrTrigonBot/Maintenance',
+        'maintenance_page':  u'User talk:DrTrigon#%s',
 
         'queue_security':    ([u'DrTrigon'], u'Bot: exec'),
 
