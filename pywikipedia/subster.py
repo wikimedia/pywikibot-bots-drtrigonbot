@@ -90,12 +90,15 @@ bot_config = {    # unicode values
                     },
 
         'msg': {
-            'de': ( u'Bot: ',
-                    u'substituiere %s tag(s).',
-                  ),
-            'en': ( u'robot ',
-                    u'substituting %s tag(s).',
-                  ),
+            'de':  ( u'Bot: ',
+                     u'substituiere %s tag(s).',
+                   ),
+            'en':  ( u'robot ',
+                     u'substituting %s tag(s).',
+                   ),
+            'frr': ( u'Bot: ',
+                     u'substituiere %s tag(s).',
+                   ),
         },
 
         # this is a system parameter and should not be changed!
@@ -134,6 +137,8 @@ class SubsterBot(dtbext.basic.BasicBot):
     def __init__(self):
         '''Constructor of SubsterBot(), initialize needed vars.'''
 
+        logging.basicConfig(level=logging.DEBUG if ('code' in debug) else logging.INFO)
+
         pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
 
         dtbext.basic.BasicBot.__init__(self, bot_config)
@@ -146,8 +151,6 @@ class SubsterBot(dtbext.basic.BasicBot):
 
     def run(self, sim=False, msg=bot_config['msg'], EditFlags=bot_config['EditFlags']):
         '''Run SubsterBot().'''
-
-        logging.basicConfig(level=logging.DEBUG if ('code' in debug) else logging.INFO)
 
         pywikibot.output(u'\03{lightgreen}* Processing Template Backlink List:\03{default}')
 
