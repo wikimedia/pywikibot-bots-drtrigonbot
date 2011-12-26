@@ -30,6 +30,7 @@ __version__ = '$Id$'
 
 import re, sys
 import time, codecs, os
+import logging
 
 import config, userlib, basic
 import dtbext
@@ -49,13 +50,15 @@ class BasicBot(basic.BasicBot):
 
     ## @since   ? (MODIFIED)
     #  @remarks needed by various bots
-    def __init__(self, bot_config={}):
+    def __init__(self, bot_config={}, debug=[]):
         """Constructor of BasicBot(); setup environment, initialize needed consts and objects.
            MODIFIED METHOD: needed by various bots
 
            @param bot_config: The configuration of the running bot.
            @type  bot_config: dict
         """
+
+        logging.basicConfig(level=logging.DEBUG if ('code' in debug) else logging.INFO)
 
         #basic.BasicBot.__init__(self, generator, dry)
 
@@ -68,13 +71,17 @@ class BasicBot(basic.BasicBot):
         pywikibot.setAction('Wikipedia python library / dtbext (DrTrigonBot extensions)')
 
         if bot_config:
-            # init constants
-            self._bot_config = bot_config
-            self._template_regex = re.compile('\{\{' + self._bot_config['TemplateName'] + '(.*?)\}\}', re.S)
-
             # init variable/dynamic objects
             self.site = pywikibot.getSite(code=pywikibot.default_code)
             dtbext.pywikibot.addAttributes( self.site )        # enhance to dtbext.pywikibot.Site
+
+            # init constants
+            self._bot_config = bot_config
+            # convert e.g. namespaces to corret language
+            self._bot_config['TemplateName'] = pywikibot.Page(self.site, self._bot_config['TemplateName']).title()
+            self._template_regex = re.compile('\{\{' + self._bot_config['TemplateName'] + '(.*?)\}\}', re.S)
+
+        self._debug = debug
 
     ## @since   ? (ADDED)
     #  @remarks needed by sum_disc
@@ -180,7 +187,7 @@ class BasicBot(basic.BasicBot):
 
     ## @since   ? (ADDED)
     #  @remarks common interface to bot job queue on wiki
-    def loadJobQueue(self, page, queue_security, debug = False):
+    def loadJobQueue(self, page, queue_security):
         """Check if the data queue security is ok to execute the jobs,
            if so read the jobs and reset the queue.
            ADDED METHOD: common interface to bot job queue on wiki
@@ -190,8 +197,6 @@ class BasicBot(basic.BasicBot):
            @param queue_security: This string must match the last edit
                               comment, or else nothing is done.
            @type  queue_security: string
-           @param debug: Parameter to prevent writing to wiki in debug mode.
-           @type  debug: bool
 
            Returns a list of jobs. This list may be empty.
         """
@@ -208,7 +213,7 @@ class BasicBot(basic.BasicBot):
         if not secure: return []
 
         data = self._REGEX_eol.split(page.get())
-        if debug:
+        if ('write2wiki' in self._debug):
             pywikibot.setAction(u'reset job queue')
             page.put(u'', minorEdit = True)
         else:

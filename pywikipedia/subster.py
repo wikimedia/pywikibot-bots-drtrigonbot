@@ -113,6 +113,7 @@ magic_words = {} # no magic word substitution (for empty dict)
 # (look at 'bot_control.py' for more info)
 debug = []                       # no write, all users
 #debug.append( 'write2wiki' )    # write to wiki (operational mode)
+#debug.append( 'code' )          # code debugging
 
 
 class SubsterBot(dtbext.basic.BasicBot):
@@ -137,11 +138,9 @@ class SubsterBot(dtbext.basic.BasicBot):
     def __init__(self):
         '''Constructor of SubsterBot(), initialize needed vars.'''
 
-        logging.basicConfig(level=logging.DEBUG if ('code' in debug) else logging.INFO)
-
         pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
 
-        dtbext.basic.BasicBot.__init__(self, bot_config)
+        dtbext.basic.BasicBot.__init__(self, bot_config, debug)
 
         # init constants
         self._userListPage = pywikibot.Page(self.site, bot_config['TemplateName'])

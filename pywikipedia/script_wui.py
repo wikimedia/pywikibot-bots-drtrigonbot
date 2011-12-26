@@ -50,6 +50,7 @@ import copy
 import StringIO
 import re
 import __builtin__
+import logging
 
 import config
 import dtbext
@@ -113,14 +114,14 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
 
         pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
 
-        dtbext.basic.BasicBot.__init__(self)
+        dtbext.basic.BasicBot.__init__(self, debug=debug)
         self.site = pywikibot.getSite()
 
         # init constants
         pywikibot.output(u'\03{lightred}** Receiving Job Queue\03{default}')
         page = pywikibot.Page(self.site, bot_config['commandlist'])
-        self._commandlist = self.loadJobQueue(page, bot_config['queue_security'], debug = ('write2wiki' in debug))
-#        print self._commandlist
+        self._commandlist = self.loadJobQueue(page, bot_config['queue_security'])
+        logging.getLogger('script_wui').debug( self._commandlist )
 
         # code debugging
         dtbext.pywikibot.debug = ('code' in debug)

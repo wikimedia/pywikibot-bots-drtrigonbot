@@ -261,11 +261,9 @@ class SumDiscBot(dtbext.basic.BasicBot):
     def __init__(self):
         '''Constructor of SumDiscBot(); setup environment, initialize needed consts and objects.'''
 
-        logging.basicConfig(level=logging.DEBUG if ('code' in debug) else logging.INFO)
-
         pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
 
-        dtbext.basic.BasicBot.__init__(self, bot_config)
+        dtbext.basic.BasicBot.__init__(self, bot_config, debug)
 
         lang = locale.locale_alias.get(self.site.lang, locale.locale_alias['en']).split('.')[0]
         locale.setlocale(locale.LC_TIME, lang)
