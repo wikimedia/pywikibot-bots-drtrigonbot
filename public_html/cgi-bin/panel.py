@@ -246,7 +246,7 @@ def displaystate(form):
 
 	data['botlog'] = ""
 	for item in d:
-	    try:    data['botlog'] = re.split(':: ', item)[-1].strip()
+	    try:    data['botlog'] = re.split('\s+', item, maxsplit=4)[-1].strip()
 	    except: pass
 	    if data['botlog']: break
 
