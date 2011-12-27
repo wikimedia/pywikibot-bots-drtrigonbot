@@ -54,14 +54,12 @@ import wikipedia as pywikibot
 
 
 bot_config = {    # unicode values
-        'TemplateName':     u'Benutzer:DrTrigon/Entwurf/Vorlage:Subster',
-#        'TemplateName':     u'User:DrTrigonBot/Subster',
+        'TemplateName':     u'User:DrTrigonBot/Subster',
         'ErrorTemplate':    u'\n<noinclude>----\n<b>SubsterBot Exception (%s)</b>\n%s</noinclude>\n',
 
         # important to use a '.css' page here, since it HAS TO BE protected to
         # prevent malicious code injection !
-        'ConfigCSSPage':    u'Benutzer:DrTrigon/Benutzer:DrTrigonBot/config.css',
-#        'ConfigCSSPage':    u'User:DrTrigon/DrTrigonBot/config.css',
+        'ConfigCSSPage':    u'User:DrTrigon/DrTrigonBot/config.css',
         'CodeTemplate':     u'\n%s(DATA, *args)\n',
         'CRONMaxDelay':     1*24*60*60,       # bot runs daily
 
