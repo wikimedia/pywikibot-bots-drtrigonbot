@@ -294,7 +294,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
 
         pywikibot.output(u'\03{lightred}** Receiving Job Queue (Maintenance Messages)\03{default}')
         page = pywikibot.Page(self.site, bot_config['maintenance_queue'])
-        self.maintenance_msg = self.loadJobQueue(page, bot_config['queue_security'], debug = ('write2wiki' in debug))
+        self.maintenance_msg = self.loadJobQueue(page, bot_config['queue_security'])
 
         self._wday = time.gmtime().tm_wday
 
