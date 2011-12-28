@@ -815,12 +815,10 @@ class SumDiscBot(dtbext.basic.BasicBot):
                              title=data[u'link'])
                 #self.pages.edit_hist(self._news_list[page.title()])
         except pywikibot.MaxTriesExceededError:
-            logging.getLogger('sum_disc').warning(
-                  u'MaxTriesExceededError occurred, thus skipping global wiki notify!')
+            pywikibot.output(u'Problem MaxTriesExceededError occurred, thus skipping global wiki notify!')
             self._skip_globwikinotify = True # skip for all following users to speed-up (~30min)
         except pywikibot.urllib2.HTTPError:
-            logging.getLogger('sum_disc').warning(
-                  u'HTTPError occurred, thus skipping global wiki notify!')
+            pywikibot.output(u'Problem HTTPError occurred, thus skipping global wiki notify!')
 
         if globalnotify:
             pywikibot.output(u'\03{lightpurple}*** %i Global wiki notifications checked\03{default}' % count)
@@ -1231,7 +1229,8 @@ class PageSections(object):
             #sections = page.getSections(minLevel=1, force=True)  # slow for pages with > 100 sections
             sections = []
 
-            pywikibot.output(u'  Problem resolving section data, processing the whole page at once...')
+            logging.getLogger('sum_disc').warning(
+                  u'Problem resolving section data, processing the whole page at once...')
 
         # drop from templates included headings (are None)
         sections = [ s for s in sections if s[0] ]

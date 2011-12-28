@@ -211,6 +211,26 @@ class BotErrorHandler:
         except:  # break exception handling recursion
             pass
         logging.getLogger('bot_control').warning(u'mail could not be sent!')
+        pywikibot.output(u'May be not logged in - try to send emergency email')
+        try:
+            import smtplib
+            from email.mime.text import MIMEText
+            # sender's and recipient's email addresses
+            FROM = "drtrigon@toolserver.org"
+            TO   = ["dr.trigon@surfeu.ch"]    # must be a list
+            # Create a text/plain message
+            msg = MIMEText(item)
+            msg['Subject'] = "!EMERGENCY! " + error_mail[1]
+            msg['From']    = FROM
+            msg['To']      = ", ".join(TO)
+            # Send the mail
+            server = smtplib.SMTP("localhost")
+            server.sendmail(FROM, TO, msg.as_string())
+            server.quit()
+            return
+        except:  # break exception handling recursion
+            pass
+        logging.getLogger('bot_control').warning(u'emergency mail could not be sent!')
 
     def gettraceback(self, exc_info):
         (exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)

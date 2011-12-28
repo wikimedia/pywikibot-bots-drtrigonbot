@@ -54,7 +54,7 @@ import wikipedia as pywikibot
 
 
 bot_config = {    # unicode values
-        'TemplateName':     u'User:DrTrigonBot/Subster',
+        'TemplateName':     u'User:DrTrigonBot/Subster',    # or 'template' for 'Flagged Revisions'
         'ErrorTemplate':    u'\n<noinclude>----\n<b>SubsterBot Exception (%s)</b>\n%s</noinclude>\n',
 
         # important to use a '.css' page here, since it HAS TO BE protected to
