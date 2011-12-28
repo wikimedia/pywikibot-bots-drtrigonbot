@@ -425,7 +425,7 @@ if __name__ == "__main__":
         debug.append( 'code' ) # code debugging
 
     log = None
-    logfile = logname % dtbext.date.getTimeStmpNow()    # actual date (no time)
+    logfile = logname % 'mainbot'
     if len(arg) > 0:
         #arg = pywikibot.handleArgs()[0]
         #print sys.argv[0]    # who am I?

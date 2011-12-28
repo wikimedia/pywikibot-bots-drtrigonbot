@@ -58,10 +58,12 @@ import ps_wikinew as style # panel-stylesheet 'wiki (new)' not CSS 2.1 compilant
 # === page HTML contents === === ===
 #
 displaystate_content = \
-"""Actual state: <img src="%(botstate)s" width="15" height="15" alt="Botstate"><br><br>
+"""Actual state: <img src="%(botstate_daily)s" width="15" height="15" alt="Botstate">
+                 <img src="%(botstate_cont)s" width="15" height="15" alt="Botstate"><br><br>
 Time now: %(time)s<br><br>
 
 <a href="%(loglink)s">Latest</a> bot status message log: <b>%(botlog)s</b><br><br>
+Current log files: %(currentlog)s<br><br>
 <a href="%(oldlink)s">Old log</a> files: <i>%(oldlog)s</i><br><br>
 See also <a href="%(logstat)s">log statistics</a> <small>(also available in <a href="%(logstatraw)s">raw/plain format</a>)</small>.<br><br>"""
 
@@ -76,9 +78,9 @@ logstat_content = \
 <br>
 History compressed: %(histcomp_count)s (times)<br>
 <br>
-<!--Problem rate (in %%):<br>
+Problem rate (in %%):<br>
 %(reliability)s<br>
-<a href="%(graphlink)s"><img src="%(graphlink)s"></a><br>
+<!--<a href="%(graphlink)s"><img src="%(graphlink)s"></a><br>
 <br>
 Warnings (%(warn_total)s distilled to %(warn_dist)s):<br>
 %(warnings)s<br>
@@ -118,23 +120,28 @@ html_color = {	'green':	'#00ff00',
 bottimeout = 24
 botdonemsg = 'DONE'
 
+# use classic 're' since 'pyparsing' does not work with unicode
+regex = re.compile(r'(?P<timestamp>\S+\s\S+)\s(?P<file>\S+)\s*(?P<level>\S+)\s*(?P<message>.*)')#, re.U)
+
 
 # === functions === === ===
 #
 def oldlogfiles(all=False):
-	#localdir = os.path.dirname('../DrTrigonBot/')
 	localdir = os.path.dirname(os.path.join('..','DrTrigonBot','.'))
 	files = os.listdir( localdir )
-	#files = [int(item[:-4]) for item in files]
-	buffer = files
-	files = []
-	for item in buffer:
-		if item[:-4].isdigit(): files.append( int(item[:-4]) )
-	a = max(files)
-	if not all: files.remove(a)
-	log = os.path.join(localdir, str(a) + ".log")
+	archive, current = [], []
+	for item in files:
+		info = item.split('.')
+		if   (len(info) == 2):
+			current.append( item )
+			if all: archive.append( item )
+		elif (len(info) == 3):
+			archive.append( item )
 
-	return (localdir, files, log)
+	archive.sort()
+	current.sort()
+
+	return (localdir, archive, current)
 
 #def graph(xdata, xscale=1, xticks=10, xmajor=5, yscale=1, yticks=10, ymajor=1):
 #	X,Y = 500, 275			# image width and height
@@ -234,72 +241,69 @@ def irc_status():
 def displaystate(form):
 	data = {}
 
-	(localdir, files, data['loglink']) = oldlogfiles()
+	(localdir, files, current) = oldlogfiles()
+	data['loglink'] = os.path.join(localdir, 'mainbot.log')
 
 	b = file(data['loglink'], "r")
 	d = b.readlines()
 	b.close()
 
-	#buffer = os.path.join(localdir, data['loglink']) + str(b.readlines())
-
 	d.reverse()
 
 	data['botlog'] = ""
+	# or use 'regex' here...
 	for item in d:
 	    try:    data['botlog'] = re.split('\s+', item, maxsplit=4)[-1].strip()
 	    except: pass
 	    if data['botlog']: break
 
-	#buffer = data['botlog'] +"\n"+ str(files)
-
-	files = [str(item)+".log" for item in files]
-	files.sort()
-	buf = ", "
-
 	lastrun = (time() - os.stat(data['loglink']).st_mtime)
 	botmsg = data['botlog'].strip()
 
-	data['botstate'] = botstate_img['red']
+	data['botstate_daily'] = botstate_img['red']
 	color = html_color['red']
 	state_text = "n/a"
 	if (lastrun <= (bottimeout*60*60)):
 		if   (botmsg == botdonemsg):
-			data['botstate'] = botstate_img['green']
+			data['botstate_daily'] = botstate_img['green']
 			color = html_color['green']
 			state_text = "OK"
 		elif (botmsg.find(botdonemsg) == 0):
-			data['botstate'] = botstate_img['orange']
+			data['botstate_daily'] = botstate_img['orange']
 			color = html_color['orange']
 			state_text = "problem"
 		elif (lastrun <= 5*60):  # during run is also green (thus: lastrun <= 5*60)
-			data['botstate'] = botstate_img['green']
+			data['botstate_daily'] = botstate_img['green']
 			color = html_color['green']
 			state_text = "running"
 		else:
 			data['botstate'] = botstate_img['orange']
 			color = html_color['orange']
 
+	data['botstate_cont'] = botstate_img['red']
 	if irc_status()[0]:
+		data['botstate_cont'] = botstate_img['green']
 		irc_color = html_color['green']
 		irc_state_text = "OK"
 	else:
+		data['botstate_cont'] = botstate_img['orange']
 		irc_color = html_color['orange']
 		irc_state_text = "problem"
 
-	status  = "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': color, 'bot': 'all:', 'state': state_text}
-	status += "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': irc_color, 'bot': 'irc:', 'state': irc_state_text}
+	status  = "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': color, 'bot': 'daily:', 'state': state_text}
+	status += "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': irc_color, 'bot': 'cont.:', 'state': irc_state_text}
+
+	data['currentlog'] = ", ".join([ '<a href="%s">%s</a>' % (os.path.join(localdir, item), item) for item in current ])
 
 	data.update({	'time':		asctime(localtime(time())),
-			'oldlog':	buf.join(files),
+			'oldlog':	", ".join(files),
 			'oldlink':	r"http://toolserver.org/~drtrigon/DrTrigonBot/",
 			'logstat':	sys.argv[0] + r"?action=logstat",
 			'logstatraw':	sys.argv[0] + r"?action=logstat&amp;format=plain",
 			'refresh':	'15',
 			'title':	'DrTrigonBot status panel',
 			'tsnotice': 	style.print_tsnotice(),
-			#'content':	displaystate_content,
 			'p-status':	status,
-			#'footer': 	style.footer + style.footer_w3c + style.footer_w3c_css,
 			'footer': 	style.footer + style.footer_w3c, # wiki (new) not CSS 2.1 compilant
 	})
 	data['content'] = displaystate_content % data
@@ -314,24 +318,24 @@ def adminlogs(form):
 
 	data['message'] = ''
 
-	(localdir, files, log) = oldlogfiles()
+	(localdir, files, current) = oldlogfiles()
 	files_str = map(str, files)
 
 	if (len(filelist) > 0):
 		data['message'] = []
 		for item in filelist:
-			if (item in files_str): os.remove( os.path.join(localdir, str(item)+".log") )
-			else: data['message'].append( 'Warning: "%s" is NOT a log file! Nothing done.' % item )
-			#pass
+			if (item in files_str):
+				os.remove( os.path.join(localdir, item) )
+			else:
+				data['message'].append( 'Warning: "%s" is NOT a log file! Nothing done.' % item )
 		data['message'].append( '%i log file(s) deleted.' % (len(filelist)-len(data['message'])) )
 		data['message'] = '<br>\n'.join(data['message'])
-		(localdir, files, log) = oldlogfiles()
+		(localdir, files, current) = oldlogfiles()
 
 	checkbox_tmpl = '<input type="checkbox" name="filelist" value="%(datei)s">%(datei)s<br>'
 
-	buf = '\n'
-	files.sort()
-	data.update({	'oldloglist':	buf.join([checkbox_tmpl % {'datei':item} for item in files[:-5]]),
+	#data.update({	'oldloglist':	'\n'.join([checkbox_tmpl % {'datei':item} for item in files[:-5]]),
+	data.update({	'oldloglist':	'\n'.join([checkbox_tmpl % {'datei':item} for item in files]),
 			'logcount':	len(files),
 			'refresh':	'',
 			'title':	'DrTrigonBot log admin panel',
@@ -345,46 +349,67 @@ def adminlogs(form):
 def logstat(form):
 	format = form.getvalue('format', 'html')
 
-	(localdir, files, log) = oldlogfiles(all=True)
-	files = [str(item)+".log" for item in files]
-	files.sort()
-	buf = ", "
+#	(localdir, files, log) = oldlogfiles(all=True)
+	(localdir, files, log) = oldlogfiles()
 
 	stat = {'run_count':		0, 
 		'histcomp_count':	0, 
 		'successful_count':	0, 
 		'warn_list':		[], 
 		'reliability_list':	[], 
-		'start_date':		strptime(files[0], "%Y%m%d.log"),
-		'end_date':		strptime(files[-1], "%Y%m%d.log"),
+#		'start_date':		strptime(os.path.splitext(files[0])[1], "%Y-%m-%d"),
+#		'end_date':		strptime(os.path.splitext(files[-1])[1], "%Y-%m-%d"),
+		'start_date':		strptime("2011-12-25", "%Y-%m-%d"),
+		'end_date':		strptime("2011-12-28", "%Y-%m-%d"),
 		'warn_total':		0, 
 		'warn_dist':		0,  }
 
-	for item in files:
-		logfile = os.path.join(localdir, item)
-		f = open(logfile, "r")
-		buffer = re.split('\n', f.read(-1))
-		f.close()
-		status = 0
-		request_total = 0
-		request_failed = 0
-		for line in buffer:
-			#line.append(None)
-			if ('SCRIPT CALL:' in line): stat['run_count'] += 1
-			elif ('* Compressing of histories:' in line): stat['histcomp_count'] += 1
-			elif ('Done.' in line): stat['successful_count'] += 1
-			elif ('progress: 0.0% (0 of ' in line):
-				try:	request_total += int(re.split('\s|\)', line)[6])
-				except: request_total += int(re.split('\s|\)', line)[4])	# work-a-round for old format
-			elif ('* Processing Warnings:' in line): status += 1
-			elif (status == 1) and ('*Bot warning message:' in line):
-				request_failed += 1
-				try:	(timestmp, data) = re.split('::', line)
-				except:	data = line						# work-a-round for old format
-				stat['warn_list'].append( data )
-			elif ('* Processing Template Backlink List:' in line): status += 1
-			#elif ('SCRIPT CALL:' in line): stat['run_count'] += 1
-		if request_total != 0: stat['reliability_list'].append( (item, float(request_failed)/float(request_total)) )
+#	for item in files:
+#		logfile = os.path.join(localdir, item)
+#		f = open(logfile, "r")
+#		buffer = re.split('\n', f.read(-1))
+#		f.close()
+
+	logfile = os.path.join(localdir, files[0])
+	f = open(logfile, "r")
+	buffer = f.read(-1).strip().split("\n")
+	f.close()
+
+	# statistics (like mentioned in 'logging.statistics')
+	count     = { 'debug': 0, 'warn': 0, 'info': 0, 'error': 0, 'critical': 0, 'unknown': 0, }
+	events    = { 'start':     'SCRIPT CALL:',
+	              'end':       botdonemsg,
+	              'histcomp':  '* Compressing of histories:',
+	              'warn?':     '* Processing Warnings:',
+	              'backlink?': '* Processing Template Backlink List:', }
+	etiming   = { 'start': [], 'end': [], 'histcomp': [], 'warn?': [], 'backlink?': [],
+	              'mainstart': None, 'mainend': None, }
+	resources = { 'files': set(), }
+
+	#How many requests are being handled per second, how much of various resources are 
+
+	# gather statistics
+	etiming['mainstart'] = regex.match(buffer[0]).groupdict()['timestamp']
+	etiming['mainend']   = regex.match(buffer[-1]).groupdict()['timestamp']
+	for line in buffer:
+		if not line.strip(): continue
+		try:
+			info = regex.match(line).groupdict()
+
+			lvl = info['level'].lower()
+			count[ 'unknown' if lvl not in count else lvl ] += 1
+
+			for e in events:
+				if events[e] in info['message']:
+					etiming[e].append( info['timestamp'] )
+
+			resources['files'].add( info['file'] )
+		except AttributeError:
+			pass
+
+	# evaluate statistics
+	#in use, how long we've been up. 
+
 
 	#stat['warn_total'] = len(stat['warn_list'])
 	stat['warn_total'] = None
@@ -398,7 +423,7 @@ def logstat(form):
 		'end_date':		str(strftime("%a %b %d %Y", stat['end_date'])),
 		'run_diff':		(int(stat['run_count']) - int(stat['successful_count'])),
 		#'reliability':		[ "%.2f" % (100*item[1]) for item in stat['reliability_list'] ],
-		'reliability':		None,
+		'reliability':		str(count) + str(etiming) + str(resources),
 		#'warnings':		"<br>".join(stat['warn_list']),
 		'warnings':		None,
 		#'graphlink':		sys.argv[0] + r"?action=logstat&format=graph",
