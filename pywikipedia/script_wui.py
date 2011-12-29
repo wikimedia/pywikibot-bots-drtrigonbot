@@ -73,6 +73,10 @@ bot_config = {    # unicode values
                                  u'add_text',
                                  u'standardize_notes',
                                  u'image', ],
+                                 #u'maintenance/readtalk', u'noreferences', # UNTESTED
+                                 #u'patrol', u'reflinks', u'tag_nowcommons',# UNTESTED
+                                 #u'djvutext', u'imagecopy_self',           # UNTESTED
+                                 #u'imageharvest', u'match_images',         # UNTESTED
                                  #u'copyright', u'spellcheck', u'redirect', # UNUSABLE
                                  #u'table2wiki', u'imagetransfer',          # UNUSABLE
                                  #u'category', u'commonscat',               # UNUSABLE

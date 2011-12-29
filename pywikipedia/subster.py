@@ -85,8 +85,11 @@ bot_config = {    # unicode values
                     'expandtemplates': 'False',        # DRTRIGON-93 (only with 'wiki')
                     'simple':          '',             # DRTRIGON-85
                     'zip':             'False',
-                    'xlsx':            'False',        #
+                    'xlsx':            '',             #
                     'cron':            '',             # DRTRIGON-102
+                    #'djvu': ... u"djvused -e 'n' \"%s\"" ... djvutext.py
+                    #'pdf': ... u"pdftotext" or python module
+                    #'imageocr', 'swfocr', ...
                     },
 
         'msg': {
@@ -298,6 +301,7 @@ class SubsterBot(dtbext.basic.BasicBot):
             secure = secure or (param['url'][:len(item)] == item)
         param['wiki'] = eval(param['wiki'])
         param['zip']  = eval(param['zip'])
+        param['xlsx'] = eval(param['xlsx'])
         if (not secure) and (not param['wiki']):
             return (content, substed_tags)
         if   param['wiki']:
@@ -319,7 +323,7 @@ class SubsterBot(dtbext.basic.BasicBot):
         if param['zip']:
             fileno          = 0 if (param['zip'] == True) else (param['zip']-1)
             external_buffer = self.unzip(external_buffer, fileno)
-        if not (param['xlsx'].lower() == 'false'):
+        if param['xlsx']:
             external_buffer = self.xlsx2csv(external_buffer, param['xlsx'])
 
         if not eval(param['beautifulsoup']):    # DRTRIGON-88
