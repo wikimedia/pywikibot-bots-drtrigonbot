@@ -38,12 +38,17 @@ import cgi
 # === module imports === === ===
 #
 from time import *
+import datetime
 # http://www.ibm.com/developerworks/aix/library/au-python/
 import os, re, sys, copy
 
 #import Image,ImageDraw
 import matplotlib.pyplot as plt
+# http://matplotlib.sourceforge.net/api/dates_api.html?highlight=year%20out%20range#matplotlib.dates.epoch2num
+from matplotlib.dates import MonthLocator, DayLocator, DateFormatter, epoch2num
 import cStringIO
+
+import numpy
 
 
 # === panel HTML stylesheets === === ===
@@ -63,38 +68,54 @@ displaystate_content = \
 Time now: %(time)s<br><br>
 
 <a href="%(loglink)s">Latest</a> bot status message log: <b>%(botlog)s</b><br><br>
-Current log files: %(currentlog)s<br><br>
+Successfully finished bot runs: <b>%(successfull)s</b><br><br>
+Current log files: %(currentlog)s<br>
 <a href="%(oldlink)s">Old log</a> files: <i>%(oldlog)s</i><br><br>
-See also <a href="%(logstat)s">log statistics</a> <small>(also available in <a href="%(logstatraw)s">raw/plain format</a>)</small>.<br><br>"""
+See also <a href="%(logstat)s">logging statistics</a> and the important messages:
+<br>
+%(messages)s<br>
+<br>"""
 
 logstat_content = \
-"""Evaluated data period from %(start_date)s to %(end_date)s.<br>
+"""<small><a href="%(backlink)s">back</a></small><br>
+Evaluated data period from %(start_date)s to %(end_date)s.<br>
+<br>
+Filter: %(filter)s<br>
+<br>
+<h2>Runs (started, ended, difference, history compression)</h2>
+<a href="%(graphlink-ecount)s"><img src="%(graphlink-ecount)s" alt=""></a>
+<a href="%(graphlink-ecount-sed)s"><img src="%(graphlink-ecount-sed)s" alt=""></a><br>
 <br>
 <table>
-<tr><td>Total runs:</td><td>%(run_count)s</td></tr>
-<tr><td>Successful runs:</td><td>%(successful_count)s</td></tr>
+<tr><td>Total runs:</td><td>%(start_count)s</td></tr>
+<tr><td>Successful runs:</td><td>%(end_count)s</td></tr>
 <tr><td>Difference:</td><td>%(run_diff)s</td></tr>
+<tr><td>Uptime [s]:</td><td>%(uptimes)s</td></tr>
 </table>
 <br>
 History compressed: %(histcomp_count)s (times)<br>
 <br>
-Problem rate (in %%):<br>
-%(reliability)s<br>
-<!--<a href="%(graphlink)s"><img src="%(graphlink)s"></a><br>
+<h2>Logging messages</h2>
+<a href="%(graphlink-mcount)s"><img src="%(graphlink-mcount)s" alt=""></a>
+<a href="%(graphlink-mcount-i)s"><img src="%(graphlink-mcount-i)s" alt=""></a><br>
 <br>
-Warnings (%(warn_total)s distilled to %(warn_dist)s):<br>
-%(warnings)s<br>
-<br>-->"""
+Important messages (everything except INFO):<br>
+<br>
+%(messages)s"""
 
 adminlogs_content = \
 """Log file count: %(logcount)s<br>
 <p>%(message)s</p>
 <form action="panel.py">
   <input type="hidden" name="action" value="adminlogs">
+  Filter:
+  <select name="filter" size="1">
+    %(filter_options)s
+  </select>
   <p>
     %(oldloglist)s
   </p>
-  <input type="submit" value=" Delete ">
+  <input type="submit" value=" Delete/OK ">
   <input type="reset" value=" Reset ">
 </form>"""
 
@@ -121,7 +142,8 @@ bottimeout = 24
 botdonemsg = 'DONE'
 
 # use classic 're' since 'pyparsing' does not work with unicode
-regex = re.compile(r'(?P<timestamp>\S+\s\S+)\s(?P<file>\S+)\s*(?P<level>\S+)\s*(?P<message>.*)')#, re.U)
+regex   = re.compile(r'(?P<timestamp>\S+\s\S+)\s(?P<file>\S+)\s*(?P<level>\S+)\s*(?P<message>.*)')#, re.U)
+timefmt = "%Y-%m-%d %H:%M:%S,%f"
 
 
 # === functions === === ===
@@ -143,47 +165,8 @@ def oldlogfiles(all=False):
 
 	return (localdir, archive, current)
 
-#def graph(xdata, xscale=1, xticks=10, xmajor=5, yscale=1, yticks=10, ymajor=1):
-#	X,Y = 500, 275			# image width and height
-#
-#	img = Image.new("RGB", (X,Y), "#FFFFFF")
-#	draw = ImageDraw.Draw(img)
-#
-#	#draw some axes and markers
-#	for i in range(X/10):
-#		draw.line((i*10+30, Y-15, i*10+30, 20), fill="#DDD")
-#		if i % xmajor == 0:
-#			draw.text((xscale*(i*xticks)+15, Y-15), `i*xticks`, fill="#000")
-#	for j in range(1,Y/10-2):
-#		if i % ymajor == 0:
-#			#draw.text((xscale*(0),Y-15-yscale*(j*yticks)), `j*yticks`, fill="#000")
-#			draw.text((xscale*(0),Y-15-yscale*(2*j*yticks)), `j*yticks`, fill="#000")	# cheap patch
-#	draw.line((20,Y-19,X,Y-19), fill="#000")
-#	draw.line((19,20,19,Y-18), fill="#000")
-#
-#	#graph data (file)
-#	#log = file(r"c:\python\random_img\%s" % filename)
-#	#log = file(filename)
-#	for (i, value) in enumerate(xdata):
-#		#value = int(value.strip())
-#		draw.line((xscale*(i)+20,Y-20,xscale*(i)+20,Y-20-yscale*(value)), fill="#55d")
-#
-#	#write to file object
-#	f = cStringIO.StringIO()
-#	img.save(f, "PNG")
-#	f.seek(0)
-#
-#	#output to browser
-#	return "Content-type: image/png\n\n" + f.read()
-
 # http://www.scipy.org/Cookbook/Matplotlib/Using_MatPlotLib_in_a_CGI_script
-def graph(xdata, *args, **kwargs):
-	fig = plt.figure(figsize=(10,4))
-	ax = fig.add_subplot(111)
-	plot1 = ax.bar(range(len(xdata)), xdata)
-
-	ax.grid(True)
-
+def show_onwebpage(plt):
 	#plt.show()
 
 	#write to file object
@@ -235,6 +218,86 @@ def irc_status():
 	return ((botname in users) or
 		(":"+botname in users), users)
 
+def logging_statistics(logfile):
+	f = open(logfile, "r")
+	buffer = f.read(-1).strip().split("\n")
+	f.close()
+
+	# statistics (like mentioned in 'logging.statistics')
+	mcount    = { 'debug': 0, 'warning': 0, 'info': 0, 'error': 0, 'critical': 0, 'unknown': 0, }
+	mqueue    = { 'debug': [], 'warning': [], 'info': [], 'error': [], 'critical': [], 'unknown': [], }
+	events    = { 'start':     'SCRIPT CALL:',
+	              'end':       botdonemsg,
+	              'histcomp':  '* Compressing of histories:',
+	              'warn?':     '* Processing Warnings:',
+	              'backlink?': '* Processing Template Backlink List:', }
+	ecount    = { 'start': 0, 'end': 0, 'histcomp': 0, 'warn?': 0, 'backlink?': 0, }
+	etiming   = { 'start': [], 'end': [], 'histcomp': [], 'warn?': [], 'backlink?': [],
+	              'mainstart': None, 'mainend': None, }
+	resources = { 'files': set(), }
+
+	def process_event(event, result, log, process=None, ignore=[]):
+		# match event
+		if process is None:
+			event = 'unknown' if event not in result else event
+		else:
+			noevent = True
+			for e in process:
+				if process[e] in event:
+					event   = e
+					noevent = False
+					break
+			if noevent:
+				return
+		# count matched events
+		result[event] += 1
+		if event not in ignore:
+			log[0][event].append( log[1] )
+		return
+
+	timeepoch = lambda t: mktime(datetime.datetime.strptime(t, timefmt).timetuple())
+
+	#How many requests are being handled per second, how much of various resources are 
+
+	# gather statistics
+	etiming['mainstart'] = [ regex.match(buffer[0]).groupdict()['timestamp'] ]
+	etiming['mainend']   = [ regex.match(buffer[-1]).groupdict()['timestamp'] ]
+	for line in buffer:
+		if not line.strip(): continue
+		try:
+			info = regex.match(line).groupdict()
+
+			process_event( info['level'].lower(), mcount, (mqueue, cgi.escape(line)), 
+			               ignore='info' )
+			process_event( info['message'],       ecount, (etiming, info['timestamp']), 
+			               process=events )
+			resources['files'].add( info['file'] )
+		except AttributeError:
+			pass
+
+	# evaluate statistics
+	stats = {'mcount': mcount, 'mqueue': mqueue, 'ecount': ecount, 'resources': resources}
+	# (in use, how long we've been up.)
+	start = datetime.datetime.strptime(etiming['mainstart'][0], timefmt)
+	end   = datetime.datetime.strptime(etiming['mainend'][0], timefmt)
+	stats['uptime'] = (end - start).seconds
+	stats['mainstart'] = timeepoch(etiming['mainstart'][0])
+	stats['mainend']   = timeepoch(etiming['mainend'][0])
+	# gather messages ignoring info
+	stats['messages'] = []
+	for key in mqueue:
+		if key == 'info': continue
+		stats['messages'].append( "<i>%s</i>" % key )
+		stats['messages'] += mqueue[key]
+	# convert event times
+	for key in etiming:
+		etiming[key] = [ timeepoch(item) for item in etiming[key] ]
+	stats['etiming'] = etiming
+	# last message
+	stats['lastmessage'] = regex.match(buffer[-1]).groupdict()['message'].strip()
+
+	return stats
+
 
 # === CGI/HTML page view user interfaces === === ===
 #
@@ -250,12 +313,10 @@ def displaystate(form):
 
 	d.reverse()
 
-	data['botlog'] = ""
-	# or use 'regex' here...
-	for item in d:
-	    try:    data['botlog'] = re.split('\s+', item, maxsplit=4)[-1].strip()
-	    except: pass
-	    if data['botlog']: break
+	stat = logging_statistics(data['loglink'])
+	data['botlog']      = stat['lastmessage']
+	data['messages']    = "<br>\n".join(stat['messages'])
+	data['successfull'] = "%s of %s" % (stat['ecount']['end'], stat['ecount']['start'])
 
 	lastrun = (time() - os.stat(data['loglink']).st_mtime)
 	botmsg = data['botlog'].strip()
@@ -313,13 +374,22 @@ def displaystate(form):
 def adminlogs(form):
 	data = {}
 
+	(localdir, files, current) = oldlogfiles()
+
 	filelist = form.getvalue('filelist', [])
 	if type(filelist) == type(''): filelist = [filelist]
 
-	data['message'] = ''
+	current.insert(0, 'ALL')
+	filt = form.getvalue('filter', current[0])
+	filt = '' if filt == 'ALL' else filt
+	data['filter_options'] = "<option>%s</option>" % ("</option><option>".join(current))
+	data['filter_options'] = data['filter_options'].replace("<option>%s</option>" % filt,
+	                                                        "<option selected>%s</option>" % filt)
 
-	(localdir, files, current) = oldlogfiles()
+	files = filter(lambda item: filt in item, files)
 	files_str = map(str, files)
+
+	data['message'] = ''
 
 	if (len(filelist) > 0):
 		data['message'] = []
@@ -349,92 +419,155 @@ def adminlogs(form):
 def logstat(form):
 	format = form.getvalue('format', 'html')
 
-#	(localdir, files, log) = oldlogfiles(all=True)
+	#(localdir, files, log) = oldlogfiles(all=True)		# would be better - but has NO date!
 	(localdir, files, log) = oldlogfiles()
 
-	stat = {'run_count':		0, 
+	filter = 'mainbot.log'
+
+	data = {'start_count':		0, # = run_count
+		'end_count':		0, # = successful_count
 		'histcomp_count':	0, 
-		'successful_count':	0, 
-		'warn_list':		[], 
-		'reliability_list':	[], 
-#		'start_date':		strptime(os.path.splitext(files[0])[1], "%Y-%m-%d"),
-#		'end_date':		strptime(os.path.splitext(files[-1])[1], "%Y-%m-%d"),
-		'start_date':		strptime("2011-12-25", "%Y-%m-%d"),
-		'end_date':		strptime("2011-12-28", "%Y-%m-%d"),
-		'warn_total':		0, 
-		'warn_dist':		0,  }
+		'messages':		"", 
+		'start_date':		0.0,
+		'end_date':		0.0,
+		'filter':		filter + " (fix)",  }
 
-#	for item in files:
-#		logfile = os.path.join(localdir, item)
-#		f = open(logfile, "r")
-#		buffer = re.split('\n', f.read(-1))
-#		f.close()
+	stat = {}
+	for item in files:
+		if filter not in item: continue
+		last = item	# a little bit hacky but needed for plot below
 
-	logfile = os.path.join(localdir, files[0])
-	f = open(logfile, "r")
-	buffer = f.read(-1).strip().split("\n")
-	f.close()
+		logfile = os.path.join(localdir, item)
+		stat[item] = logging_statistics(logfile)
 
-	# statistics (like mentioned in 'logging.statistics')
-	count     = { 'debug': 0, 'warn': 0, 'info': 0, 'error': 0, 'critical': 0, 'unknown': 0, }
-	events    = { 'start':     'SCRIPT CALL:',
-	              'end':       botdonemsg,
-	              'histcomp':  '* Compressing of histories:',
-	              'warn?':     '* Processing Warnings:',
-	              'backlink?': '* Processing Template Backlink List:', }
-	etiming   = { 'start': [], 'end': [], 'histcomp': [], 'warn?': [], 'backlink?': [],
-	              'mainstart': None, 'mainend': None, }
-	resources = { 'files': set(), }
+	d = {'mcount': [], 'ecount': [], 'messages': '', 'uptimes': [], 'histcomp': 0}
+	keys = stat.keys()
+	keys.sort()
+	data['start_date'] = stat[keys[0]]['mainstart']
+	data['end_date']   = stat[keys[-1]]['mainend']
+	for item in keys:
+		t = mktime(strptime(item.split('.')[-1], "%Y-%m-%d"))
 
-	#How many requests are being handled per second, how much of various resources are 
+		d['mcount'].append( [t] + stat[item]['mcount'].values() )
 
-	# gather statistics
-	etiming['mainstart'] = regex.match(buffer[0]).groupdict()['timestamp']
-	etiming['mainend']   = regex.match(buffer[-1]).groupdict()['timestamp']
-	for line in buffer:
-		if not line.strip(): continue
-		try:
-			info = regex.match(line).groupdict()
+		d['ecount'].append( [t] + stat[item]['ecount'].values() )
 
-			lvl = info['level'].lower()
-			count[ 'unknown' if lvl not in count else lvl ] += 1
+		d['messages'] += "<b>%s</b><br>\n<i>used resources: %s</i><br>\n" % (item, stat[item]['resources'])
+		d['messages'] += "<br>\n".join(stat[item]['messages']) + ("<br>\n"*2)
 
-			for e in events:
-				if events[e] in info['message']:
-					etiming[e].append( info['timestamp'] )
+		end   = numpy.array(stat[item]['etiming']['end'])
+		start = numpy.array(stat[item]['etiming']['start'])
+		if end.shape == start.shape:
+			d['uptimes'].append( list(end-start-3600) )	# -3600 because of time jump during 'set TZ'
+		else:
+			d['uptimes'].append( '-' )
 
-			resources['files'].add( info['file'] )
-		except AttributeError:
-			pass
+		d['histcomp'] += stat[item]['ecount']['histcomp']
 
-	# evaluate statistics
-	#in use, how long we've been up. 
+	d['mcount'] = numpy.array(d['mcount'])
+	d['ecount'] = numpy.array(d['ecount'])
 
-
-	#stat['warn_total'] = len(stat['warn_list'])
-	stat['warn_total'] = None
-	stat['warn_list'] = list(set(stat['warn_list']))
-	#stat['warn_dist'] = len(stat['warn_list'])
-	stat['warn_dist'] = None
-	stat['warn_list'].sort()
-
-	data = copy.deepcopy(stat)
-	data.update({'start_date':		str(strftime("%a %b %d %Y", stat['start_date'])),
-		'end_date':		str(strftime("%a %b %d %Y", stat['end_date'])),
-		'run_diff':		(int(stat['run_count']) - int(stat['successful_count'])),
-		#'reliability':		[ "%.2f" % (100*item[1]) for item in stat['reliability_list'] ],
-		'reliability':		str(count) + str(etiming) + str(resources),
-		#'warnings':		"<br>".join(stat['warn_list']),
-		'warnings':		None,
-		#'graphlink':		sys.argv[0] + r"?action=logstat&format=graph",
-		'graphlink':		None,
+	data.update({'start_date':		str(strftime("%a %b %d %Y", localtime(data['start_date']))),
+		'end_date':		str(strftime("%a %b %d %Y", localtime(data['end_date']))),
+		'run_diff':		"</td><td>".join( map(str, d['ecount'][:,1]-d['ecount'][:,3]) ),
+		'messages':		d['messages'],
+		'start_count':		"</td><td>".join( map(str, d['ecount'][:,1]) ),
+		'end_count':		"</td><td>".join( map(str, d['ecount'][:,3]) ),
+		'uptimes':		"</td><td>".join( map(str, d['uptimes']) ),
+		'histcomp_count':	d['histcomp'], 
+		'graphlink-mcount':	sys.argv[0] + r"?action=logstat&amp;format=graph-mcount",
+		'graphlink-mcount-i':	sys.argv[0] + r"?action=logstat&amp;format=graph-mcount-i",
+		'graphlink-ecount':	sys.argv[0] + r"?action=logstat&amp;format=graph-ecount",
+		'graphlink-ecount-sed':	sys.argv[0] + r"?action=logstat&amp;format=graph-ecount-sed",
+		'backlink':		sys.argv[0],
 	})
 
-
-	if (format == 'plain'): return "Content-Type: text/plain\n\n%s" % str(stat)
-	if (format == 'graph'):
-		xdata = [ item[1]*100 for item in stat['reliability_list'] ]
-		return graph(xdata, xscale=3, xticks=10, xmajor=1, yscale=4, yticks=10, ymajor=1)
+	if   (format == 'plain'):
+		return "Content-Type: text/plain\n\n%s" % str(stat)
+	elif (format == 'graph-mcount'):
+		d = d['mcount']
+		fig = plt.figure(figsize=(4,4))
+		ax = fig.add_subplot(111)
+		#plot1 = ax.bar(range(len(xdata)), xdata)
+		#p1 = ax.plot(epoch2num(d[:,0]), d[:,1])	# 'info'
+		p2 = ax.step(epoch2num(d[:,0]), d[:,2], marker='x', where='mid')
+		p3 = ax.step(epoch2num(d[:,0]), d[:,3], marker='x', where='mid')
+		p4 = ax.step(epoch2num(d[:,0]), d[:,4], marker='x', where='mid')
+		p5 = ax.step(epoch2num(d[:,0]), d[:,5], marker='x', where='mid')
+		p6 = ax.step(epoch2num(d[:,0]), d[:,6], marker='x', where='mid')
+		plt.legend([p2, p3, p4, p5, p6], stat[last]['mcount'].keys()[1:], loc='center left')
+		plt.grid(True, which='both')
+		# format the ticks
+		ax.xaxis.set_major_locator(MonthLocator())
+		ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
+		ax.xaxis.set_minor_locator(DayLocator())
+		ax.autoscale_view()
+		# format the coords message box
+		ax.fmt_xdata = DateFormatter('%Y-%m-%d')
+		# format axis
+		fig.autofmt_xdate()
+		# show plot
+		return show_onwebpage(plt)
+	elif (format == 'graph-mcount-i'):
+		d = d['mcount']
+		fig = plt.figure(figsize=(4,4))
+		ax = fig.add_subplot(111)
+		p1 = ax.step(epoch2num(d[:,0]), d[:,1], marker='x', where='mid')
+		# legend
+		plt.legend([p1], stat[last]['mcount'].keys(), loc='upper left')
+		# grid
+		plt.grid(True, which='both')
+		# format the ticks
+		ax.xaxis.set_major_locator(MonthLocator())
+		ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
+		ax.xaxis.set_minor_locator(DayLocator())
+		ax.autoscale_view()
+		# format the coords message box
+		ax.fmt_xdata = DateFormatter('%Y-%m-%d')
+		# format axis
+		fig.autofmt_xdate()
+		# show plot
+		return show_onwebpage(plt)
+	elif (format == 'graph-ecount'):
+		d = d['ecount']
+		fig = plt.figure(figsize=(4,4))
+		ax = fig.add_subplot(111)
+		p1 = ax.step(epoch2num(d[:,0]), d[:,1], marker='x', where='mid')
+		p2 = ax.step(epoch2num(d[:,0]), d[:,2], marker='x', where='mid')
+		p3 = ax.step(epoch2num(d[:,0]), d[:,3], marker='x', where='mid')
+		p4 = ax.step(epoch2num(d[:,0]), d[:,4], marker='x', where='mid')
+		p5 = ax.step(epoch2num(d[:,0]), d[:,5], marker='x', where='mid')
+		plt.legend([p1, p2, p3, p4, p5], stat[last]['ecount'].keys(), loc='upper left')
+		plt.grid(True, which='both')
+		# format the ticks
+		ax.xaxis.set_major_locator(MonthLocator())
+		ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
+		ax.xaxis.set_minor_locator(DayLocator())
+		ax.autoscale_view()
+		# format the coords message box
+		ax.fmt_xdata = DateFormatter('%Y-%m-%d')
+		# format axis
+		fig.autofmt_xdate()
+		# show plot
+		return show_onwebpage(plt)
+	elif (format == 'graph-ecount-sed'):
+		d = d['ecount']
+		fig = plt.figure(figsize=(4,4))
+		ax = fig.add_subplot(111)
+		p1 = ax.step(epoch2num(d[:,0]), (d[:,1]-d[:,3]), marker='x', where='mid')
+		plt.legend([p1], ['runs failed'])
+		plt.grid(True, which='both')
+		# format the ticks
+		ax.xaxis.set_major_locator(MonthLocator())
+		ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
+		ax.xaxis.set_minor_locator(DayLocator())
+		ax.autoscale_view()
+		# format the coords message box
+		ax.fmt_xdata = DateFormatter('%Y-%m-%d')
+		# format axis
+		fig.autofmt_xdate()
+		# show plot
+		return show_onwebpage(plt)
 
 	data.update({	'refresh':	'',
 			'title':	'DrTrigonBot log statistics',

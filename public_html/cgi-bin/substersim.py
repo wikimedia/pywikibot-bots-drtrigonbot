@@ -182,6 +182,16 @@ Simulation:
         <td><input name="zip" type="text" size="60" maxlength="200" value="%(zip)s"></td>
       </tr>
       <tr>
+        <td>xlsx</td>
+        <td>=</td>
+        <td><input name="xlsx" type="text" size="60" maxlength="200" value="%(xlsx)s"></td>
+      </tr>
+      <tr>
+        <td>cron</td>
+        <td>=</td>
+        <td><input name="cron" type="text" size="60" maxlength="200" value="%(cron)s"></td>
+      </tr>
+      <tr>
         <td>(add. params)</td>
         <td>=</td>
         <td><input name="add_params" type="text" size="60" maxlength="200" value="%(add_params)s"></td>
