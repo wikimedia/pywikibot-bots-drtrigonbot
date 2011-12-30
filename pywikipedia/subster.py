@@ -301,7 +301,6 @@ class SubsterBot(dtbext.basic.BasicBot):
             secure = secure or (param['url'][:len(item)] == item)
         param['wiki'] = eval(param['wiki'])
         param['zip']  = eval(param['zip'])
-        param['xlsx'] = eval(param['xlsx'])
         if (not secure) and (not param['wiki']):
             return (content, substed_tags)
         if   param['wiki']:
