@@ -41,6 +41,7 @@ from time import *
 import datetime
 # http://www.ibm.com/developerworks/aix/library/au-python/
 import os, re, sys, copy
+import subprocess
 
 #import Image,ImageDraw
 import matplotlib.pyplot as plt
@@ -72,8 +73,7 @@ Successfully finished bot runs: <b>%(successfull)s</b><br><br>
 Current log files: %(currentlog)s<br>
 <a href="%(oldlink)s">Old log</a> files: <i>%(oldlog)s</i><br><br>
 See also <a href="%(logstat)s">logging statistics</a> and the important messages:
-<br>
-%(messages)s<br>
+<p style="white-space:pre-wrap;">%(messages)s</p>
 <br>"""
 
 logstat_content = \
@@ -100,8 +100,7 @@ History compressed: %(histcomp_count)s (times)<br>
 <a href="%(graphlink-mcount-i)s"><img src="%(graphlink-mcount-i)s" alt=""></a><br>
 <br>
 Important messages (everything except INFO):<br>
-<br>
-%(messages)s"""
+<p style="white-space:pre-wrap;">%(messages)s</p>"""
 
 adminlogs_content = \
 """Log file count: %(logcount)s<br>
@@ -142,14 +141,15 @@ bottimeout = 24
 botdonemsg = 'DONE'
 
 # use classic 're' since 'pyparsing' does not work with unicode
-regex   = re.compile(r'(?P<timestamp>\S+\s\S+)\s(?P<file>\S+)\s*(?P<level>\S+)\s*(?P<message>.*)')#, re.U)
+regex   = re.compile(r'(?P<timestamp>[\d-]+\s[\d:,]+)\s(?P<file>\S+)\s*(?P<level>\S+)\s*(?P<message>.*)')#, re.U)
 timefmt = "%Y-%m-%d %H:%M:%S,%f"
+
+localdir = os.path.dirname(os.path.join('..','DrTrigonBot','.'))
 
 
 # === functions === === ===
 #
 def oldlogfiles(all=False):
-	localdir = os.path.dirname(os.path.join('..','DrTrigonBot','.'))
 	files = os.listdir( localdir )
 	archive, current = [], []
 	for item in files:
@@ -262,18 +262,23 @@ def logging_statistics(logfile):
 	# gather statistics
 	etiming['mainstart'] = [ regex.match(buffer[0]).groupdict()['timestamp'] ]
 	etiming['mainend']   = [ regex.match(buffer[-1]).groupdict()['timestamp'] ]
+	info = {'level': 'unknown', 'message': '', 'timestamp': etiming['mainstart'][0], 'file': ''}
 	for line in buffer:
 		if not line.strip(): continue
-		try:
-			info = regex.match(line).groupdict()
 
-			process_event( info['level'].lower(), mcount, (mqueue, cgi.escape(line)), 
-			               ignore='info' )
-			process_event( info['message'],       ecount, (etiming, info['timestamp']), 
-			               process=events )
-			resources['files'].add( info['file'] )
-		except AttributeError:
-			pass
+		data = regex.match(line)
+		if (data is not None):
+			data = data.groupdict()
+		else:
+			#line = ("%(level)s " % info) + line
+			data = {'message': line}
+		info.update( data )
+
+		process_event( info['level'].lower(), mcount, (mqueue, cgi.escape(line)), 
+		               ignore='info' )
+		process_event( info['message'],       ecount, (etiming, info['timestamp']), 
+		               process=events )
+		resources['files'].add( info['file'] )
 
 	# evaluate statistics
 	stats = {'mcount': mcount, 'mqueue': mqueue, 'ecount': ecount, 'resources': resources}
@@ -315,7 +320,7 @@ def displaystate(form):
 
 	stat = logging_statistics(data['loglink'])
 	data['botlog']      = stat['lastmessage']
-	data['messages']    = "<br>\n".join(stat['messages'])
+	data['messages']    = "\n".join(stat['messages'])
 	data['successfull'] = "%s of %s" % (stat['ecount']['end'], stat['ecount']['start'])
 
 	lastrun = (time() - os.stat(data['loglink']).st_mtime)
@@ -404,9 +409,13 @@ def adminlogs(form):
 
 	checkbox_tmpl = '<input type="checkbox" name="filelist" value="%(datei)s">%(datei)s<br>'
 
+	# get directory size (but is not stable)
+	df = subprocess.Popen(["du", localdir, "-h"], stdout=subprocess.PIPE)
+	size = df.communicate()[0].split()[0]
+
 	#data.update({	'oldloglist':	'\n'.join([checkbox_tmpl % {'datei':item} for item in files[:-5]]),
 	data.update({	'oldloglist':	'\n'.join([checkbox_tmpl % {'datei':item} for item in files]),
-			'logcount':	len(files),
+			'logcount':	"%i (size: %s)" % (len(files), size),
 			'refresh':	'',
 			'title':	'DrTrigonBot log admin panel',
 			'tsnotice': 	'',
@@ -419,17 +428,13 @@ def adminlogs(form):
 def logstat(form):
 	format = form.getvalue('format', 'html')
 
-	#(localdir, files, log) = oldlogfiles(all=True)		# would be better - but has NO date!
-	(localdir, files, log) = oldlogfiles()
+	(localdir, files, log) = oldlogfiles(all=True)
 
-	filter = 'mainbot.log'
+	filter  = 'mainbot.log'
+	datefmt = "%Y-%m-%d"
 
-	data = {'start_count':		0, # = run_count
-		'end_count':		0, # = successful_count
-		'histcomp_count':	0, 
-		'messages':		"", 
-		'start_date':		0.0,
-		'end_date':		0.0,
+	data = {'histcomp_count':	0, 
+		'messages':		'',
 		'filter':		filter + " (fix)",  }
 
 	stat = {}
@@ -438,22 +443,24 @@ def logstat(form):
 		last = item	# a little bit hacky but needed for plot below
 
 		logfile = os.path.join(localdir, item)
+		if len(item.split('.')) == 2:
+			item += "." + strftime(datefmt)
 		stat[item] = logging_statistics(logfile)
 
-	d = {'mcount': [], 'ecount': [], 'messages': '', 'uptimes': [], 'histcomp': 0}
+	d = {'mcount': [], 'ecount': [], 'uptimes': []}
 	keys = stat.keys()
 	keys.sort()
-	data['start_date'] = stat[keys[0]]['mainstart']
-	data['end_date']   = stat[keys[-1]]['mainend']
+	data['start_date'] = str(strftime("%a %b %d %Y", localtime( stat[keys[0]]['mainstart'] )))
+	data['end_date']   = str(strftime("%a %b %d %Y", localtime( stat[keys[-1]]['mainend'] )))
 	for item in keys:
-		t = mktime(strptime(item.split('.')[-1], "%Y-%m-%d"))
+		t = mktime(strptime(item.split('.')[-1], datefmt))
 
 		d['mcount'].append( [t] + stat[item]['mcount'].values() )
 
 		d['ecount'].append( [t] + stat[item]['ecount'].values() )
 
-		d['messages'] += "<b>%s</b><br>\n<i>used resources: %s</i><br>\n" % (item, stat[item]['resources'])
-		d['messages'] += "<br>\n".join(stat[item]['messages']) + ("<br>\n"*2)
+		data['messages'] += "<b>%s</b>\n<i>used resources: %s</i>\n" % (item, stat[item]['resources'])
+		data['messages'] += "\n".join(stat[item]['messages']) + ("\n"*2)
 
 		end   = numpy.array(stat[item]['etiming']['end'])
 		start = numpy.array(stat[item]['etiming']['start'])
@@ -462,19 +469,18 @@ def logstat(form):
 		else:
 			d['uptimes'].append( '-' )
 
-		d['histcomp'] += stat[item]['ecount']['histcomp']
+		data['histcomp_count'] += stat[item]['ecount']['histcomp']
 
 	d['mcount'] = numpy.array(d['mcount'])
 	d['ecount'] = numpy.array(d['ecount'])
+	d['mcount'][:,0] = epoch2num(d['mcount'][:,0])
+	d['ecount'][:,0] = epoch2num(d['ecount'][:,0])
 
-	data.update({'start_date':		str(strftime("%a %b %d %Y", localtime(data['start_date']))),
-		'end_date':		str(strftime("%a %b %d %Y", localtime(data['end_date']))),
+	data.update({
 		'run_diff':		"</td><td>".join( map(str, d['ecount'][:,1]-d['ecount'][:,3]) ),
-		'messages':		d['messages'],
 		'start_count':		"</td><td>".join( map(str, d['ecount'][:,1]) ),
 		'end_count':		"</td><td>".join( map(str, d['ecount'][:,3]) ),
 		'uptimes':		"</td><td>".join( map(str, d['uptimes']) ),
-		'histcomp_count':	d['histcomp'], 
 		'graphlink-mcount':	sys.argv[0] + r"?action=logstat&amp;format=graph-mcount",
 		'graphlink-mcount-i':	sys.argv[0] + r"?action=logstat&amp;format=graph-mcount-i",
 		'graphlink-ecount':	sys.argv[0] + r"?action=logstat&amp;format=graph-ecount",
@@ -482,19 +488,18 @@ def logstat(form):
 		'backlink':		sys.argv[0],
 	})
 
-	if   (format == 'plain'):
-		return "Content-Type: text/plain\n\n%s" % str(stat)
-	elif (format == 'graph-mcount'):
+	# plot graphs output
+	if   (format == 'graph-mcount'):
 		d = d['mcount']
 		fig = plt.figure(figsize=(4,4))
 		ax = fig.add_subplot(111)
 		#plot1 = ax.bar(range(len(xdata)), xdata)
-		#p1 = ax.plot(epoch2num(d[:,0]), d[:,1])	# 'info'
-		p2 = ax.step(epoch2num(d[:,0]), d[:,2], marker='x', where='mid')
-		p3 = ax.step(epoch2num(d[:,0]), d[:,3], marker='x', where='mid')
-		p4 = ax.step(epoch2num(d[:,0]), d[:,4], marker='x', where='mid')
-		p5 = ax.step(epoch2num(d[:,0]), d[:,5], marker='x', where='mid')
-		p6 = ax.step(epoch2num(d[:,0]), d[:,6], marker='x', where='mid')
+		#p1 = ax.plot(d[:,0], d[:,1])	# 'info'
+		p2 = ax.step(d[:,0], d[:,2], marker='x', where='mid')
+		p3 = ax.step(d[:,0], d[:,3], marker='x', where='mid')
+		p4 = ax.step(d[:,0], d[:,4], marker='x', where='mid')
+		p5 = ax.step(d[:,0], d[:,5], marker='x', where='mid')
+		p6 = ax.step(d[:,0], d[:,6], marker='x', where='mid')
 		plt.legend([p2, p3, p4, p5, p6], stat[last]['mcount'].keys()[1:], loc='center left')
 		plt.grid(True, which='both')
 		# format the ticks
@@ -512,7 +517,7 @@ def logstat(form):
 		d = d['mcount']
 		fig = plt.figure(figsize=(4,4))
 		ax = fig.add_subplot(111)
-		p1 = ax.step(epoch2num(d[:,0]), d[:,1], marker='x', where='mid')
+		p1 = ax.step(d[:,0], d[:,1], marker='x', where='mid')
 		# legend
 		plt.legend([p1], stat[last]['mcount'].keys(), loc='upper left')
 		# grid
@@ -532,11 +537,11 @@ def logstat(form):
 		d = d['ecount']
 		fig = plt.figure(figsize=(4,4))
 		ax = fig.add_subplot(111)
-		p1 = ax.step(epoch2num(d[:,0]), d[:,1], marker='x', where='mid')
-		p2 = ax.step(epoch2num(d[:,0]), d[:,2], marker='x', where='mid')
-		p3 = ax.step(epoch2num(d[:,0]), d[:,3], marker='x', where='mid')
-		p4 = ax.step(epoch2num(d[:,0]), d[:,4], marker='x', where='mid')
-		p5 = ax.step(epoch2num(d[:,0]), d[:,5], marker='x', where='mid')
+		p1 = ax.step(d[:,0], d[:,1], marker='x', where='mid')
+		p2 = ax.step(d[:,0], d[:,2], marker='x', where='mid')
+		p3 = ax.step(d[:,0], d[:,3], marker='x', where='mid')
+		p4 = ax.step(d[:,0], d[:,4], marker='x', where='mid')
+		p5 = ax.step(d[:,0], d[:,5], marker='x', where='mid')
 		plt.legend([p1, p2, p3, p4, p5], stat[last]['ecount'].keys(), loc='upper left')
 		plt.grid(True, which='both')
 		# format the ticks
@@ -554,7 +559,7 @@ def logstat(form):
 		d = d['ecount']
 		fig = plt.figure(figsize=(4,4))
 		ax = fig.add_subplot(111)
-		p1 = ax.step(epoch2num(d[:,0]), (d[:,1]-d[:,3]), marker='x', where='mid')
+		p1 = ax.step(d[:,0], (d[:,1]-d[:,3]), marker='x', where='mid')
 		plt.legend([p1], ['runs failed'])
 		plt.grid(True, which='both')
 		# format the ticks
@@ -578,6 +583,7 @@ def logstat(form):
 	})
 	data['content'] = logstat_content % data
 
+	# default output
 	return style.page % data
 
 
