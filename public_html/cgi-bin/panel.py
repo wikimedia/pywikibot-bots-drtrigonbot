@@ -44,6 +44,8 @@ import os, re, sys, copy
 import subprocess
 
 #import Image,ImageDraw
+import matplotlib
+matplotlib.rc('font', size=8)
 import matplotlib.pyplot as plt
 # http://matplotlib.sourceforge.net/api/dates_api.html?highlight=year%20out%20range#matplotlib.dates.epoch2num
 from matplotlib.dates import MonthLocator, DayLocator, DateFormatter, epoch2num
@@ -86,7 +88,7 @@ Filter: %(filter)s<br>
 <a href="%(graphlink-ecount)s"><img src="%(graphlink-ecount)s" alt=""></a>
 <a href="%(graphlink-ecount-sed)s"><img src="%(graphlink-ecount-sed)s" alt=""></a><br>
 <br>
-<table>
+<table class="wikitable">
 <tr><td>Total runs:</td><td>%(start_count)s</td></tr>
 <tr><td>Successful runs:</td><td>%(end_count)s</td></tr>
 <tr><td>Difference:</td><td>%(run_diff)s</td></tr>
@@ -228,11 +230,11 @@ def logging_statistics(logfile):
 	mqueue    = { 'debug': [], 'warning': [], 'info': [], 'error': [], 'critical': [], 'unknown': [], }
 	events    = { 'start':     'SCRIPT CALL:',
 	              'end':       botdonemsg,
-	              'histcomp':  '* Compressing of histories:',
-	              'warn?':     '* Processing Warnings:',
-	              'backlink?': '* Processing Template Backlink List:', }
-	ecount    = { 'start': 0, 'end': 0, 'histcomp': 0, 'warn?': 0, 'backlink?': 0, }
-	etiming   = { 'start': [], 'end': [], 'histcomp': [], 'warn?': [], 'backlink?': [],
+	              'histcomp':  'RUN BOT: compressing discussion summary',
+	              'sum_disc':  'RUN BOT: discussion summary',
+	              'subster':   'RUN BOT: "SubsterBot"', }
+	ecount    = { 'start': 0, 'end': 0, 'histcomp': 0, 'sum_disc': 0, 'subster': 0, }
+	etiming   = { 'start': [], 'end': [], 'histcomp': [], 'sum_disc': [], 'subster': [],
 	              'mainstart': None, 'mainend': None, }
 	resources = { 'files': set(), }
 
@@ -410,8 +412,9 @@ def adminlogs(form):
 	checkbox_tmpl = '<input type="checkbox" name="filelist" value="%(datei)s">%(datei)s<br>'
 
 	# get directory size (but is not stable)
-	df = subprocess.Popen(["du", localdir, "-h"], stdout=subprocess.PIPE)
-	size = df.communicate()[0].split()[0]
+	du = subprocess.Popen(["du", localdir, "-h"], stdout=subprocess.PIPE)
+	du = du.communicate()[0].split()
+	size = du[du.index('../DrTrigonBot')-1]
 
 	#data.update({	'oldloglist':	'\n'.join([checkbox_tmpl % {'datei':item} for item in files[:-5]]),
 	data.update({	'oldloglist':	'\n'.join([checkbox_tmpl % {'datei':item} for item in files]),
@@ -491,7 +494,7 @@ def logstat(form):
 	# plot graphs output
 	if   (format == 'graph-mcount'):
 		d = d['mcount']
-		fig = plt.figure(figsize=(4,4))
+		fig = plt.figure(figsize=(4,3))
 		ax = fig.add_subplot(111)
 		#plot1 = ax.bar(range(len(xdata)), xdata)
 		#p1 = ax.plot(d[:,0], d[:,1])	# 'info'
@@ -515,7 +518,7 @@ def logstat(form):
 		return show_onwebpage(plt)
 	elif (format == 'graph-mcount-i'):
 		d = d['mcount']
-		fig = plt.figure(figsize=(4,4))
+		fig = plt.figure(figsize=(4,3))
 		ax = fig.add_subplot(111)
 		p1 = ax.step(d[:,0], d[:,1], marker='x', where='mid')
 		# legend
@@ -535,7 +538,7 @@ def logstat(form):
 		return show_onwebpage(plt)
 	elif (format == 'graph-ecount'):
 		d = d['ecount']
-		fig = plt.figure(figsize=(4,4))
+		fig = plt.figure(figsize=(4,3))
 		ax = fig.add_subplot(111)
 		p1 = ax.step(d[:,0], d[:,1], marker='x', where='mid')
 		p2 = ax.step(d[:,0], d[:,2], marker='x', where='mid')
@@ -557,7 +560,7 @@ def logstat(form):
 		return show_onwebpage(plt)
 	elif (format == 'graph-ecount-sed'):
 		d = d['ecount']
-		fig = plt.figure(figsize=(4,4))
+		fig = plt.figure(figsize=(4,3))
 		ax = fig.add_subplot(111)
 		p1 = ax.step(d[:,0], (d[:,1]-d[:,3]), marker='x', where='mid')
 		plt.legend([p1], ['runs failed'])
