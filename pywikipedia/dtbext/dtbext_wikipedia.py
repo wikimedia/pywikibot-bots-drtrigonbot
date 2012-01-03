@@ -161,7 +161,7 @@ class Page(pywikibot.Page):
         try:
             r = result[u'parse'][u'sections']
         except KeyError:    # sequence of sometimes occuring "KeyError: u'parse'"
-            logging.getLogger('dtbext.wikipedia').warning(u'Query result: %r' % result)
+            logging.getLogger('dtbext.wikipedia').warning(u'Query result (gS): %r' % result)
             raise pywikibot.Error('Problem occured during data retrieval for sections in %s!' % self.title(asLink=True))
         #debug_data = str(r) + '\n'
         debug_data = str(result) + '\n'
@@ -268,8 +268,13 @@ class Page(pywikibot.Page):
             pywikibot.output(u"  Reading section %s from %s via API..." % (section[u'index'], self.title(asLink=True)))
 
             result = query.GetData(params, self.site())
-            r = result[u'query'][u'pages'].values()[0]
-            pl = r[u'revisions'][0][u'*'].splitlines()
+            # JIRA: DRTRIGON-90; catch and convert error (convert it such that the whole page gets processed later)
+            try:
+                r = result[u'query'][u'pages'].values()[0]
+                pl = r[u'revisions'][0][u'*'].splitlines()
+            except KeyError:    # sequence of sometimes occuring "KeyError: u'parse'"
+                logging.getLogger('dtbext.wikipedia').warning(u'Query result (gSBO): %r' % result)
+                raise pywikibot.Error('Problem occured during data retrieval for sections in %s!' % self.title(asLink=True))
 
             if pl:
                 possible_headers = [ (pl[0], pl[0]) ]
