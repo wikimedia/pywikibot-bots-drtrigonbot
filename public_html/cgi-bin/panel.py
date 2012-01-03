@@ -245,7 +245,8 @@ def logging_statistics(logfile):
 		else:
 			noevent = True
 			for e in process:
-				if process[e] in event:
+				#if process[e] in event:
+				if (process[e] == event.strip()):
 					event   = e
 					noevent = False
 					break
