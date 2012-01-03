@@ -32,7 +32,7 @@ import wikipedia as pywikibot
 
 import articlenos
 import subster
-import botlist
+#import botlist
 from collections import deque
 import time
 import thread
@@ -40,15 +40,15 @@ import copy
 
 bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang],
 
-                  # this is still VERY "HACKY" first approach to satisfy
-                  # http://de.wikipedia.org/wiki/Benutzer_Diskussion:Grip99#Subster
-                  # may be use: Benutzer:DrTrigon/Benutzer:DrTrigonBot/config.css
-                  'difflink':   [ ( 'Wikipedia:Projektdiskussion/PRD-subst',  # target (with template)
-                                    'Wikipedia:Projektdiskussion',  # source (url in template)
-                                    {'subpages':  True,             # link params: ext. source with subpages?
-                                     'flags':     {'minorEdit': False, 'botflag': False}, # link params: edit flags?
-                                    } ),
-                                ],
+#                  # this is still VERY "HACKY" first approach to satisfy
+#                  # http://de.wikipedia.org/wiki/Benutzer_Diskussion:Grip99#Subster
+#                  # may be use: Benutzer:DrTrigon/Benutzer:DrTrigonBot/config.css
+#                  'difflink':   [ ( 'Wikipedia:Projektdiskussion/PRD-subst',  # target (with template)
+#                                    'Wikipedia:Projektdiskussion',  # source (url in template)
+#                                    {'subpages':  True,             # link params: ext. source with subpages?
+#                                     'flags':     {'minorEdit': False, 'botflag': False}, # link params: edit flags?
+#                                    } ),
+#                                ],
 }
 
 ## used/defined magic words, look also at bot_control
@@ -112,7 +112,8 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
                     self.do_check(pop)
         # test actual page against 'difflink' list ("HACKY")
         p = page
-        for (target, source, params) in bot_config['difflink']:
+        #for (target, source, params) in bot_config['difflink']:
+        for (target, source, params) in subster.bot_config['difflink']:
             if params['subpages']:
                 p = p.split('/')
             else:

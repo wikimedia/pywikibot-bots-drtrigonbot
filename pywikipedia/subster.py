@@ -46,6 +46,7 @@ import mailbox, mimetypes, datetime, locale
 import openpyxl.reader.excel
 import crontab
 import logging
+import copy
 
 import pagegenerators
 import dtbext
@@ -104,8 +105,31 @@ bot_config = {    # unicode values
                    ),
         },
 
-        # this is a system parameter and should not be changed!
+        # this is a system parameter and should not be changed! (copy.deepcopy)
         'EditFlags':        {'minorEdit': True, 'botflag': True},
+
+        # this is still VERY "HACKY" first approach to satisfy (Grip99)
+        # http://de.wikipedia.org/wiki/Benutzer_Diskussion:DrTrigon#DrTrigonBot_ohne_Botflag
+        # (may be a param 'boflag' should be added to template, that works only if enabled/listed here)
+        'flagenable':       { u'Benutzer:Grip99/Wikipedia Diskussion:Vandalismusmeldung':
+                                {'botflag': False}, # (enables to) disable botflag
+                              u'Benutzer:Grip99/Wikipedia Diskussion:Sperrprüfung':
+                                {'botflag': False}, # (enables to) disable botflag
+                              u'Benutzer:Grip99/Wikipedia:Sperrprüfung':
+                                {'botflag': False}, # (enables to) disable botflag
+                            },
+
+
+        # --- subster_irc.py; subster.bot_config ---
+        # ...and second approach to satisfy (Grip99)
+        # http://de.wikipedia.org/wiki/Benutzer_Diskussion:Grip99#Subster
+        # may be use: Benutzer:DrTrigon/Benutzer:DrTrigonBot/config.css
+        'difflink':         [ ( 'Wikipedia:Projektdiskussion/PRD-subst',  # target (with template)
+                                'Wikipedia:Projektdiskussion',  # source (url in template)
+                                {'subpages':  True,             # link params: ext. source with subpages?
+                                 'flags':     {'minorEdit': False, 'botflag': False}, # link params: edit flags?
+                                } ),
+                            ],
 }
 
 ## used/defined magic words, look also at bot_control
@@ -151,7 +175,7 @@ class SubsterBot(dtbext.basic.BasicBot):
         self.pagegen = pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
         self._code   = self._ConfigPage.get()
 
-    def run(self, sim=False, msg=bot_config['msg'], EditFlags=bot_config['EditFlags']):
+    def run(self, sim=False, msg=bot_config['msg'], EditFlags=copy.deepcopy(bot_config['EditFlags'])):
         '''Run SubsterBot().'''
 
         pywikibot.output(u'\03{lightgreen}* Processing Template Backlink List:\03{default}')
@@ -189,6 +213,8 @@ class SubsterBot(dtbext.basic.BasicBot):
                         continue
 
                     head, mod = pywikibot.translate(self.site.lang, msg)
+                    if page.title() in bot_config['flagenable']:
+                        EditFlags.update( bot_config['flagenable'][page.title()] )
                     self.save(page, substed_content, head + mod % (", ".join(substed_tags)), **EditFlags)
                 else:
                     pywikibot.output(u'NOTHING TO DO!')
