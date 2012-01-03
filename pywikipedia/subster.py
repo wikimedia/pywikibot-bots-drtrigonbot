@@ -213,11 +213,11 @@ class SubsterBot(dtbext.basic.BasicBot):
                         continue
 
                     head, mod = pywikibot.translate(self.site.lang, msg)
+                    flags = copy.deepcopy(EditFlags)
                     if page.title() in bot_config['flagenable']:
-                        EditFlags = copy.deepcopy(EditFlags)
-                        EditFlags.update( bot_config['flagenable'][page.title()] )
-                    pywikibot.output(u'Flags used for write: %s' % EditFlags)
-                    self.save(page, substed_content, head + mod % (", ".join(substed_tags)), **EditFlags)
+                        flags.update( bot_config['flagenable'][page.title()] )
+                    pywikibot.output(u'Flags used for writing: %s' % flags)
+                    self.save(page, substed_content, head + mod % (", ".join(substed_tags)), **flags)
                 else:
                     pywikibot.output(u'NOTHING TO DO!')
 
