@@ -175,7 +175,7 @@ class SubsterBot(dtbext.basic.BasicBot):
         self.pagegen = pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
         self._code   = self._ConfigPage.get()
 
-    def run(self, sim=False, msg=bot_config['msg'], EditFlags=copy.deepcopy(bot_config['EditFlags'])):
+    def run(self, sim=False, msg=bot_config['msg'], EditFlags=bot_config['EditFlags']):
         '''Run SubsterBot().'''
 
         pywikibot.output(u'\03{lightgreen}* Processing Template Backlink List:\03{default}')
@@ -214,6 +214,7 @@ class SubsterBot(dtbext.basic.BasicBot):
 
                     head, mod = pywikibot.translate(self.site.lang, msg)
                     if page.title() in bot_config['flagenable']:
+                        EditFlags = copy.deepcopy(EditFlags)
                         EditFlags.update( bot_config['flagenable'][page.title()] )
                     pywikibot.output(u'Flags used for write: %s' % EditFlags)
                     self.save(page, substed_content, head + mod % (", ".join(substed_tags)), **EditFlags)
