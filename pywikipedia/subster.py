@@ -345,6 +345,7 @@ class SubsterBot(dtbext.basic.BasicBot):
             external_buffer = urllib.urlopen(param['url']).read()
         else:
             external_buffer = self.site.getUrl(param['url'], no_hostname = True)
+            if self.site.loggedInAs() is None: self.site._load(force=True)  # DRTRIGON-112 (work-a-round)
 
         # some intermediate processing (unzip, xlsx2csv, ...)
         if param['zip']:

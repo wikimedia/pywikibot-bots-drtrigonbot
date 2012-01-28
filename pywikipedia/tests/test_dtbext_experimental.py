@@ -17,9 +17,6 @@ import userlib
 import wikipedia as pywikibot
 
 
-site = pywikibot.getSite()
-
-
 # 'TESTPAGE', 'TESTPAGES', ... imported from 'test_dtbext.py'
 
 
@@ -46,3 +43,11 @@ if __name__ == '__main__':
 #    sections = page.getSections(minLevel=1)
 #    for s in sections:
 #        print s
+
+    #print site.cookies()
+    print 'loggedInAs: %s' % site.loggedInAs()
+    external_buffer = site.getUrl(u'http://aniki.info/Special:Statistics', no_hostname = True)
+    print 'loggedInAs: %s' % site.loggedInAs()
+    if site.loggedInAs() is None:
+        site._load(force=True)
+    print 'loggedInAs: %s' % site.loggedInAs()
