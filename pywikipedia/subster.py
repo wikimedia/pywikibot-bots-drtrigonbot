@@ -60,7 +60,9 @@ bot_config = {    # unicode values
 
         # important to use a '.css' page here, since it HAS TO BE protected to
         # prevent malicious code injection !
-        'ConfigCSSPage':    u'User:DrTrigon/DrTrigonBot/config.css',
+        'ConfCSSpostproc':  u'User:DrTrigon/DrTrigonBot/subster-postproc.css',
+        'ConfCSSconfig':    u'User:DrTrigon/DrTrigonBot/subster-config.css',
+
         'CodeTemplate':     u'\n%s(DATA, *args)\n',
         'CRONMaxDelay':     1*24*60*60,       # bot runs daily
 
@@ -69,8 +71,8 @@ bot_config = {    # unicode values
 
         'var_regex_str':    u'<!--SUBSTER-%(var1)s-->%(cont)s<!--SUBSTER-%(var2)s-->',
 
-        'mbox_file':         'mail_inbox',    # "drtrigon+subster@toolserver.org"
-        'data_path':         '../data/subster',
+        'mbox_file':        'mail_inbox',    # "drtrigon+subster@toolserver.org"
+        'data_path':        '../data/subster',
 
         # bot paramater/options
         'param_default':    { 'url':   '',
@@ -107,29 +109,6 @@ bot_config = {    # unicode values
 
         # this is a system parameter and should not be changed! (copy.deepcopy)
         'EditFlags':        {'minorEdit': True, 'botflag': True},
-
-        # this is still VERY "HACKY" first approach to satisfy (Grip99)
-        # http://de.wikipedia.org/wiki/Benutzer_Diskussion:DrTrigon#DrTrigonBot_ohne_Botflag
-        # (may be a param 'boflag' should be added to template, that works only if enabled/listed here)
-        'flagenable':       { u'Benutzer:Grip99/Wikipedia Diskussion:Vandalismusmeldung':
-                                {'botflag': False}, # (enables to) disable botflag
-                              u'Benutzer:Grip99/Wikipedia Diskussion:Sperrprüfung':
-                                {'botflag': False}, # (enables to) disable botflag
-                              u'Benutzer:Grip99/Wikipedia:Sperrprüfung':
-                                {'botflag': False}, # (enables to) disable botflag
-                            },
-
-
-        # --- subster_irc.py; subster.bot_config ---
-        # ...and second approach to satisfy (Grip99)
-        # http://de.wikipedia.org/wiki/Benutzer_Diskussion:Grip99#Subster
-        # may be use: Benutzer:DrTrigon/Benutzer:DrTrigonBot/config.css
-        'difflink':         [ ( 'Wikipedia:Projektdiskussion/PRD-subst',  # target (with template)
-                                'Wikipedia:Projektdiskussion',  # source (url in template)
-                                {'subpages':  True,             # link params: ext. source with subpages?
-                                 'flags':     {'minorEdit': False, 'botflag': False}, # link params: edit flags?
-                                } ),
-                            ],
 }
 
 ## used/defined magic words, look also at bot_control
@@ -170,10 +149,15 @@ class SubsterBot(dtbext.basic.BasicBot):
         dtbext.basic.BasicBot.__init__(self, bot_config, debug)
 
         # init constants
-        self._userListPage = pywikibot.Page(self.site, bot_config['TemplateName'])
-        self._ConfigPage   = pywikibot.Page(self.site, bot_config['ConfigCSSPage'])
-        self.pagegen = pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
-        self._code   = self._ConfigPage.get()
+        self._userListPage        = pywikibot.Page(self.site, bot_config['TemplateName'])
+        self._ConfCSSpostprocPage = pywikibot.Page(self.site, bot_config['ConfCSSpostproc'])
+        self._ConfCSSconfigPage   = pywikibot.Page(self.site, bot_config['ConfCSSconfig'])
+        self.pagegen     = pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
+        self._code       = self._ConfCSSpostprocPage.get()
+        self._flagenable = {}
+        if self._ConfCSSconfigPage.exists():
+            exec(self._ConfCSSconfigPage.get())    # with variable: bot_config_wiki
+            self._flagenable = bot_config_wiki['flagenable']
 
     def run(self, sim=False, msg=bot_config['msg'], EditFlags=bot_config['EditFlags']):
         '''Run SubsterBot().'''
@@ -214,8 +198,8 @@ class SubsterBot(dtbext.basic.BasicBot):
 
                     head, mod = pywikibot.translate(self.site.lang, msg)
                     flags = copy.deepcopy(EditFlags)
-                    if page.title() in bot_config['flagenable']:
-                        flags.update( bot_config['flagenable'][page.title()] )
+                    if page.title() in self._flagenable:
+                        flags.update( self._flagenable[page.title()] )
                     pywikibot.output(u'Flags used for writing: %s' % flags)
                     self.save(page, substed_content, head + mod % (", ".join(substed_tags)), **flags)
                 else:

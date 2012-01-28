@@ -40,15 +40,7 @@ import copy
 
 bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang],
 
-#                  # this is still VERY "HACKY" first approach to satisfy
-#                  # http://de.wikipedia.org/wiki/Benutzer_Diskussion:Grip99#Subster
-#                  # may be use: Benutzer:DrTrigon/Benutzer:DrTrigonBot/config.css
-#                  'difflink':   [ ( 'Wikipedia:Projektdiskussion/PRD-subst',  # target (with template)
-#                                    'Wikipedia:Projektdiskussion',  # source (url in template)
-#                                    {'subpages':  True,             # link params: ext. source with subpages?
-#                                     'flags':     {'minorEdit': False, 'botflag': False}, # link params: edit flags?
-#                                    } ),
-#                                ],
+            'ConfCSSconfig':    u'User:DrTrigon/DrTrigonBot/subster-config.css',
 }
 
 ## used/defined magic words, look also at bot_control
@@ -84,6 +76,13 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
         self.templ = pywikibot.Page(self.site, subster.bot_config['TemplateName'])
         self.do_refresh_References()
 
+        # init constants
+        self._ConfCSSconfigPage = pywikibot.Page(self.site, bot_config['ConfCSSconfig'])
+        self._difflink = []
+        if self._ConfCSSconfigPage.exists():
+            exec(self._ConfCSSconfigPage.get())    # with variable: bot_config_wiki
+            self._difflink = bot_config_wiki['difflink']
+
     def on_pubmsg(self, c, e):
         match = self.re_edit.match(e.arguments()[0])
         if not match:
@@ -112,8 +111,7 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
                     self.do_check(pop)
         # test actual page against 'difflink' list ("HACKY")
         p = page
-        #for (target, source, params) in bot_config['difflink']:
-        for (target, source, params) in subster.bot_config['difflink']:
+        for (target, source, params) in self._difflink:
             if params['subpages']:
                 p = p.split('/')
             else:
