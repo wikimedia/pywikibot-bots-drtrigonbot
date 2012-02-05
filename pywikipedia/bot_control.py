@@ -388,7 +388,10 @@ def main():
 
     # mediawiki software version?
     pywikibot.output(u'\nMEDIAWIKI VERSION:')
-    pywikibot.output(u'  Actual revision: %s' % str(pywikibot.getSite().live_version()))
+    if pywikibot.getSite().language() == 'ar':	# work-a-round: live_version has error in 'ar'
+        pywikibot.output(u'  Actual revision: skipped')
+    else:
+        pywikibot.output(u'  Actual revision: %s' % str(pywikibot.getSite().live_version()))
 
     # processing of messages on bot discussion page
     if pywikibot.getSite().messages():
