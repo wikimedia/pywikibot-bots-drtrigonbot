@@ -181,7 +181,8 @@ bot_config = {    # unicode values
                                 u'^(Wikipedia:Grafikwerkstatt/Grafikwünsche)', #
                                 u'^(Wikipedia:Kartenwerkstatt)',               #
                                 u'^(Wikipedia:Kartenwerkstatt/Kartenwünsche)', #
-                                u'^(Wikipedia:Bots/.*)', ],                    # DRTRIGON-11
+                                u'^(Wikipedia:Bots/.*)',                       # DRTRIGON-11
+                                u'^(Wikipedia:Redundanz/.*)', ],               # (Wunsch von Flominator)
                     # LIST of SIGNATUREs REGEX to USE, a LIST       (DRTRIGON-89)
                     # ev. sogar [\]\|/#] statt nur [\]\|/] ...?! dann kann Signatur auch links auf Unterabschn. enth.
                     # liefert leider aber auch falsch positive treffer... wobei seiten, die mal die aufmerksamkeit geweckt
