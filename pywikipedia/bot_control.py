@@ -396,7 +396,7 @@ def main():
     # processing of messages on bot discussion page
     if pywikibot.getSite().messages():
         pywikibot.output(u'====== new messages on bot discussion page =======')
-        messagesforbot = pywikibot.Page(pywikibot.getSite(), u'Benutzer Diskussion:DrTrigonBot').get(get_redirect=True)
+        messagesforbot = pywikibot.Page(pywikibot.getSite(), u'User:DrTrigonBot').toggleTalkPage().get(get_redirect=True)
         pywikibot.output(messagesforbot)
         pywikibot.output(u'==================================================')
 
