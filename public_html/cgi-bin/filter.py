@@ -78,7 +78,7 @@ default_content = \
   </tr>
   <tr>
     <td>unshorten urls:</td>
-    <td><input type="checkbox" name="unshort" value="1"></td>
+    <td><input type="checkbox" name="unshort" value="1" %(unshort)s></td>
     <td>(this is VERY slow - be patient)</td>
   </tr>
   </table>
@@ -120,7 +120,7 @@ if secure and url:
 
     # external unshortener API from ...
     #unshort   = "http://realurl.org/api/v1/getrealurl.php?url=%s"
-    unshort   = "http://www.unshorten.it/api1.0.php?shortURL=%s&responseFormat=xml"
+    unshort   = "http://www.unshorten.it/api1.0.php?responseFormat=xml&shortURL=%s"
     skip_list = ['://identi.ca',
                  '.wikimedia.org',
                  '://wikimediafoundation.org',
@@ -148,7 +148,7 @@ if secure and url:
     if param['unshort']:
         tic = time.time()
 
-        r = re.compile(r'(http(s?)://[^ "<]+)')
+        r = re.compile(r'(http(s?)://[^ "<\']+)')
         url_list = r.findall(page_buf)
         for (url, other) in set(url_list):
             skip = False
@@ -161,10 +161,10 @@ if secure and url:
             unshort_buf = urllib.urlopen(unshort % url).read()
             bs          = BeautifulSoup.BeautifulSoup(unshort_buf)
             #if (bs.status.contents[0] == "1"):
-            #    longurl = str(bs.real.contents[0])
+            #    longurl  = str(bs.real.contents[0])
             #    page_buf = page_buf.replace(url, longurl)
             if not bs.findAll('error'):
-                longurl = str(bs.fullurl.contents[0])
+                longurl  = str(bs.fullurl.contents[0])
                 page_buf = page_buf.replace(url, longurl)
 
         toc = time.time()
@@ -177,7 +177,8 @@ if secure and url:
     page_buf += '\n<!-- \n%s\n -->' % '\n'.join(info)
 
 else:
-    param.update({'footer': style.footer + style.footer_w3c})
+    sel_dict = {'': '', '1': 'checked'}
+    param.update({'footer': style.footer + style.footer_w3c, 'unshort': sel_dict[param['unshort']]})
     page_buf = default_content % param
 
 
