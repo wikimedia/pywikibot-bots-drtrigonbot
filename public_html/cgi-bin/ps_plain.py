@@ -94,10 +94,23 @@ footer_w3c_css = \
 # http://toolserver.org/sitenotice
 # http://www.mail-archive.com/toolserver-l@lists.wikimedia.org/msg01679.html
 def print_tsnotice():
-        try:
-                notice = open('/var/www/sitenotice', 'r').read()
-                if notice:
-                        return tsnotice % { 'text': notice }
-        except IOError:
-                pass
-        return ''
+    try:
+        notice = open('/var/www/sitenotice', 'r').read()
+        if notice:
+            return tsnotice % { 'text': notice }
+    except IOError:
+        pass
+    return ''
+
+# security
+# http://lists.wikimedia.org/pipermail/toolserver-l/2011-September/004403.html
+# check url not to point to a local file on the server, e.g. 'file://'
+# (same code as used in subster.py)
+def secure_url(url):
+    # check no.1
+    s1 = False
+    for item in ['http://', 'https://']:
+        s1 = s1 or (url[:len(item)] == item)
+    secure = s1
+
+    return secure

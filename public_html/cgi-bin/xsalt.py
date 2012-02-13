@@ -90,13 +90,7 @@ form = cgi.FieldStorage()
 url  = form.getvalue('url', '')
 xslt = form.getvalue('xslt', '')
 
-# security
-# http://lists.wikimedia.org/pipermail/toolserver-l/2011-September/004403.html
-# check url not to point to a local file on the server, e.g. 'file://'
-# (same code as used in subster.py)
-s1 = False
-for item in ['http://', 'https://']:
-    s1 = s1 or (url[:len(item)] == item)
+s1 = style.secure_url(url)    # security
 # check xslt does point to allowed local files on the server (the
 # '.xslt' in same directory as script) and not any other, e.g. '../'
 import os

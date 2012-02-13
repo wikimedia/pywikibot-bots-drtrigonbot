@@ -27,15 +27,9 @@ __version__='$Id$'
 #
 
 
-# 'python test_rss2html-urlunshortened.py > test.html'
-# (buffer to speed up is implemented but is still very slow,
-#  multi-threading should be implemented for unshorten calls...)
-# (security for param 'url' like in xsalt or subster HAS TO BE
-#  IMPLEMENTED - may be do this in a extra module since it is
-#  needed in various places now...)
-# (other options additional to 'unshort' can an may be should
-#  be implemented...)
-# PROBLEME mit 'Content-Type ... utf-8' ... !!!!
+# *other options additional to 'unshort' can an may be should
+#  be implemented...
+# *PROBLEMS with 'Content-Type ... utf-8' ... !!!!
 
 
 # === python CGI script === === ===
@@ -103,15 +97,7 @@ param = {    'url': form.getvalue('url', ''),
         }
 url   = param['url']
 
-# security
-# http://lists.wikimedia.org/pipermail/toolserver-l/2011-September/004403.html
-# check url not to point to a local file on the server, e.g. 'file://'
-# (same code as used in subster.py)
-s1 = False
-for item in ['http://', 'https://']:
-    s1 = s1 or (url[:len(item)] == item)
-secure = s1
-
+secure       = style.secure_url(url)    # security
 content_type = style.content_type
 
 
