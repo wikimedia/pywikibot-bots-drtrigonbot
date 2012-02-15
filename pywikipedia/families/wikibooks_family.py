@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikibooks_family.py 9788 2011-12-08 05:32:33Z xqt $'
+__version__ = '$Id: wikibooks_family.py 9847 2012-01-29 17:43:21Z xqt $'
 
 # The Wikimedia family that is known as Wikibooks
 
@@ -12,13 +12,13 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'de', 'fr', 'hu', 'ja', 'pt', 'nl', 'pl', 'it', 'es', 'he',
-            'sq', 'fi', 'ca', 'vi', 'ru', 'cs', 'zh', 'id', 'hr', 'sv', 'tr',
-            'da', 'fa', 'th', 'gl', 'ko', 'no', 'ta', 'sr', 'tl', 'ar', 'mk',
-            'is', 'tt', 'lt', 'ka', 'eo', 'az', 'ro', 'bg', 'uk', 'sl', 'sk',
-            'el', 'si', 'li', 'la', 'hy', 'ang', 'ia', 'cv', 'et', 'mr', 'ur',
-            'bn', 'oc', 'ml', 'hi', 'ms', 'eu', 'fy', 'ie', 'ne', 'te', 'af',
+            'sq', 'fi', 'ca', 'ru', 'vi', 'cs', 'id', 'zh', 'hr', 'sv', 'tr',
+            'da', 'fa', 'th', 'gl', 'ta', 'ko', 'no', 'sr', 'ar', 'tl', 'mk',
+            'is', 'tt', 'lt', 'ka', 'az', 'eo', 'ro', 'bg', 'uk', 'sl', 'sk',
+            'el', 'si', 'hy', 'li', 'la', 'ang', 'ia', 'cv', 'et', 'mr', 'ur',
+            'bn', 'ms', 'oc', 'hi', 'ml', 'eu', 'fy', 'ie', 'ne', 'te', 'af',
             'tg', 'sa', 'pa', 'bs', 'ky', 'be', 'cy', 'mg', 'zh-min-nan', 'ast',
-            'ku', 'tk', 'su', 'uz', 'vo', 'kk', 'mn', 'my',
+            'kk', 'ku', 'tk', 'su', 'uz', 'vo', 'mn', 'my',
         ]
 
         if family.config.SSL_connection:
@@ -55,6 +55,7 @@ class Family(family.Family):
         self.namespaces[2]['cs'] = [u'Uživatel', u'Uživatelka']
         self.namespaces[12]['nl'] = [u'Help']
         self.namespaces[3]['ro'] = [u'Discuție Utilizator', u'Discuţie Utilizator']
+        self.namespaces[9]['ro'] = [u'Discuție MediaWiki', u'Discuţie MediaWiki']
         self.namespaces[15]['bn'] = [u'বিষয়শ্রেণী আলোচনা']
         self.namespaces[14]['bn'] = [u'বিষয়শ্রেণী']
         self.namespaces[3]['pl'] = [u'Dyskusja wikipedysty', u'Dyskusja wikipedystki', u'Dyskusja użytkownika', u'Dyskusja użytkowniczki']
@@ -345,6 +346,7 @@ class Family(family.Family):
         }
 
         self.namespaces[104] = {
+            'az': u'Vikikitab',
             'he': u'מדף',
             'ka': u'თარო',
             'nl': u'Wikijunior',
@@ -354,6 +356,7 @@ class Family(family.Family):
         }
 
         self.namespaces[105] = {
+            'az': u'Vikikitab müzakirəsi',
             'he': u'שיחת מדף',
             'ka': u'თარო განხილვა',
             'nl': u'Overleg Wikijunior',

@@ -153,6 +153,10 @@ msg = {
 	'ie': {
 		'isbn-formatting': u'Machine: Formatant ISBN',
 	},
+	# Author: Lam-ang
+	'ilo': {
+		'isbn-formatting': u'Robot: Agiporpormat ti ISBN',
+	},
 	# Author: Snævar
 	'is': {
 		'isbn-formatting': u'Vélmenni: Forsnið ISBN',
@@ -217,6 +221,9 @@ msg = {
 	'my': {
 		'isbn-formatting': u'ရိုဘော့ - ISBN နံပါတ်ကို ပုံစံချနေသည်',
 	},
+	'no': {
+		'isbn-formatting': u'robot: Formaterer ISBN',
+	},
 	# Author: Slomox
 	'nds': {
 		'isbn-formatting': u'Bot: ISBN-Format',
@@ -233,12 +240,9 @@ msg = {
 		'isbn-formatting': u'Robot: ISBN opgemaakt',
 	},
 	# Author: Harald Khan
+	# Author: Njardarlogar
 	'nn': {
 		'isbn-formatting': u'robot: formaterer ISBN',
-	},
-	# Author: Jon Harald Søby
-	'no': {
-		'isbn-formatting': u'robot: Formaterer ISBN',
 	},
 	# Author: Bouron
 	'os': {
@@ -247,6 +251,10 @@ msg = {
 	# Author: Sp5uhe
 	'pl': {
 		'isbn-formatting': u'Robot sformatował numer ISBN',
+	},
+	# Author: Borichèt
+	'pms': {
+		'isbn-formatting': u'Trigomiro: Formassion ëd l\'ISBN',
 	},
 	# Author: Hamilton Abreu
 	'pt': {
@@ -281,6 +289,10 @@ msg = {
 	# Author: බිඟුවා
 	'si': {
 		'isbn-formatting': u'රොබෝ: ISBN ආකෘතිකරණය',
+	},
+	# Author: Wizzard
+	'sk': {
+		'isbn-formatting': u'Robot: Formátovanie ISBN',
 	},
 	# Author: Dbc334
 	'sl': {

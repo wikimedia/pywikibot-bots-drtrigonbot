@@ -11,7 +11,7 @@ and return a unicode string.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: textlib.py 9697 2011-10-30 17:26:49Z xqt $'
+__version__ = '$Id: textlib.py 9799 2011-12-12 06:19:10Z xqt $'
 
 
 import wikipedia as pywikibot
@@ -41,7 +41,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
 
     Parameters:
         text            - a unicode string
-        old             - a compiled od uncompiled regular expression
+        old             - a compiled or uncompiled regular expression
         new             - a unicode string (which can contain regular
                           expression references), or a function which takes
                           a match object as parameter. See parameter repl of
@@ -747,7 +747,7 @@ def compileLinkR(withoutBracketed=False, onlyBracketed=False):
     # Note: While allowing dots inside URLs, MediaWiki will regard
     # dots at the end of the URL as not part of that URL.
     # The same applies to comma, colon and some other characters.
-    notAtEnd = '\]\s\.:;,<>"\|'
+    notAtEnd = '\]\s\.:;,<>"\|\)'
     # So characters inside the URL can be anything except whitespace,
     # closing squared brackets, quotation marks, greater than and less
     # than, and the last character also can't be parenthesis or another

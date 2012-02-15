@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikisource_family.py 9790 2011-12-08 06:02:41Z xqt $'
+__version__ = '$Id: wikisource_family.py 9890 2012-02-13 10:19:39Z xqt $'
 
 # The Wikimedia family that is known as Wikisource
 
@@ -11,12 +11,12 @@ class Family(family.Family):
         self.name = 'wikisource'
 
         self.languages_by_size = [
-            'en', 'ru', 'fr', 'zh', 'pt', 'de', 'it', 'es', 'he', 'fa', 'ar',
-            'pl', 'hu', 'cs', 'th', 'ro', 'ko', 'hr', 'te', 'fi', 'sv', 'sl',
-            'vi', 'nl', 'bn', 'tr', 'el', 'sa', 'sr', 'uk', 'ja', 'ml', 'la',
-            'br', 'ca', 'hy', 'li', 'yi', 'az', 'mk', 'vec', 'ta', 'is', 'bs',
-            'no', 'da', 'id', 'eo', 'et', 'bg', 'sah', 'lt', 'gl', 'kn', 'cy',
-            'sk', 'fo', 'zh-min-nan',
+            'en', 'fr', 'ru', 'zh', 'pt', 'de', 'it', 'es', 'he', 'pl', 'fa',
+            'ar', 'hu', 'cs', 'th', 'ro', 'ko', 'sv', 'hr', 'te', 'fi', 'sl',
+            'vi', 'nl', 'bn', 'sa', 'tr', 'el', 'ca', 'sr', 'uk', 'ja', 'ml',
+            'br', 'la', 'hy', 'li', 'yi', 'az', 'mk', 'vec', 'ta', 'is', 'bs',
+            'no', 'id', 'da', 'eo', 'et', 'bg', 'sah', 'lt', 'gl', 'kn', 'cy',
+            'sk', 'mr', 'fo', 'zh-min-nan',
         ]
 
         if family.config.SSL_connection:
@@ -52,6 +52,7 @@ class Family(family.Family):
         self.namespaces[9]['da'] = [u'MediaWiki diskussion', u'MediaWiki-diskussion']
         self.namespaces[13]['da'] = [u'Hjælp diskussion', u'Hjælp-diskussion']
         self.namespaces[3]['ro'] = [u'Discuție Utilizator', u'Discuţie Utilizator']
+        self.namespaces[9]['ro'] = [u'Discuție MediaWiki', u'Discuţie MediaWiki']
 
         # Most namespaces are inherited from family.Family.
         # Translation used on all wikis for the different namespaces.
@@ -77,7 +78,7 @@ class Family(family.Family):
             'eo': [u'Vikifontaro', u'Wikisource'],
             'es': u'Wikisource',
             'et': u'Vikitekstid',
-            'fa': u'ویکی‌نبشته',
+            'fa': [u'ویکی‌نبشته', u'ون'],
             'fi': [u'Wikiaineisto', u'Wikisource'],
             'fo': [u'Wikiheimild', u'Wikisource'],
             'fr': u'Wikisource',
@@ -97,7 +98,8 @@ class Family(family.Family):
             'li': [u'Wikibrónne', u'Wikisource'],
             'lt': [u'Vikišaltiniai', u'Wikisource'],
             'mk': u'Wikisource',
-            'ml': u'വിക്കിഗ്രന്ഥശാല',
+            'ml': [u'വിക്കിഗ്രന്ഥശാല', u'Wikisource', u'WS'],
+            'mr': [u'विकिस्रोत', u'Wikisource'],
             'nb': u'Wikikilden',
             'nl': u'Wikisource',
             'no': u'Wikikilden',
@@ -163,6 +165,7 @@ class Family(family.Family):
             'lt': u'Vikišaltiniai aptarimas',
             'mk': u'Разговор за Wikisource',
             'ml': u'വിക്കിഗ്രന്ഥശാല സംവാദം',
+            'mr': u'विकिस्रोत चर्चा',
             'nb': u'Wikikilden-diskusjon',
             'nl': u'Overleg Wikisource',
             'no': u'Wikikilden-diskusjon',
@@ -222,6 +225,7 @@ class Family(family.Family):
             'id': u'Pengarang',
             'ko': u'저자',
             'ml': u'രചയിതാവ്',
+            'mr': u'दालन',
             'nl': u'Hoofdportaal',
             'pl': u'Strona',
             'pt': u'Portal',
@@ -251,6 +255,7 @@ class Family(family.Family):
             'id': u'Pembicaraan Pengarang',
             'ko': u'저자토론',
             'ml': u'രചയിതാവിന്റെ സംവാദം',
+            'mr': u'दालन चर्चा',
             'nl': u'Overleg hoofdportaal',
             'pl': u'Dyskusja strony',
             'pt': u'Portal Discussão',
@@ -274,7 +279,7 @@ class Family(family.Family):
             'eo': u'Aŭtoro',
             'es': u'Página',
             'et': u'Lehekülg',
-            'fa': u'مؤلف',
+            'fa': [u'پدیدآورنده', u'Autor'],
             'fr': u'Auteur',
             'hr': u'Stranica',
             'hy': u'Պորտալ',
@@ -283,6 +288,7 @@ class Family(family.Family):
             'la': u'Scriptor',
             'mk': u'Автор',
             'ml': u'കവാടം',
+            'mr': u'सूची',
             'nb': u'Forfatter',
             'nl': u'Auteur',
             'no': u'Forfatter',
@@ -307,7 +313,7 @@ class Family(family.Family):
             'eo': u'Aŭtoro-Diskuto',
             'es': u'Página Discusión',
             'et': u'Lehekülje arutelu',
-            'fa': u'بحث مؤلف',
+            'fa': [u'گفتگو پدیدآورنده', u'Autor talk'],
             'fr': u'Discussion Auteur',
             'hr': u'Razgovor o stranici',
             'hy': u'Պորտալի քննարկում',
@@ -316,6 +322,7 @@ class Family(family.Family):
             'la': u'Disputatio Scriptoris',
             'mk': u'Разговор за автор',
             'ml': u'കവാടത്തിന്റെ സംവാദം',
+            'mr': u'सूची चर्चा',
             'nb': u'Forfatterdiskusjon',
             'nl': u'Overleg auteur',
             'no': u'Forfatterdiskusjon',
@@ -347,6 +354,7 @@ class Family(family.Family):
             'it': u'Progetto',
             'la': u'Pagina',
             'ml': [u'സൂചിക', u'Index'],
+            'mr': u'पान',
             'no': u'Side',
             'pl': [u'Autor', u'Author'],
             'pt': [u'Galeria', u'Index'],
@@ -380,6 +388,7 @@ class Family(family.Family):
             'it': u'Discussioni progetto',
             'la': u'Disputatio Paginae',
             'ml': [u'സൂചികയുടെ സംവാദം', u'Index talk'],
+            'mr': u'पान चर्चा',
             'no': u'Sidediskusjon',
             'pl': [u'Dyskusja autora', u'Author talk'],
             'pt': [u'Galeria Discussão', u'Index talk'],
@@ -411,6 +420,7 @@ class Family(family.Family):
             'it': u'Portale',
             'la': u'Liber',
             'ml': u'താൾ',
+            'mr': u'साहित्यिक',
             'no': u'Indeks',
             'pt': u'Página',
             'ro': u'Index',
@@ -439,6 +449,7 @@ class Family(family.Family):
             'it': u'Discussioni portale',
             'la': u'Disputatio Libri',
             'ml': u'താളിന്റെ സംവാദം',
+            'mr': u'साहित्यिक चर्चा',
             'no': u'Indeksdiskusjon',
             'pt': u'Página Discussão',
             'ro': u'Discuție Index',

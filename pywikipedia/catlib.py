@@ -13,7 +13,7 @@ Library to work with category pages on Wikipedia
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: catlib.py 9733 2011-11-08 16:38:46Z cydeweys $'
+__version__ = '$Id: catlib.py 9844 2012-01-28 13:48:29Z jhsoby $'
 #
 import re, time, urllib, query
 import wikipedia
@@ -41,6 +41,7 @@ msg_created_for_renaming = {
     'nds':u'Kat-Bot: herschaven von %s. Schriever: %s',
     'nl':u'Bot: hernoemd van %s. Auteurs: %s',
     'nn':u'robot: flytta frå %s. Bidragsytarar: %s',
+    'no':u'Bot: Flytta fra %s. Bidragsytere: %s',
     'pl':u'Robot przenosi z %s. Autorzy: %s',
     'pt':u'Bot: Movido de %s. Autor: %s',
     'zh':u'機器人: 已從 %s 移動。原作者是 %s',
@@ -557,7 +558,8 @@ def add_category(article, category, comment=None, createEmptyPages=False):
 #    # Prepend it
 #    return Category(code, "%s:%s" % (ns, name))
 
-def change_category(article, oldCat, newCat, comment=None, sortKey=None, inPlace=False):
+def change_category(article, oldCat, newCat, comment=None, sortKey=None,
+                    inPlace=False):
     """
     Given an article which is in category oldCat, moves it to
     category newCat. Moves subcategories of oldCat as well.
@@ -569,9 +571,10 @@ def change_category(article, oldCat, newCat, comment=None, sortKey=None, inPlace
     changesMade = False
 
     if not article.canBeEdited():
-        wikipedia.output("Can't edit %s, skipping it..." % article.title(asLink=True))
+        wikipedia.output("Can't edit %s, skipping it..."
+                         % article.title(asLink=True))
         return False
-    if inPlace == True:
+    if inPlace or article.namespace() == 10:
         oldtext = article.get(get_redirect=True)
         newtext = wikipedia.replaceCategoryInPlace(oldtext, oldCat, newCat)
         if newtext == oldtext:
@@ -582,20 +585,19 @@ def change_category(article, oldCat, newCat, comment=None, sortKey=None, inPlace
             article.put(newtext, comment)
             return True
         except wikipedia.EditConflict:
-            wikipedia.output(
-                u'Skipping %s because of edit conflict' % article.title(asLink=True))
+            wikipedia.output(u'Skipping %s because of edit conflict'
+                             % article.title(asLink=True))
         except wikipedia.LockedPage:
-            wikipedia.output(u'Skipping locked page %s' % article.title(asLink=True))
+            wikipedia.output(u'Skipping locked page %s'
+                             % article.title(asLink=True))
         except wikipedia.SpamfilterError, error:
-            wikipedia.output(
-                u'Changing page %s blocked by spam filter (URL=%s)'
+            wikipedia.output(u'Changing page %s blocked by spam filter (URL=%s)'
                              % (article.title(asLink=True), error.url))
         except wikipedia.NoUsername:
-            wikipedia.output(
-                u"Page %s not saved; sysop privileges required."
+            wikipedia.output(u'Page %s not saved; sysop privileges required.'
                              % article.title(asLink=True))
         except wikipedia.PageNotSaved, error:
-            wikipedia.output(u"Saving page %s failed: %s"
+            wikipedia.output(u'Saving page %s failed: %s'
                              % (article.title(asLink=True), error.message))
         return False
 
@@ -620,7 +622,8 @@ def change_category(article, oldCat, newCat, comment=None, sortKey=None, inPlace
             newCatList.append(cat)
 
     if not changesMade:
-        wikipedia.output(u'ERROR: %s is not in category %s!' % (article.aslink(), oldCat.title()))
+        wikipedia.output(u'ERROR: %s is not in category %s!'
+                         % (article.title(asLink=True), oldCat.title()))
     else:
         text = article.get(get_redirect=True)
         try:
@@ -644,7 +647,7 @@ def change_category(article, oldCat, newCat, comment=None, sortKey=None, inPlace
                     u'Skipping %s because page is locked' % article.title())
         except wikipedia.PageNotSaved, error:
             wikipedia.output(u"Saving page %s failed: %s"
-                             % (article.aslink(), error.message))
+                             % (article.title(asLink=True), error.message))
 
 def categoryAllElementsAPI(CatName, cmlimit = 5000, categories_parsed = [], site = None):
     #action=query&list=categorymembers&cmlimit=500&cmtitle=Category:License_tags

@@ -50,7 +50,7 @@ Todo:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: imagecopy_self.py 9692 2011-10-30 15:03:29Z xqt $'
+__version__='$Id: imagecopy_self.py 9813 2011-12-23 21:23:47Z multichill $'
 #
 
 from Tkinter import *
@@ -99,6 +99,7 @@ skipTemplates = {
            u'Db-f8',
            u'Db-f9',
            u'Db-f10',
+           u'Do not move to Commons',
            u'NowCommons',
            u'CommonsNow',
            u'Nowcommons',

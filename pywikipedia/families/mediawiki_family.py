@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: mediawiki_family.py 9574 2011-10-03 14:36:41Z xqt $'
+__version__ = '$Id: mediawiki_family.py 9819 2011-12-29 11:52:55Z xqt $'
 
 import family
 
@@ -53,6 +53,12 @@ class Family(family.Family):
         }
         self.namespaces[105] = {
             '_default': u'API talk',
+        }
+        self.namespaces[1198] = {
+            '_default': u'Translations',
+        }
+        self.namespaces[1199] = {
+            '_default': u'Translations talk',
         }
         self.cross_projects = [
             'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikisource',

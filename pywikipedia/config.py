@@ -7,7 +7,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: config.py 9496 2011-09-03 15:42:26Z xqt $'
+__version__ = '$Id: config.py 9880 2012-02-10 10:12:04Z alexsh $'
 
 import os, re
 import sys as __sys

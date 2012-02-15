@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikipedia_family.py 9792 2011-12-09 14:31:19Z xqt $'
+__version__ = '$Id: wikipedia_family.py 9890 2012-02-13 10:19:39Z xqt $'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 
@@ -11,39 +11,52 @@ class Family(family.Family):
         self.name = 'wikipedia'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'nl', 'it', 'es', 'pl', 'ru', 'ja', 'pt', 'sv',
-            'zh', 'ca', 'uk', 'no', 'fi', 'vi', 'cs', 'hu', 'ko', 'id', 'tr',
-            'ro', 'fa', 'ar', 'da', 'eo', 'sr', 'lt', 'sk', 'ms', 'he', 'bg',
-            'sl', 'vo', 'kk', 'war', 'eu', 'hr', 'hi', 'et', 'az', 'gl',
-            'simple', 'nn', 'th', 'new', 'el', 'roa-rup', 'la', 'oc', 'tl',
-            'ht', 'ka', 'mk', 'sh', 'te', 'pms', 'ceb', 'ta', 'be-x-old', 'br',
-            'lv', 'jv', 'sq', 'be', 'mr', 'cy', 'lb', 'is', 'bs', 'yo', 'mg',
-            'an', 'bpy', 'lmo', 'fy', 'bn', 'io', 'sw', 'gu', 'ml', 'pnb', 'af',
-            'nds', 'scn', 'ur', 'ku', 'zh-yue', 'hy', 'qu', 'su', 'ne', 'diq',
-            'ast', 'tt', 'nap', 'ga', 'cv', 'bat-smg', 'wa', 'am', 'kn', 'als',
-            'bug', 'ia', 'my', 'zh-min-nan', 'tg', 'vec', 'yi', 'roa-tara',
-            'gd', 'os', 'arz', 'nah', 'sah', 'uz', 'sco', 'pam', 'hsb', 'mn',
-            'mi', 'sa', 'li', 'co', 'gan', 'ba', 'glk', 'si', 'hif', 'bcl',
-            'fo', 'mrj', 'bo', 'bar', 'ckb', 'fiu-vro', 'nds-nl', 'tk', 'vls',
-            'ilo', 'gv', 'se', 'map-bms', 'ky', 'dv', 'nrm', 'pag', 'pa', 'rue',
-            'mzn', 'rm', 'km', 'ps', 'udm', 'fur', 'csb', 'wuu', 'mt', 'ug',
-            'lij', 'koi', 'pi', 'kv', 'ang', 'mhr', 'bh', 'lad', 'sc', 'nov',
-            'zh-classical', 'ksh', 'cbk-zam', 'hak', 'so', 'nv', 'kw', 'frp',
-            'stq', 'szl', 'ext', 'ie', 'xal', 'or', 'rw', 'ln', 'haw', 'pcd',
-            'pdc', 'frr', 'pfl', 'krc', 'to', 'ace', 'crh', 'eml', 'gn', 'myv',
-            'ay', 'arc', 'kl', 'ce', 'xmf', 'pap', 'gag', 'bjn', 'lbe', 'tpi',
-            'wo', 'jbo', 'zea', 'mdf', 'av', 'kab', 'dsb', 'ty', 'srn', 'sn',
-            'as', 'lo', 'ab', 'ig', 'na', 'tet', 'kg', 'mwl', 'kaa', 'ltg',
-            'rmy', 'cu', 'kbd', 'sm', 'sd', 'bi', 'bm', 'ik', 'ss', 'iu', 'pih',
-            'za', 'pnt', 'chr', 'cdo', 'tn', 'got', 'ee', 'ha', 'zu', 'ti',
-            'ks', 'bxr', 'om', 've', 'ts', 'sg', 'rn', 'dz', 'cr', 'ak', 'tum',
-            'lg', 'fj', 'ch', 'ny', 'chy', 'st', 'ff', 'tw', 'xh', 'ki',
+            'en', 'de', 'fr', 'nl', 'it', 'pl', 'es', 'ru', 'ja', 'pt', 'sv',
+            'zh', 'ca', 'uk', 'no', 'vi', 'fi', 'cs', 'hu', 'ko', 'id', 'tr',
+            'ro', 'fa', 'ar', 'da', 'eo', 'sr', 'lt', 'sl', 'sk', 'ms', 'he',
+            'bg', 'kk', 'eu', 'vo', 'war', 'hr', 'hi', 'et', 'az', 'gl', 'nn',
+            'simple', 'th', 'la', 'new', 'el', 'roa-rup', 'oc', 'tl', 'ka',
+            'mk', 'sh', 'ht', 'pms', 'te', 'ta', 'ceb', 'be-x-old', 'br', 'sq',
+            'lv', 'be', 'jv', 'mg', 'lb', 'cy', 'mr', 'is', 'bs', 'yo', 'an',
+            'bpy', 'lmo', 'fy', 'hy', 'sw', 'bn', 'io', 'ml', 'gu', 'af', 'pnb',
+            'ne', 'nds', 'scn', 'ku', 'ur', 'zh-yue', 'su', 'qu', 'diq', 'ba',
+            'ast', 'tt', 'ga', 'nap', 'ia', 'cv', 'bat-smg', 'map-bms', 'wa',
+            'am', 'kn', 'als', 'bug', 'my', 'zh-min-nan', 'tg', 'vec', 'yi',
+            'roa-tara', 'gd', 'hif', 'os', 'sco', 'arz', 'nah', 'sah', 'uz',
+            'pam', 'sa', 'mn', 'hsb', 'mi', 'li', 'si', 'co', 'gan', 'glk',
+            'bcl', 'fo', 'ckb', 'bar', 'bo', 'mrj', 'ky', 'ilo', 'fiu-vro',
+            'nds-nl', 'tk', 'vls', 'se', 'gv', 'dv', 'nrm', 'rue', 'pag', 'pa',
+            'rm', 'ps', 'mzn', 'km', 'udm', 'fur', 'csb', 'mt', 'wuu', 'ug',
+            'lij', 'koi', 'kv', 'mhr', 'ang', 'pi', 'lad', 'bh', 'sc', 'zea',
+            'zh-classical', 'nov', 'ksh', 'cbk-zam', 'so', 'nv', 'hak', 'or',
+            'kw', 'frp', 'stq', 'szl', 'ext', 'xmf', 'pcd', 'ie', 'frr', 'xal',
+            'haw', 'rw', 'ln', 'pdc', 'ay', 'pfl', 'krc', 'ace', 'to', 'eml',
+            'crh', 'ce', 'gn', 'myv', 'kl', 'arc', 'pap', 'bjn', 'gag', 'lbe',
+            'tpi', 'as', 'wo', 'jbo', 'dsb', 'mdf', 'av', 'kab', 'ty', 'sn',
+            'srn', 'lo', 'ab', 'ig', 'na', 'kg', 'tet', 'mwl', 'ltg', 'kaa',
+            'nso', 'rmy', 'cu', 'tn', 'kbd', 'sm', 'bi', 'sd', 'bm', 'ik', 'iu',
+            'ss', 'pih', 'za', 'chr', 'pnt', 'got', 'cdo', 'ee', 'ha', 'zu',
+            'ti', 'ks', 'om', 'bxr', 've', 'ts', 'sg', 'rn', 'cr', 'dz', 'lg',
+            'ak', 'fj', 'tum', 'chy', 'ff', 'st', 'ch', 'ny', 'tw', 'xh', 'ki',
+            'vep',
         ]
 
         if family.config.SSL_connection:
             self.langs = dict([(lang, None) for lang in self.languages_by_size])
         else:
             self.langs = dict([(lang, '%s.wikipedia.org' % lang) for lang in self.languages_by_size])
+
+        # Override defaults
+        self.namespaces[1]['ja'] = [u'ノート', u'トーク']
+        self.namespaces[3]['ja'] = [u'利用者‐会話', u'利用者・トーク']
+        self.namespaces[7]['ja'] = [u'ファイル‐ノート', u'ファイル・トーク', u'Image talk', u'画像‐ノート']
+        self.namespaces[9]['ja'] = [u'MediaWiki‐ノート', u'MediaWiki・トーク']
+        self.namespaces[10]['ja'] = [u'Template', u'テンプレート']
+        self.namespaces[11]['ja'] = [u'Template‐ノート', u'テンプレート・トーク']
+        self.namespaces[12]['ja'] = [u'Help', u'ヘルプ']
+        self.namespaces[13]['ja'] = [u'Help‐ノート', u'ヘルプ・トーク']
+        self.namespaces[14]['ja'] = [u'Category', u'カテゴリ']
+        self.namespaces[15]['ja'] = [u'Category‐ノート', u'カテゴリ・トーク']
 
         # Most namespaces are inherited from family.Family.
         # Translation used on all wikis for the different namespaces.
@@ -62,7 +75,7 @@ class Family(family.Family):
             'ar': [u'ويكيبيديا', u'وب'],
             'arc': [u'ܘܝܩܝܦܕܝܐ', u'Wikipedia'],
             'arz': u'ويكيبيديا',
-            'as': [u'Wikipedia', u'ৱিকিপিডিয়া', u'প্ৰকল্প'],
+            'as': [u'ৱিকিপিডিয়া', u'Wikipedia', u'প্ৰকল্প'],
             'ast': u'Uiquipedia',
             'av': u'Wikipedia',
             'ay': u'Wikipidiya',
@@ -304,6 +317,7 @@ class Family(family.Family):
             'uz': u'Vikipediya',
             've': u'Wikipedia',
             'vec': [u'Wikipedia', u'WP'],
+            'vep': u'Vikipedii',
             'vi': u'Wikipedia',
             'vls': u'Wikipedia',
             'vo': [u'Vükiped', u'Wikipedia'],
@@ -338,7 +352,7 @@ class Family(family.Family):
             'ar': [u'نقاش ويكيبيديا', u'نو'],
             'arc': u'ܡܡܠܠܐ ܕܘܝܩܝܦܕܝܐ',
             'arz': u'نقاش ويكيبيديا',
-            'as': [u'Wikipedia বাৰ্তা', u'ৱিকিপিডিয়া আলোচনা', u'প্ৰকল্প আলোচনা', u'Wikipedia वार्ता', u'Wikipedia বার্তা'],
+            'as': [u'ৱিকিপিডিয়া বাৰ্তা', u'Wikipedia talk', u'প্ৰকল্প আলোচনা', u'Wikipedia বার্তা', u'ৱিকিপিডিয়া वार्ता', u'ৱিকিপিডিয়া বার্তা'],
             'ast': [u'Uiquipedia alderique', u'Uiquipedia discusión'],
             'av': u'Обсуждение Wikipedia',
             'ay': u'Wikipidiyan Aruskipäwi',
@@ -580,6 +594,7 @@ class Family(family.Family):
             'uz': u'Vikipediya munozarasi',
             've': u'Wikipedia talk',
             'vec': u'Discussion Wikipedia',
+            'vep': [u'Paginad Vikipedii', u'Vikipedii arutelu'],
             'vi': u'Thảo luận Wikipedia',
             'vls': u'Discuusje Wikipedia',
             'vo': [u'Bespik dö Vükiped', u'Wikipedia talk'],
@@ -880,6 +895,7 @@ class Family(family.Family):
             'fr': u'Référence',
             'lt': u'Sąrašas',
             'pt': u'Livro',
+            'ru': u'Проект',
         }
 
         self.namespaces[105] = {
@@ -890,6 +906,7 @@ class Family(family.Family):
             'fr': u'Discussion Référence',
             'lt': u'Sąrašo aptarimas',
             'pt': u'Livro Discussão',
+            'ru': u'Обсуждение проекта',
         }
 
         self.namespaces[106] = {
@@ -1218,8 +1235,8 @@ class Family(family.Family):
             'szl', 'so', 'ckb', 'srn', 'sr', 'sh', 'fi', 'sv', 'ta', 'tl',
             'kab', 'roa-tara', 'tt', 'te', 'tet', 'th', 'ti', 'vi', 'tg',
             'tokipona', 'tp', 'tpi', 'chy', 've', 'tr', 'tk', 'tw', 'udm', 'uk',
-            'ur', 'ug', 'za', 'vec', 'vo', 'fiu-vro', 'wa', 'vls', 'war', 'wo',
-            'wuu', 'ts', 'xmf', 'yi', 'yo', 'diq', 'zea', 'zh', 'zh-tw',
+            'ur', 'ug', 'za', 'vec', 'vep', 'vo', 'fiu-vro', 'wa', 'vls', 'war',
+            'wo', 'wuu', 'ts', 'xmf', 'yi', 'yo', 'diq', 'zea', 'zh', 'zh-tw',
             'zh-cn', 'zh-classical', 'zh-yue', 'bat-smg',
         ]
 

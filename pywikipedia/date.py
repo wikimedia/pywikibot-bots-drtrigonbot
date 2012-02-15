@@ -14,7 +14,7 @@ lists which are required by some other programs.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: date.py 9762 2011-11-13 11:52:35Z xqt $'
+__version__='$Id: date.py 9839 2012-01-21 16:28:59Z valhallasw $'
 
 # used for date recognition
 import types
@@ -1119,14 +1119,12 @@ formats = {
         'cs' :      lambda v: dh_centuryAD( v, u'%d. století' ),
         'da' :      lambda v: dh_centuryAD( v, u'%d. århundrede' ),
         'no' :      lambda v: dh( v, u'%d-tallet', lambda i: (i-1)*100, lambda ii: ii[0]/100+1 ),
-        'ksh':      lambda v: dh_constVal( v, 1, u'Joohunndot' ),
     },
 
     'CenturyBC_Cat':{
         'cs' :      lambda v: dh_centuryBC( v, u'%d. století př. n. l.' ),
         'de' :      lambda v: dh_centuryBC( v, u'Jahr (%d. Jh. v. Chr.)' ),
         'no' :      lambda v: dh( v, u'%d-tallet f.Kr.', lambda i: (i-1)*100, lambda ii: ii[0]/100+1 ),
-        'ksh':      lambda v: dh_constVal( v, 1, u'Joohunndot' ),
     },
 
     'MillenniumAD': {
@@ -1842,6 +1840,6 @@ def test(quick=False, showAll=False):
     else:
         pywikibot.output(u'Date module has been fully tested')
 
-# Do a quick test upon module loading!
-# Make sure the date file is correct
-test(quick=True)
+if __name__=="__main__":
+    # Test the date file
+    test(quick=False)

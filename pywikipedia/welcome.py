@@ -178,7 +178,7 @@ badword at all but can be used for some bad-nickname.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: welcome.py 9623 2011-10-10 20:16:33Z filnik $'
+__version__ = '$Id: welcome.py 9824 2012-01-09 06:13:01Z xqt $'
 #
 
 import time, re, urllib, locale
@@ -253,6 +253,7 @@ netext = {
         'ru': u'{{Hello}} %s',
         'sq': u'{{subst:tung}} %s',
         'sr': u'{{Добродошлица}} %s',
+        'vec': u'{{subst:Benvegnù|%s}}',
         'vo': u'{{benokömö}} %s',
         'zh': u'{{subst:welcome|sign=%s}}',
         'zh-yue': u'{{歡迎}}--%s',

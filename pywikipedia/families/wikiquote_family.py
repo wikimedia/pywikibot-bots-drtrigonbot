@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiquote_family.py 9790 2011-12-08 06:02:41Z xqt $'
+__version__ = '$Id: wikiquote_family.py 9890 2012-02-13 10:19:39Z xqt $'
 
 # The Wikimedia family that is known as Wikiquote
 
@@ -11,12 +11,12 @@ class Family(family.Family):
         self.name = 'wikiquote'
 
         self.languages_by_size = [
-            'en', 'pl', 'it', 'de', 'ru', 'pt', 'es', 'sk', 'bg', 'cs', 'bs',
-            'tr', 'fr', 'sl', 'he', 'eo', 'lt', 'el', 'nl', 'id', 'zh', 'uk',
+            'en', 'pl', 'it', 'de', 'ru', 'pt', 'es', 'fr', 'sk', 'bg', 'cs',
+            'bs', 'tr', 'sl', 'he', 'eo', 'lt', 'el', 'nl', 'id', 'zh', 'uk',
             'fa', 'hu', 'fi', 'sv', 'no', 'nn', 'ja', 'az', 'hy', 'li', 'et',
-            'ar', 'ca', 'hr', 'cy', 'ko', 'ka', 'gl', 'sr', 'ro', 'ml', 'ku',
-            'is', 'th', 'te', 'da', 'eu', 'af', 'sq', 'vi', 'hi', 'la', 'br',
-            'be', 'ta', 'mr', 'uz', 'ang', 'ur', 'zh-min-nan', 'gu', 'su', 'lb',
+            'ar', 'ca', 'hr', 'cy', 'ko', 'ka', 'ml', 'gl', 'sr', 'ro', 'ku',
+            'te', 'is', 'th', 'eu', 'da', 'af', 'sq', 'vi', 'hi', 'la', 'br',
+            'ta', 'be', 'mr', 'uz', 'ang', 'ur', 'zh-min-nan', 'gu', 'su', 'lb',
             'kn', 'wo', 'ky', 'am', 'co',
         ]
 
@@ -51,6 +51,7 @@ class Family(family.Family):
         self.namespaces[12]['zh'] = [u'Help', u'帮助', u'幫助']
         self.namespaces[14]['zh'] = [u'Category', u'分类', u'分類']
         self.namespaces[3]['ro'] = [u'Discuție Utilizator', u'Discuţie Utilizator']
+        self.namespaces[9]['ro'] = [u'Discuție MediaWiki', u'Discuţie MediaWiki']
         self.namespaces[3]['pl'] = [u'Dyskusja użytkownika', u'Dyskusja użytkowniczki']
         self.namespaces[2]['pl'] = [u'Użytkownik', u'Użytkowniczka']
 
@@ -121,7 +122,7 @@ class Family(family.Family):
             'sr': u'Wikiquote',
             'su': u'Wikiquote',
             'sv': u'Wikiquote',
-            'ta': [u'Wikiquote', u'விக்கிபீடியா'],
+            'ta': [u'விக்கிமேற்கோள்', u'Wikiquote', u'விக்கிபீடியா'],
             'te': u'Wikiquote',
             'th': [u'วิกิคำคม', u'Wikiquote'],
             'tr': [u'Vikisöz', u'Wikiquote'],
@@ -202,7 +203,7 @@ class Family(family.Family):
             'sr': [u'Разговор о Wikiquote', u'Razgovor o Wikiquote'],
             'su': u'Obrolan Wikiquote',
             'sv': u'Wikiquotediskussion',
-            'ta': [u'Wikiquote பேச்சு', u'விக்கிபீடியா பேச்சு'],
+            'ta': [u'விக்கிமேற்கோள் பேச்சு', u'விக்கிபீடியா பேச்சு'],
             'te': u'Wikiquote చర్చ',
             'th': u'คุยเรื่องวิกิคำคม',
             'tr': u'Vikisöz tartışma',

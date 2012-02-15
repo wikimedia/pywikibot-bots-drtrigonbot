@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wiktionary_family.py 9788 2011-12-08 05:32:33Z xqt $'
+__version__ = '$Id: wiktionary_family.py 9890 2012-02-13 10:19:39Z xqt $'
 
 # The Wikimedia family that is known as Wiktionary
 
@@ -11,20 +11,20 @@ class Family(family.Family):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'en', 'fr', 'zh', 'mg', 'lt', 'ko', 'ru', 'tr', 'pl', 'ta', 'vi',
-            'de', 'io', 'el', 'fi', 'pt', 'hu', 'kn', 'sv', 'nl', 'no', 'my',
-            'it', 'hi', 'et', 'li', 'ja', 'ml', 'fa', 'es', 'lo', 'ku', 'ar',
-            'ro', 'te', 'id', 'gl', 'ca', 'cs', 'uk', 'bg', 'eo', 'vo', 'oc',
-            'eu', 'is', 'hr', 'br', 'simple', 'scn', 'th', 'sr', 'af', 'fy',
-            'sw', 'tl', 'he', 'fj', 'cy', 'la', 'ast', 'sq', 'hy', 'da', 'sl',
-            'tt', 'wa', 'zh-min-nan', 'ka', 'az', 'lv', 'ne', 'ur', 'tk', 'ps',
-            'hsb', 'kk', 'nn', 'ky', 'wo', 'km', 'bs', 'ang', 'be', 'lb', 'ga',
-            'co', 'mr', 'gn', 'ia', 'sk', 'csb', 'ms', 'st', 'nds', 'sd', 'kl',
-            'sh', 'si', 'tg', 'ug', 'ti', 'mk', 'bn', 'nah', 'zu', 'an', 'gu',
-            'chr', 'am', 'ss', 'qu', 'ts', 'fo', 'rw', 'kw', 'om', 'gv', 'iu',
-            'su', 'mn', 'so', 'yi', 'ie', 'gd', 'za', 'pa', 'mt', 'mi', 'tpi',
-            'dv', 'ik', 'jv', 'sg', 'roa-rup', 'uz', 'ln', 'na', 'sm', 'tn',
-            'sa', 'ha', 'ay', 'ks', 'jbo', 'dz',
+            'en', 'fr', 'mg', 'zh', 'lt', 'ko', 'ru', 'tr', 'pl', 'ta', 'vi',
+            'de', 'io', 'el', 'kn', 'fi', 'pt', 'hu', 'nl', 'sv', 'no', 'it',
+            'my', 'id', 'hi', 'et', 'li', 'ja', 'ml', 'fa', 'es', 'lo', 'ku',
+            'ar', 'ro', 'te', 'gl', 'cs', 'ca', 'uk', 'bg', 'eu', 'eo', 'vo',
+            'oc', 'is', 'hr', 'br', 'simple', 'scn', 'th', 'sr', 'af', 'fy',
+            'sw', 'tl', 'ur', 'cy', 'he', 'fj', 'ast', 'la', 'sq', 'hy', 'da',
+            'sl', 'wa', 'tt', 'zh-min-nan', 'az', 'ka', 'lv', 'ne', 'tk', 'ps',
+            'hsb', 'lb', 'kk', 'nn', 'ky', 'wo', 'bs', 'km', 'be', 'ang', 'ga',
+            'co', 'mr', 'gn', 'ia', 'sk', 'csb', 'ms', 'nah', 'st', 'nds', 'sd',
+            'kl', 'sh', 'si', 'tg', 'ug', 'ti', 'mk', 'bn', 'zu', 'pnb', 'an',
+            'gu', 'ss', 'chr', 'qu', 'am', 'ts', 'fo', 'rw', 'kw', 'om', 'gv',
+            'iu', 'su', 'roa-rup', 'sa', 'mn', 'so', 'yi', 'ie', 'gd', 'za',
+            'pa', 'mt', 'mi', 'tpi', 'dv', 'ik', 'sg', 'na', 'uz', 'ln', 'jv',
+            'sm', 'tn', 'ha', 'ay', 'ks', 'jbo', 'dz',
         ]
 
         if family.config.SSL_connection:
@@ -59,6 +59,7 @@ class Family(family.Family):
         self.namespaces[2]['cs'] = [u'Uživatel', u'Uživatelka']
         self.namespaces[12]['nl'] = [u'Help']
         self.namespaces[3]['ro'] = [u'Discuție Utilizator', u'Discuţie Utilizator']
+        self.namespaces[9]['ro'] = [u'Discuție MediaWiki', u'Discuţie MediaWiki']
         self.namespaces[3]['ca'] = [u'Usuari Discussió']
         self.namespaces[2]['ca'] = [u'Usuari']
 
@@ -138,7 +139,7 @@ class Family(family.Family):
             'kw': u'Wiktionary',
             'ky': u'Wiktionary',
             'la': [u'Victionarium', u'Wiktionary'],
-            'lb': u'Wiktionary',
+            'lb': [u'Wiktionnaire', u'Wiktionary'],
             'li': u'Wiktionary',
             'ln': u'Wiktionary',
             'lo': u'Wiktionary',
@@ -164,6 +165,7 @@ class Family(family.Family):
             'om': u'Wiktionary',
             'pa': u'Wiktionary',
             'pl': [u'Wikisłownik', u'WS'],
+            'pnb': [u'وکشنری', u'Wiktionary'],
             'ps': [u'ويکيسيند', u'Wiktionary'],
             'pt': [u'Wikcionário', u'Wiktionary'],
             'qu': u'Wiktionary',
@@ -293,7 +295,7 @@ class Family(family.Family):
             'kw': [u'Kescows Wiktionary', u'Cows Wiktionary', u'Keskows Wiktionary'],
             'ky': u'Wiktionary talk',
             'la': u'Disputatio Victionarii',
-            'lb': u'Wiktionary Diskussioun',
+            'lb': [u'Wiktionnaire Diskussioun', u'Wiktionary Diskussioun'],
             'li': u'Euverlèk Wiktionary',
             'ln': u'Discussion Wiktionary',
             'lo': u'ສົນທະນາກ່ຽວກັບWiktionary',
@@ -320,6 +322,7 @@ class Family(family.Family):
             'om': u'Wiktionary talk',
             'pa': u'Wiktionary ਚਰਚਾ',
             'pl': u'Wikidyskusja',
+            'pnb': u'گل ات',
             'ps': u'د ويکيسيند خبرې اترې',
             'pt': u'Wikcionário Discussão',
             'qu': u'Wiktionary rimanakuy',
@@ -411,6 +414,7 @@ class Family(family.Family):
             'lb': u'Annexen',
             'lt': u'Sąrašas',
             'lv': u'Pielikums',
+            'mg': u'Rakibolana',
             'no': u'Tillegg',
             'oc': u'Annèxa',
             'pl': u'Aneks',
@@ -444,6 +448,7 @@ class Family(family.Family):
             'lb': u'Annexen Diskussioun',
             'lt': u'Sąrašo aptarimas',
             'lv': u'Pielikuma diskusija',
+            'mg': u'Dinika amin\'ny rakibolana',
             'no': u'Tilleggdiskusjon',
             'oc': u'Discussion Annèxa',
             'pl': u'Dyskusja aneksu',
@@ -617,8 +622,8 @@ class Family(family.Family):
             'el', 'av', 'ab', 'ba', 'be', 'bg', 'mk', 'mn', 'ru', 'sr', 'tg',
             'uk', 'kk', 'hy', 'yi', 'he', 'ur', 'ar', 'tk', 'sd', 'fa', 'ha',
             'ps', 'dv', 'ks', 'ne', 'pi', 'bh', 'mr', 'sa', 'hi', 'as', 'bn',
-            'pa', 'gu', 'or', 'ta', 'te', 'kn', 'ml', 'si', 'th', 'lo', 'dz',
-            'ka', 'ti', 'am', 'chr', 'iu', 'km', 'zh', 'ja', 'ko',
+            'pa', 'pnb', 'gu', 'or', 'ta', 'te', 'kn', 'ml', 'si', 'th', 'lo',
+            'dz', 'ka', 'ti', 'am', 'chr', 'iu', 'km', 'zh', 'ja', 'ko',
            ]
 
 

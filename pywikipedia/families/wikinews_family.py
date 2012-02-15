@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikinews_family.py 9788 2011-12-08 05:32:33Z xqt $'
+__version__ = '$Id: wikinews_family.py 9862 2012-02-03 11:55:42Z xqt $'
 
 # The Wikimedia family that is known as Wikinews
 
@@ -11,9 +11,9 @@ class Family(family.Family):
         self.name = 'wikinews'
 
         self.languages_by_size = [
-            'sr', 'en', 'pl', 'de', 'fr', 'it', 'es', 'pt', 'zh', 'ja', 'sv',
-            'ru', 'ta', 'cs', 'fi', 'el', 'fa', 'ro', 'ar', 'he', 'bg', 'tr',
-            'ca', 'sd', 'sq', 'uk', 'no', 'bs', 'ko', 'eo',
+            'sr', 'en', 'pl', 'fr', 'de', 'it', 'es', 'pt', 'zh', 'ru', 'ja',
+            'sv', 'ta', 'ca', 'cs', 'el', 'fa', 'fi', 'ro', 'ar', 'he', 'bg',
+            'tr', 'sd', 'sq', 'uk', 'no', 'bs', 'ko', 'eo',
         ]
 
         if family.config.SSL_connection:
@@ -68,7 +68,7 @@ class Family(family.Family):
             'no': [u'Wikinytt', u'Wikinews'],
             'pl': u'Wikinews',
             'pt': [u'Wikinotícias', u'Wikinews'],
-            'ro': [u'Wikiștiri', u'Wikinews'],
+            'ro': [u'Wikiștiri', u'Wikiştiri', u'Wikinews'],
             'ru': [u'Викиновости', u'ВикиНовости', u'ВН'],
             'sd': u'Wikinews',
             'sq': [u'Wikilajme', u'WL'],
@@ -104,7 +104,7 @@ class Family(family.Family):
             'no': u'Wikinytt-diskusjon',
             'pl': u'Dyskusja Wikinews',
             'pt': u'Wikinotícias Discussão',
-            'ro': [u'Discuție Wikiștiri', u'Discuţie Wikiștiri'],
+            'ro': [u'Discuție Wikiștiri', u'Discuţie Wikiştiri', u'Discuţie Wikiștiri'],
             'ru': [u'Обсуждение Викиновостей', u'Обсуждение ВикиНовостей'],
             'sd': u'Wikinews بحث',
             'sq': u'Wikilajme diskutim',
@@ -209,10 +209,12 @@ class Family(family.Family):
 
         self.namespaces[104] = {
             'fr': u'Page',
+            'pt': u'Transwiki',
         }
 
         self.namespaces[105] = {
             'fr': u'Discussion Page',
+            'pt': u'Transwiki Discussão',
         }
 
         self.namespaces[106] = {
