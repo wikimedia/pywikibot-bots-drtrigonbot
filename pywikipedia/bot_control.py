@@ -83,7 +83,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '9897'
+__framework_rev__ = '9900'
 __release_ver__   = '1.2'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -395,10 +395,7 @@ def main():
 
     # mediawiki software version?
     pywikibot.output(u'\nMEDIAWIKI VERSION:')
-    if pywikibot.getSite().language() == 'ar':	# work-a-round: live_version has error in 'ar'
-        pywikibot.output(u'  Actual revision: skipped')
-    else:
-        pywikibot.output(u'  Actual revision: %s' % str(pywikibot.getSite().live_version()))
+    pywikibot.output(u'  Actual revision: %s' % str(pywikibot.getSite().live_version()))
 
     # processing of messages on bot discussion page
     if pywikibot.getSite().messages():

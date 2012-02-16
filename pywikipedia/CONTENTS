@@ -175,7 +175,6 @@ welcome.py             : Script to welcome new users.
 
 === Directories ===
 
-archive                : Contains old bots. Maybe they not run no more
 category               :
 copyright              : Contains information retrieved by copyright.py
 deadlinks              : Contains information retrieved by weblinkchecker.py
