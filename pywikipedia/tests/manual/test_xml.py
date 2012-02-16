@@ -10,7 +10,7 @@ Pass this script the name of an XML file as argument.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '$Id: test_xml.py 9836 2012-01-21 13:46:03Z valhallasw $'
 #
 import sys, xml.sax, xml.sax.handler
 

@@ -225,13 +225,6 @@ def main():
                 return
             elif (arg[:17] == "-rollback_history"):
                 bot.rollback = int( arg[18:] )
-            elif (arg[:5] == "-auto") \
-                 or (arg[:5] == "-cron"):
-                pass
-            elif (arg == "-all") \
-                 or (arg == "-default") \
-                 or ("-script_wui" in arg):
-                pass
             else:
                 pywikibot.showHelp()
                 return

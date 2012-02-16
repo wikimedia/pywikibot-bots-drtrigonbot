@@ -116,17 +116,22 @@ infolist = [ pywikibot.__version__, pywikibot.config.__version__,     # framewor
              botlist.__version__, clean_sandbox.__version__,          #
              dtbext.pywikibot.__version__, dtbext.basic.__version__,  # DrTrigonBot extensions
              dtbext.date.__version__, dtbext.userlib.__version__,     #
-             __version__, clean_user_sandbox.__version__,             # bots
-             sum_disc.__version__, subster.__version__,               #
+             __version__, sum_disc.__version__, subster.__version__,  # bots
              script_wui.__version__, subster_irc.__version__, ]       #
 
 # bots to run and control
-bot_list = { 'clean_user_sandbox': (clean_user_sandbox, u'clean userspace Sandboxes'),
-             'sum_disc':           (sum_disc, u'discussion summary'),
-             'compress_history':   (sum_disc, u'compressing discussion summary'),
-             'subster':            (subster, u'"SubsterBot"'),
-             'script_wui':         (script_wui, u'script WikiUserInterface (beta)'),
-             'subster_irc':        (subster_irc, u'"SubsterBot" IRC surveillance (beta)'), }
+bot_list = { 'clean_user_sandbox': ( clean_sandbox, [u'-user'], 
+                                     u'clean userspace Sandboxes' ),
+             'sum_disc':           ( sum_disc, [], 
+                                     u'discussion summary'),
+             'compress_history':   ( sum_disc, [u'-compress_history:[]'], 
+                                     u'compressing discussion summary'),
+             'subster':            ( subster, [], 
+                                     u'"SubsterBot"'),
+             'script_wui':         ( script_wui, [], 
+                                     u'script WikiUserInterface (beta)'),
+             'subster_irc':        ( subster_irc, [], 
+                                     u'"SubsterBot" IRC surveillance (beta)'), }
 bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'script_wui', 'subster', 'subster_irc' ]
 
 # SGE: exit errorlevel
@@ -243,8 +248,9 @@ class BotErrorHandler:
 ## BotController (or WatchDog) class.
 #
 class BotController:
-    def __init__(self, bot, desc, run_bot, ErrorHandler):
+    def __init__(self, bot, argv, desc, run_bot, ErrorHandler):
         self.bot          = bot
+        self.argv         = argv
         self.desc         = desc
         self.run_bot      = run_bot
         self.ErrorHandler = ErrorHandler
@@ -262,6 +268,7 @@ class BotController:
         pywikibot.output(u'\nRUN BOT: ' + self.desc)
 
         try:
+            sys.argv[1:]   = self.argv
             self.bot.debug = debug
             self.bot.main()
         except:
@@ -400,23 +407,29 @@ def main():
         pywikibot.output(messagesforbot)
         pywikibot.output(u'==================================================')
 
+    # modification of timezone to be in sync with wiki
+    os.environ['TZ'] = 'Europe/Amsterdam'
+    time.tzset()
+    pywikibot.output(u'\nSetting process TimeZone (TZ): %s' % str(time.tzname))    # ('CET', 'CEST')
+
     for bot_name in bot_order:
-        (bot_module, bot_desc) = bot_list[bot_name]
+        (bot_module, bot_argv, bot_desc) = bot_list[bot_name]
 
         bot = BotController(bot_module,
-                        bot_desc,
-                        do_dict[bot_name],
+                            bot_argv,
+                            bot_desc,
+                            do_dict[bot_name],
                             error )
 
         # magic words for subster, look also at 'subster.py' (should be strings, but not needed)
         #if bot.desc == u'"SubsterBot"':
         if (bot_name == 'subster') and (not no_magic_words):
             bot.bot.magic_words = {'BOTerror':          str(bool(error.error_buffer)),
-                                     'BOTerrortraceback': str([item[2] for item in error.error_buffer]),
-                                     'BOTrelease_ver':    __release_ver__ + '.' + __release_rev__,
-                                     'BOTframework_ver':  __framework_rev__,
-                                     'BOTrunningsubbots': bot_order,
-                                     }
+                                   'BOTerrortraceback': str([item[2] for item in error.error_buffer]),
+                                   'BOTrelease_ver':    __release_ver__ + '.' + __release_rev__,
+                                   'BOTframework_ver':  __framework_rev__,
+                                   'BOTrunningsubbots': bot_order,
+                                  }
         bot.trigger()
 
     return

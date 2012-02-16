@@ -1392,15 +1392,6 @@ def main():
                 return
             elif (arg[:17] == "-rollback_history"):
                 bot.rollback = int( arg[18:] )
-            elif (arg[:5] == "-auto") \
-                 or (arg[:5] == "-cron"):
-                pass
-            elif (arg == "-all") \
-                 or (arg == "-default") \
-                 or ("-sum_disc" in arg):
-                pass
-            #elif    (arg == "-test_run"):
-            #    debug = ...
             else:
                 pywikibot.showHelp()
                 return

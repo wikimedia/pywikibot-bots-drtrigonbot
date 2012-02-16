@@ -26,7 +26,7 @@ TODO:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '$Id: apispec.py 9881 2012-02-11 13:16:03Z xqt $'
 
 import datetime, re
 import wikipedia as pywikibot

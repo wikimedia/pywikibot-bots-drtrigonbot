@@ -551,19 +551,8 @@ def main():
     bot  = SubsterBot()   # for several user's, but what about complete automation (continous running...)
     if len(args) > 0:
         for arg in args:
-            if arg[:2] == "u'": arg = eval(arg)        # for 'bot_control.py' and unicode compatibility
-            if   (arg[:5] == "-auto") \
-                 or (arg[:5] == "-cron"):
-                bot.silent = True
-            elif (arg == "-all") \
-                 or (arg == "-default") \
-                 or ("-subster" in arg):
-                pass
-            elif (arg == "-no_magic_words"):
-                pass
-            else:
-                pywikibot.showHelp()
-                return
+            pywikibot.showHelp()
+            return
     try:
         bot.run()
     except KeyboardInterrupt:
