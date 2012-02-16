@@ -52,6 +52,7 @@ import pagegenerators
 import dtbext
 # Splitting the bot into library parts
 import wikipedia as pywikibot
+from pywikibot.comms import http
 
 
 bot_config = {    # unicode values
@@ -328,8 +329,7 @@ class SubsterBot(dtbext.basic.BasicBot):
             # !!! does zip deflate work with 'self.site.getUrl' ??!! (has to be made working!)
             external_buffer = urllib.urlopen(param['url']).read()
         else:
-            external_buffer = self.site.getUrl(param['url'], no_hostname = True)
-            if self.site.loggedInAs() is None: self.site._load(force=True)  # DRTRIGON-112 (work-a-round)
+            external_buffer = http.request(self.site, param['url'], no_hostname = True)
 
         # some intermediate processing (unzip, xlsx2csv, ...)
         if param['zip']:
