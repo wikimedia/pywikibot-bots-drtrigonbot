@@ -115,7 +115,7 @@ class BasicBot(basic.BasicBot):
 
             # update template and content
             tmpl[u'timestamp'] = u'--~~~~'
-            tmpl_text = dtbext.pywikibot.glue_template_and_params( (self._bot_config['TemplateName'], tmpl) )
+            tmpl_text = pywikibot.glue_template_and_params( (self._bot_config['TemplateName'], tmpl) )
             tmpl_pos  = self._template_regex.search(self._content)
             self._content = self._content[:tmpl_pos.start()] + tmpl_text + self._content[tmpl_pos.end():]
 
