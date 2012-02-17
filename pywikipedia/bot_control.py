@@ -268,8 +268,9 @@ class BotController:
         pywikibot.output(u'\nRUN BOT: ' + self.desc)
 
         try:
-            sys.argv[1:]   = self.argv
-            self.bot.debug = debug
+            sys.argv[1:]    = self.argv
+            pywikibot.debug = ('write2wiki' not in debug)
+            self.bot.debug  = debug
             self.bot.main()
         except:
             self.ErrorHandler.gettraceback(sys.exc_info())
