@@ -44,17 +44,20 @@ if __name__ == '__main__':
 #    for s in sections:
 #        print s
 
-    #print site.cookies()
-    print 'loggedInAs: %s' % site.loggedInAs()
-    external_buffer = site.getUrl(u'http://aniki.info/Special:Statistics', no_hostname = True)
-    print 'loggedInAs: %s' % site.loggedInAs()
-    if site.loggedInAs() is None:
-        site._load(force=True)
-    print 'loggedInAs: %s' % site.loggedInAs()
+#    #print site.cookies()
+#    print 'loggedInAs: %s' % site.loggedInAs()
+#    external_buffer = site.getUrl(u'http://aniki.info/Special:Statistics', no_hostname = True)
+#    print 'loggedInAs: %s' % site.loggedInAs()
+#    if site.loggedInAs() is None:
+#        site._load(force=True)
+#    print 'loggedInAs: %s' % site.loggedInAs()
+#
+#    print '-' * 20
+#
+#    from pywikibot.comms import http
+#    print 'loggedInAs: %s' % site.loggedInAs()
+#    external_buffer = http.request(site, u'http://aniki.info/Special:Statistics', no_hostname = True)
+#    print 'loggedInAs: %s' % site.loggedInAs()
 
-    print '-' * 20
-
-    from pywikibot.comms import http
-    print 'loggedInAs: %s' % site.loggedInAs()
-    external_buffer = http.request(site, u'http://aniki.info/Special:Statistics', no_hostname = True)
-    print 'loggedInAs: %s' % site.loggedInAs()
+    print site.getParsedString("{{CURRENTTIMESTAMP}}")
+    print site.getExpandedString("{{CURRENTTIMESTAMP}}")

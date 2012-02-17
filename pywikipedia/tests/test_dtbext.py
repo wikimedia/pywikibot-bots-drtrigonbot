@@ -49,7 +49,6 @@ class TestModuleImports(unittest.TestCase):
 
   def test_WF_addAttributes(self):
     site = pywikibot.getSite()
-    dtbext.pywikibot.addAttributes( site )
     self.assertTrue( hasattr(site, "getParsedString") )  # how to check if callable???
     site.getParsedString(TESTBUFFER)                     #
 
@@ -94,7 +93,6 @@ class TestWorkerFunction(unittest.TestCase):
     #
     ##site = pywikibot.Page(pywikibot.getSite(), TESTPAGE)
     site = pywikibot.Page(pywikibot.getSite(), TESTPAGE)
-    dtbext.pywikibot.addAttributes(site)
     buf = site.get()
     #buf = site.get(mode='full')
     ##buf = site.getFullB()[:1000]
@@ -159,7 +157,6 @@ class TestWorkerFunction(unittest.TestCase):
     #print dtbext.pywikibot.Page(pywikibot.getSite(), TESTPAGE).get(mode='parse', plaintext=True)
 
     site = pywikibot.getSite()
-    dtbext.pywikibot.addAttributes( site )
     print "*", site.getParsedString(u'Erweiterung für [[Wikipedia:Bots/Bot-Info]]', keeptags = []), "*"
 
   def test_WF_purgeCache(self):
@@ -257,7 +254,6 @@ class TestWorkerFunction(unittest.TestCase):
 
 #  def test_WF_addAttributes(self):
 #    site = pywikibot.getSite()
-#    dtbext.pywikibot.addAttributes( site )
 #    print site.getParsedString(TESTBUFFER)
 #
 #    page = pywikibot.Page(pywikibot.getSite(), TESTPAGE)

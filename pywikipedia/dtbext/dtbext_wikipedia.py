@@ -49,9 +49,6 @@ def addAttributes(obj):
         obj.__dict__['purgeCache']            = lambda *args, **kwds: Page.__dict__['purgeCache'](obj, *args, **kwds)
         obj.__dict__['userNameHuman']         = lambda *args, **kwds: Page.__dict__['userNameHuman'](obj, *args, **kwds)
         obj.__dict__['append']                = lambda *args, **kwds: Page.__dict__['append'](obj, *args, **kwds)
-    elif "class 'wikipedia.Site'" in str(type(obj)):
-        obj.__dict__['getParsedString']       = lambda *args, **kwds: Site.__dict__['getParsedString'](obj, *args, **kwds)
-        obj.__dict__['getExpandedString']     = lambda *args, **kwds: Site.__dict__['getExpandedString'](obj, *args, **kwds)
 
 
 ## @since   ? (MODIFIED)
@@ -408,72 +405,3 @@ class Page(pywikibot.Page):
             raise PageNotSaved('Bad result returned: %s' % data['edit']['result'])
 
         return response.code, response.msg, data
-
-
-## @since   r19 (ADDED)
-#  @remarks needed by various bots
-class Site(object):
-    """A MediaWiki site.
-
-       look at wikipedia.py for more information!
-    """
-
-    ## @since   r19 (ADDED)
-    #  @remarks needed by various bots
-    def getParsedString(self, string, keeptags = [u'*']):
-        """Parses the string with API and return html content.
-           ADDED METHOD: needed by various bots
-
-           @param string: String that should be parsed.
-           @type  string: string
-           @param keeptags: Defines which tags (wiki, HTML) should be NOT removed.
-           @type  keeptags: list
-
-           Returns the string given, parsed through the wiki parser.
-        """
-
-        # call the wiki to get info
-        params = {
-            u'action' : u'parse',
-            u'text'   : string,
-        }
-
-        pywikibot.get_throttle()
-        pywikibot.output(u"Parsing string through the wiki parser.")
-
-        result = query.GetData(params, self)
-        r = result[u'parse'][u'text'][u'*']
-
-        r = pywikibot.removeDisabledParts(r, tags = ['comments']).strip()        # disable/remove comments
-
-        if not (keeptags == [u'*']):                               # disable/remove ALL tags
-            r = removeHTMLParts(r, keeptags = keeptags).strip()    #
-
-        return r
-
-    ## @since   r158 (ADDED)
-    #  @remarks needed by various bots
-    def getExpandedString(self, string):
-        """Expands the string with API and return wiki content.
-           ADDED METHOD: needed by various bots
-
-           @param string: String that should be expanded.
-           @type  string: string
-
-           Returns the string given, expanded through the wiki parser.
-        """
-
-        # call the wiki to get info
-        params = {
-            u'action' : u'expandtemplates',
-            u'text'   : string,
-        }
-
-        pywikibot.get_throttle()
-        pywikibot.output(u"Expanding string through the wiki parser via API.")
-
-        result = query.GetData(params, self)
-        r = result[u'expandtemplates'][u'*']
-
-        return r
-

@@ -83,7 +83,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '9900'
+__framework_rev__ = '9901'
 __release_ver__   = '1.2'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -93,8 +93,8 @@ import logging
 import logging.handlers
 
 # wikipedia-bot imports
-import pagegenerators, userlib, botlist, clean_sandbox
-import clean_user_sandbox, sum_disc, subster, script_wui, subster_irc
+import pagegenerators, userlib, botlist
+import clean_sandbox, sum_disc, subster, script_wui, subster_irc
 import dtbext
 # Splitting the bot into library parts
 import wikipedia as pywikibot
@@ -120,16 +120,16 @@ infolist = [ pywikibot.__version__, pywikibot.config.__version__,     # framewor
              script_wui.__version__, subster_irc.__version__, ]       #
 
 # bots to run and control
-bot_list = { 'clean_user_sandbox': ( clean_sandbox, [u'-user'], 
-                                     u'clean userspace Sandboxes' ),
+bot_list = { 'clean_user_sandbox': ( clean_sandbox, ['-user'], 
+                                     u'Clean Userspace Sandboxes' ),
              'sum_disc':           ( sum_disc, [], 
-                                     u'discussion summary'),
-             'compress_history':   ( sum_disc, [u'-compress_history:[]'], 
-                                     u'compressing discussion summary'),
+                                     u'Discussion Summary'),
+             'compress_history':   ( sum_disc, ['-compress_history:[]'], 
+                                     u'Compressing Discussion Summary'),
              'subster':            ( subster, [], 
                                      u'"SubsterBot"'),
              'script_wui':         ( script_wui, [], 
-                                     u'script WikiUserInterface (beta)'),
+                                     u'Script WikiUserInterface (beta)'),
              'subster_irc':        ( subster_irc, [], 
                                      u'"SubsterBot" IRC surveillance (beta)'), }
 bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'script_wui', 'subster', 'subster_irc' ]
@@ -324,7 +324,10 @@ class BotLoggerObject:
             string = self._REGEX_boc.sub('', string)  # make more readable
             string = self._REGEX_eoc.sub('', string)  #
         for string in self._REGEX_eol.split(string.rstrip()):
-            self._func(string)
+            if 'WARNING:' in string:
+                self._logger.warning(string)
+            else:
+                self._func(string)
     def close(self):
         pass
     def flush(self):
@@ -401,7 +404,7 @@ def main():
     if pywikibot.getSite().messages():
         pywikibot.output(u'====== new messages on bot discussion page =======')
         messagesforbot = pywikibot.Page(pywikibot.getSite(), u'User:DrTrigonBot').toggleTalkPage().get(get_redirect=True)
-        pywikibot.output(messagesforbot)
+        pywikibot.output( messagesforbot.splitlines()[-5:] )
         pywikibot.output(u'==================================================')
 
     # modification of timezone to be in sync with wiki
@@ -522,4 +525,3 @@ if __name__ == "__main__":
         # of raised 'SystemExit' exception by sys.exit()
         if exitcode:
             sys.exit(exitcode)
-

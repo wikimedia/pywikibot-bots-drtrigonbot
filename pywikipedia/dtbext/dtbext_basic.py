@@ -73,7 +73,6 @@ class BasicBot(basic.BasicBot):
         if bot_config:
             # init variable/dynamic objects
             self.site = pywikibot.getSite(code=pywikibot.default_code)
-            dtbext.pywikibot.addAttributes( self.site )        # enhance to dtbext.pywikibot.Site
 
             # init constants
             self._bot_config = bot_config
