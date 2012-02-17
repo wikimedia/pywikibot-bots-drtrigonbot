@@ -19,8 +19,9 @@ This script understands the following command-line arguments:
                    > ATTENTION: on most wiki THIS IS FORBIDEN FOR BOTS ! <
                    > (please talk with your admin first)                 <
                    Since it is considered bad style to edit user page with-
-                   out permission, the 'user_sandboxTitle' for given
+                   out permission, the 'user_sandboxTemplate' for given
                    language has to be set-up (no fall-back will be used).
+                   All pages containing that template will get cleaned.
                    Please be also aware that the rules when to clean the
                    user sandbox differ from those for project sandbox.
 
@@ -39,7 +40,7 @@ This script understands the following command-line arguments:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: clean_sandbox.py 9905 2012-02-17 13:47:49Z drtrigon $'
+__version__ = '$Id: clean_sandbox.py 9909 2012-02-17 23:09:15Z drtrigon $'
 #
 
 import time
@@ -118,7 +119,7 @@ user_content = {
     'de': u'{{Benutzer:DrTrigonBot/Spielwiese}}',
     }
 
-user_sandboxTitle = {
+user_sandboxTemplate = {
     'de': u'User:DrTrigonBot/Spielwiese',
     }
 
@@ -133,12 +134,12 @@ class SandboxBot:
         self.user = user
         self.site = pywikibot.getSite()
         if self.user:
-            localSandboxTitle = pywikibot.translate(self.site, user_sandboxTitle)
+            localSandboxTitle = pywikibot.translate(self.site, user_sandboxTemplate)
             localSandbox      = pywikibot.Page(self.site, localSandboxTitle)
             content.update(user_content)
             sandboxTitle[self.site.lang] = [item.title() \
               for item in localSandbox.getReferences(onlyTemplateInclusion=True)]
-            if self.site.lang not in user_sandboxTitle:
+            if self.site.lang not in user_sandboxTemplate:
                 sandboxTitle[self.site.lang] = []
                 pywikibot.output(u'Not properly set-up to run in user namespace!')
 
@@ -186,12 +187,10 @@ class SandboxBot:
                             if (pos < 0) or (endpos == len(text)):
                                 pywikibot.output(u'The user sandbox is still clean or not set up, no change necessary.')
                             else:
-                                if not pywikibot.debug:
-                                    sandboxPage.put(text[:endpos], translatedMsg)
+                                sandboxPage.put(text[:endpos], translatedMsg)
                                 pywikibot.output(u'Standard content was changed, user sandbox cleaned.')
                         else:
-                            if not pywikibot.debug:
-                                sandboxPage.put(translatedContent, translatedMsg)
+                            sandboxPage.put(translatedContent, translatedMsg)
                             pywikibot.output(u'Standard content was changed, sandbox cleaned.')
                     else:
                         diff = minutesDiff(sandboxPage.editTime(), time.strftime("%Y%m%d%H%M%S", time.gmtime()))
@@ -199,8 +198,7 @@ class SandboxBot:
                             print sandboxPage.editTime(), time.strftime("%Y%m%d%H%M%S", time.gmtime())
                         #Is the last edit more than 5 minutes ago?
                         if diff >= self.delay:
-                            if not pywikibot.debug:
-                                sandboxPage.put(translatedContent, translatedMsg)
+                            sandboxPage.put(translatedContent, translatedMsg)
                         else: #wait for the rest
                             pywikibot.output(u'Sleeping for %d minutes.' % (self.delay-diff))
                             time.sleep((self.delay-diff)*60)
@@ -236,9 +234,6 @@ def main():
         else:
             pywikibot.showHelp('clean_sandbox')
             return
-
-    if pywikibot.debug:
-        pywikibot.output(u'\03{lightyellow}DEBUG: write actions blocked.\03{default}')
 
     bot = SandboxBot(hours, no_repeat, delay, user)
     try:

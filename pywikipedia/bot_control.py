@@ -83,7 +83,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '9906'
+__framework_rev__ = '9909'
 __release_ver__   = '1.2'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -115,7 +115,7 @@ infolist = [ pywikibot.__version__, pywikibot.config.__version__,     # framewor
              pywikibot.query.__version__, pagegenerators.__version__, #
              botlist.__version__, clean_sandbox.__version__,          #
              dtbext.pywikibot.__version__, dtbext.basic.__version__,  # DrTrigonBot extensions
-             dtbext.date.__version__, dtbext.userlib.__version__,     #
+             dtbext.userlib.__version__,                              #
              __version__, sum_disc.__version__, subster.__version__,  # bots
              script_wui.__version__, subster_irc.__version__, ]       #
 
@@ -148,11 +148,11 @@ error_SGE_stop    = 1    # error, but not for SGE
 # 'write2wiki', 'user'         # write wiki, skip users
 # 'write2hist', 'toolserver'   # write only history (for code changes and smooth update), toolserver down
 debug = []                    # no write, all users
-debug.append( 'write2wiki' )  # write to wiki (operational mode)
-#debug.append( 'user' )        # skip users
-debug.append( 'write2hist' )  # write history (operational mode)
-#debug.append( 'toolserver' )  # toolserver down
-# code debugging look below; debug.append( 'code' )
+#debug.append( 'write2wiki' )  # write to wiki (operational mode)
+##debug.append( 'user' )        # skip users
+#debug.append( 'write2hist' )  # write history (operational mode)
+##debug.append( 'toolserver' )  # toolserver down
+## code debugging look below; debug.append( 'code' )
 
 
 ## Bot Error Handling; to prevent bot errors to stop execution of other bots
@@ -268,9 +268,10 @@ class BotController:
         pywikibot.output(u'\nRUN BOT: ' + self.desc)
 
         try:
-            sys.argv[1:]    = self.argv
-            pywikibot.debug = ('write2wiki' not in debug)
-            self.bot.debug  = debug
+            if ('write2wiki' not in debug):
+                pywikibot.config.actions_to_block = ['edit']
+            sys.argv[1:]   = self.argv
+            self.bot.debug = debug
             self.bot.main()
         except:
             self.ErrorHandler.gettraceback(sys.exc_info())

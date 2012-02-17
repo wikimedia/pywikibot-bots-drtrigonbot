@@ -7,7 +7,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: config.py 9880 2012-02-10 10:12:04Z alexsh $'
+__version__ = '$Id: config.py 9909 2012-02-17 23:09:15Z drtrigon $'
 
 import os, re
 import sys as __sys
@@ -463,6 +463,13 @@ use_diskcache = False
 # Retry loading a page on failure (back off 1 minute, 2 minutes, 4 minutes
 # up to 30 minutes)
 retry_on_fail = True
+
+# Defines what actions the bots are NOT allowed to do (e.g. 'edit') on wikipedia
+# servers. Setting this to:
+# actions_to_block = ['edit', 'watch', 'move', 'delete', 'undelete', 'protect']
+# allows simulation runs of bots to be carried out without changing any page on
+# the server side.
+actions_to_block = []
 
 # How many pages should be put to a queue in asynchroneous mode.
 # If maxsize is <= 0, the queue size is infinite.
