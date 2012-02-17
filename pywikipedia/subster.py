@@ -52,6 +52,7 @@ import pagegenerators
 import dtbext
 # Splitting the bot into library parts
 import wikipedia as pywikibot
+from pywikibot import i18n
 from pywikibot.comms import http
 
 
@@ -96,18 +97,6 @@ bot_config = {    # unicode values
             #'djvu': ... u"djvused -e 'n' \"%s\"" ... djvutext.py
             #'pdf': ... u"pdftotext" or python module
             #'imageocr', 'swfocr', ...
-        },
-
-        'msg': {
-            'de':  ( u'Bot: ',
-                     u'substituiere %s tag(s).',
-                   ),
-            'en':  ( u'robot ',
-                     u'substituting %s tag(s).',
-                   ),
-            'frr': ( u'Bot: ',
-                     u'substituiere %s tag(s).',
-                   ),
         },
 
         # this is a system parameter and should not be changed! (copy.deepcopy)
@@ -162,7 +151,7 @@ class SubsterBot(dtbext.basic.BasicBot):
             exec(self._ConfCSSconfigPage.get())    # with variable: bot_config_wiki
             self._flagenable = bot_config_wiki['flagenable']
 
-    def run(self, sim=False, msg=bot_config['msg'], EditFlags=bot_config['EditFlags']):
+    def run(self, sim=False, msg=None, EditFlags=bot_config['EditFlags']):
         '''Run SubsterBot().'''
 
         pywikibot.output(u'\03{lightgreen}* Processing Template Backlink List:\03{default}')
@@ -199,12 +188,18 @@ class SubsterBot(dtbext.basic.BasicBot):
                         pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
                         continue
 
-                    head, mod = pywikibot.translate(self.site.lang, msg)
+                    head = i18n.twtranslate(self.site.lang,
+                                            'thirdparty-drtrigonbot-sum_disc-summary-head')
+                    if msg is None:
+                        msg = i18n.twtranslate(self.site.lang,
+                                               'thirdparty-drtrigonbot-subster-summary-mod')
                     flags = copy.deepcopy(EditFlags)
                     if page.title() in self._flagenable:
                         flags.update( self._flagenable[page.title()] )
                     pywikibot.output(u'Flags used for writing: %s' % flags)
-                    self.save(page, substed_content, head + mod % (", ".join(substed_tags)), **flags)
+                    self.save( page, substed_content, 
+                               (head + u' ' + msg) % {'tags':", ".join(substed_tags)},
+                               **flags )
                 else:
                     pywikibot.output(u'NOTHING TO DO!')
 

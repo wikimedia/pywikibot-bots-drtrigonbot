@@ -36,7 +36,6 @@ import subster
 from collections import deque
 import time
 import thread
-import copy
 
 bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang],
 
@@ -121,7 +120,7 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
                 text = u'[[%s]] / [[User:%s]] / %s' % ( page, 
                                                         user, 
                                            match.group('summary').decode(self.site.encoding()) )
-                self.do_check(target, params=(text, self.site.lang, params['flags']))
+                self.do_check(target, params=(text, params['flags']))
 
     def do_refresh_References(self):
 #        print "refresh"
@@ -147,9 +146,7 @@ def main_subster(page, params=None):
     bot.silent  = True
     bot.pagegen = [ page ]   # single page, according to pagegenerators.py
     if params:
-        msg = copy.deepcopy(subster.bot_config['msg'])
-        msg[params[1]] = (msg[params[1]][0], params[0] + u' / %s')
-        bot.run(msg=msg, EditFlags=params[2])
+        bot.run(msg = params[0], EditFlags = params[1])
     else:
         bot.run()
     del bot

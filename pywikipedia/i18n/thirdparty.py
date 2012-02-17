@@ -147,6 +147,7 @@ msg = {
 		'thirdparty-drtrigonbot-sum_disc-summary-clean': u'Diskussions-Zusammenfassung hinzugefügt und bereinigt (%(num)i Einträge)',
 		'thirdparty-drtrigonbot-sum_disc-summary-head': u'Bot:',
 		'thirdparty-drtrigonbot-sum_disc-summary-mod': u'Diskussions-Zusammenfassung aktualisiert (%(num)i Einträge in %(page)s)',
+		'thirdparty-drtrigonbot-subster-summary-mod': u'substituiere %(tags)s tag(s).',
 	},
 	# Author: Erdemaslancan
 	'diq': {
@@ -184,6 +185,7 @@ msg = {
 		'thirdparty-drtrigonbot-sum_disc-summary-clean': u'Discussion summary added with clean up: %(num)i entries',
 		'thirdparty-drtrigonbot-sum_disc-summary-head': u'robot',
 		'thirdparty-drtrigonbot-sum_disc-summary-mod': u'Discussion summary updated: %(num)i entries in %(page)s',
+		'thirdparty-drtrigonbot-subster-summary-mod': u'substituting %(tags)s tag(s).',
 	},
 	# Author: Vivaelcelta
 	'es': {
@@ -295,6 +297,7 @@ msg = {
 		'thirdparty-drtrigonbot-sum_disc-summary-clean': u'Diskusjuun tuupfaadet an apredet: %(num)i entries',
 		'thirdparty-drtrigonbot-sum_disc-summary-head': u'Bot:',
 		'thirdparty-drtrigonbot-sum_disc-summary-mod': u'Diskusjuun tuupfaadet an apredet: %(num)i entries in %(page)s',
+		'thirdparty-drtrigonbot-subster-summary-mod': u'substituiere %(tags)s tag(s).',
 	},
 	# Author: Toliño
 	# Author: DrTrigon
