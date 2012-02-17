@@ -57,7 +57,7 @@ from pywikibot.comms import http
 
 bot_config = {    # unicode values
         'TemplateName':     u'User:DrTrigonBot/Subster',    # or 'template' for 'Flagged Revisions'
-        'ErrorTemplate':    u'\n<noinclude>----\n<b>SubsterBot Exception (%s)</b>\n%s</noinclude>\n',
+        'ErrorTemplate':    u'----\n<b>SubsterBot Exception (%s)</b>\n%s',
 
         # important to use a '.css' page here, since it HAS TO BE protected to
         # prevent malicious code injection !
@@ -76,25 +76,27 @@ bot_config = {    # unicode values
         'data_path':        '../data/subster',
 
         # bot paramater/options
-        'param_default':    { 'url':   '',
-                    'regex':           '',
-                    'value':           '',
-                    'count':           '0',
-                    'notags':          '',
-                    #'postproc':        '("","")',
-                    'postproc':        '(\'\', \'\')',
-                    'wiki':            'False',
-                    'magicwords_only': 'False',
-                    'beautifulsoup':   'False',        # DRTRIGON-88
-                    'expandtemplates': 'False',        # DRTRIGON-93 (only with 'wiki')
-                    'simple':          '',             # DRTRIGON-85
-                    'zip':             'False',
-                    'xlsx':            '',             #
-                    'cron':            '',             # DRTRIGON-102
-                    #'djvu': ... u"djvused -e 'n' \"%s\"" ... djvutext.py
-                    #'pdf': ... u"pdftotext" or python module
-                    #'imageocr', 'swfocr', ...
-                    },
+        'param_default':    {
+            'url':             '',
+            'regex':           '',
+            'value':           '',
+            'count':           '0',
+            'notags':          '',
+            #'postproc':        '("","")',
+            'postproc':        '(\'\', \'\')',
+            'wiki':            'False',
+            'magicwords_only': 'False',
+            'beautifulsoup':   'False',        # DRTRIGON-88
+            'expandtemplates': 'False',        # DRTRIGON-93 (only with 'wiki')
+            'simple':          '',             # DRTRIGON-85
+            'zip':             'False',
+            'xlsx':            '',             #
+            'cron':            '',             # DRTRIGON-102
+            'error':           '\n<noinclude>%(error)s</noinclude>\n', # DRTRIGON-116
+            #'djvu': ... u"djvused -e 'n' \"%s\"" ... djvutext.py
+            #'pdf': ... u"pdftotext" or python module
+            #'imageocr', 'swfocr', ...
+        },
 
         'msg': {
             'de':  ( u'Bot: ',
@@ -228,8 +230,11 @@ class SubsterBot(dtbext.basic.BasicBot):
         except:
             exc_info = sys.exc_info()
             (exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)
-            substed_content += bot_config['ErrorTemplate'] % ( dtbext.date.getTimeStmpNow(full=True, humanreadable=True, local=True), 
-                                                               u' ' + result.replace(u'\n', u'\n ').rstrip() )
+            substed_content += self._param_default['error'] %\
+                               {'error': bot_config['ErrorTemplate'] %\
+                                 ( dtbext.date.getTimeStmpNow(
+                                     full=True, humanreadable=True, local=True), 
+                                   u' ' + result.replace(u'\n', u'\n ').rstrip() ) }
             substed_tags.append( u'>error:BotMagicWords<' )
 
         if (len(params) == 1) and eval(params[0]['magicwords_only']):
@@ -243,8 +248,11 @@ class SubsterBot(dtbext.basic.BasicBot):
             except:
                 exc_info = sys.exc_info()
                 (exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)
-                substed_content += bot_config['ErrorTemplate'] % ( dtbext.date.getTimeStmpNow(full=True, humanreadable=True, local=True), 
-                                                                   u' ' + result.replace(u'\n', u'\n ').rstrip() )
+                substed_content += item['error'] %\
+                                   {'error': bot_config['ErrorTemplate'] %\
+                                     ( dtbext.date.getTimeStmpNow(
+                                         full=True, humanreadable=True, local=True), 
+                                       u' ' + result.replace(u'\n', u'\n ').rstrip() ) }
                 substed_tags.append( u'>error:Template<' )
 
         return (substed_content, substed_tags)
