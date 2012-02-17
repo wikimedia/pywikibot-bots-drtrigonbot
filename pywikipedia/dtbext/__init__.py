@@ -25,7 +25,6 @@ __version__ = '$Id$'
 import dtbext_userlib as userlib
 #import dtbext_wikipedia as wikipedia
 import dtbext_wikipedia as pywikibot	# dtbext_pywikibot is completely imported into dtbext_wikipedia
-import dtbext_date as date
 #import dtbext_pywikibot as pywikibot
 
 import dtbext_basic as basic

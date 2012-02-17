@@ -227,8 +227,7 @@ class SubsterBot(dtbext.basic.BasicBot):
             (exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)
             substed_content += self._param_default['error'] %\
                                {'error': bot_config['ErrorTemplate'] %\
-                                 ( dtbext.date.getTimeStmpNow(
-                                     full=True, humanreadable=True, local=True), 
+                                 ( pywikibot.Timestamp.now().isoformat(' '), 
                                    u' ' + result.replace(u'\n', u'\n ').rstrip() ) }
             substed_tags.append( u'>error:BotMagicWords<' )
 
@@ -245,8 +244,7 @@ class SubsterBot(dtbext.basic.BasicBot):
                 (exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)
                 substed_content += item['error'] %\
                                    {'error': bot_config['ErrorTemplate'] %\
-                                     ( dtbext.date.getTimeStmpNow(
-                                         full=True, humanreadable=True, local=True), 
+                                     ( pywikibot.Timestamp.now().isoformat(' '), 
                                        u' ' + result.replace(u'\n', u'\n ').rstrip() ) }
                 substed_tags.append( u'>error:Template<' )
 

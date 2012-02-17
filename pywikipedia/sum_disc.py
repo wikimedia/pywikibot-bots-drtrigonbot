@@ -389,7 +389,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
         pywikibot.output(u'* Compressing of histories:')
 
         if bot_config['backup_hist']:
-            timestmp = dtbext.date.getTimeStmpNow()
+            timestmp = pywikibot.Timestamp.now().strftime(pywikibot.Timestamp.mediawikiTSFormat)[:-6]
             pathname = pywikibot.config.datafilepath(self._bot_config['data_path'], timestmp, '')    # according to 'setUser'
             import shutil
 
@@ -1125,14 +1125,14 @@ class SumDiscPages(object):
                          'page':          page.title(), # backward compatibility (can be removed depending on TW/i18n)
                          'page_size':     u'{{subst:PAGESIZE:%s}}' % page.title(),
                          'user':          self._getLastEditor(page, data[2]), 
-                         'time':          dtbext.date.getTime(data[3]) }
+                         'time':          self._getTime(data[3]) }
                 data = self.param['parse_msg'][u'*'] % data
             elif data[5] in ps_types[1]:
                 # closed
                 data = { 'notify': data[0], 
                          'page':   page.title(asLink=True),
                          'user':   self._getLastEditor(page, data[2]), 
-                         'time':   dtbext.date.getTime(data[3]) }
+                         'time':   self._getTime(data[3]) }
                 data = self.param['parse_msg'][_PS_closed] % data
             #elif data[5] in [_PS_warning]:
             #    # warnings
@@ -1147,7 +1147,7 @@ class SumDiscPages(object):
                          'page_link': page.globalwikinotify['url'], 
                          'page':      page.title(),
                          'user':      data[2], 
-                         'time':      dtbext.date.getTime(data[3]) }
+                         'time':      self._getTime(data[3]) }
                 data = self.param['parse_msg'][_PS_notify] % data
             else:
                 continue # skip append
@@ -1186,6 +1186,23 @@ class SumDiscPages(object):
         else:
             # no human editor found; use last editor
             return (u'[[User:%s]] ' % lastuser) + self.param['parse_msg'][u'nonhuman']
+
+    ## @since   r276 (MOVED from dtbext.date.getTime)
+    #  @remarks need to convert wiki timestamp format to python
+    def _getTime(timestamp, localized=True):
+        """Convert wiki timestamp to (localized) python unicode format."""
+        # thanks to: http://docs.python.org/library/time.html
+        # http://www.mediawiki.org/wiki/API:Data_formats
+        # http://www.w3.org/TR/NOTE-datetime
+        # http://pytz.sourceforge.net/
+        # use only UTC for internal timestamps
+        # could also be used as given by the API, but is converted here for compatibility
+        timestamp = pywikibot.Timestamp.fromISOformat(timestamp)
+        if localized:
+            # is localized to the actual date/time settings, cannot localize timestamps that are
+            #    half of a year in the past or future!
+            timestamp = pywikibot.Timestamp.fromtimestamp( calendar.timegm(timestamp.timetuple()) )
+        return timestamp.strftime(u'%H:%M, %d. %b. %Y').decode(pywikibot.getSite().encoding())
 
 
 class PageSections(object):

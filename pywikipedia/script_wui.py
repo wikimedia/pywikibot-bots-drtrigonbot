@@ -184,7 +184,7 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
 
         if 'write2wiki' in debug:
             head, msg = pywikibot.translate(self.site.lang, bot_config['msg'])
-            comment = head + msg % dtbext.date.getTimeStmpNow(full=True, humanreadable=True, local=True)
+            comment = head + msg % pywikibot.Timestamp.now().isoformat(' ')
             page = pywikibot.Page(self.site, bot_config['sim_output'])
             self.append(page, self.terminal2wiki(out), comment=comment)
         else:
