@@ -69,8 +69,6 @@ bot_config = {    # unicode values
         'CRONMaxDelay':     1*24*60*60,       # bot runs daily
 
         # regex values
-        'tag_regex':        re.compile('<.*?>', re.S | re.I),
-
         'var_regex_str':    u'<!--SUBSTER-%(var1)s-->%(cont)s<!--SUBSTER-%(var2)s-->',
 
         'mbox_file':        'mail_inbox',    # "drtrigon+subster@toolserver.org"
@@ -82,7 +80,6 @@ bot_config = {    # unicode values
             'regex':           '',
             'value':           '',
             'count':           '0',
-            'notags':          '',
             #'postproc':        '("","")',
             'postproc':        '(\'\', \'\')',
             'wiki':            'False',
@@ -122,7 +119,6 @@ class SubsterBot(dtbext.basic.BasicBot):
 
     _param_default = bot_config['param_default']
 
-    _tag_regex     = bot_config['tag_regex']
     _var_regex_str = bot_config['var_regex_str']%{'var1':'%(var)s','var2':'%(var)s','cont':'%(cont)s'}
 
     _BS_regex      = re.compile(u'(' + _var_regex_str%{'var':'BS:(.*?)','cont':'(.*?)'} + u')')
@@ -358,10 +354,6 @@ class SubsterBot(dtbext.basic.BasicBot):
                     external_data = external_data[0]
                 else:
                     external_data = str(external_data)
-            logging.getLogger('subster').debug( external_data )
-
-            if param['notags']:
-                external_data = self._tag_regex.sub(param['notags'], external_data)
             logging.getLogger('subster').debug( external_data )
 
             # 4.) postprocessing
