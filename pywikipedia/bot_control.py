@@ -148,11 +148,11 @@ error_SGE_stop    = 1    # error, but not for SGE
 # 'write2wiki', 'user'         # write wiki, skip users
 # 'write2hist', 'toolserver'   # write only history (for code changes and smooth update), toolserver down
 debug = []                    # no write, all users
-#debug.append( 'write2wiki' )  # write to wiki (operational mode)
-##debug.append( 'user' )        # skip users
-#debug.append( 'write2hist' )  # write history (operational mode)
-##debug.append( 'toolserver' )  # toolserver down
-## code debugging look below; debug.append( 'code' )
+debug.append( 'write2wiki' )  # write to wiki (operational mode)
+#debug.append( 'user' )        # skip users
+debug.append( 'write2hist' )  # write history (operational mode)
+#debug.append( 'toolserver' )  # toolserver down
+# code debugging look below; debug.append( 'code' )
 
 
 ## Bot Error Handling; to prevent bot errors to stop execution of other bots
