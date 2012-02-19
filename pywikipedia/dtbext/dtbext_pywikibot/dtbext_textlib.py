@@ -23,44 +23,6 @@ This is a part of pywikipedia framework, it is a deviation of pywikibot/textlib.
 __version__ = '$Id$'
 #
 
-# Standard library imports
-from HTMLParser import HTMLParser
-
-
-## @since   r19 (ADDED)
-#  @remarks needed by various bots
-def removeHTMLParts(text, keeptags = ['tt', 'nowiki', 'small', 'sup']):
-    """
-    Return text without portions where HTML markup is disabled
-
-    Parts that can/will be removed are --
-    * HTML and all wiki tags
-
-    The exact set of parts which should NOT be removed can be passed as the
-    'keeptags' parameter, which defaults to ['tt', 'nowiki', 'small', 'sup'].
-    """
-    # try to replace with 'pywikibot.removeDisabledParts()' from 'textlib' !!
-
-    # thanks to http://www.hellboundhackers.org/articles/841-using-python-39;s-htmlparser-class.html
-    parser = _GetDataHTML()
-    parser.keeptags = keeptags
-    parser.feed(text)
-    parser.close()
-    return parser.textdata
-
-# thanks to http://docs.python.org/library/htmlparser.html
-class _GetDataHTML(HTMLParser):
-    textdata = u''
-    keeptags = []
-
-    def handle_data(self, data):
-        self.textdata += data
-
-    def handle_starttag(self, tag, attrs):
-        if tag in self.keeptags: self.textdata += u"<%s>" % tag
-
-    def handle_endtag(self, tag):
-        if tag in self.keeptags: self.textdata += u"</%s>" % tag
 
 #--------------------------------------------
 # Functions dealing with interwiki links
