@@ -1189,7 +1189,7 @@ class SumDiscPages(object):
 
     ## @since   r276 (MOVED from dtbext.date.getTime)
     #  @remarks need to convert wiki timestamp format to python
-    def _getTime(timestamp, localized=True):
+    def _getTime(self, timestamp, localized=True):
         """Convert wiki timestamp to (localized) python unicode format."""
         # thanks to: http://docs.python.org/library/time.html
         # http://www.mediawiki.org/wiki/API:Data_formats
