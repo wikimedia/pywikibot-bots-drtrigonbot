@@ -19,7 +19,7 @@ Options/parameters:
 ## @package bot_control
 #  @brief   General DrTrigonBot Robot(s) Caller
 #
-#  @copyright Dr. Trigon, 2008-2011
+#  @copyright Dr. Trigon, 2008-2012
 #
 #  @todo      look also at and learn from daemonize.py (@ref daemonize)
 #
@@ -83,7 +83,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '9911'
+__framework_rev__ = '9912'
 __release_ver__   = '1.2'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -279,6 +279,9 @@ class BotController:
 
 ## Bot Output Redirecting And Logging; to assure all output is logged into file
 #
+#  @todo try to merge/combine with 'log' from 'user-config.py' and use this
+#        mechnism alread implemented upstream
+#        \n[ JIRA: ticket? ]
 class BotLogger:
     def __init__(self, filename, console=True):
         # http://docs.python.org/howto/logging-cookbook.html#logging-to-multiple-destinations

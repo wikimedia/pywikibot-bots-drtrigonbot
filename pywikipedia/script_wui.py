@@ -16,7 +16,7 @@ Syntax example:
 ## @package script_wui
 #  @brief   Script WikiUserInterface (WUI) Robot
 #
-#  @copyright Dr. Trigon, 2011
+#  @copyright Dr. Trigon, 2012
 #
 #  @section FRAMEWORK
 #

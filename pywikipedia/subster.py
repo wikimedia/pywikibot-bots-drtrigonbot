@@ -17,7 +17,7 @@ drtrigon+subster@toolserver.org
 ## @package subster
 #  @brief   Dynamic Text Substitutions Robot
 #
-#  @copyright Dr. Trigon, 2009-2010
+#  @copyright Dr. Trigon, 2009-2012
 #
 #  @section FRAMEWORK
 #
@@ -283,7 +283,12 @@ class SubsterBot(dtbext.basic.BasicBot):
         substed_tags = []  # DRTRIGON-73
         prev_content = content
 
-        # 0.2.) check cron/date
+        # 0.2.) check for 'simple' mode and get additional params
+        if param['simple']:
+            p = self.site.getExpandedString(param['simple'])
+            param.update( pywikibot.extract_templates_and_params(p)[0][1] )
+
+        # 0.5.) check cron/date
         if param['cron']:
             # [min] [hour] [day of month] [month] [day of week]
             # (date supported only, thus [min] and [hour] dropped)
@@ -297,11 +302,6 @@ class SubsterBot(dtbext.basic.BasicBot):
 
             if not (delay <= bot_config['CRONMaxDelay']):
                 return (content, substed_tags)
-
-        # 0.5.) check for 'simple' mode and get additional params
-        if param['simple']:
-            p = self.site.getExpandedString(param['simple'])
-            param.update( pywikibot.extract_templates_and_params(p)[0][1] )
 
         # 1.) getUrl or wiki text
         # (security: check url not to point to a local file on the server,
