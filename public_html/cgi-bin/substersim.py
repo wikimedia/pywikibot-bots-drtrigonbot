@@ -86,7 +86,6 @@ function switch_mode () {
     document.SubsterBotForm.regex.disabled = false;
     document.SubsterBotForm.value.disabled = false;
     document.SubsterBotForm.count.disabled = false;
-    document.SubsterBotForm.notags.disabled = false;
     document.SubsterBotForm.postproc.disabled = false;
     document.SubsterBotForm.wiki.disabled = false;
     document.SubsterBotForm.expandtemplates.disabled = false;
@@ -96,7 +95,6 @@ function switch_mode () {
     document.SubsterBotForm.regex.disabled = true;
     document.SubsterBotForm.value.disabled = true;
     document.SubsterBotForm.count.disabled = true;
-    document.SubsterBotForm.notags.disabled = true;
     document.SubsterBotForm.postproc.disabled = true;
     document.SubsterBotForm.wiki.disabled = true;
     document.SubsterBotForm.expandtemplates.disabled = true;
@@ -106,7 +104,6 @@ function switch_mode () {
     document.SubsterBotForm.regex.disabled = false;
     document.SubsterBotForm.value.disabled = false;
     document.SubsterBotForm.count.disabled = false;
-    document.SubsterBotForm.notags.disabled = false;
     document.SubsterBotForm.postproc.disabled = false;
     document.SubsterBotForm.wiki.disabled = false;
     document.SubsterBotForm.expandtemplates.disabled = false;
@@ -145,11 +142,6 @@ Simulation:
         <td>count</td>
         <td>=</td>
         <td><input name="count" type="text" size="60" maxlength="200" value="%(count)s"></td>
-      </tr>
-      <tr>
-        <td>notags</td>
-        <td>=</td>
-        <td><input name="notags" type="text" size="60" maxlength="200" value="%(notags)s"></td>
       </tr>
       <tr>
         <td>postproc</td>

@@ -52,7 +52,6 @@ import query						#
 import wikipedia as pywikibot				#
 import pagegenerators, catlib
 #import wikipedia as pywikibot	# for 'Timestamp'
-import dtbext			# for 'getTimeStmpNow'
 import family
 # may be best would be to get namespace info from DB?!
 
@@ -308,7 +307,7 @@ def get_wikiinfo_db(wiki, limit=SQL_LIMIT_max):
 def displayhtmlpage(form):
 	cat    = form.getvalue('cat', '')
 #	start  = form.getvalue('start', datetime.datetime.utcnow().strftime(wikitime))
-	start  = form.getvalue('start', dtbext.date.getTimeStmpNow(full=True))
+	start  = form.getvalue('start', pywikibot.Timestamp.utcnow().strftime(wikitime))
 	period = form.getvalue('period', '24')
 
 	lang = locale.locale_alias.get(wiki, locale.locale_alias['en']).split('.')[0]
