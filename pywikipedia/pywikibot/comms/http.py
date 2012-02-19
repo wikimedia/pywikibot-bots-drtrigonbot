@@ -16,7 +16,7 @@ This module is responsible for
 # Distributed under the terms of the MIT license.
 #
 
-__version__ = '$Id: http.py 9904 2012-02-17 13:29:07Z drtrigon $'
+__version__ = '$Id: http.py 9910 2012-02-19 12:49:35Z drtrigon $'
 
 import urllib2
 
@@ -174,7 +174,7 @@ u"WARNING: Could not open '%s'. Maybe the server or\n your connection is down. R
     if m:
         charset = m.group(1)
     else:
-        if verbose:
+        if pywikibot.verbose:
             pywikibot.output(u"WARNING: No character set found.")
         # UTF-8 as default
         charset = 'utf-8'
