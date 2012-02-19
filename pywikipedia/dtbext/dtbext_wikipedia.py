@@ -49,6 +49,7 @@ def addAttributes(obj):
         obj.__dict__['purgeCache']            = lambda *args, **kwds: Page.__dict__['purgeCache'](obj, *args, **kwds)
         obj.__dict__['userNameHuman']         = lambda *args, **kwds: Page.__dict__['userNameHuman'](obj, *args, **kwds)
         obj.__dict__['append']                = lambda *args, **kwds: Page.__dict__['append'](obj, *args, **kwds)
+        obj.__dict__['get']                   = lambda *args, **kwds: Page.__dict__['get'](obj, *args, **kwds)
 
 
 ## @since   ? (MODIFIED)

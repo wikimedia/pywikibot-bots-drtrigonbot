@@ -7,7 +7,7 @@
 
 import test_utils
 
-from test_dtbext import *
+from test_dtbext import TESTPAGE, TESTPAGES
 
 import dtbext
 
