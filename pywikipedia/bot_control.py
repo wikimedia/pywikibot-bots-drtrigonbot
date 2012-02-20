@@ -407,10 +407,10 @@ def main():
 
     # processing of messages on bot discussion page
     if pywikibot.getSite().messages():
-        pywikibot.output(u'====== new messages on bot discussion page =======')
+        pywikibot.output(u'====== new messages on bot discussion page (last few lines) ======')
         messagesforbot = pywikibot.Page(pywikibot.getSite(), u'User:DrTrigonBot').toggleTalkPage().get(get_redirect=True)
-        pywikibot.output( messagesforbot.splitlines()[-5:] )
-        pywikibot.output(u'==================================================')
+        pywikibot.output( u'\n'.join(messagesforbot.splitlines()[-10:]) )
+        pywikibot.output(u'==================================================================')
 
     # modification of timezone to be in sync with wiki
     os.environ['TZ'] = 'Europe/Amsterdam'
