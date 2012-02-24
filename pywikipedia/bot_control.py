@@ -491,6 +491,10 @@ if __name__ == "__main__":
                              'script_wui':         ("-script_wui" in arg),
             })
 
+        # hack/work-a-round for hourly runs on 'ar' not to flood mainbot logs
+        if pywikibot.default_code == 'ar':
+            logfile = logfile.replace('.log', '_ar.log')
+
         log = BotLogger(logfile, not cron)
 
         no_magic_words = ("-no_magic_words" in arg)
