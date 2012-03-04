@@ -888,7 +888,7 @@ class SumDiscBot(dtbext.basic.BasicBot):
                     self.append(page, text, comment=comment, minorEdit=minEd)
                 else:
                     # append with cleanup
-                    text = self.cleanupDiscSum( self.load(page), 
+                    text = self.cleanupDiscSum( self.load(page) or u'', 
                                                 days=self._param['cleanup_count'] ) + u'\n\n' + text
                     comment = head + clean % {'num':count}
                     self.save(page, text, comment=comment, minorEdit=minEd)
