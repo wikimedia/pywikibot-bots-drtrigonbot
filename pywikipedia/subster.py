@@ -359,7 +359,9 @@ class SubsterBot(dtbext.basic.BasicBot):
             logging.getLogger('subster').debug( external_data )
 
             # 4.) postprocessing
-            param['postproc'] = ast.literal_eval(param['postproc'])
+            param['postproc'] = eval(param['postproc'])
+            # should be secured as given below, but needs code changes in wiki too
+            #param['postproc'] = ast.literal_eval(param['postproc'])
             func  = param['postproc'][0]    # needed by exec call of self._code
             DATA  = [ external_data ]       #
             args  = param['postproc'][1:]   #
