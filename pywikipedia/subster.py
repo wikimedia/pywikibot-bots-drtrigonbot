@@ -47,6 +47,7 @@ import openpyxl.reader.excel
 import crontab
 import logging
 import copy
+import ast
 
 import pagegenerators
 import dtbext
@@ -89,8 +90,9 @@ bot_config = {    # unicode values
             'simple':          '',             # DRTRIGON-85
             'zip':             'False',
             'xlsx':            '',             #
+            # may be 'hours' have to be added too (e.g. for 'ar')
             'cron':            '',             # DRTRIGON-102
-            'error':           '\n<noinclude>%(error)s</noinclude>\n', # DRTRIGON-116
+            'error':           repr('\n<noinclude>%(error)s</noinclude>\n'), # DRTRIGON-116
             #'djvu': ... u"djvused -e 'n' \"%s\"" ... djvutext.py
             #'pdf': ... u"pdftotext" or python module
             #'imageocr', 'swfocr', ...
@@ -221,13 +223,13 @@ class SubsterBot(dtbext.basic.BasicBot):
         except:
             exc_info = sys.exc_info()
             (exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)
-            substed_content += self._param_default['error'] %\
+            substed_content += ast.literal_eval(self._param_default['error']) %\
                                {'error': bot_config['ErrorTemplate'] %\
                                  ( pywikibot.Timestamp.now().isoformat(' '), 
                                    u' ' + result.replace(u'\n', u'\n ').rstrip() ) }
             substed_tags.append( u'>error:BotMagicWords<' )
 
-        if (len(params) == 1) and eval(params[0]['magicwords_only']):
+        if (len(params) == 1) and ast.literal_eval(params[0]['magicwords_only']):
             return (substed_content, substed_tags)
 
         for item in params:
@@ -238,7 +240,7 @@ class SubsterBot(dtbext.basic.BasicBot):
             except:
                 exc_info = sys.exc_info()
                 (exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)
-                substed_content += item['error'] %\
+                substed_content += ast.literal_eval(item['error']) %\
                                    {'error': bot_config['ErrorTemplate'] %\
                                      ( pywikibot.Timestamp.now().isoformat(' '), 
                                        u' ' + result.replace(u'\n', u'\n ').rstrip() ) }
@@ -309,12 +311,12 @@ class SubsterBot(dtbext.basic.BasicBot):
         secure = False
         for item in [u'http://', u'https://', u'mail://']:
             secure = secure or (param['url'][:len(item)] == item)
-        param['wiki'] = eval(param['wiki'])
-        param['zip']  = eval(param['zip'])
+        param['wiki'] = ast.literal_eval(param['wiki'])
+        param['zip']  = ast.literal_eval(param['zip'])
         if (not secure) and (not param['wiki']):
             return (content, substed_tags)
         if   param['wiki']:
-            if eval(param['expandtemplates']): # DRTRIGON-93 (only with 'wiki')
+            if ast.literal_eval(param['expandtemplates']):  # DRTRIGON-93 (only with 'wiki')
                 external_buffer = dtbext.pywikibot.Page(self.site, param['url']).get(expandtemplates=True)
             else:
                 external_buffer = self.load( dtbext.pywikibot.Page(self.site, param['url']) )
@@ -323,7 +325,7 @@ class SubsterBot(dtbext.basic.BasicBot):
             external_buffer = mbox.find_data(param['url'])
             mbox.close()
         elif param['zip']:
-            # !!! does zip deflate work with 'self.site.getUrl' ??!! (has to be made working!)
+            # !!! does zip deflate work with 'http.request' ??!! (has to be made working! see opencv stuff also!)
             external_buffer = urllib.urlopen(param['url']).read()
         else:
             external_buffer = http.request(self.site, param['url'], no_hostname = True)
@@ -335,7 +337,7 @@ class SubsterBot(dtbext.basic.BasicBot):
         if param['xlsx']:
             external_buffer = self.xlsx2csv(external_buffer, param['xlsx'])
 
-        if not eval(param['beautifulsoup']):    # DRTRIGON-88
+        if not ast.literal_eval(param['beautifulsoup']):    # DRTRIGON-88
             # 2.) regexp
             #for subitem in param['regex']:
             subitem = param['regex']
@@ -357,7 +359,7 @@ class SubsterBot(dtbext.basic.BasicBot):
             logging.getLogger('subster').debug( external_data )
 
             # 4.) postprocessing
-            param['postproc'] = eval(param['postproc'])
+            param['postproc'] = ast.literal_eval(param['postproc'])
             func  = param['postproc'][0]    # needed by exec call of self._code
             DATA  = [ external_data ]       #
             args  = param['postproc'][1:]   #
