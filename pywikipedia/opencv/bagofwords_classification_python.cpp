@@ -2548,32 +2548,79 @@ void computeGnuPlotOutput( const string& resPath, const string& objClassName, Vo
 //#include <boost/python/def.hpp>
 //#include <boost/python/object.hpp>
 #include <boost/python/stl_iterator.hpp>
+#include <streambuf>
+
+// http://bo-peng.blogspot.com/2004/10/how-to-re-direct-cout-to-python_05.html
+// http://mail.python.org/pipermail/cplusplus-sig/2005-September/009252.html
+// A streambuf class for output to a Python stream.
+/* Example usage:
+
+using namespace boost::python;
+object sys(PyImport_ImportModule("sys"));
+object sys_stdout = sys.attr("stdout");
+object sys_stderr = sys.attr("stderr");
+
+if (PyObject_HasAttrString( sys_stdout.ptr(), "write"))
+	std::cout.rdbuf( new py_ostreambuf( sys_stdout));
+if (PyObject_HasAttrString( sys_stderr.ptr(), "write"))
+	std::cerr.rdbuf( new py_ostreambuf( sys_stderr));
+
+*/
+class py_ostreambuf : public std::streambuf
+{
+ private:
+    boost::python::object file;
+    bool have_flush;
+
+ public:
+    py_ostreambuf( boost::python::object file_object)
+        : file( file_object)
+    {
+        have_flush = PyObject_HasAttrString( file.ptr(), "flush");
+    }
+
+ protected:
+    virtual int_type overflow( int_type c) 
+    {
+        file.attr("write")( static_cast<char>(c));
+        return c;
+    }
+
+    virtual std::streamsize xsputn(const char_type* s, std::streamsize n)
+    {
+        file.attr("write")( std::string( s, n));
+        return n;
+    }
+    
+    virtual int sync()
+    {
+        if (have_flush) {
+            file.attr("flush")();
+            // Perhaps we should only return 0 if this path is followed?
+        }
+        // And return -1 here?  Methinks that might make anything that uses
+	// std::endl fail.
+        return 0;
+    }
+};
 
 /*int main(int argc, char** argv)*/
 vector<float> worker(const int& argc, const string& vocPath, const string& resPath, 
                      const string& argv3 = "", const string& argv4 = "", const string& argv5 = "",
                      const boost::python::list& files_list = boost::python::list())
 {
-    ////int n = boost::python::extract<int>(files.attr("__len__")());
-    //int n = boost::python::len(files);
-    //for ( int i = 0; i < n; i++ ){
-    //    string val = (boost::python::extract<string>(files[i]));
-    //    cout << val << endl;
-    //}
     boost::python::stl_input_iterator<string> begin(files_list), end;
     vector<string> files_vec;
     std::copy( begin, end, back_inserter(files_vec) );
-    //std::copy( files_vec.begin(), files_vec.end(),
-    //           ostream_iterator<string>(cout, "\n") );
-    //return vector<float>(0);
 
-    /*if( argc != 3 && argc != 6 )
+    std::streambuf *sb = std::cout.rdbuf();
+    if ( files_vec.size() )
     {
-    	help(argv);
-        return -1;
-    }*/
-
-    /*const string vocPath = argv[1], resPath = argv[2];*/
+        boost::python::object sys(boost::python::detail::new_reference(PyImport_ImportModule("sys")));
+        boost::python::object sys_stdout = sys.attr("stdout");
+        if (PyObject_HasAttrString(sys_stdout.ptr(), "write"))
+            sb = std::cout.rdbuf( new py_ostreambuf(sys_stdout) );
+    }
 
     // Read or set default parameters
     string vocName;
@@ -2596,7 +2643,8 @@ vector<float> worker(const int& argc, const string& vocPath, const string& resPa
         {
             cout << "Feature detector, descriptor extractor, descriptor matcher must be set" << endl;
             /*return -1;*/
-            return vector<float>(0);
+            std::cout.rdbuf(sb);
+            return vector<float>();
         }
         /*ddmParams = DDMParams( argv[3], argv[4], argv[5] ); // from command line*/
         ddmParams = DDMParams( argv3, argv4, argv5 ); // from command line
@@ -2611,7 +2659,8 @@ vector<float> worker(const int& argc, const string& vocPath, const string& resPa
         {
             cout << "File " << (resPath + "/" + paramsFile) << "can not be opened to write" << endl;
             /*return -1;*/
-            return vector<float>(0);
+            std::cout.rdbuf(sb);
+            return vector<float>();
         }
     }
 
@@ -2623,7 +2672,8 @@ vector<float> worker(const int& argc, const string& vocPath, const string& resPa
     {
         cout << "featureDetector or descExtractor was not created" << endl;
         /*return -1;*/
-        return vector<float>(0);
+        std::cout.rdbuf(sb);
+        return vector<float>();
     }
     {
         Ptr<DescriptorMatcher> descMatcher = DescriptorMatcher::create( ddmParams.matcherType );
@@ -2631,7 +2681,8 @@ vector<float> worker(const int& argc, const string& vocPath, const string& resPa
         {
             cout << "descMatcher was not created" << endl;
             /*return -1;*/
-            return vector<float>(0);
+            std::cout.rdbuf(sb);
+            return vector<float>();
         }
         bowExtractor = new BOWImgDescriptorExtractor( descExtractor, descMatcher );
     }
@@ -2648,7 +2699,7 @@ vector<float> worker(const int& argc, const string& vocPath, const string& resPa
 
     // 2. Train a classifier and run a sample query for each object class
     const vector<string>& objClasses = vocData.getObjectClasses(); // object class list
-    vector<float> confidences(0), conf;
+    vector<float> confidences, conf;
     for( size_t classIdx = 0; classIdx < objClasses.size(); ++classIdx )
     {
         // Train a classifier on train dataset
@@ -2668,6 +2719,7 @@ vector<float> worker(const int& argc, const string& vocPath, const string& resPa
             computeGnuPlotOutput( resPath, objClasses[classIdx], vocData );
     }
     /*return 0;*/
+    std::cout.rdbuf(sb);
     return confidences;
 }
 
@@ -2696,8 +2748,8 @@ int main(int argc, char** argv)
 
     if ( !confidences.size() )
         return -1;
-    else
-        return 0;
+
+    return 0;
 }
 
 

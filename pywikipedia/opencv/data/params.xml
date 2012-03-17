@@ -2,8 +2,8 @@
 <opencv_storage>
 <vocName>VOC2007</vocName>
 <ddmParams>
-  <detectorType>FAST</detectorType>
-  <descriptorType>SURF</descriptorType>
+  <detectorType>HARRIS</detectorType>
+  <descriptorType>SIFT</descriptorType>
   <matcherType>BruteForce</matcherType></ddmParams>
 <vocabTrainParams>
   <trainObjClass>chair</trainObjClass>

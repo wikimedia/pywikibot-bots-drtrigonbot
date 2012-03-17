@@ -243,18 +243,6 @@ class Global(object):
 
 
 class main(checkimages.main):
-    cats = {
-        'people':        (u'Category:Unidentified people', 0),
-        'maps':          (u'Category:Unidentified maps', 1),
-        'flags':         (u'Category:Unidentified flags', 2),
-        'plants':        (u'Category:Unidentified plants', 3),
-        'coats of arms': (u'Category:Unidentified coats of arms', 4),
-        'buildings':     (u'Category:Unidentified buildings', 5),
-        'trains':        (u'Category:Unidentified trains', 6),
-        'automobiles':   (u'Category:Unidentified automobiles', 7),
-        'buses':         (u'Category:Unidentified buses', 8),
-    }
-
 #    def __init__(self, site, logFulNumber = 25000, sendemailActive = False,
 #                 duplicatesReport = False, logFullError = True): pass
 #    def setParameters(self, imageName, timestamp, uploader): pass
@@ -319,8 +307,10 @@ class main(checkimages.main):
                 (cat, result) = self.__class__.__dict__[item](self)
                 #print cat, result
                 if result:
-                    pywikibot.output( u'   {{%s}} found %i time(s)'
+                    pywikibot.output( u'   {{Category:Unidentified %s}} found %i time(s)'
                                       % (cat, len(result)) )
+
+#        raise
 
     # Category:Unidentified people
     def _searchPeople(self):
@@ -331,10 +321,9 @@ class main(checkimages.main):
             pywikibot.output(u'WARNING: unknown file type')
         #print self.image, '\n   ', result
 
-        (c, r) = self._CVclassifyObjects('people')
-        result += r
+        result += self._CVclassifyObjects('person')
 
-        return (c, result)
+        return (u'people', result)
 
     def _CVdetectObjects(self):
         """Converts an image to grayscale and prints the locations of any
@@ -385,37 +374,40 @@ class main(checkimages.main):
         draw.rectangle([x1,y1,x2,y2], outline=(255,0,0))
         im.save(image_path_new)
 
-    # Category:Unidentified maps
-    def _searchMaps(self):
-        return self._CVclassifyObjects('maps')
+#    # Category:Unidentified maps
+#    def _searchMaps(self):
+#        return (u'maps', self._CVclassifyObjects('maps'))
 
-    # Category:Unidentified flags
-    def _searchFlags(self):
-        return self._CVclassifyObjects('flags')
+#    # Category:Unidentified flags
+#    def _searchFlags(self):
+#        return (u'flags', self._CVclassifyObjects('flags'))
 
     # Category:Unidentified plants
     def _searchPlants(self):
-        return self._CVclassifyObjects('plants')
+        return (u'plants', self._CVclassifyObjects('pottedplant'))
 
-    # Category:Unidentified coats of arms
-    def _searchCoatsOfArms(self):
-        return self._CVclassifyObjects('coats of arms')
+#    # Category:Unidentified coats of arms
+#    def _searchCoatsOfArms(self):
+#        return (u'coats of arms', self._CVclassifyObjects('coats of arms'))
 
-    # Category:Unidentified buildings
-    def _searchBuildings(self):
-        return self._CVclassifyObjects('buildings')
+#    # Category:Unidentified buildings
+#    def _searchBuildings(self):
+#        return (u'buildings', self._CVclassifyObjects('buildings'))
 
     # Category:Unidentified trains
     def _searchTrains(self):
-        return self._CVclassifyObjects('trains')
+        return (u'trains', self._CVclassifyObjects('train'))
 
     # Category:Unidentified automobiles
     def _searchAutomobiles(self):
-        return self._CVclassifyObjects('automobiles')
+        result  = self._CVclassifyObjects('bus')
+        result += self._CVclassifyObjects('car')
+        result += self._CVclassifyObjects('motorbike')
+        return (u'automobiles', result)
 
     # Category:Unidentified buses
     def _searchBuses(self):
-        return self._CVclassifyObjects('buses')
+        return (u'buses', self._CVclassifyObjects('bus'))
 
     def _CVclassifyObjects(self, cls):
         """Uses the 'The Bag of Words model' for classification"""
@@ -426,53 +418,72 @@ class main(checkimages.main):
             # http://app-solut.com/blog/2011/07/using-the-normal-bayes-classifier-for-image-categorization-in-opencv/
             # http://authors.library.caltech.edu/7694/
             # http://www.vision.caltech.edu/Image_Datasets/Caltech256/
+            # http://opencv.itseez.com/modules/features2d/doc/object_categorization.html
+            
+            # http://www.morethantechnical.com/2011/08/25/a-simple-object-classifier-with-bag-of-words-using-opencv-2-3-w-code/
+            #   source: https://github.com/royshil/FoodcamClassifier
+            # http://app-solut.com/blog/2011/07/using-the-normal-bayes-classifier-for-image-categorization-in-opencv/
+            #   source: http://code.google.com/p/open-cv-bow-demo/downloads/detail?name=bowdemo.tar.gz&can=2&q=
 
-            info = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus',
-                    'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse',
-                    'motorbike', 'person', 'pottedplant', 'sheep', 'sofa',
-                    'train', 'tvmonitor',]
+            # parts of code here should/have to be placed into e.g. a own
+            # class in 'opencv/__init__.py' script/module
+            
+            trained = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus',
+                       'car', 'cat', 'chair', 'cow', 'diningtable', 'dog',
+                       'horse', 'motorbike', 'person', 'pottedplant', 'sheep',
+                       'sofa', 'train', 'tvmonitor',]
             bowDescPath = '/home/ursin/data/toolserver/pywikipedia/opencv/data/bowImageDescriptors/000000.xml.gz'
 
             # https://code.ros.org/trac/opencv/browser/trunk/opencv/samples/cpp/bagofwords_classification.cpp?rev=3714
             # stand-alone (in shell) for training e.g. with:
-            #   BoWclassify /data/toolserver/pywikipedia/opencv/VOC2007 /data/toolserver/pywikipedia/opencv/data FAST SURF BruteForce
+            #   BoWclassify /data/toolserver/pywikipedia/opencv/VOC2007 /data/toolserver/pywikipedia/opencv/data FAST SURF BruteForce | tee run.log
+            #   BoWclassify /data/toolserver/pywikipedia/opencv/VOC2007 /data/toolserver/pywikipedia/opencv/data HARRIS SIFT BruteForce | tee run.log
+            # http://experienceopencv.blogspot.com/2011/02/object-recognition-bag-of-keypoints.html
             import opencv
+            import StringIO#, numpy
 
             if os.path.exists(bowDescPath):
                 os.remove(bowDescPath)
 
+            stdout = sys.stdout
+            sys.stdout = StringIO.StringIO()
             #result = opencv.BoWclassify.main(0, '', '', '', '', '')
             result = opencv.BoWclassify.main(6, 
                                              '/data/toolserver/pywikipedia/opencv/VOC2007', 
                                              '/data/toolserver/pywikipedia/opencv/data', 
-                                             'FAST', 
-                                             'SURF', 
-                                             'BruteForce',
-                                             #['/data/toolserver/pywikipedia/opencv/VOC2007/JPEGImages/000019.jpg'])
+                                             'HARRIS',      # not important; given by training
+                                             'SIFT',        # not important; given by training
+                                             'BruteForce',  # not important; given by training
                                              [str(os.path.abspath(self.image_path).encode('latin-1'))])
+            out = sys.stdout.getvalue()
+            sys.stdout = stdout
+            #print out
             try:
+                if not result:
+                    raise
                 os.remove(bowDescPath)
             except:
                 print "PROBLEM!!!"
-                raise
-            print self.image_path
-            for i in range(len(result)):
-                print "%12s %.3f" % (info[i], result[i])
-            raise
+                #raise
+                self._result_classify = {}
+                return []
+#            result = list(numpy.abs(numpy.array(result)))
+            (mi, ma) = (min(result), max(result))
+#            for i in range(len(result)):
+#                print "%12s %.3f" % (trained[i], result[i]), ((result[i] == mi) or (result[i] == ma))
 
             # now make the algo working; confer also
             # http://www.xrce.xerox.com/layout/set/print/content/download/18763/134049/file/2004_010.pdf
             # http://people.csail.mit.edu/torralba/shortCourseRLOC/index.html
 
-            self._result_classify = result
+            self._result_classify = dict([ (trained[i], abs(r)) for i, r in enumerate(result) ])
 
-        (cat, cls) = self.cats[cls]
-        if (self._result_classify[cls] >= 0.5): # >= threshold 50%
+        if (self._result_classify.get(cls, 0.0) >= 0.5): # >= threshold 50%
             result = [ self._result_classify[cls] ] # ok
         else:
             result = []                             # nothing found
 
-        return (cat, result)
+        return result
 
 gbv = Global()
 
@@ -693,7 +704,10 @@ def checkbot():
                     pywikibot.output(u"%s is not a file, skipping..." % image.title())
                     continue
             mainClass.setParameters(imageName, timestamp, uploader) # Setting the image for the main class
-            mainClass.downloadImage()
+            try:
+                mainClass.downloadImage()
+            except pywikibot.exceptions.NoPage:
+                continue
             # Skip block
             if skip == True:
                 skip = mainClass.skipImages(skip_number, limit)
