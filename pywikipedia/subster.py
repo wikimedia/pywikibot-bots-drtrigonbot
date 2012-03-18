@@ -83,15 +83,16 @@ bot_config = {    # unicode values
             'count':           '0',
             #'postproc':        '("","")',
             'postproc':        '(\'\', \'\')',
-            'wiki':            'False',
+            'wiki':            'False',         # may be change to url='wiki://'
             'magicwords_only': 'False',
-            'beautifulsoup':   'False',        # DRTRIGON-88
-            'expandtemplates': 'False',        # DRTRIGON-93 (only with 'wiki')
-            'simple':          '',             # DRTRIGON-85
+            'beautifulsoup':   'False',         # DRTRIGON-88
+            'expandtemplates': 'False',         # DRTRIGON-93 (only with 'wiki')
+            'simple':          '',              # DRTRIGON-85
             'zip':             'False',
-            'xlsx':            '',             #
+            'xlsx':            '',              #
+            'ods':             '',              #
             # may be 'hours' have to be added too (e.g. for 'ar')
-            'cron':            '',             # DRTRIGON-102
+            'cron':            '',              # DRTRIGON-102
             'error':           repr('\n<noinclude>%(error)s</noinclude>\n'), # DRTRIGON-116
             #'djvu': ... u"djvused -e 'n' \"%s\"" ... djvutext.py
             #'pdf': ... u"pdftotext" or python module
@@ -336,6 +337,8 @@ class SubsterBot(dtbext.basic.BasicBot):
             external_buffer = self.unzip(external_buffer, fileno)
         if param['xlsx']:
             external_buffer = self.xlsx2csv(external_buffer, param['xlsx'])
+        if param['ods']:
+            external_buffer = self.ods2csv(external_buffer, param['ods'])
 
         if not ast.literal_eval(param['beautifulsoup']):    # DRTRIGON-88
             # 2.) regexp
@@ -445,6 +448,31 @@ class SubsterBot(dtbext.basic.BasicBot):
 
         for row in sheet_ranges.iter_rows(): # it brings a new method: iter_rows()
             spamWriter.writerow([ cell.internal_value for cell in row ])
+
+        external_buffer = output.getvalue()
+        output.close()
+
+        return external_buffer
+
+    def ods2csv(self, external_buffer, sheet):
+        """Convert ods (Open/Libre Office) data to csv format.
+        """
+        # http://www.mail-archive.com/python-list@python.org/msg209447.html
+
+        import odf
+        from odf import opendocument, table, teletype
+
+        doc = odf.opendocument.load(StringIO.StringIO(external_buffer))
+
+        output = StringIO.StringIO()
+        spamWriter = csv.writer(output)
+
+        for sheet in doc.getElementsByType(odf.table.Table):
+            if not (sheet.getAttribute('name') == sheet):
+                continue
+            for row in sheet.getElementsByType(odf.table.TableRow):
+                spamWriter.writerow([ odf.teletype.extractText(cell).encode('utf-8')
+                                      for cell in row.getElementsByType(odf.table.TableCell) ])
 
         external_buffer = output.getvalue()
         output.close()
