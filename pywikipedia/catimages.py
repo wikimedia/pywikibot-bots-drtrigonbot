@@ -299,15 +299,25 @@ class main(checkimages.main):
         #print self.image_path
         pywikibot.output(self.image.title())
 
-        # use explicit searches for classification
         if hasattr(self, '_result_classify'):
             delattr(self, '_result_classify')
+            
+        # use explicit searches for classification
         for item in dir(self):
             if '_search' in item:
                 (cat, result) = self.__class__.__dict__[item](self)
                 #print cat, result
                 if result:
                     pywikibot.output( u'   {{Category:Unidentified %s}} found %i time(s)'
+                                      % (cat, len(result)) )
+            
+        # use guesses for unreliable classification
+        for item in dir(self):
+            if '_guess' in item:
+                (cat, result) = self.__class__.__dict__[item](self)
+                #print cat, result
+                if result:
+                    pywikibot.output( u'   <!--{{Category:Unidentified %s}}--> found %i time(s)'
                                       % (cat, len(result)) )
 
 #        raise
@@ -321,7 +331,20 @@ class main(checkimages.main):
             pywikibot.output(u'WARNING: unknown file type')
         #print self.image, '\n   ', result
 
-        result += self._CVclassifyObjects('person')
+#        result += self._CVclassifyObjects('person')
+
+        return (u'people', result)
+
+    # Category:Unidentified people
+    def _guessPeople(self):
+#        result = []
+#        try:
+#            result = self._CVdetectObjects()
+#        except IOError:
+#            pywikibot.output(u'WARNING: unknown file type')
+#        #print self.image, '\n   ', result
+
+        result = self._CVclassifyObjects('person')
 
         return (u'people', result)
 
@@ -375,38 +398,38 @@ class main(checkimages.main):
         im.save(image_path_new)
 
 #    # Category:Unidentified maps
-#    def _searchMaps(self):
+#    def _guessMaps(self):
 #        return (u'maps', self._CVclassifyObjects('maps'))
 
 #    # Category:Unidentified flags
-#    def _searchFlags(self):
+#    def _guessFlags(self):
 #        return (u'flags', self._CVclassifyObjects('flags'))
 
     # Category:Unidentified plants
-    def _searchPlants(self):
+    def _guessPlants(self):
         return (u'plants', self._CVclassifyObjects('pottedplant'))
 
 #    # Category:Unidentified coats of arms
-#    def _searchCoatsOfArms(self):
+#    def _guessCoatsOfArms(self):
 #        return (u'coats of arms', self._CVclassifyObjects('coats of arms'))
 
 #    # Category:Unidentified buildings
-#    def _searchBuildings(self):
+#    def _guessBuildings(self):
 #        return (u'buildings', self._CVclassifyObjects('buildings'))
 
     # Category:Unidentified trains
-    def _searchTrains(self):
+    def _guessTrains(self):
         return (u'trains', self._CVclassifyObjects('train'))
 
     # Category:Unidentified automobiles
-    def _searchAutomobiles(self):
+    def _guessAutomobiles(self):
         result  = self._CVclassifyObjects('bus')
         result += self._CVclassifyObjects('car')
         result += self._CVclassifyObjects('motorbike')
         return (u'automobiles', result)
 
     # Category:Unidentified buses
-    def _searchBuses(self):
+    def _guessBuses(self):
         return (u'buses', self._CVclassifyObjects('bus'))
 
     def _CVclassifyObjects(self, cls):
