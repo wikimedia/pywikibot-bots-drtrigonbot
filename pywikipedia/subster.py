@@ -322,6 +322,7 @@ class SubsterBot(dtbext.basic.BasicBot):
             else:
                 external_buffer = self.load( dtbext.pywikibot.Page(self.site, param['url']) )
         elif (param['url'][:7] == u'mail://'): # DRTRIGON-101
+            param['url'] = param['url'].replace(u'{{@}}', u'@')     # e.g. nlwiki
             mbox = SubsterMailbox(pywikibot.config.datafilepath(bot_config['data_path'], bot_config['mbox_file'], ''))
             external_buffer = mbox.find_data(param['url'])
             mbox.close()
