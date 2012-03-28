@@ -305,10 +305,10 @@ def get_wikiinfo_db(wiki, limit=SQL_LIMIT_max):
 
 
 def displayhtmlpage(form):
-	cat    = form.getvalue('cat', '')
+	cat    = cgi.escape(form.getvalue('cat', ''), quote=True)
 #	start  = form.getvalue('start', datetime.datetime.utcnow().strftime(wikitime))
-	start  = form.getvalue('start', pywikibot.Timestamp.utcnow().strftime(wikitime))
-	period = form.getvalue('period', '24')
+	start  = cgi.escape(form.getvalue('start', pywikibot.Timestamp.utcnow().strftime(wikitime)), quote=True)
+	period = cgi.escape(form.getvalue('period', '24'), quote=True)
 
 	lang = locale.locale_alias.get(wiki, locale.locale_alias['en']).split('.')[0]
 	locale.setlocale(locale.LC_TIME, lang)
@@ -396,7 +396,7 @@ def displayhtmlpage(form):
 
 
 form = cgi.FieldStorage()
-wiki = form.getvalue('wiki', 'de')
+wiki = cgi.escape(form.getvalue('wiki', 'de'), quote=True)
 if len(wiki) > 4: wiki = 'de'  # cheap protection for SQL injection
 
 site = pywikibot.getSite(wiki)

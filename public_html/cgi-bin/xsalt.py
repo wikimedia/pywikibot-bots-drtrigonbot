@@ -87,8 +87,10 @@ default_content = \
 form = cgi.FieldStorage()
 
 # operational mode
-url  = form.getvalue('url', '')
-xslt = form.getvalue('xslt', '')
+# disable XSS cross site scripting (code injection vulnerability)
+# http://amix.dk/blog/post/19432
+url  = cgi.escape(form.getvalue('url', ''), quote=True)
+xslt = cgi.escape(form.getvalue('xslt', ''), quote=True)
 
 (url, s1) = style.secure_url(url)    # security
 # check xslt does point to allowed local files on the server (the

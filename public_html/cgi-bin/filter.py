@@ -92,7 +92,9 @@ default_content = \
 form = cgi.FieldStorage()
 
 # operational mode
-param = {    'url': form.getvalue('url', ''),
+# disable XSS cross site scripting (code injection vulnerability)
+# http://amix.dk/blog/post/19432
+param = {    'url': cgi.escape(form.getvalue('url', ''), quote=True),
          'unshort': form.getvalue('unshort', ''),
         }
 url   = param['url']

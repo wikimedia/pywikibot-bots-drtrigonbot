@@ -236,7 +236,7 @@ def maindisplay():
 	param_default.update(sim_param_default)
 	params = {}
 	for key in param_default.keys():
-		params[key] = form.getvalue(key, param_default[key])
+		params[key] = cgi.escape(form.getvalue(key, param_default[key]), quote=True)
 		params[key] = re.sub('"', '\\x22', params[key])			# hack: wegen problem zw. " und html form 'maindisplay_content' (probl. mit 'postproc')
 
 	# enhance with add. params

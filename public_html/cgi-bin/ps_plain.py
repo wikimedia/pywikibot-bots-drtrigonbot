@@ -23,8 +23,6 @@ __version__='$Id$'
 #
 
 
-import cgi
-
 #content_type = "Content-Type: text/html"
 content_type = "Content-Type: text/html; charset=UTF-8"
 
@@ -109,10 +107,6 @@ def print_tsnotice():
 # check url not to point to a local file on the server, e.g. 'file://'
 # (same code as used in subster.py)
 def secure_url(url):
-    # disable XSS cross site scripting (code injection vulnerability)
-    # http://amix.dk/blog/post/19432
-    url = cgi.escape(url, quote=True)
-
     # check no.1
     s1 = False
     for item in ['http://', 'https://']:
