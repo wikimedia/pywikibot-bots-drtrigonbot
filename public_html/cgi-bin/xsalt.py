@@ -90,7 +90,7 @@ form = cgi.FieldStorage()
 url  = form.getvalue('url', '')
 xslt = form.getvalue('xslt', '')
 
-s1 = style.secure_url(url)    # security
+(url, s1) = style.secure_url(url)    # security
 # check xslt does point to allowed local files on the server (the
 # '.xslt' in same directory as script) and not any other, e.g. '../'
 import os

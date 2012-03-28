@@ -97,8 +97,8 @@ param = {    'url': form.getvalue('url', ''),
         }
 url   = param['url']
 
-secure       = style.secure_url(url)    # security
-content_type = style.content_type
+(url, secure) = style.secure_url(url)    # security
+content_type  = style.content_type
 
 
 if secure and url:
