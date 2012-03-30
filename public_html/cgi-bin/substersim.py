@@ -205,7 +205,7 @@ sim_param_default = {	'value': 	'val',
 			'action':	'',
 			'content':	'<!--SUBSTER-val--><!--SUBSTER-val-->',
 			'add_params':	'{}', }
-timeout = 10		# 10-sec. max. delay for url request
+timeout = 30		# 30-sec. max. delay for url request
 
 
 # from 'runbotrun.py'
@@ -232,12 +232,10 @@ def timeout_handler(signum, frame):
 
 def maindisplay():
 	param_default = subster.SubsterBot._param_default
-	param_default['postproc'] = re.sub('"', '\'', param_default['postproc'])	# hack: wegen unsauberer def. in 'subster_beta.py'
 	param_default.update(sim_param_default)
 	params = {}
 	for key in param_default.keys():
-		params[key] = cgi.escape(form.getvalue(key, param_default[key]), quote=True)
-		params[key] = re.sub('"', '\\x22', params[key])			# hack: wegen problem zw. " und html form 'maindisplay_content' (probl. mit 'postproc')
+		params[key] = form.getvalue(key, param_default[key])
 
 	# enhance with add. params
 	try:	params.update( eval(params['add_params']) )
@@ -278,6 +276,11 @@ def maindisplay():
 	if type(params['content']) == type(u""):
 		params['content'] = params['content'].encode(config.textfile_encoding)
 		#params['content'] = params['content'].encode(config.textfile_encoding).decode("ISO-8859-1")
+
+	# proper output format and prevent XSS vulnerabilities
+	for key in params:
+		if (type(params[key]) == type('')) or (type(params[key]) == type(u'')):
+			params[key] = cgi.escape(params[key], quote=True)
 
 	data.update( params )
 

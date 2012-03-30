@@ -87,12 +87,10 @@ default_content = \
 form = cgi.FieldStorage()
 
 # operational mode
-# disable XSS cross site scripting (code injection vulnerability)
-# http://amix.dk/blog/post/19432
-url  = cgi.escape(form.getvalue('url', ''), quote=True)
-xslt = cgi.escape(form.getvalue('xslt', ''), quote=True)
+url  = form.getvalue('url', '')
+xslt = form.getvalue('xslt', '')
 
-(url, s1) = style.secure_url(url)    # security
+s1 = style.secure_url(url)    # security
 # check xslt does point to allowed local files on the server (the
 # '.xslt' in same directory as script) and not any other, e.g. '../'
 import os
@@ -118,4 +116,9 @@ if secure and url and xslt:
     #print result.getroot().text
     print result
 else:
+    # disable XSS cross site scripting (code injection vulnerability)
+    # http://amix.dk/blog/post/19432
+    url  = cgi.escape( url, quote=True)
+    xslt = cgi.escape(xslt, quote=True)
+
     print default_content % {'url': url, 'xslt': xslt, 'footer': style.footer + style.footer_w3c}

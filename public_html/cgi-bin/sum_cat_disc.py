@@ -305,10 +305,10 @@ def get_wikiinfo_db(wiki, limit=SQL_LIMIT_max):
 
 
 def displayhtmlpage(form):
-	cat    = cgi.escape(form.getvalue('cat', ''), quote=True)
+	cat    = form.getvalue('cat', '')
 #	start  = form.getvalue('start', datetime.datetime.utcnow().strftime(wikitime))
-	start  = cgi.escape(form.getvalue('start', pywikibot.Timestamp.utcnow().strftime(wikitime)), quote=True)
-	period = cgi.escape(form.getvalue('period', '24'), quote=True)
+	start  = form.getvalue('start', pywikibot.Timestamp.utcnow().strftime(wikitime))
+	period = form.getvalue('period', '24')
 
 	lang = locale.locale_alias.get(wiki, locale.locale_alias['en']).split('.')[0]
 	locale.setlocale(locale.LC_TIME, lang)
@@ -386,9 +386,9 @@ def displayhtmlpage(form):
 			'p-status':	'<tr><td><small><a href="http://status.toolserver.org/" target="_blank">DB status</a></small></td></tr>',
 			'footer': 	style.footer + style.footer_w3c, # wiki (new) not CSS 2.1 compilant
 			'wiki':		wiki,
-			'cat':		cat,
-			'start':	start,
-			'period':	period,
+			'cat':		cgi.escape(   cat, quote=True), # proper XSS secure output
+			'start':	cgi.escape( start, quote=True), #
+			'period':	cgi.escape(period, quote=True), #
 	})
 	data['content'] = displaystate_content % data
 

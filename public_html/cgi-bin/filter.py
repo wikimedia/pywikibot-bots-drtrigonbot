@@ -92,15 +92,13 @@ default_content = \
 form = cgi.FieldStorage()
 
 # operational mode
-# disable XSS cross site scripting (code injection vulnerability)
-# http://amix.dk/blog/post/19432
-param = {    'url': cgi.escape(form.getvalue('url', ''), quote=True),
+param = {    'url': form.getvalue('url', ''),
          'unshort': form.getvalue('unshort', ''),
         }
 url   = param['url']
 
-(url, secure) = style.secure_url(url)    # security
-content_type  = style.content_type
+secure = style.secure_url(url)    # security
+content_type = style.content_type
 
 
 if secure and url:
@@ -166,7 +164,12 @@ if secure and url:
 
 else:
     sel_dict = {'': '', '1': 'checked'}
-    param.update({'footer': style.footer + style.footer_w3c, 'unshort': sel_dict[param['unshort']]})
+
+    # disable XSS cross site scripting (code injection vulnerability)
+    # http://amix.dk/blog/post/19432
+    url = cgi.escape(url, quote=True)
+
+    param.update({'footer': style.footer + style.footer_w3c, 'unshort': sel_dict[param['unshort']], 'url': url})
     page_buf = default_content % param
 
 

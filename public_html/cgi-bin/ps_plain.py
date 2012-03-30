@@ -113,4 +113,4 @@ def secure_url(url):
         s1 = s1 or (url[:len(item)] == item)
     secure = s1
 
-    return (url, secure)
+    return secure
