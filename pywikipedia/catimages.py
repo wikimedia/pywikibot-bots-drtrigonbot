@@ -53,30 +53,9 @@ This script understands the following command-line arguments:
 -nologerror         If given, this option will disable the error that is risen
                     when the log is full.
 
----- Instructions for the real-time settings  ----
-* For every new block you have to add:
+-noguesses          If given, this option will disable all guesses (which are
+                    less reliable than true searches).
 
-<------- ------->
-
-In this way the Bot can understand where the block starts in order to take the
-right parameter.
-
-* Name=     Set the name of the block
-* Find=     Use it to define what search in the text of the image's description,
-            while
-  Findonly= search only if the exactly text that you give is in the image's
-            description.
-* Summary=  That's the summary that the bot will use when it will notify the
-            problem.
-* Head=     That's the incipit that the bot will use for the message.
-* Text=     This is the template that the bot will use when it will report the
-            image's problem.
-
----- Known issues/FIXMEs: ----
-* Clean the code, some passages are pretty difficult to understand if you're not the coder.
-* Add the "catch the language" function for commons.
-* Fix and reorganise the new documentation
-* Add a report for the image tagged.
 
 """
 
@@ -240,6 +219,7 @@ class Global(object):
     duplicatesReport = False # Use the duplicate-report option
     sendemailActive = False  # Use the send-email
     logFullError = True      # Raise an error when the log is full
+    useGuesses = True        # Use guesses which are less reliable than true searches
 
 
 class main(checkimages.main):
@@ -277,6 +257,9 @@ class main(checkimages.main):
     def downloadImage(self):
         #print self.image
         self.image_filename = os.path.split(self.image.fileUrl())[-1]
+        if pywikibot.debug:
+            self.image_filename = "Ali_1_-_IMG_1378.jpg"
+            #self.image_filename = "Gyorche_Petrov_Todor_Alexandrov_Andrey_Lyapchev_Simeon_Radev_Stamatov_and_others.jpg"
         self.image_path     = os.path.join('cache', self.image_filename)
         if os.path.exists(self.image_path):
             return
@@ -294,14 +277,16 @@ class main(checkimages.main):
         f.close()
 
     # LOOK ALSO AT: checkimages.main.checkStep
-    # (and actegory scripts/bots too...)
+    # (and category scripts/bots too...)
     def checkStep(self):
         #print self.image_path
         pywikibot.output(self.image.title())
 
         if hasattr(self, '_result_classify'):
             delattr(self, '_result_classify')
-            
+
+        outresult = []
+
         # use explicit searches for classification
         for item in dir(self):
             if '_search' in item:
@@ -310,8 +295,11 @@ class main(checkimages.main):
                 if result:
                     pywikibot.output( u'   {{Category:Unidentified %s}} found %i time(s)'
                                       % (cat, len(result)) )
+                    outresult.append( cat )
             
         # use guesses for unreliable classification
+        if not gbv.useGuesses:
+            return outresult
         for item in dir(self):
             if '_guess' in item:
                 (cat, result) = self.__class__.__dict__[item](self)
@@ -319,15 +307,20 @@ class main(checkimages.main):
                 if result:
                     pywikibot.output( u'   <!--{{Category:Unidentified %s}}--> found %i time(s)'
                                       % (cat, len(result)) )
+                    outresult.append( cat )
 
 #        raise
+        return outresult
 
     # Category:Unidentified people
     def _searchPeople(self):
         result = []
         try:
-            result = self._CVdetectObjects()
+            result = self._CVdetectObjects_Faces()
+#            result = self._CVdetectObjects_People()
         except IOError:
+            pywikibot.output(u'WARNING: unknown file type')
+        except AttributeError:
             pywikibot.output(u'WARNING: unknown file type')
         #print self.image, '\n   ', result
 
@@ -348,7 +341,109 @@ class main(checkimages.main):
 
         return (u'people', result)
 
-    def _CVdetectObjects(self):
+    def _CVdetectObjects_Faces(self, confidence=0.5):
+        # .../opencv/samples/c/facedetect.cpp
+        # http://opencv.willowgarage.com/documentation/python/genindex.html
+        import cv, cv2, numpy
+
+        scale = 1.
+
+        # https://code.ros.org/trac/opencv/browser/trunk/opencv_extra/testdata/gpu/haarcascade?rev=HEAD
+        #nestedCascade = cv.Load(
+        nestedCascade = cv2.CascadeClassifier(
+          'opencv/haarcascades/haarcascade_eye_tree_eyeglasses.xml',
+          )
+        # http://tutorial-haartraining.googlecode.com/svn/trunk/data/haarcascades/
+        #cascade       = cv.Load(
+        cascade       = cv2.CascadeClassifier(
+          'opencv/haarcascades/haarcascade_frontalface_alt.xml',
+          )
+
+        #image = cv.LoadImage(self.image_path)
+        img    = cv2.imread( self.image_path, 1 )
+        #image  = cv.fromarray(img)
+        scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/500.)])
+
+        #detectAndDraw( image, cascade, nestedCascade, scale );
+        # http://nullege.com/codes/search/cv.CvtColor
+        #smallImg = cv.CreateImage( (cv.Round(img.shape[0]/scale), cv.Round(img.shape[1]/scale)), cv.CV_8UC1 )
+        #smallImg = cv.fromarray(numpy.empty( (cv.Round(img.shape[0]/scale), cv.Round(img.shape[1]/scale)), dtype=numpy.uint8 ))
+        smallImg = numpy.empty( (cv.Round(img.shape[1]/scale), cv.Round(img.shape[0]/scale)), dtype=numpy.uint8 )
+
+        #cv.CvtColor( image, gray, cv.CV_BGR2GRAY )
+        gray = cv2.cvtColor( img, cv.CV_BGR2GRAY )
+        #cv.Resize( gray, smallImg, smallImg.size(), 0, 0, INTER_LINEAR )        
+        smallImg = cv2.resize( gray, smallImg.shape, interpolation=cv2.INTER_LINEAR )
+        #cv.EqualizeHist( smallImg, smallImg )
+        smallImg = cv2.equalizeHist( smallImg )
+
+        t = cv.GetTickCount()
+        faces = numpy.array(cascade.detectMultiScale( smallImg,
+            1.1, 2, 0
+            #|cv.CV_HAAR_FIND_BIGGEST_OBJECT
+            #|cv.CV_HAAR_DO_ROUGH_SEARCH
+            |cv.CV_HAAR_SCALE_IMAGE,
+            (30, 30) ))
+        t = cv.GetTickCount() - t
+#        if faces.any():
+#            self._drawRect(faces) #call to a python pil
+        #print( "detection time = %g ms\n" % (t/(cv.GetTickFrequency()*1000.)) )
+        colors = [ (0,0,255),
+            (0,128,255),
+            (0,255,255),
+            (0,255,0),
+            (255,128,0),
+            (255,255,0),
+            (255,0,0),
+            (255,0,255) ]
+        result = []
+        for i, r in enumerate(faces):
+            color = colors[i%8]
+            (rx, ry, rwidth, rheight) = r
+            cx = cv.Round((rx + rwidth*0.5)*scale)
+            cy = cv.Round((ry + rheight*0.5)*scale)
+            radius = cv.Round((rwidth + rheight)*0.25*scale)
+            cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
+            if nestedCascade.empty():
+                continue
+            dx, dy = cv.Round(img.shape[1]/5.), cv.Round(img.shape[0]/5.)
+            (rx, ry, rwidth, rheight) = (max([rx-dx,0]), max([ry-dy,0]), min([rwidth+2*dx,img.shape[1]]), min([rheight+2*dy,img.shape[0]]))
+#            smallImgROI = smallImg
+#            print r, (rx, ry, rwidth, rheight)
+            smallImgROI = smallImg[ry:(ry+rheight),rx:(rx+rwidth)]
+            nestedObjects = nestedCascade.detectMultiScale( smallImgROI,
+                1.1, 2, 0
+                #|CV_HAAR_FIND_BIGGEST_OBJECT
+                #|CV_HAAR_DO_ROUGH_SEARCH
+                #|CV_HAAR_DO_CANNY_PRUNING
+                |cv.CV_HAAR_SCALE_IMAGE,
+                (30, 30) )
+            c = len(nestedObjects) / 2.
+            if (c >= confidence):
+                result.append( {'face': r, 'eyes': nestedObjects, 'confidence': c} )
+            #print {'face': r, 'eyes': nestedObjects, 'confidence': c}
+            for nr in nestedObjects:
+                (nrx, nry, nrwidth, nrheight) = nr
+                cx = cv.Round((rx + nrx + nrwidth*0.5)*scale)
+                cy = cv.Round((ry + nry + nrheight*0.5)*scale)
+                radius = cv.Round((nrwidth + nrheight)*0.25*scale)
+                cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
+
+        # see '_drawRect'
+        if result:
+            image_path_new = os.path.join('cache', '0_DETECTED_' + self.image_filename)
+            cv2.imwrite( image_path_new, img )
+
+        #return faces.tolist()
+        return result
+
+    def _CVdetectObjects_People(self):
+        # .../opencv/samples/c/peopledetect.cpp
+        # needs an .so (C++) module since python bindings are missing, but
+        # results do not look very probising, so forget about it...
+        pass
+
+    def _CVdetectObjects_FaceSimple(self):
         """Converts an image to grayscale and prints the locations of any
            faces found"""
         # http://python.pastebin.com/m76db1d6b
@@ -373,28 +468,32 @@ class main(checkimages.main):
         cv.EqualizeHist(grayscale, grayscale)
         #cascade = cv.LoadHaarClassifierCascade(
         cascade = cv.Load(
-          '/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml',
+#          '/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml',
+#          '/home/ursin/Desktop/haarcascades/haarcascade_frontalface_default.xml',
+          '/home/ursin/Desktop/haarcascades/haarcascade_frontalface_alt.xml',
           #(1,1))
           )
         faces = cv.HaarDetectObjects(grayscale, cascade, storage, 1.2, 2,
                                    cv.CV_HAAR_DO_CANNY_PRUNING, (50,50))
 
         if faces:
-            for f in faces:
-                (x, y, width, height) = f[0]
-                #print("[(%d,%d) -> (%d,%d)]" % (f.x, f.y, f.x+f.width, f.y+f.height))
-                (x1, y1, x2, y2) = (x, y, x+width, y+height)
-                #print("[(%d,%d) -> (%d,%d)]" % (x1, y1, x2, y2))
-                self._drawRect(x1,y1,x2,y2) #call to a python pil
+            self._drawRect(faces) #call to a python pil
 
         return faces
 
-    def _drawRect(self, x1,y1,x2,y2): #function to modify the img
+    def _drawRect(self, faces): #function to modify the img
         import Image, ImageDraw
         image_path_new = os.path.join('cache', '0_DETECTED_' + self.image_filename)
         im = Image.open(self.image_path)
         draw = ImageDraw.Draw(im)
-        draw.rectangle([x1,y1,x2,y2], outline=(255,0,0))
+        for f in faces:
+            (x, y, width, height) = f[0]
+#            (x, y, width, height) = f
+            #print("[(%d,%d) -> (%d,%d)]" % (f.x, f.y, f.x+f.width, f.y+f.height))
+            (x1, y1, x2, y2) = (x, y, x+width, y+height)
+            #print("[(%d,%d) -> (%d,%d)]" % (x1, y1, x2, y2))
+#            draw.rectangle([x1,y1,x2,y2], outline=(255,0,0))
+            draw.rectangle([x1,y1,x2,y2], outline="#ff0000")
         im.save(image_path_new)
 
 #    # Category:Unidentified maps
@@ -432,7 +531,7 @@ class main(checkimages.main):
     def _guessBuses(self):
         return (u'buses', self._CVclassifyObjects('bus'))
 
-    def _CVclassifyObjects(self, cls):
+    def _CVclassifyObjects(self, cls, confidence=0.5):
         """Uses the 'The Bag of Words model' for classification"""
 
         # prevent multiple execute of code below
@@ -501,7 +600,7 @@ class main(checkimages.main):
 
             self._result_classify = dict([ (trained[i], abs(r)) for i, r in enumerate(result) ])
 
-        if (self._result_classify.get(cls, 0.0) >= 0.5): # >= threshold 50%
+        if (self._result_classify.get(cls, 0.0) >= confidence): # >= threshold 50%
             result = [ self._result_classify[cls] ] # ok
         else:
             result = []                             # nothing found
@@ -527,9 +626,14 @@ def checkbot():
     duplicatesReport = False # Use the duplicate-report option
     sendemailActive = False # Use the send-email
     logFullError = True # Raise an error when the log is full
+    useGuesses = True # Use guesses which are less reliable than true searches
 
-    # emulate: 'python checkimages_content.py -limit:5 -break -lang:en'
-    sys.argv += ['-limit:20', '-break', '-lang:en']
+    # emulate:  'python checkimages_content.py -limit:5 -break -lang:en'
+    # debug:    'python catimages.py -noguesses -debug'
+    # run/test: 'python catimages.py -noguesses'
+#    sys.argv += ['-limit:20', '-break', '-lang:en']
+#    sys.argv += ['-limit:5', '-break', '-family:commons', '-lang:commons', '-lang:commons', '-noguesses']
+    sys.argv += ['-limit:20', '-break', '-family:commons', '-lang:commons', '-lang:commons', '-noguesses']
     print "http://commons.wikimedia.org/wiki/User:Multichill/Using_OpenCV_to_categorize_files"
 
     # Here below there are the parameters.
@@ -625,13 +729,15 @@ def checkbot():
                 projectUntagged = str(pywikibot.input(u'In which project should I work?'))
             elif len(arg) > 9:
                 projectUntagged = str(arg[10:])
+        elif arg == '-noguesses':
+            gbv.useGuesses = False
 
     # Understand if the generator it's the default or not.
     try:
         generator
     except NameError:
         normal = True
-
+    
     # Define the site.
     site = pywikibot.getSite()
 
@@ -690,6 +796,7 @@ def checkbot():
         if wait:
             # Let's sleep...
             generator = mainClass.wait(waitTime, generator, normal, limit)
+        outresult = []
         for image in generator:
             # When you've a lot of image to skip before working use this workaround, otherwise
             # let this commented, thanks. [ decoment also parsed = False if you want to use it
@@ -748,12 +855,30 @@ def checkbot():
                     continue
             resultCheck = mainClass.checkStep()
             if resultCheck:
+                outresult.append( u"* [[:%s]]: %s" % (image.title(), u", ".join(resultCheck)) )
+            if pywikibot.debug:
+                break
+            if resultCheck:
                 continue
+        # hacky cache-dir handling / clean-up
+        maxtime = 60*60*24
+        now = time.time()
+        for f in os.listdir(u'cache'):
+            filename  = os.path.join(u'cache', f)
+            fileext   = f.split(u'.')
+            timedelta = now - os.stat(filename).st_atime
+            if ((timedelta >= maxtime) and bool(fileext[0]) and (len(fileext) > 1)):
+                os.remove(filename)
     # A little block to perform the repeat or to break.
         if repeat == True:
             printWithTimeZone(u"Waiting for %s seconds," % time_sleep)
             time.sleep(time_sleep)
         else:
+            if outresult:
+                outpage = pywikibot.Page(site, u"User:DrTrigon/Category:Unidentified people (bot tagged)")
+                outresult = [ outpage.get() ] + outresult
+                outpage.put( u"\n".join(outresult) )
+
             pywikibot.output(u"\t\t\t>> STOP! <<")
             break # Exit
 
