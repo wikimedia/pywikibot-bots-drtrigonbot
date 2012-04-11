@@ -261,6 +261,9 @@ class main(checkimages.main):
             self.image_filename = "Ali_1_-_IMG_1378.jpg"
             #self.image_filename = "Gyorche_Petrov_Todor_Alexandrov_Andrey_Lyapchev_Simeon_Radev_Stamatov_and_others.jpg"
         self.image_path     = os.path.join('cache', self.image_filename)
+        targetName = self.image_path.split(u'.')
+        targetName[-1] = u'jpg'
+        self.targetName = u'.'.join(targetName)
         if os.path.exists(self.image_path):
             return
 
@@ -275,6 +278,17 @@ class main(checkimages.main):
         f = open(self.image_path, 'wb')
         f.write( data )
         f.close()
+
+        try:
+            import Image
+#            targetName = self.image_path.split(u'.')
+#            targetName[-1] = u'jpg'
+#            self.targetName = u'.'.join(targetName)
+            im = Image.open(self.image_path) # might be png, gif etc, for instance
+    #        im.thumbnail(size, Image.ANTIALIAS) # size is 640x480
+            im.convert('RGB').save(self.targetName, "JPEG") # targetname is test1.jpg
+        except:
+            self.targetName = self.image_path
 
     # LOOK ALSO AT: checkimages.main.checkStep
     # (and category scripts/bots too...)
@@ -293,10 +307,11 @@ class main(checkimages.main):
                 (cat, result) = self.__class__.__dict__[item](self)
                 #print cat, result
                 if result:
-                    pywikibot.output( u'   {{Category:Unidentified %s}} found %i time(s)'
-                                      % (cat, len(result)) )
-                    outresult.append( cat )
-            
+                    c = [r['confidence'] for r in result]
+                    pywikibot.output( u'   {{Category:Unidentified %s}} found %i time(s) - confidence: %s'
+                                      % (cat, len(result), c) )
+                    outresult.append( (cat, c) )
+
         # use guesses for unreliable classification
         if not gbv.useGuesses:
             return outresult
@@ -305,9 +320,10 @@ class main(checkimages.main):
                 (cat, result) = self.__class__.__dict__[item](self)
                 #print cat, result
                 if result:
+                    c = [r['confidence'] for r in result]
                     pywikibot.output( u'   <!--{{Category:Unidentified %s}}--> found %i time(s)'
                                       % (cat, len(result)) )
-                    outresult.append( cat )
+                    outresult.append( (cat, c) )
 
 #        raise
         return outresult
@@ -341,7 +357,7 @@ class main(checkimages.main):
 
         return (u'people', result)
 
-    def _CVdetectObjects_Faces(self, confidence=0.5):
+    def _CVdetectObjects_Faces(self, confidence=0.75):
         # .../opencv/samples/c/facedetect.cpp
         # http://opencv.willowgarage.com/documentation/python/genindex.html
         import cv, cv2, numpy
@@ -352,6 +368,7 @@ class main(checkimages.main):
         #nestedCascade = cv.Load(
         nestedCascade = cv2.CascadeClassifier(
           'opencv/haarcascades/haarcascade_eye_tree_eyeglasses.xml',
+#          'opencv/haarcascades/haarcascade_eye.xml',
           )
         # http://tutorial-haartraining.googlecode.com/svn/trunk/data/haarcascades/
         #cascade       = cv.Load(
@@ -360,7 +377,8 @@ class main(checkimages.main):
           )
 
         #image = cv.LoadImage(self.image_path)
-        img    = cv2.imread( self.image_path, 1 )
+#        img    = cv2.imread( self.image_path, 1 )
+        img    = cv2.imread( self.targetName, 1 )
         #image  = cv.fromarray(img)
         scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/500.)])
 
@@ -418,7 +436,7 @@ class main(checkimages.main):
                 #|CV_HAAR_DO_CANNY_PRUNING
                 |cv.CV_HAAR_SCALE_IMAGE,
                 (30, 30) )
-            c = len(nestedObjects) / 2.
+            c = (len(nestedObjects) + 2.) / 4.
             if (c >= confidence):
                 result.append( {'face': r, 'eyes': nestedObjects, 'confidence': c} )
             #print {'face': r, 'eyes': nestedObjects, 'confidence': c}
@@ -431,7 +449,8 @@ class main(checkimages.main):
 
         # see '_drawRect'
         if result:
-            image_path_new = os.path.join('cache', '0_DETECTED_' + self.image_filename)
+#            image_path_new = os.path.join('cache', '0_DETECTED_' + self.image_filename)
+            image_path_new = self.targetName.replace(u"cache/", u"cache/0_DETECTED_")
             cv2.imwrite( image_path_new, img )
 
         #return faces.tolist()
@@ -633,7 +652,7 @@ def checkbot():
     # run/test: 'python catimages.py -noguesses'
 #    sys.argv += ['-limit:20', '-break', '-lang:en']
 #    sys.argv += ['-limit:5', '-break', '-family:commons', '-lang:commons', '-lang:commons', '-noguesses']
-    sys.argv += ['-limit:20', '-break', '-family:commons', '-lang:commons', '-lang:commons', '-noguesses']
+    sys.argv += ['-limit:125', '-break', '-family:commons', '-lang:commons', '-lang:commons', '-noguesses']
     print "http://commons.wikimedia.org/wiki/User:Multichill/Using_OpenCV_to_categorize_files"
 
     # Here below there are the parameters.
@@ -731,6 +750,9 @@ def checkbot():
                 projectUntagged = str(arg[10:])
         elif arg == '-noguesses':
             gbv.useGuesses = False
+            
+#    generator = pagegenerators.GeneratorFactory().getCategoryGen(u"-catr:Media_needing_categories|fromtitle", len('-catr'), recurse = True)
+    generator = pagegenerators.GeneratorFactory().getCategoryGen(u"-catr:Media_needing_categories", len('-catr'), recurse = True)
 
     # Understand if the generator it's the default or not.
     try:
@@ -854,8 +876,17 @@ def checkbot():
                 if response2 == False:
                     continue
             resultCheck = mainClass.checkStep()
+            limit += -1
+            if limit < 0:
+                break
             if resultCheck:
-                outresult.append( u"* [[:%s]]: %s" % (image.title(), u", ".join(resultCheck)) )
+                for item in resultCheck:
+                    (cat, c) = item
+                    out  = u"{{Check categories}}\n"
+                    out += u"{{Category:Unidentified %s}}\n" % cat
+                    out += u"<small>categorized by DrTrigonBot with confidence %s</small>\n" % c
+                    print "\n", out
+                outresult.append( u"* [[:%s]]: %s (%s)" % (image.title(), cat, c) )
             if pywikibot.debug:
                 break
             if resultCheck:
