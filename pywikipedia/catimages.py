@@ -84,89 +84,6 @@ locale.setlocale(locale.LC_ALL, '')
 # NOTE: in the messages used by the Bot if you put __botnick__ in the text, it
 # will automatically replaced with the bot's nickname.
 
-# That's what you want that will be added. (i.e. the {{no source}} with the
-# right day/month/year )
-
-# Text that the bot will try to see if there's already or not. If there's a
-
-# Summary for when the will add the no source
-
-# When the Bot find that the usertalk is empty is not pretty to put only the
-# no source without the welcome, isn't it?
-
-# Summary that the bot use when it notify the problem with the image's license
-
-# if the file has an unknown extension it will be tagged with this template.
-# In reality, there aren't unknown extension, they are only not allowed...
-
-# The header of the Unknown extension's message.
-
-# Text that will be add if the bot find a unknown extension.
-
-# Summary of the delete immediately.
-# (e.g: Adding {{db-meta|The file has .%s as extension.}})
-
-# This is the most important header, because it will be used a lot. That's the
-# header that the bot will add if the image hasn't the license.
-
-# This is a list of what bots used this script in your project.
-
-# The message that the bot will add the second time that find another license
-# problem.
-
-# You can add some settings to wikipedia. In this way, you can change them
-# without touching the code. That's useful if you are running the bot on
-# Toolserver.
-
-# The bot can report some images (like the images that have the same name of an
-# image on commons) This is the page where the bot will store them.
-
-# Adding the date after the signature.
-
-# The text added in the report
-
-# The summary of the report
-
-# If a template isn't a license but it's included on a lot of images, that can
-# be skipped to analyze the image without taking care of it. (the template must
-# be in a list)
-
-# A page where there's a list of template to skip.
-
-# A page where there's a list of template to consider as licenses.
-
-# Template added when the bot finds only an hidden template and nothing else.
-# Note: every __botnick__ will be repleaced with your bot's nickname (feel free not to use if you don't need it)
-
-# In this part there are the parameters for the dupe images.
-
-# Put here the template that you want to put in the image to warn that it's a dupe
-# put __image__ if you want only one image, __images__ if you want the whole list
-
-# Head of the message given to the author
-
-# Message to put in the talk
-
-# Comment used by the bot while it reports the problem in the uploader's talk
-
-# Comment used by the bot while it reports the problem in the image
-
-# Regex to detect the template put in the image's decription to find the dupe
-
-# Category with the licenses and / or with subcategories with the other licenses.
-
-## Put None if you don't use this option or simply add nothing if en
-## is still None.
-# Page where is stored the message to send as email to the users
-
-# Title of the email
-
-# Seems that uploaderBots aren't interested to get messages regarding the
-# files that they upload.. strange, uh?
-
-# Service images that don't have to be deleted and/or reported has a template inside them
-# (you can let this param as None)
-
 # Add your project (in alphabetical order) if you want that the bot start
 project_inserted = [u'ar', u'commons', u'de', u'en', u'fa', u'ga', u'hu', u'it',
                     u'ja', u'ko', u'ta', u'zh']
@@ -299,7 +216,8 @@ class main(checkimages.main):
         if hasattr(self, '_result_classify'):
             delattr(self, '_result_classify')
 
-        outresult = []
+        self.outresult = []
+        self.logresult = []
 
         # use explicit searches for classification
         for item in dir(self):
@@ -308,25 +226,68 @@ class main(checkimages.main):
                 #print cat, result
                 if result:
                     c = [r['confidence'] for r in result]
-                    pywikibot.output( u'   {{Category:Unidentified %s}} found %i time(s) - confidence: %s'
-                                      % (cat, len(result), c) )
-                    outresult.append( (cat, c) )
+#                    pywikibot.output( u'   [[Category:Unidentified %s]] found %i time(s) - confidence: %s'
+#                                      % (cat, len(result), c) )
+                    self.logresult.append( (cat, c) )
+                    if (max(c) >= 0.75):
+                        self.outresult.append( (cat, c) )
 
         # use guesses for unreliable classification
         if not gbv.useGuesses:
-            return outresult
+            return self.outresult
         for item in dir(self):
             if '_guess' in item:
                 (cat, result) = self.__class__.__dict__[item](self)
                 #print cat, result
                 if result:
                     c = [r['confidence'] for r in result]
-                    pywikibot.output( u'   <!--{{Category:Unidentified %s}}--> found %i time(s)'
-                                      % (cat, len(result)) )
-                    outresult.append( (cat, c) )
+#                    pywikibot.output( u'   <!--[[Category:Unidentified %s]]--> found %i time(s)'
+#                                      % (cat, len(result)) )
+                    self.logresult.append( (cat, c) )
+                    if (max(c) >= 0.75):
+                        self.outresult.append( (cat, c) )
 
 #        raise
-        return outresult
+        return self.outresult
+
+    def applyResult(self):
+        resultCheck = self.outresult
+        result = []
+        ret    = u""
+        for item in resultCheck:
+            (cat, c) = item
+            result.append( u"[[Category:Unidentified %s]]" % cat )
+            result.append( u"[[Category:Categorized by bot]]" )
+            result.append( u" categorized by [[User:DrTrigonBot]] with confidence(s) %s" % c )
+
+        if self.logresult:
+            ret = u"* [[%s|100px]]: %s %r" % (self.image.title(), bool(resultCheck), self.logresult)
+            
+        if result:
+            result = [ u"{{Check categories}}" ] + result
+            result = [ self.image.get() ] + result
+#            print u"\n".join(result)
+            print u"--- " * 10
+            print u"\n".join(result[1:])
+            print u"--- " * 10
+#            self.image.put( buf, comment="bot adding categories" )
+            pywikibot.put_throttle()
+
+#        # hacky cache-dir handling / clean-up
+#        maxtime = 60*60*24
+#        now = time.time()
+#        for f in os.listdir(u'cache'):
+#            filename  = os.path.join(u'cache', f)
+#            fileext   = f.split(u'.')
+#            timedelta = now - os.stat(filename).st_atime
+#            if ((timedelta >= maxtime) and bool(fileext[0]) and (len(fileext) > 1)):
+#                os.remove(filename)
+        if os.path.exists(self.image_path):
+            os.remove( self.image_path )
+        if os.path.exists(self.targetName):
+            os.remove( self.targetName )
+
+        return ret
 
     # Category:Unidentified people
     def _searchPeople(self):
@@ -357,7 +318,8 @@ class main(checkimages.main):
 
         return (u'people', result)
 
-    def _CVdetectObjects_Faces(self, confidence=0.75):
+#    def _CVdetectObjects_Faces(self, confidence=0.75):
+    def _CVdetectObjects_Faces(self, confidence=0.5):
         # .../opencv/samples/c/facedetect.cpp
         # http://opencv.willowgarage.com/documentation/python/genindex.html
         import cv, cv2, numpy
@@ -649,11 +611,13 @@ def checkbot():
 
     # emulate:  'python checkimages_content.py -limit:5 -break -lang:en'
     # debug:    'python catimages.py -noguesses -debug'
-    # run/test: 'python catimages.py -noguesses'
+    # run/test: 'python catimages.py [-start:File:abc]'
 #    sys.argv += ['-limit:20', '-break', '-lang:en']
 #    sys.argv += ['-limit:5', '-break', '-family:commons', '-lang:commons', '-lang:commons', '-noguesses']
-    sys.argv += ['-limit:125', '-break', '-family:commons', '-lang:commons', '-lang:commons', '-noguesses']
+    sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-lang:commons', '-noguesses']
     print "http://commons.wikimedia.org/wiki/User:Multichill/Using_OpenCV_to_categorize_files"
+
+    firstPageTitle = None
 
     # Here below there are the parameters.
     for arg in pywikibot.handleArgs():
@@ -699,12 +663,17 @@ def checkbot():
                 waitTime = int(arg[6:])
         elif arg.startswith('-start'):
             if len(arg) == 6:
-                firstPageTitle = pywikibot.input(u'From witch page do you want to start?')
+#                firstPageTitle = pywikibot.input(u'From witch page do you want to start?')
+                if os.path.exists( os.path.join('cache', 'catimages_pos') ):
+                    posfile = open(os.path.join('cache', 'catimages_pos'), "r")
+                    firstPageTitle = posfile.read().decode('utf-8')
+                    print firstPageTitle
+                    posfile.close()
             elif len(arg) > 6:
                 firstPageTitle = arg[7:]
             firstPageTitle = firstPageTitle.split(":")[1:]
-            generator = pywikibot.getSite().allpages(start=firstPageTitle, namespace=6)
-            repeat = False
+#            generator = pywikibot.getSite().allpages(start=firstPageTitle, namespace=6)
+#            repeat = False
         elif arg.startswith('-page'):
             if len(arg) == 5:
                 regexPageName = str(pywikibot.input(u'Which page do you want to use for the regex?'))
@@ -820,6 +789,13 @@ def checkbot():
             generator = mainClass.wait(waitTime, generator, normal, limit)
         outresult = []
         for image in generator:
+            if firstPageTitle and not (image.title() == u":".join([u'File']+firstPageTitle)):
+                pywikibot.output( u"skipping page '%s' ..." % image.title() )
+                continue
+            if firstPageTitle and (image.title() == u":".join([u'File']+firstPageTitle)):
+                pywikibot.output( u"skipping page '%s' ..." % image.title() )
+                firstPageTitle = None
+                continue
             # When you've a lot of image to skip before working use this workaround, otherwise
             # let this commented, thanks. [ decoment also parsed = False if you want to use it
             #
@@ -875,31 +851,21 @@ def checkbot():
                 response2 = mainClass.checkImageDuplicated(duplicates_rollback)
                 if response2 == False:
                     continue
+            pywikibot.get_throttle()
             resultCheck = mainClass.checkStep()
+            ret = mainClass.applyResult()
+            if ret:
+                outresult.append( ret )
             limit += -1
+            posfile = open(os.path.join('cache', 'catimages_pos'), "w")
+            posfile.write( image.title().encode('utf-8') )
+            posfile.close()
             if limit < 0:
                 break
-            if resultCheck:
-                for item in resultCheck:
-                    (cat, c) = item
-                    out  = u"{{Check categories}}\n"
-                    out += u"{{Category:Unidentified %s}}\n" % cat
-                    out += u"<small>categorized by DrTrigonBot with confidence %s</small>\n" % c
-                    print "\n", out
-                outresult.append( u"* [[:%s]]: %s (%s)" % (image.title(), cat, c) )
             if pywikibot.debug:
                 break
             if resultCheck:
                 continue
-        # hacky cache-dir handling / clean-up
-        maxtime = 60*60*24
-        now = time.time()
-        for f in os.listdir(u'cache'):
-            filename  = os.path.join(u'cache', f)
-            fileext   = f.split(u'.')
-            timedelta = now - os.stat(filename).st_atime
-            if ((timedelta >= maxtime) and bool(fileext[0]) and (len(fileext) > 1)):
-                os.remove(filename)
     # A little block to perform the repeat or to break.
         if repeat == True:
             printWithTimeZone(u"Waiting for %s seconds," % time_sleep)
@@ -908,7 +874,7 @@ def checkbot():
             if outresult:
                 outpage = pywikibot.Page(site, u"User:DrTrigon/Category:Unidentified people (bot tagged)")
                 outresult = [ outpage.get() ] + outresult
-                outpage.put( u"\n".join(outresult) )
+                outpage.put( u"\n".join(outresult), comment="bot adding test results" )
 
             pywikibot.output(u"\t\t\t>> STOP! <<")
             break # Exit
