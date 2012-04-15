@@ -16,9 +16,6 @@ This script understands the following command-line arguments:
 
 -limit              The number of images to check (default: 80)
 
--commons            The Bot will check if an image on Commons has the same name
-                    and if true it report the image.
-
 -duplicates[:#]     Checking if the image has duplicates (if arg, set how many
                     rollback wait before reporting the image in the report
                     instead of tag the image) default: 1 rollback.
@@ -34,18 +31,10 @@ This script understands the following command-line arguments:
 
 -wait[:#]           Wait x second before check the images (default: 0)
 
--skip[:#]           The bot skip the first [:#] images (default: 0)
-
--start[:#]          Use allpages() as generator
-                    (it starts already form File:[:#])
+-start[:#]          Start already form File:[:#] or if no file given resume
+                    last run.
 
 -cat[:#]            Use a category as generator
-
--regex[:#]          Use regex, must be used with -url or -page
-
--page[:#]           Define the name of the wikipage where are the images
-
--url[:#]            Define the url where are the images
 
 -untagged[:#]       Use daniel's tool as generator:
                     http://toolserver.org/~daniel/WikiSense/UntaggedImages.php
@@ -61,9 +50,8 @@ This script understands the following command-line arguments:
 
 #
 # (C) Kyle/Orgullomoore, 2006-2007 (newimage.py)
-# (C) Siebrand Mazeland, 2007-2010
-# (C) Filnik, 2007-2011
-# (C) Pywikipedia team, 2007-2011
+# (C) Pywikipedia team, 2007-2011 (checkimages.py)
+# (C) DrTrigon, 2012
 #
 # Distributed under the terms of the MIT license.
 #
@@ -85,25 +73,12 @@ locale.setlocale(locale.LC_ALL, '')
 # will automatically replaced with the bot's nickname.
 
 # Add your project (in alphabetical order) if you want that the bot start
-project_inserted = [u'ar', u'commons', u'de', u'en', u'fa', u'ga', u'hu', u'it',
-                    u'ja', u'ko', u'ta', u'zh']
+project_inserted = [u'commons',]
 
 # Ok, that's all. What is below, is the rest of code, now the code is fixed and it will run correctly in your project.
 ################################################################################
 # <--------------------------- Change only above! ---------------------------> #
 ################################################################################
-
-# Error Classes
-class LogIsFull(pywikibot.Error):
-    """An exception indicating that the log is full and the Bot cannot add
-    other data to prevent Errors.
-
-    """
-
-class NothingFound(pywikibot.Error):
-    """ An exception indicating that a regex has return [] instead of results.
-
-    """
 
 # Other common useful functions
 def printWithTimeZone(message):
@@ -125,12 +100,8 @@ class Global(object):
     repeat = True            # Restart after having check all the images?
     limit = 80               # How many images check?
     time_sleep = 30          # How many time sleep after the check?
-    skip_number = 0          # How many images to skip before checking?
     waitTime = 0             # How many time sleep before the check?
-    commonsActive = False    # Check if on commons there's an image with the same name?
     normal = False           # Check the new images or use another generator?
-    urlUsed = False          # Use the url-related function instead of the new-pages generator
-    regexGen = False         # Use the regex generator
     untagged = False         # Use the untagged generator
     duplicatesActive = False # Use the duplicate option
     duplicatesReport = False # Use the duplicate-report option
@@ -139,37 +110,20 @@ class Global(object):
     useGuesses = True        # Use guesses which are less reliable than true searches
 
 
+# EXPERIMENTAL BOT SCRIPT DERIVED FROM 'checkimages.py' and should use 'catlib.py'
 class main(checkimages.main):
 #    def __init__(self, site, logFulNumber = 25000, sendemailActive = False,
 #                 duplicatesReport = False, logFullError = True): pass
 #    def setParameters(self, imageName, timestamp, uploader): pass
 #    def report(self, newtext, image_to_report, notification=None, head=None,
 #               notification2 = None, unver=True, commTalk=None, commImage=None): pass
-#    def uploadBotChangeFunction(self, reportPageText, upBotArray): pass
-#    def tag_image(self, put = True): pass
-#    def put_mex_in_talk(self): pass
-#    def untaggedGenerator(self, untaggedProject, limit): pass
-#    def regexGenerator(self, regexp, textrun): pass
-#    def loadHiddenTemplates(self): pass
-#    def returnOlderTime(self, listGiven, timeListGiven): pass
-#    def convert_to_url(self, page): pass
-#    def countEdits(self, pagename, userlist): pass
-#    def checkImageOnCommons(self): pass
-#    def checkImageDuplicated(self, duplicates_rollback): pass
-#    def report_image(self, image_to_report, rep_page = None, com = None, rep_text = None, addings = True, regex = None): pass
-#    def takesettings(self): pass
 
     def load_licenses(self):
+        pywikibot.output(u'\n\t...Listing the procedures available...\n')
+        for item in dir(self):
+            if ('_search' in item) or ('_guess' in item):
+                pywikibot.output( item )
         return []
-
-#    def miniTemplateCheck(self, template): pass
-#    def templateInList(self): pass
-#    def smartDetection(self): pass
-#    def load(self, raw): pass
-#    def skipImages(self, skip_number, limit): pass
-#    def wait(self, waitTime, generator, normal, limit): pass
-#    def isTagged(self): pass
-#    def findAdditionalProblems(self): pass
 
     def downloadImage(self):
         #print self.image
@@ -183,6 +137,8 @@ class main(checkimages.main):
         self.targetName = u'.'.join(targetName)
         if os.path.exists(self.image_path):
             return
+
+        pywikibot.get_throttle()
 
 #        f, data = self.site.getUrl(self.image.fileUrl(), no_hostname=True, back_response=True)
         # !!! CHEAP HACK TO GET IT WORKING -> NEEDS PATCH IN 'getUrl' upstream !!!
@@ -228,9 +184,9 @@ class main(checkimages.main):
                     c = [r['confidence'] for r in result]
 #                    pywikibot.output( u'   [[Category:Unidentified %s]] found %i time(s) - confidence: %s'
 #                                      % (cat, len(result), c) )
-                    self.logresult.append( (cat, c) )
+                    self.logresult.append( (cat, result) )
                     if (max(c) >= 0.75):
-                        self.outresult.append( (cat, c) )
+                        self.outresult.append( (cat, result) )
 
         # use guesses for unreliable classification
         if not gbv.useGuesses:
@@ -243,35 +199,69 @@ class main(checkimages.main):
                     c = [r['confidence'] for r in result]
 #                    pywikibot.output( u'   <!--[[Category:Unidentified %s]]--> found %i time(s)'
 #                                      % (cat, len(result)) )
-                    self.logresult.append( (cat, c) )
+                    self.logresult.append( (cat, result) )
                     if (max(c) >= 0.75):
-                        self.outresult.append( (cat, c) )
+                        self.outresult.append( (cat, result) )
 
 #        raise
         return self.outresult
 
-    def applyResult(self):
+#    def tag_image(self, put = True):
+    def tag_image(self, put = False):
         resultCheck = self.outresult
         result = []
-        ret    = u""
         for item in resultCheck:
-            (cat, c) = item
+            (cat, res) = item
+            c = [r['confidence'] for r in res]
             result.append( u"[[Category:Unidentified %s]]" % cat )
             result.append( u"[[Category:Categorized by bot]]" )
-            result.append( u" categorized by [[User:DrTrigonBot]] with confidence(s) %s" % c )
+            result.append( u"{{Information" )
+            result.append( u"..." )
+            result.append( u"|other_fields={{Information field|name=[[User:DrTrigonBot|Bot]] cat info|value=" )
+            result.append( u"{{(!}}" )
+            result.append( u"{{!}}-" )
+            result.append( u"{{!}}Confidence" )
+            result.append( u"{{!}}%s" % c )
+            result.append( u"{{!}}-" )
+            for r in res:
+                result.append( u"{{!}}Face / Eyes" )
+                result.append( u"{{!}}%s / %s" % (r['face'], r['eyes']) )
+                result.append( u"{{!}}-" )
+            result.append( u"{{!)}}}}" )
+            result.append( u"}}" )
 
-        if self.logresult:
-            ret = u"* [[%s|100px]]: %s %r" % (self.image.title(), bool(resultCheck), self.logresult)
-            
+        ret = []
+        for item in self.logresult:
+            (cat, res) = item
+            c = [r['confidence'] for r in res]
+            ret.append( u"== [[:%s]] ==" % self.image.title() )
+            ret.append( u"[[%s|100px]]" % self.image.title() )
+            ret.append( u'{{(!}}style="background:%s;"' % {True: 'green', False: 'red'}[bool(resultCheck)] )
+            ret.append( u"{{!}}-" )
+            ret.append( u"{{!}}Confidence" )
+            ret.append( u"{{!}}%s" % c )
+            ret.append( u"{{!}}-" )
+            for r in res:
+                ret.append( u"{{!}}Face / Eyes" )
+                ret.append( u"{{!}}%s / %s" % (r['face'], r['eyes']) )
+                ret.append( u"{{!}}-" )
+            ret.append( u"{{!)}}" )
+            ret.append( u"" )
+        ret = u"\n".join( ret )
+
         if result:
             result = [ u"{{Check categories}}" ] + result
             result = [ self.image.get() ] + result
+            buf    = u"\n".join(result[1:])
 #            print u"\n".join(result)
             print u"--- " * 10
-            print u"\n".join(result[1:])
+            print buf
+            print "(append to {{Information}} template ..."
+            print "... and remove other categories like 'uncategorized')"
             print u"--- " * 10
-#            self.image.put( buf, comment="bot adding categories" )
-            pywikibot.put_throttle()
+            if put:
+                pywikibot.put_throttle()
+                self.image.put( buf, comment="bot adding categories" )
 
 #        # hacky cache-dir handling / clean-up
 #        maxtime = 60*60*24
@@ -294,34 +284,33 @@ class main(checkimages.main):
         result = []
         try:
             result = self._CVdetectObjects_Faces()
-#            result = self._CVdetectObjects_People()
+            #result = self._CVdetectObjects_People()
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
         except AttributeError:
             pywikibot.output(u'WARNING: unknown file type')
         #print self.image, '\n   ', result
 
-#        result += self._CVclassifyObjects('person')
+        #result += self._CVclassifyObjects_All('person')
 
         return (u'people', result)
 
     # Category:Unidentified people
     def _guessPeople(self):
-#        result = []
-#        try:
-#            result = self._CVdetectObjects()
-#        except IOError:
-#            pywikibot.output(u'WARNING: unknown file type')
-#        #print self.image, '\n   ', result
+        return (u'people', self._CVclassifyObjects_All('person'))
 
-        result = self._CVclassifyObjects('person')
-
-        return (u'people', result)
-
-#    def _CVdetectObjects_Faces(self, confidence=0.75):
+    # .../opencv/samples/c/facedetect.cpp
+    # http://opencv.willowgarage.com/documentation/python/genindex.html
     def _CVdetectObjects_Faces(self, confidence=0.5):
-        # .../opencv/samples/c/facedetect.cpp
-        # http://opencv.willowgarage.com/documentation/python/genindex.html
+        """Converts an image to grayscale and prints the locations of any
+           faces found"""
+        # http://python.pastebin.com/m76db1d6b
+        # http://creatingwithcode.com/howto/face-detection-in-static-images-with-python/
+        # http://opencv.willowgarage.com/documentation/python/objdetect_cascade_classification.html
+        # http://opencv.willowgarage.com/wiki/FaceDetection
+        # http://blog.jozilla.net/2008/06/27/fun-with-python-opencv-and-face-detection/
+        # http://www.cognotics.com/opencv/servo_2007_series/part_4/index.html
+
         import cv, cv2, numpy
 
         scale = 1.
@@ -364,9 +353,11 @@ class main(checkimages.main):
             #|cv.CV_HAAR_DO_ROUGH_SEARCH
             |cv.CV_HAAR_SCALE_IMAGE,
             (30, 30) ))
-        t = cv.GetTickCount() - t
-#        if faces.any():
+#        faces = cv.HaarDetectObjects(grayscale, cascade, storage, 1.2, 2,
+#                                   cv.CV_HAAR_DO_CANNY_PRUNING, (50,50))
+#        if faces:
 #            self._drawRect(faces) #call to a python pil
+        t = cv.GetTickCount() - t
         #print( "detection time = %g ms\n" % (t/(cv.GetTickFrequency()*1000.)) )
         colors = [ (0,0,255),
             (0,128,255),
@@ -400,7 +391,10 @@ class main(checkimages.main):
                 (30, 30) )
             c = (len(nestedObjects) + 2.) / 4.
             if (c >= confidence):
-                result.append( {'face': r, 'eyes': nestedObjects, 'confidence': c} )
+                eyes = nestedObjects
+                if not (type(eyes) == type(tuple())):
+                    eyes = tuple((eyes*scale).tolist())
+                result.append( {'face': r*scale, 'eyes': eyes, 'confidence': c} )
             #print {'face': r, 'eyes': nestedObjects, 'confidence': c}
             for nr in nestedObjects:
                 (nrx, nry, nrwidth, nrheight) = nr
@@ -418,101 +412,64 @@ class main(checkimages.main):
         #return faces.tolist()
         return result
 
+    # .../opencv/samples/cpp/peopledetect.cpp
     def _CVdetectObjects_People(self):
-        # .../opencv/samples/c/peopledetect.cpp
         # needs an .so (C++) module since python bindings are missing, but
         # results do not look very probising, so forget about it...
         pass
 
-    def _CVdetectObjects_FaceSimple(self):
-        """Converts an image to grayscale and prints the locations of any
-           faces found"""
-        # http://python.pastebin.com/m76db1d6b
-        # http://creatingwithcode.com/howto/face-detection-in-static-images-with-python/
-        # http://opencv.willowgarage.com/documentation/python/objdetect_cascade_classification.html
-        # http://opencv.willowgarage.com/wiki/FaceDetection
-        # http://blog.jozilla.net/2008/06/27/fun-with-python-opencv-and-face-detection/
-        # http://www.cognotics.com/opencv/servo_2007_series/part_4/index.html
-        
-        #from opencv.cv import *
-        #from opencv.highgui import *
-        import cv
-
-        image = cv.LoadImage(self.image_path)
-
-        grayscale = cv.CreateImage((image.width, image.height), 8, 1)
-        cv.CvtColor(image, grayscale, cv.CV_BGR2GRAY)
-
-        storage = cv.CreateMemStorage(0)
-        #storage = cv.CreateMemStorage()
-        #cv.ClearMemStorage(storage)
-        cv.EqualizeHist(grayscale, grayscale)
-        #cascade = cv.LoadHaarClassifierCascade(
-        cascade = cv.Load(
-#          '/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml',
-#          '/home/ursin/Desktop/haarcascades/haarcascade_frontalface_default.xml',
-          '/home/ursin/Desktop/haarcascades/haarcascade_frontalface_alt.xml',
-          #(1,1))
-          )
-        faces = cv.HaarDetectObjects(grayscale, cascade, storage, 1.2, 2,
-                                   cv.CV_HAAR_DO_CANNY_PRUNING, (50,50))
-
-        if faces:
-            self._drawRect(faces) #call to a python pil
-
-        return faces
-
-    def _drawRect(self, faces): #function to modify the img
-        import Image, ImageDraw
-        image_path_new = os.path.join('cache', '0_DETECTED_' + self.image_filename)
-        im = Image.open(self.image_path)
-        draw = ImageDraw.Draw(im)
-        for f in faces:
-            (x, y, width, height) = f[0]
-#            (x, y, width, height) = f
-            #print("[(%d,%d) -> (%d,%d)]" % (f.x, f.y, f.x+f.width, f.y+f.height))
-            (x1, y1, x2, y2) = (x, y, x+width, y+height)
-            #print("[(%d,%d) -> (%d,%d)]" % (x1, y1, x2, y2))
-#            draw.rectangle([x1,y1,x2,y2], outline=(255,0,0))
-            draw.rectangle([x1,y1,x2,y2], outline="#ff0000")
-        im.save(image_path_new)
+#    def _drawRect(self, faces): #function to modify the img
+#        import Image, ImageDraw
+#        image_path_new = os.path.join('cache', '0_DETECTED_' + self.image_filename)
+#        im = Image.open(self.image_path)
+#        draw = ImageDraw.Draw(im)
+#        for f in faces:
+#            (x, y, width, height) = f[0]
+##            (x, y, width, height) = f
+#            #print("[(%d,%d) -> (%d,%d)]" % (f.x, f.y, f.x+f.width, f.y+f.height))
+#            (x1, y1, x2, y2) = (x, y, x+width, y+height)
+#            #print("[(%d,%d) -> (%d,%d)]" % (x1, y1, x2, y2))
+##            draw.rectangle([x1,y1,x2,y2], outline=(255,0,0))
+#            draw.rectangle([x1,y1,x2,y2], outline="#ff0000")
+#        im.save(image_path_new)
 
 #    # Category:Unidentified maps
 #    def _guessMaps(self):
-#        return (u'maps', self._CVclassifyObjects('maps'))
+#        return (u'maps', self._CVclassifyObjects_All('maps'))
 
 #    # Category:Unidentified flags
 #    def _guessFlags(self):
-#        return (u'flags', self._CVclassifyObjects('flags'))
+#        return (u'flags', self._CVclassifyObjects_All('flags'))
 
     # Category:Unidentified plants
     def _guessPlants(self):
-        return (u'plants', self._CVclassifyObjects('pottedplant'))
+        return (u'plants', self._CVclassifyObjects_All('pottedplant'))
 
 #    # Category:Unidentified coats of arms
 #    def _guessCoatsOfArms(self):
-#        return (u'coats of arms', self._CVclassifyObjects('coats of arms'))
+#        return (u'coats of arms', self._CVclassifyObjects_All('coats of arms'))
 
 #    # Category:Unidentified buildings
 #    def _guessBuildings(self):
-#        return (u'buildings', self._CVclassifyObjects('buildings'))
+#        return (u'buildings', self._CVclassifyObjects_All('buildings'))
 
     # Category:Unidentified trains
     def _guessTrains(self):
-        return (u'trains', self._CVclassifyObjects('train'))
+        return (u'trains', self._CVclassifyObjects_All('train'))
 
     # Category:Unidentified automobiles
     def _guessAutomobiles(self):
-        result  = self._CVclassifyObjects('bus')
-        result += self._CVclassifyObjects('car')
-        result += self._CVclassifyObjects('motorbike')
+        result  = self._CVclassifyObjects_All('bus')
+        result += self._CVclassifyObjects_All('car')
+        result += self._CVclassifyObjects_All('motorbike')
         return (u'automobiles', result)
 
     # Category:Unidentified buses
     def _guessBuses(self):
-        return (u'buses', self._CVclassifyObjects('bus'))
+        return (u'buses', self._CVclassifyObjects_All('bus'))
 
-    def _CVclassifyObjects(self, cls, confidence=0.5):
+    # .../opencv/samples/cpp/bagofwords_classification.cpp
+    def _CVclassifyObjects_All(self, cls, confidence=0.5):
         """Uses the 'The Bag of Words model' for classification"""
 
         # prevent multiple execute of code below
@@ -596,25 +553,20 @@ def checkbot():
     repeat = True # Restart after having check all the images?
     limit = 80 # How many images check?
     time_sleep = 30 # How many time sleep after the check?
-    skip_number = 0 # How many images to skip before checking?
     waitTime = 0 # How many time sleep before the check?
-    commonsActive = False # Check if on commons there's an image with the same name?
     normal = False # Check the new images or use another generator?
-    urlUsed = False # Use the url-related function instead of the new-pages generator
-    regexGen = False # Use the regex generator
     untagged = False # Use the untagged generator
     duplicatesActive = False # Use the duplicate option
     duplicatesReport = False # Use the duplicate-report option
     sendemailActive = False # Use the send-email
     logFullError = True # Raise an error when the log is full
-    useGuesses = True # Use guesses which are less reliable than true searches
 
     # emulate:  'python checkimages_content.py -limit:5 -break -lang:en'
     # debug:    'python catimages.py -noguesses -debug'
     # run/test: 'python catimages.py [-start:File:abc]'
 #    sys.argv += ['-limit:20', '-break', '-lang:en']
-#    sys.argv += ['-limit:5', '-break', '-family:commons', '-lang:commons', '-lang:commons', '-noguesses']
-    sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-lang:commons', '-noguesses']
+#    sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-noguesses']#, '-start']
+    sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-noguesses', '-start']
     print "http://commons.wikimedia.org/wiki/User:Multichill/Using_OpenCV_to_categorize_files"
 
     firstPageTitle = None
@@ -635,8 +587,6 @@ def checkbot():
             repeat = False
         elif arg == '-nologerror':
             logFullError = False
-        elif arg == '-commons':
-            commonsActive = True
         elif arg.startswith('-duplicates'):
             duplicatesActive = True
             if len(arg) == 11:
@@ -647,13 +597,6 @@ def checkbot():
             duplicatesReport = True
         elif arg == '-sendemail':
             sendemailActive = True
-        elif arg.startswith('-skip'):
-            if len(arg) == 5:
-                skip = True
-                skip_number = int(pywikibot.input(u'How many files do you want to skip?'))
-            elif len(arg) > 5:
-                skip = True
-                skip_number = int(arg[6:])
         elif arg.startswith('-wait'):
             if len(arg) == 5:
                 wait = True
@@ -674,28 +617,6 @@ def checkbot():
             firstPageTitle = firstPageTitle.split(":")[1:]
 #            generator = pywikibot.getSite().allpages(start=firstPageTitle, namespace=6)
 #            repeat = False
-        elif arg.startswith('-page'):
-            if len(arg) == 5:
-                regexPageName = str(pywikibot.input(u'Which page do you want to use for the regex?'))
-            elif len(arg) > 5:
-                regexPageName = str(arg[6:])
-            repeat = False
-            regexGen = True
-        elif arg.startswith('-url'):
-            if len(arg) == 4:
-                regexPageUrl = str(pywikibot.input(u'Which url do you want to use for the regex?'))
-            elif len(arg) > 4:
-                regexPageUrl = str(arg[5:])
-            urlUsed = True
-            repeat = False
-            regexGen = True
-        elif arg.startswith('-regex'):
-            if len(arg) == 6:
-                regexpToUse = str(pywikibot.input(u'Which regex do you want to use?'))
-            elif len(arg) > 6:
-                regexpToUse = str(arg[7:])
-            generator = 'regex'
-            repeat = False
         elif arg.startswith('-cat'):
             if len(arg) == 4:
                 catName = str(pywikibot.input(u'In which category do I work?'))
@@ -737,8 +658,6 @@ def checkbot():
     image_namespace = u"File:"
 
     # If the images to skip are 0, set the skip variable to False (the same for the wait time)
-    if skip_number == 0:
-        skip = False
     if waitTime == 0:
         wait = False
 
@@ -765,20 +684,6 @@ def checkbot():
         # Normal True? Take the default generator
         if normal == True:
             generator = site.newimages(number = limit)
-        # if urlUsed and regexGen, get the source for the generator
-        if urlUsed == True and regexGen == True:
-            textRegex = site.getUrl(regexPageUrl, no_hostname = True)
-        # Not an url but a wiki page as "source" for the regex
-        elif regexGen == True:
-            pageRegex = pywikibot.Page(site, regexPageName)
-            try:
-                textRegex = pageRegex.get()
-            except pywikibot.NoPage:
-                pywikibot.output(u"%s doesn't exist!" % pageRegex.title())
-                textRegex = '' # No source, so the bot will quit later.
-        # If generator is the regex' one, use your own Generator using an url or page and a regex.
-        if generator == 'regex' and regexGen == True:
-            generator = mainClass.regexGenerator(regexpToUse, textRegex)
         # Ok, We (should) have a generator, so let's go on.
         # Take the additional settings for the Project
         mainClass.takesettings()
@@ -796,16 +701,7 @@ def checkbot():
                 pywikibot.output( u"skipping page '%s' ..." % image.title() )
                 firstPageTitle = None
                 continue
-            # When you've a lot of image to skip before working use this workaround, otherwise
-            # let this commented, thanks. [ decoment also parsed = False if you want to use it
-            #
-            #if image.title() != u'File:Nytlogo379x64.gif' and not parsed:
-            #    pywikibot.output(u"%s already parsed." % image.title())
-            #    continue
-            #else:
-            #    parsed = True
-            # If the generator returns something that is not an image, simply skip it.
-            if normal == False and regexGen == False:
+            if normal == False:
                 if image_namespace.lower() not in image.title().lower() and \
                 image_old_namespace.lower() not in image.title().lower() and 'file:' not in image.title().lower():
                     pywikibot.output(u'%s seems not an file, skip it...' % image.title())
@@ -836,24 +732,13 @@ def checkbot():
                 mainClass.downloadImage()
             except pywikibot.exceptions.NoPage:
                 continue
-            # Skip block
-            if skip == True:
-                skip = mainClass.skipImages(skip_number, limit)
-                if skip == True:
-                    continue
-            # Check on commons if there's already an image with the same name
-            if commonsActive == True and site.family.name != "commons":
-                response = mainClass.checkImageOnCommons()
-                if response == False:
-                    continue
             # Check if there are duplicates of the image on the project selected
             if duplicatesActive == True:
                 response2 = mainClass.checkImageDuplicated(duplicates_rollback)
                 if response2 == False:
                     continue
-            pywikibot.get_throttle()
             resultCheck = mainClass.checkStep()
-            ret = mainClass.applyResult()
+            ret = mainClass.tag_image()
             if ret:
                 outresult.append( ret )
             limit += -1
