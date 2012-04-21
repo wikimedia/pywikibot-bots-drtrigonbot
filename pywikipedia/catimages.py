@@ -65,6 +65,14 @@ import checkimages
 
 locale.setlocale(locale.LC_ALL, '')
 
+
+# debug tools
+# (look at 'bot_control.py' for more info)
+debug = []                       # no write, all users
+debug.append( 'write2wiki' )    # write to wiki (operational mode)
+#debug.append( 'code' )          # code debugging
+
+
 ###############################################################################
 # <--------------------------- Change only below! --------------------------->#
 ###############################################################################
@@ -126,27 +134,37 @@ class main(checkimages.main):
         return []
 
     def downloadImage(self):
-        #print self.image
-        self.image_filename = os.path.split(self.image.fileUrl())[-1]
+        self.image_filename  = os.path.split(self.image.fileUrl())[-1]
         if pywikibot.debug:
             self.image_filename = "Ali_1_-_IMG_1378.jpg"
             #self.image_filename = "Gyorche_Petrov_Todor_Alexandrov_Andrey_Lyapchev_Simeon_Radev_Stamatov_and_others.jpg"
-        self.image_path     = os.path.join('cache', self.image_filename)
-        targetName = self.image_path.split(u'.')
-        targetName[-1] = u'jpg'
-        self.targetName = u'.'.join(targetName)
+        self.image_path      = urllib2.quote(os.path.join('cache', self.image_filename[-128:]))
+        
+        image_path_JPEG      = self.image_path.split(u'.')
+        self.image_path_JPEG = u'.'.join(image_path_JPEG[:-1]+[u'jpg'])
+        
         if os.path.exists(self.image_path):
             return
 
-        pywikibot.get_throttle()
-
-#        f, data = self.site.getUrl(self.image.fileUrl(), no_hostname=True, back_response=True)
-        # !!! CHEAP HACK TO GET IT WORKING -> NEEDS PATCH IN 'getUrl' upstream !!!
-        # (prevent unicode encoding at end or allow to re-read in back_response)
-        # (this will be useful for 'subster' also; merge several get modes there)
-        req = urllib2.Request(self.image.fileUrl(), None, {})
-        f = pywikibot.MyURLopener.open(req)
-        data = f.read()
+        maxtries = 5
+        while maxtries:
+            maxtries -= 1
+            
+            pywikibot.get_throttle()
+    #        f, data = self.site.getUrl(self.image.fileUrl(), no_hostname=True, back_response=True)
+            # !!! CHEAP HACK TO GET IT WORKING -> NEEDS PATCH IN 'getUrl' upstream !!!
+            # (prevent unicode encoding at end or allow to re-read in back_response)
+            # (this will be useful for 'subster' also; merge several get modes there)
+            try:
+                req = urllib2.Request(self.image.fileUrl(), None, {})
+                f = pywikibot.MyURLopener.open(req)
+                data = f.read()
+                break
+            except urllib2.URLError:
+                pywikibot.output( u"Error downloading data: retrying in 60 secs." )
+                time.sleep(60.)
+        if not maxtries:
+            raise pywikibot.exceptions.NoPage(u'MaxTries reached; skipping page!')
 
         f = open(self.image_path, 'wb')
         f.write( data )
@@ -154,14 +172,11 @@ class main(checkimages.main):
 
         try:
             import Image
-#            targetName = self.image_path.split(u'.')
-#            targetName[-1] = u'jpg'
-#            self.targetName = u'.'.join(targetName)
             im = Image.open(self.image_path) # might be png, gif etc, for instance
-    #        im.thumbnail(size, Image.ANTIALIAS) # size is 640x480
-            im.convert('RGB').save(self.targetName, "JPEG") # targetname is test1.jpg
+#            im.thumbnail(size, Image.ANTIALIAS) # size is 640x480
+            im.convert('RGB').save(self.image_path_JPEG, "JPEG")
         except:
-            self.targetName = self.image_path
+            self.image_path_JPEG = self.image_path
 
     # LOOK ALSO AT: checkimages.main.checkStep
     # (and category scripts/bots too...)
@@ -172,97 +187,84 @@ class main(checkimages.main):
         if hasattr(self, '_result_classify'):
             delattr(self, '_result_classify')
 
-        self.outresult = []
-        self.logresult = []
+        self._result_check = []
 
         # use explicit searches for classification
         for item in dir(self):
             if '_search' in item:
                 (cat, result) = self.__class__.__dict__[item](self)
-                #print cat, result
+                #print cat, result, len(result)
                 if result:
-                    c = [r['confidence'] for r in result]
-#                    pywikibot.output( u'   [[Category:Unidentified %s]] found %i time(s) - confidence: %s'
-#                                      % (cat, len(result), c) )
-                    self.logresult.append( (cat, result) )
-                    if (max(c) >= 0.75):
-                        self.outresult.append( (cat, result) )
+                    self._result_check.append( (cat, result) )
 
         # use guesses for unreliable classification
         if not gbv.useGuesses:
-            return self.outresult
+            return self._result_check
         for item in dir(self):
             if '_guess' in item:
                 (cat, result) = self.__class__.__dict__[item](self)
-                #print cat, result
+                #print cat, result, len(result)
                 if result:
-                    c = [r['confidence'] for r in result]
-#                    pywikibot.output( u'   <!--[[Category:Unidentified %s]]--> found %i time(s)'
-#                                      % (cat, len(result)) )
-                    self.logresult.append( (cat, result) )
-                    if (max(c) >= 0.75):
-                        self.outresult.append( (cat, result) )
+                    self._result_check.append( (cat, result) )
 
-#        raise
-        return self.outresult
+        return self._result_check
 
 #    def tag_image(self, put = True):
     def tag_image(self, put = False):
-        resultCheck = self.outresult
-        result = []
-        for item in resultCheck:
-            (cat, res) = item
-            c = [r['confidence'] for r in res]
-            result.append( u"[[Category:Unidentified %s]]" % cat )
-            result.append( u"[[Category:Categorized by bot]]" )
-            result.append( u"{{Information" )
-            result.append( u"..." )
-            result.append( u"|other_fields={{Information field|name=[[User:DrTrigonBot|Bot]] cat info|value=" )
-            result.append( u"{{(!}}" )
-            result.append( u"{{!}}-" )
-            result.append( u"{{!}}Confidence" )
-            result.append( u"{{!}}%s" % c )
-            result.append( u"{{!}}-" )
-            for r in res:
-                result.append( u"{{!}}Face / Eyes" )
-                result.append( u"{{!}}%s / %s" % (r['face'], r['eyes']) )
-                result.append( u"{{!}}-" )
-            result.append( u"{{!)}}}}" )
-            result.append( u"}}" )
+        pywikibot.get_throttle()
+        content = self.image.get()
 
+        if gbv.useGuesses:
+            thrshld = 0.1
+        else:
+            thrshld = 0.75
+
+        report_topage = False
         ret = []
-        for item in self.logresult:
+        if self._result_check:
+            ret.append( u"" )
+            ret.append( u"== [[:%s]] ==" % self.image.title() )
+            ret.append( u'<div style="position:relative;">' )
+            ret.append( u"[[%s|200px]]" % self.image.title() )
+#            ret.append( u"[[%s]]" % self.image.title() )
+        for item in self._result_check:
             (cat, res) = item
             c = [r['confidence'] for r in res]
-            ret.append( u"== [[:%s]] ==" % self.image.title() )
-            ret.append( u"[[%s|100px]]" % self.image.title() )
-            ret.append( u'{{(!}}style="background:%s;"' % {True: 'green', False: 'red'}[bool(resultCheck)] )
-            ret.append( u"{{!}}-" )
-            ret.append( u"{{!}}Confidence" )
-            ret.append( u"{{!}}%s" % c )
-            ret.append( u"{{!}}-" )
-            for r in res:
-                ret.append( u"{{!}}Face / Eyes" )
-                ret.append( u"{{!}}%s / %s" % (r['face'], r['eyes']) )
-                ret.append( u"{{!}}-" )
-            ret.append( u"{{!)}}" )
-            ret.append( u"" )
-        ret = u"\n".join( ret )
+            report = (max(c) >= thrshld)
+            report_topage = report_topage or report
 
-        if result:
-            result = [ u"{{Check categories}}" ] + result
-            result = [ self.image.get() ] + result
-            buf    = u"\n".join(result[1:])
-#            print u"\n".join(result)
-            print u"--- " * 10
-            print buf
-            print "(append to {{Information}} template ..."
-            print "... and remove other categories like 'uncategorized')"
-            print u"--- " * 10
+            info   = self.make_infoblock(item, report)
+            marker = self.make_markerblock(item, 200.)
+
+            ret.append( marker )
+            ret.append( u"</div>" )
+            ret.append( u"=== [[:Category:Unidentified %s]] ===" % cat )
+            ret.append( info )
+
+            if report:
+                content = self.add_category(content, u"Category:Unidentified %s" % cat)
+                info = u"{{Information field|name=[[User:DrTrigonBot|Bot]] cat info|value=\n%s}}" % info
+                # works just once (for one iteration)
+                #content = self.change_template(content, u"Information", {'other_versions':info})
+                # works multiple times, but '|other_fields=' is missing at top (is that important?)
+                content = self.append_to_template(content, u"Information", info)
+
+        if report_topage:
+            content = self.add_category(content, u"Category:Categorized by bot")
+            content = self.add_template(content, u"Check categories", top=True)
+            content = self.remove_category_or_template(content, u"Uncategorized")
+            print u"--- " * 20
+            print content
+            print u"--- " * 20
             if put:
                 pywikibot.put_throttle()
-                self.image.put( buf, comment="bot adding categories" )
+                self.image.put( content, comment="bot automatic categorization" )
 
+        self.clean_cache()
+
+        return u"\n".join( ret )
+
+    def clean_cache(self):
 #        # hacky cache-dir handling / clean-up
 #        maxtime = 60*60*24
 #        now = time.time()
@@ -274,22 +276,142 @@ class main(checkimages.main):
 #                os.remove(filename)
         if os.path.exists(self.image_path):
             os.remove( self.image_path )
-        if os.path.exists(self.targetName):
-            os.remove( self.targetName )
+        if os.path.exists(self.image_path_JPEG):
+            os.remove( self.image_path_JPEG )
+        image_path_new = self.image_path_JPEG.replace(u"cache/", u"cache/0_DETECTED_")
+        if os.path.exists(image_path_new):
+            os.remove( image_path_new )
 
-        return ret
+    def make_infoblock(self, item, report):
+        (cat, res) = item
+        c = [r['confidence'] for r in res]
+
+        result = []
+        #result.append( u"{{(!}}" )
+        result.append( u'{{(!}}style="background:%s;"' % {True: 'green', False: 'red'}[report] )
+        result.append( u"{{!}}-" )
+        result.append( u"{{!}}Confidence" )
+        result.append( u"{{!}}%s" % c )
+        result.append( u"{{!}}-" )
+        for r in res:
+            if 'eyes' not in r:
+                continue
+            result.append( u"{{!}}Face / Eyes" )
+            result.append( u"{{!}}%s / %s" % (r['face'], r['eyes']) )
+            result.append( u"{{!}}-" )
+        result.append( u"{{!)}}" )
+
+        return u"\n".join( result )
+
+    def make_markerblock(self, item, size):
+        import numpy
+
+        (cat, res) = item
+
+        # same as in '_CVdetectObjects_Faces'
+        colors = [ (0,0,255),
+            (0,128,255),
+            (0,255,255),
+            (0,255,0),
+            (255,128,0),
+            (255,255,0),
+            (255,0,0),
+            (255,0,255) ]
+        result = []
+        for i, r in enumerate(res):
+            color = list(colors[i%8])
+            color.reverse()
+            color = u"%02x%02x%02x" % tuple(color)
+            
+            scale = r['size'][0]/size
+            r['face'] = list(numpy.array(r['face'])/scale)
+            
+            result.append( u'<div class="face-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px solid #%s;"></div>' % tuple(r['face'] + [color]) )
+
+            for e in r['eyes']:
+                e = list(numpy.array(e)/scale)
+
+                result.append( u'<div class="eye-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px solid #%s;"></div>' % tuple(e + [color]) )
+
+        return u"\n".join( result )
+
+    # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
+    def remove_category_or_template(self, text, name):
+        text = re.sub(u"[\{\[]{2}%s.*?[\}\]]{2}\n?" % name, u"", text)
+        return text
+
+    # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
+    def add_category(self, text, name, top=False):
+        if top:
+            buf = [(u"[[%s]]" % name), text]
+        else:
+            buf = [text, (u"[[%s]]" % name)]
+        return u"\n".join( buf )
+
+    # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
+    def add_template(self, text, name, params={}, top=False):
+        if top:
+            buf = [(u"{{%s}}" % name), text]
+        else:
+            buf = [text, (u"{{%s}}" % name)]
+        return u"\n".join( buf )
+
+#    # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
+#    def change_category(self, text, oldname, newname):
+#        text = re.sub(u"\[\[%s\]\]" % oldname, u"\[\[%s\]\]" % newname, text)
+#        return text
+#
+#        import catlib
+##        catlib.change_category(article, oldCat, newCat, comment=None, sortKey=None,
+##                    inPlace=False)
+#        catlib.add_category(self.image, category, comment=None, createEmptyPages=False)
+
+#    # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
+#    def change_template(self, text, name, params={}):
+##        templates = pywikibot.textlib.extract_templates_and_params(text)
+##        params = None
+##        for t, p in templates:
+##            if t == name:
+##                params = p
+##                break
+##        if params == None:
+##            raise
+##        print params
+#
+#        pattern  = re.compile(u"\{\{%s.*?\n\s*\}\}" % name, flags=re.S)
+#        template = pattern.search(text).group()
+#
+#        for item in params:
+#            new = re.sub(u"\|%s\s*=\s*?\n" % item, u"|%s = %s\n" % (item, params[item]), template)
+#            if not (template == new):
+#                break
+#        if not (template == new):
+#            pass    # append param, since it was not used until here
+#        template = new
+#        
+#        text = pattern.sub(template, text)
+#        return text
+
+    # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
+    def append_to_template(self, text, name, append):
+        pattern  = re.compile(u"(\{\{%s.*?\n)(\s*\}\})" % name, flags=re.S)
+        template = pattern.search(text).groups()
+        
+        template = u"".join( [template[0], append, u"\n", template[1]] )
+        
+        text = pattern.sub(template, text)
+        return text
 
     # Category:Unidentified people
     def _searchPeople(self):
         result = []
         try:
-            result = self._CVdetectObjects_Faces()
-            #result = self._CVdetectObjects_People()
+            result  = self._CVdetectObjects_Faces()
+            #result += self._CVdetectObjects_People()
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
         except AttributeError:
             pywikibot.output(u'WARNING: unknown file type')
-        #print self.image, '\n   ', result
 
         #result += self._CVclassifyObjects_All('person')
 
@@ -329,7 +451,7 @@ class main(checkimages.main):
 
         #image = cv.LoadImage(self.image_path)
 #        img    = cv2.imread( self.image_path, 1 )
-        img    = cv2.imread( self.targetName, 1 )
+        img    = cv2.imread( self.image_path_JPEG, 1 )
         #image  = cv.fromarray(img)
         scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/500.)])
 
@@ -390,11 +512,15 @@ class main(checkimages.main):
                 |cv.CV_HAAR_SCALE_IMAGE,
                 (30, 30) )
             c = (len(nestedObjects) + 2.) / 4.
-            if (c >= confidence):
-                eyes = nestedObjects
-                if not (type(eyes) == type(tuple())):
-                    eyes = tuple((eyes*scale).tolist())
-                result.append( {'face': r*scale, 'eyes': eyes, 'confidence': c} )
+            data = { 'face': list(r*scale), 
+                     'eyes': [], 
+                     'confidence': c, 
+                     'size': (img.shape[1], img.shape[0]), }
+#            if (c >= confidence):
+#                eyes = nestedObjects
+#                if not (type(eyes) == type(tuple())):
+#                    eyes = tuple((eyes*scale).tolist())
+#                result.append( {'face': r*scale, 'eyes': eyes, 'confidence': c} )
             #print {'face': r, 'eyes': nestedObjects, 'confidence': c}
             for nr in nestedObjects:
                 (nrx, nry, nrwidth, nrheight) = nr
@@ -402,11 +528,14 @@ class main(checkimages.main):
                 cy = cv.Round((ry + nry + nrheight*0.5)*scale)
                 radius = cv.Round((nrwidth + nrheight)*0.25*scale)
                 cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
+                data['eyes'].append( (cx-radius, cy-radius, 2*radius, 2*radius) )
+            if (c >= confidence):
+                result.append( data )
 
         # see '_drawRect'
         if result:
 #            image_path_new = os.path.join('cache', '0_DETECTED_' + self.image_filename)
-            image_path_new = self.targetName.replace(u"cache/", u"cache/0_DETECTED_")
+            image_path_new = self.image_path_JPEG.replace(u"cache/", u"cache/0_DETECTED_")
             cv2.imwrite( image_path_new, img )
 
         #return faces.tolist()
@@ -539,7 +668,8 @@ class main(checkimages.main):
             self._result_classify = dict([ (trained[i], abs(r)) for i, r in enumerate(result) ])
 
         if (self._result_classify.get(cls, 0.0) >= confidence): # >= threshold 50%
-            result = [ self._result_classify[cls] ] # ok
+            #result = [ {'confidence': self._result_classify[cls]} ] # ok
+            result = [ {'confidence': -self._result_classify[cls]} ] # ok - BUT UNRELIABLE THUS (-)
         else:
             result = []                             # nothing found
 
@@ -566,7 +696,8 @@ def checkbot():
     # run/test: 'python catimages.py [-start:File:abc]'
 #    sys.argv += ['-limit:20', '-break', '-lang:en']
 #    sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-noguesses']#, '-start']
-    sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-noguesses', '-start']
+#    sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-noguesses', '-start']
+    sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-noguesses']
     print "http://commons.wikimedia.org/wiki/User:Multichill/Using_OpenCV_to_categorize_files"
 
     firstPageTitle = None
@@ -738,7 +869,7 @@ def checkbot():
                 if response2 == False:
                     continue
             resultCheck = mainClass.checkStep()
-            ret = mainClass.tag_image()
+            ret = mainClass.tag_image(put=('write2wiki' in debug))
             if ret:
                 outresult.append( ret )
             limit += -1
