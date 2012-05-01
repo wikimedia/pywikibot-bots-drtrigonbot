@@ -69,7 +69,7 @@ locale.setlocale(locale.LC_ALL, '')
 # debug tools
 # (look at 'bot_control.py' for more info)
 debug = []                       # no write, all users
-debug.append( 'write2wiki' )    # write to wiki (operational mode)
+#debug.append( 'write2wiki' )    # write to wiki (operational mode)
 #debug.append( 'code' )          # code debugging
 
 
@@ -191,31 +191,31 @@ class main(checkimages.main):
         self._result_info  = []
         self._result_check = []
 
-        # use information collectors for generic data
+        # use information collectors for generic data (rel = 1.0)
         for item in dir(self):
             if '_collect' in item:
-                (cat, result) = self.__class__.__dict__[item](self)
+                (cat, result, rel) = self.__class__.__dict__[item](self)
                 #print cat, result, len(result)
                 if result:
-                    self._result_info.append( (cat, result) )
+                    self._result_info.append( (cat, result, rel) )
 
-        # use explicit searches for classification
+        # use explicit searches for classification (rel = ?)
         for item in dir(self):
             if '_search' in item:
-                (cat, result) = self.__class__.__dict__[item](self)
+                (cat, result, rel) = self.__class__.__dict__[item](self)
                 #print cat, result, len(result)
                 if result:
-                    self._result_check.append( (cat, result) )
+                    self._result_check.append( (cat, result, rel) )
 
-        # use guesses for unreliable classification
+        # use guesses for unreliable classification (rel = 0.1)
         if not gbv.useGuesses:
             return self._result_check
         for item in dir(self):
             if '_guess' in item:
-                (cat, result) = self.__class__.__dict__[item](self)
+                (cat, result, rel) = self.__class__.__dict__[item](self)
                 #print cat, result, len(result)
                 if result:
-                    self._result_check.append( (cat, result) )
+                    self._result_check.append( (cat, result, rel) )
 
         return self._result_check
 
@@ -241,16 +241,17 @@ class main(checkimages.main):
         ret.append( u"[[%s|200px]]" % self.image.title() )
         #ret.append( u"[[%s]]" % self.image.title() )
         for item in self._result_check:
-            (cat, res) = item
-            c = [r['Confidence'] for r in res]
-            report = (max(c) >= thrshld)
+            (cat, res, rel) = item
+            report = (rel >= thrshld)
             report_topage = report_topage or report
 
-            info   = self.make_infoblock(item, report)
-            marker = self.make_markerblock(item, 200.)
-
-            ret.append( marker )
+            if (cat in [u'Faces', u'Groups']):
+                marker = self.make_markerblock(item, 200.)
+                ret.append( marker )
             ret.append( u"</div>" )
+
+            info   = self.make_infoblock(item, report)
+
 # TODO: WHAT CATEGORY/-IES TO USE HERE?!?
             ret.append( u"=== [[:Category:%s]] ===" % cat )
 #            ret.append( u"=== [[:Category:%s (bot tagged)]] ===" % cat )
@@ -267,11 +268,14 @@ class main(checkimages.main):
                     #content = self.change_template(content, u"Information", {'other_versions':info})
                     # works multiple times, but '|other_fields=' is missing at top (is that important?)
                     content = self.append_to_template(content, u"Information", info)
+                if (cat in [u'Faces', u'Groups']):
+                    marker  = self.make_ImageAnnotatorBlock(item)
+                    content = self.add_template(content, marker, raw=True)
 
         # again the same code as before but for other list
         # (HACKY; should be done more clever!!)
         for item in self._result_info:
-            (cat, res) = item
+            (cat, res, rel) = item
 
             info   = self.make_infoblock(item, report)
 
@@ -299,6 +303,7 @@ class main(checkimages.main):
             #content = self.add_template(content, u"Check categories", top=True)
             content = self.add_template(content, u"Check categories|year={{subst:#time:Y}}|month={{subst:#time:F}}|day={{subst:#time:j}}|category=[[Category:Categorized by bot]]", top=True)
             content = self.remove_category_or_template(content, u"Uncategorized")
+            content = self.gather_category(content)
             print u"--- " * 20
             print content
             print u"--- " * 20
@@ -321,7 +326,7 @@ class main(checkimages.main):
             os.remove( image_path_new )
 
     def make_infoblock(self, item, report):
-        (cat, res) = item
+        (cat, res, rel) = item
         if not res:
             return u''
 
@@ -366,7 +371,7 @@ class main(checkimages.main):
     def make_markerblock(self, item, size):
         import numpy
 
-        (cat, res) = item
+        (cat, res, rel) = item
 
         # same as in '_CVdetectObjects_Faces'
         colors = [ (0,0,255),
@@ -385,9 +390,9 @@ class main(checkimages.main):
             
             #scale = r['size'][0]/size
             scale = self.image_size[0]/size
-            r['Face'] = list(numpy.array(r['Face'])/scale)
+            f     = list(numpy.array(r['Face'])/scale)
             
-            result.append( u'<div class="face-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px solid #%s;"></div>' % tuple(r['Face'] + [color]) )
+            result.append( u'<div class="face-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px solid #%s;"></div>' % tuple(f + [color]) )
 
             for e in r['Eyes']:
                 e = list(numpy.array(e)/scale)
@@ -396,10 +401,74 @@ class main(checkimages.main):
 
         return u"\n".join( result )
 
+    # http://commons.wikimedia.org/wiki/Help:Gadget-ImageAnnotator
+    # (example: http://commons.wikimedia.org/wiki/File:13054_1198498614793_1598345855_498977_4395881_n.jpg)
+    def make_ImageAnnotatorBlock(self, item):
+        import numpy
+
+        (cat, res, rel) = item
+
+        # same as in '_CVdetectObjects_Faces'
+        colors = [ (0,0,255),
+            (0,128,255),
+            (0,255,255),
+            (0,255,0),
+            (255,128,0),
+            (255,255,0),
+            (255,0,0),
+            (255,0,255) ]
+        result = []
+        k = 0
+        for i, r in enumerate(res):
+            color = list(colors[i%8])
+            color.reverse()
+            color = u"%02x%02x%02x" % tuple(color)
+            
+            ##scale = r['size'][0]/size
+            #scale = self.image_size[0]/size
+            #f     = list(numpy.array(r['Face'])/scale)
+            
+            k += 1
+            param = {'id': k, 'x': r['Face'][0], 'y': r['Face'][1], 
+                     'w': r['Face'][2], 'h': r['Face'][3], 'dx': self.image_size[0], 'dy': self.image_size[1], 
+                     'color': color}
+            result.append( u'{{ImageNote|id=%(id)i|x=%(x)i|y=%(y)i|w=%(w)i|h=%(h)i|dimx=%(dx)i|dimy=%(dy)i|style=2}}' % param )
+            result.append( u'{{LangSwitch' )
+            result.append( u'|en=face' )
+            result.append( u'}}' )
+            #result.append( u'{{ImageNoteColors|inner=#%(color)s|active=#%(color)s}}' % param )
+            result.append( u'{{ImageNoteEnd|id=%(id)i}}' % param )
+
+            for j, e in enumerate(r['Eyes']):
+                #e = list(numpy.array(e)/scale)
+
+                k += 1
+                param.update({'id': k, 'x': e[0], 'y': e[1], 
+                              'w': e[2], 'h': e[3]})
+                result.append( u'{{ImageNote|id=%(id)i|x=%(x)i|y=%(y)i|w=%(w)i|h=%(h)i|dimx=%(dx)i|dimy=%(dy)i|style=2}}' % param )
+                result.append( u'{{LangSwitch' )
+                result.append( u'|en=eye' )
+                result.append( u'}}' )
+                #result.append( u'{{ImageNoteColors|inner=#%(color)s|active=#%(color)s}}' % param )
+                result.append( u'{{ImageNoteEnd|id=%(id)i}}' % param )
+
+        return u"\n".join( result )
+
     # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
     def remove_category_or_template(self, text, name):
         text = re.sub(u"[\{\[]{2}%s.*?[\}\]]{2}\n?" % name, u"", text)
         return text
+
+    # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
+    def gather_category(self, text):
+        cat  = []
+        page = []
+        for line in text.split(u"\n"):
+            if re.match(u"^\[\[Category:.*?\]\]$", line):
+                cat.append( line )
+            else:
+                page.append( line )
+        return u"\n".join( page + cat )
 
     # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
     def add_category(self, text, name, top=False):
@@ -410,11 +479,14 @@ class main(checkimages.main):
         return u"\n".join( buf )
 
     # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
-    def add_template(self, text, name, params={}, top=False):
+    def add_template(self, text, name, params={}, top=False, raw=False):
         if top:
             buf = [(u"{{%s}}" % name), text]
         else:
-            buf = [text, (u"{{%s}}" % name)]
+            if raw:
+                buf = [text, name]
+            else:
+                buf = [text, (u"{{%s}}" % name)]
         return u"\n".join( buf )
 
     ## place into 'textlib' (or else e.g. 'catlib'/'templib'...)
@@ -470,14 +542,33 @@ class main(checkimages.main):
                    'Face':       item['face'],
                    'Eyes':       item['eyes'],
                   } for item in result]
+        relevance = max([item['Confidence'] for item in result] + [0.])
 
-        return (u'Faces', result)
+        return (u'Faces', result, relevance)
+
+# TODO: MAKE THIS WORKING!!! gives confusion with 'Category:Faces' in 'tag_image'
+#    # Category:Groups
+#    def _searchGroups(self):
+#        result = self._CVdetectObjects_Faces()
+#        result = [{'Number':     (i+1),
+#                   'Face':       item['face'],
+#                   'Eyes':       item['eyes'],
+#                  } for i, item in enumerate(result)]
+#
+#        if not (len(result) > 1): # 5 should give 0.75 and get reported
+#            result    = []
+#            relevance = 0.
+#        else:
+#            relevance = 1 - 1./(len(result)-1)
+#
+#        return (u'Groups', result, relevance)
 
     # Category:Unidentified people
     def _guessPeople(self):
+        #result  = self._CVdetectObjects_Faces()
         #result += self._CVdetectObjects_People()
 
-        return (u'Unidentified people', self._CVclassifyObjects_All('person'))
+        return (u'Unidentified people', self._CVclassifyObjects_All('person'), 0.1)
 
     # .../opencv/samples/c/facedetect.cpp
     # http://opencv.willowgarage.com/documentation/python/genindex.html
@@ -636,38 +727,38 @@ class main(checkimages.main):
 
     ## Category:Unidentified maps
     #def _guessMaps(self):
-    #    return (u'Unidentified maps', self._CVclassifyObjects_All('maps'))
+    #    return (u'Unidentified maps', self._CVclassifyObjects_All('maps'), 0.1)
 
     ## Category:Unidentified flags
     #def _guessFlags(self):
-    #    return (u'Unidentified flags', self._CVclassifyObjects_All('flags'))
+    #    return (u'Unidentified flags', self._CVclassifyObjects_All('flags'), 0.1)
 
     # Category:Unidentified plants
     def _guessPlants(self):
-        return (u'Unidentified plants', self._CVclassifyObjects_All('pottedplant'))
+        return (u'Unidentified plants', self._CVclassifyObjects_All('pottedplant'), 0.1)
 
     ## Category:Unidentified coats of arms
     #def _guessCoatsOfArms(self):
-    #    return (u'Unidentified coats of arms', self._CVclassifyObjects_All('coats of arms'))
+    #    return (u'Unidentified coats of arms', self._CVclassifyObjects_All('coats of arms'), 0.1)
 
     ## Category:Unidentified buildings
     #def _guessBuildings(self):
-    #    return (u'Unidentified buildings', self._CVclassifyObjects_All('buildings'))
+    #    return (u'Unidentified buildings', self._CVclassifyObjects_All('buildings'), 0.1)
 
     # Category:Unidentified trains
     def _guessTrains(self):
-        return (u'Unidentified trains', self._CVclassifyObjects_All('train'))
+        return (u'Unidentified trains', self._CVclassifyObjects_All('train'), 0.1)
 
     # Category:Unidentified automobiles
     def _guessAutomobiles(self):
         result  = self._CVclassifyObjects_All('bus')
         result += self._CVclassifyObjects_All('car')
         result += self._CVclassifyObjects_All('motorbike')
-        return (u'Unidentified automobiles', result)
+        return (u'Unidentified automobiles', result, 0.1)
 
     # Category:Unidentified buses
     def _guessBuses(self):
-        return (u'Unidentified buses', self._CVclassifyObjects_All('bus'))
+        return (u'Unidentified buses', self._CVclassifyObjects_All('bus'), 0.1)
 
     # .../opencv/samples/cpp/bagofwords_classification.cpp
     def _CVclassifyObjects_All(self, cls, confidence=0.5):
@@ -762,12 +853,12 @@ class main(checkimages.main):
     def _collectColor(self):
         result = self._PILaverageColorAndDeltaE()
         if not result:
-            return (u"", [])
+            return (u"", [], 0.)
         cat    = result[0]['color']
 
-        result = [{'RGB': item['rgb']} for item in result]
+        result = [{'RGB': item['rgb'], 'Distance': u"%.3f" % item['delta_e']} for item in result]
 
-        return (cat, result)
+        return (cat, result, 1.0)
 
     # http://stackoverflow.com/questions/2270874/image-color-detection-using-python
     # https://gist.github.com/1246268
@@ -792,7 +883,7 @@ class main(checkimages.main):
         b = h[256*2: 256*3]
         
         # perform the weighted average of each channel:
-        # the *index* is the channel value, and the *value* is its weight
+        # the *index* 'i' is the channel value, and the *value* 'w' is its weight
         rgb = (
                 sum( i*w for i, w in enumerate(r) ) / max(1, sum(r)),
                 sum( i*w for i, w in enumerate(g) ) / max(1, sum(g)),
@@ -862,7 +953,7 @@ class main(checkimages.main):
 
         result = [{} for item in result]
 
-        return (u'Unidentified people', result)
+        return (u'Unidentified people', result, 1.0)
 
     # Category:Portraits
     def _collectPortraits(self):
@@ -873,7 +964,7 @@ class main(checkimages.main):
 
         result = [{'Coverage': "%.3f" % item['coverage']} for item in result]
 
-        return (u'Portraits', result)
+        return (u'Portraits', result, 1.0)
 
 gbv = Global()
 
