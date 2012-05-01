@@ -69,7 +69,7 @@ locale.setlocale(locale.LC_ALL, '')
 # debug tools
 # (look at 'bot_control.py' for more info)
 debug = []                       # no write, all users
-#debug.append( 'write2wiki' )    # write to wiki (operational mode)
+debug.append( 'write2wiki' )    # write to wiki (operational mode)
 #debug.append( 'code' )          # code debugging
 
 
@@ -240,20 +240,22 @@ class main(checkimages.main):
         ret.append( u'<div style="position:relative;">' )
         ret.append( u"[[%s|200px]]" % self.image.title() )
         #ret.append( u"[[%s]]" % self.image.title() )
-        for item in self._result_check:
+        imaganot_done = False
+        for i, item in enumerate(self._result_check):
             (cat, res, rel) = item
             report = (rel >= thrshld)
             report_topage = report_topage or report
 
-            if (cat in [u'Faces', u'Groups']):
-                marker = self.make_markerblock(item, 200.)
-                ret.append( marker )
-            ret.append( u"</div>" )
+            if not i:
+                if (cat in [u'Faces', u'Groups']):
+                    marker = self.make_markerblock(item, 200.)
+                    ret.append( marker )
+                ret.append( u"</div>" )
 
-            info   = self.make_infoblock(item, report)
+            info   = self.make_infoblock(item)
 
 # TODO: WHAT CATEGORY/-IES TO USE HERE?!?
-            ret.append( u"=== [[:Category:%s]] ===" % cat )
+            ret.append( u"=== [[:Category:%s]] [[File:%s|16px]] ===" % (cat, {True: 'ButtonGreen.svg', False: 'ButtonRed.svg'}[report]) )
 #            ret.append( u"=== [[:Category:%s (bot tagged)]] ===" % cat )
             ret.append( info )
 
@@ -268,18 +270,18 @@ class main(checkimages.main):
                     #content = self.change_template(content, u"Information", {'other_versions':info})
                     # works multiple times, but '|other_fields=' is missing at top (is that important?)
                     content = self.append_to_template(content, u"Information", info)
-                if (cat in [u'Faces', u'Groups']):
+                if (cat in [u'Faces', u'Groups']) and (not imaganot_done):
                     marker  = self.make_ImageAnnotatorBlock(item)
                     content = self.add_template(content, marker, raw=True)
+                    imaganot_done = True
 
         # again the same code as before but for other list
         # (HACKY; should be done more clever!!)
         for item in self._result_info:
             (cat, res, rel) = item
 
-            info   = self.make_infoblock(item, report)
+            info   = self.make_infoblock(item)
 
-            ret.append( u"</div>" )
 # TODO: WHAT CATEGORY/-IES TO USE HERE?!?
             ret.append( u"=== [[:Category:%s]] ===" % cat )
 #            ret.append( u"=== [[:Category:%s (bot tagged)]] ===" % cat )
@@ -325,7 +327,7 @@ class main(checkimages.main):
         if os.path.exists(image_path_new):
             os.remove( image_path_new )
 
-    def make_infoblock(self, item, report):
+    def make_infoblock(self, item):
         (cat, res, rel) = item
         if not res:
             return u''
@@ -339,11 +341,12 @@ class main(checkimages.main):
         #result.append( u'{{(!}}style="background:%s;"' % {True: 'green', False: 'red'}[report] )
         result.append( u"{{!}}-" )
         for key in titles:
-            if (key == 'Confidence'):
-                result.append( u"!%s [[File:%s|16px]]" % (key, {True: 'ButtonGreen.svg', False: 'ButtonRed.svg'}[report]) )
-            else:
-                result.append( u"!%s" % key )
-                #result.append( u"{{!}}%s" % c )
+            #if (key == 'Confidence'):
+            #    result.append( u"!%s [[File:%s|16px]]" % (key, {True: 'ButtonGreen.svg', False: 'ButtonRed.svg'}[report]) )
+            #else:
+            #    result.append( u"!%s" % key )
+            #    #result.append( u"{{!}}%s" % c )
+            result.append( u"!%s" % key )
         result.append( u"{{!}}-" )
         for item in res:
             for key in titles:
@@ -546,22 +549,22 @@ class main(checkimages.main):
 
         return (u'Faces', result, relevance)
 
-# TODO: MAKE THIS WORKING!!! gives confusion with 'Category:Faces' in 'tag_image'
-#    # Category:Groups
-#    def _searchGroups(self):
-#        result = self._CVdetectObjects_Faces()
-#        result = [{'Number':     (i+1),
-#                   'Face':       item['face'],
-#                   'Eyes':       item['eyes'],
-#                  } for i, item in enumerate(result)]
-#
-#        if not (len(result) > 1): # 5 should give 0.75 and get reported
-#            result    = []
-#            relevance = 0.
-#        else:
-#            relevance = 1 - 1./(len(result)-1)
-#
-#        return (u'Groups', result, relevance)
+    # Category:Groups
+    def _searchGroups(self):
+        result = self._CVdetectObjects_Faces()
+        result = [{'Number':     (i+1),
+                   'Face':       item['face'],
+                   'Eyes':       item['eyes'], # if anyone has 1 eye it is in 'Category:Faces' BUT STILL NEEDED for ImageAnnotation in 'tag_image'
+                  } for i, item in enumerate(result)]
+        # ...could also create a bounding box for the whole group 'group'
+
+        if not (len(result) > 1): # 5 should give 0.75 and get reported
+            result    = []
+            relevance = 0.
+        else:
+            relevance = 1 - 1./(len(result)-1)
+
+        return (u'Groups', result, relevance)
 
     # Category:Unidentified people
     def _guessPeople(self):
@@ -959,7 +962,8 @@ class main(checkimages.main):
     def _collectPortraits(self):
         result = self._CVdetectObjects_Faces()
 
-        if not ((len(result) == 1) and (result[0]['coverage'] >= .25)):
+        #if not ((len(result) == 1) and (result[0]['coverage'] >= .25)):
+        if not ((len(result) == 1) and (result[0]['coverage'] >= .20)):
             result = []
 
         result = [{'Coverage': "%.3f" % item['coverage']} for item in result]
@@ -1183,7 +1187,12 @@ def checkbot():
             if outresult:
                 outpage = pywikibot.Page(site, u"User:DrTrigon/Category:Unidentified people (bot tagged)")
                 outresult = [ outpage.get() ] + outresult
-                outpage.put( u"\n".join(outresult), comment="bot adding test results" )
+                if ('write2wiki' in debug):
+                    outpage.put( u"\n".join(outresult), comment="bot adding test results" )
+                else:
+                    print u"--- " * 20
+                    print u"--- " * 20
+                    print u"\n".join(outresult[1:])
 
             pywikibot.output(u"\t\t\t>> STOP! <<")
             break # Exit
