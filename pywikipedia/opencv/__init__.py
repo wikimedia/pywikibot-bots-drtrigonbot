@@ -11,7 +11,7 @@ except ImportError:
     if os.system("make BoWclassify.so"):
         raise ImportError("'BoWclassify.so' could not be compiled!")
 
-    os.chdir( os.path.abspath(os.curdir) )
+    os.chdir( cur )
 
     # re-try to import
     import BoWclassify

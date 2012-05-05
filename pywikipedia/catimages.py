@@ -69,7 +69,7 @@ locale.setlocale(locale.LC_ALL, '')
 # debug tools
 # (look at 'bot_control.py' for more info)
 debug = []                       # no write, all users
-debug.append( 'write2wiki' )    # write to wiki (operational mode)
+#debug.append( 'write2wiki' )    # write to wiki (operational mode)
 #debug.append( 'code' )          # code debugging
 
 
@@ -184,7 +184,7 @@ class main(checkimages.main):
         #print self.image_path
         pywikibot.output(self.image.title())
 
-        for attr in ['_result_classify', '_result_detectFaces']:
+        for attr in ['_result_classify', '_result_detectFaces', '_result_detectcolor']:
             if hasattr(self, attr):
                 delattr(self, attr)
 
@@ -538,8 +538,10 @@ class main(checkimages.main):
         text = pattern.sub(template, text)
         return text
 
-    # Category:Faces
-    def _searchFaces(self):
+    ## Category:Faces
+    #def _searchFaces(self):
+    # Category:Unidentified people
+    def _searchPeople(self):
         result = self._CVdetectObjects_Faces()
         result = [{'Confidence': item['confidence'],
                    'Face':       item['face'],
@@ -547,7 +549,7 @@ class main(checkimages.main):
                   } for item in result]
         relevance = max([item['Confidence'] for item in result] + [0.])
 
-        return (u'Faces', result, relevance)
+        return (u'Unidentified people', result, relevance)
 
     # Category:Groups
     def _searchGroups(self):
@@ -609,6 +611,9 @@ class main(checkimages.main):
             #img    = cv2.imread( self.image_path, 1 )
             img    = cv2.imread( self.image_path_JPEG, 1 )
             #image  = cv.fromarray(img)
+            
+            # !!! the 'scale' here IS RELEVANT FOR THE DETECTION RATE;
+            # how small and how many features are detected as faces (or eyes)
             scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/500.)])
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
@@ -853,15 +858,124 @@ class main(checkimages.main):
     # Category:White‎     (255, 255, 255)
     # Category:Yellow    (255, 255,   0)
     # http://www.farb-tabelle.de/en/table-of-color.htm
-    def _collectColor(self):
-        result = self._PILaverageColorAndDeltaE()
-        if not result:
-            return (u"", [], 0.)
-        cat    = result[0]['color']
+    #def _collectColor(self):
+    def _searchBlack(self):
+        (result, info) = self._JSEGnPILdetectColorSegments()
+        if (u'Black' not in info):
+            return (u'Black', [], 0.)
 
-        result = [{'RGB': item['rgb'], 'Distance': u"%.3f" % item['delta_e']} for item in result]
+        return (u'Black', [info[u'Black']], info[u'Black'][u'Confidence'])
 
-        return (cat, result, 1.0)
+    def _searchBlue(self):
+        (result, info) = self._JSEGnPILdetectColorSegments()
+        if (u'Blue‎' not in info):
+            return (u'Blue‎', [], 0.)
+
+        return (u'Blue‎', [info[u'Blue‎']], info[u'Blue‎'][u'Confidence'])
+
+    def _searchBrown(self):
+        (result, info) = self._JSEGnPILdetectColorSegments()
+        if (u'Brown' not in info):
+            return (u'Brown', [], 0.)
+
+        return (u'Brown', [info[u'Brown']], info[u'Brown'][u'Confidence'])
+
+    def _searchGreen(self):
+        (result, info) = self._JSEGnPILdetectColorSegments()
+        if (u'Green' not in info):
+            return (u'Green', [], 0.)
+
+        return (u'Green', [info[u'Green']], info[u'Green'][u'Confidence'])
+
+    def _searchOrange(self):
+        (result, info) = self._JSEGnPILdetectColorSegments()
+        if (u'Orange' not in info):
+            return (u'Orange', [], 0.)
+
+        return (u'Orange', [info[u'Orange']], info[u'Orange'][u'Confidence'])
+
+    def _searchPink(self):
+        (result, info) = self._JSEGnPILdetectColorSegments()
+        if (u'Pink‎' not in info):
+            return (u'Pink‎', [], 0.)
+
+        return (u'Pink‎', [info[u'Pink‎']], info[u'Pink‎'][u'Confidence'])
+
+    def _searchPurple(self):
+        (result, info) = self._JSEGnPILdetectColorSegments()
+        if (u'Purple' not in info):
+            return (u'Purple', [], 0.)
+
+        return (u'Purple', [info[u'Purple']], info[u'Purple'][u'Confidence'])
+
+    def _searchRed(self):
+        (result, info) = self._JSEGnPILdetectColorSegments()
+        if (u'Red‎' not in info):
+            return (u'Red‎', [], 0.)
+
+        return (u'Red‎', [info[u'Red‎']], info[u'Red‎'][u'Confidence'])
+
+    def _searchTurquoise(self):
+        (result, info) = self._JSEGnPILdetectColorSegments()
+        if (u'Turquoise' not in info):
+            return (u'Turquoise', [], 0.)
+
+        return (u'Turquoise', [info[u'Turquoise']], info[u'Turquoise'][u'Confidence'])
+
+    def _searchWhite(self):
+        (result, info) = self._JSEGnPILdetectColorSegments()
+        if (u'White‎' not in info):
+            return (u'White‎', [], 0.)
+
+        return (u'White‎', [info[u'White‎']], info[u'White‎'][u'Confidence'])
+
+    def _searchYellow(self):
+        (result, info) = self._JSEGnPILdetectColorSegments()
+        if (u'Yellow' not in info):
+            return (u'Yellow', [], 0.)
+
+        return (u'Yellow', [info[u'Yellow']], info[u'Yellow'][u'Confidence'])
+
+    def _JSEGnPILdetectColorSegments(self):
+        if not hasattr(self, '_result_detectcolor'):
+            #from PIL import Image
+            import Image
+    
+            try:
+                i = Image.open(self.image_path)
+            except IOError:
+                pywikibot.output(u'WARNING: unknown file type')
+                return ([], [])
+            
+            result = []
+            info   = {}
+            #h = i.histogram()   # average over WHOLE IMAGE
+            hist = self._JSEGdetectColorSegmentsHist(i)  # split image into segments first
+            for h, coverage in hist:
+                data = self._DeltaEaverageColor(h)
+                data['coverage'] = coverage
+
+                # has to be in descending order since only 1 resolves (!)
+                if   (data['coverage'] >= 0.40) and (data['delta_e']  <=  5.0):
+                    data['confidence'] = 1.0
+                elif (data['coverage'] >= 0.20) and (data['delta_e']  <= 15.0):
+                    data['confidence'] = 0.75
+                elif (data['coverage'] >= 0.10) and (data['delta_e']  <= 20.0):
+                    data['confidence'] = 0.5
+                else:
+                    data['confidence'] = 0.1
+
+                #result.append( data )
+
+                if (info.get(data['color'], {'Confidence': 0.2})['Confidence'] < data['confidence']):
+                    info[data['color']] = {'RGB': data['rgb'], 
+                                           'Distance': u"%.3f" % data['delta_e'], 
+                                           'Coverage': u"%.3f" % data['coverage'],
+                                           'Confidence': data['confidence']}
+
+            self._result_detectcolor = (result, info)
+
+        return self._result_detectcolor
 
     # http://stackoverflow.com/questions/2270874/image-color-detection-using-python
     # https://gist.github.com/1246268
@@ -869,17 +983,7 @@ class main(checkimages.main):
     # http://code.google.com/p/python-colormath/
     # http://en.wikipedia.org/wiki/Color_difference
     # http://www.farb-tabelle.de/en/table-of-color.htm
-    def _PILaverageColorAndDeltaE(self):
-        #from PIL import Image
-        import Image
-        
-        try:
-            i = Image.open(self.image_path)
-            h = i.histogram()
-        except IOError:
-            pywikibot.output(u'WARNING: unknown file type')
-            return []
-        
+    def _DeltaEaverageColor(self, h):
         # split into red, green, blue
         r = h[0:256]
         g = h[256:256*2]
@@ -913,7 +1017,9 @@ class main(checkimages.main):
         # Color to be compared to the reference.
         #color2 = LabColor(lab_l=0.7, lab_a=14.2, lab_b=-1.80)
         color2 = lab
-        
+
+        # according to Categories available in Commons
+        # (only using these color makes sense, detect other is useles...)
         colors = { u'Black':     (  0,   0,   0),
                    u'Blue':      (  0,   0, 255),
                    u'Brown':     (165,  42,  42),
@@ -942,21 +1048,98 @@ class main(checkimages.main):
             ## Typically used to more closely model human percetion.
             #print "     CMC: %.3f (1:1)" % color1.delta_e(color2, mode='cmc', pl=1, pc=1)
 
-            r = color1.delta_e(color2, mode='cmc', pl=1, pc=1)
+            r = color1.delta_e(color2, mode='cmc', pl=2, pc=1)
             if (r < res[0]):
                 res = (r, c)
         data['color']   = res[1]
         data['delta_e'] = res[0]
-        
-        return [data]
 
-    # Category:Unidentified people
-    def _collectPeople(self):
+        return data
+
+    def _JSEGdetectColorSegmentsHist(self, im):
+        import Image, numpy, os
+        
+        tmpjpg = os.path.join(os.path.abspath(os.curdir), "cache/jseg_buf.jpg")
+        tmpgif = os.path.join(os.path.abspath(os.curdir), "cache/jseg_buf.gif")
+
+        # same scale func as in '_CVdetectObjects_Faces'
+        scale  = max([1., numpy.average(numpy.array(im.size)[0:2]/200.)])
+        #print numpy.array(im.size)/scale, scale
+        try:
+            smallImg = im.resize( tuple(numpy.int_(numpy.array(im.size)/scale)), Image.ANTIALIAS )
+        except IOError:
+            pywikibot.output(u'WARNING: unknown file type')
+            return []
+        
+        #im.thumbnail(size, Image.ANTIALIAS) # size is 640x480
+        smallImg.convert('RGB').save(tmpjpg, "JPEG", quality=100, optimize=True)
+        
+        # Program limitation: The total number of regions in the image must be less
+        # than 256 before the region merging process. This works for most images
+        # smaller than 512x512.
+        
+        # Processing time will be about 10 seconds for an 192x128 image and 60 seconds
+        # for a 352x240 image. It will take several minutes for a 512x512 image.
+        # Minimum image size is 64x64.
+        
+        # ^^^  THUS RESCALING TO ABOUT 200px ABOVE  ^^^
+
+#        import StringIO
+#        stdout, stderr = sys.stdout, sys.stderr
+#        sys.stdout = StringIO.StringIO()
+#        sys.stderr = StringIO.StringIO()
+        
+        # stdout, stderr not properly handeled yet
+        import jseg
+        # e.g. "segdist -i test3.jpg -t 6 -r9 test3.map.gif"
+        pywikibot.output(u'')
+        jseg.segdist_cpp.main( ("segdist -i %s -t 6 -r9 %s"%(tmpjpg, tmpgif)).split(" ") )
+        pywikibot.output(u'')
+        
+        os.remove( tmpjpg )
+        
+        # http://stackoverflow.com/questions/384759/pil-and-numpy
+        pic = Image.open(tmpgif)
+        pix = numpy.array(pic)
+        
+        os.remove( tmpgif )
+
+# TODO: try to merge similar regions ...
+        imgsize = float(smallImg.size[0]*smallImg.size[1])
+        hist = []
+        for i in range(numpy.max(pix)+1):
+            mask = numpy.uint8(pix == i)
+            coverage = numpy.count_nonzero(mask)/imgsize
+            mask = Image.fromarray( mask )
+            h    = smallImg.histogram(mask)
+            if (len(h) == 256):
+                print "gray scale image, try to fix..."
+                h = h*3
+            if (len(h) == 256*4):
+                print "4-ch. image, try to fix (can include transperancy)..."
+                h = h[0:(256*3)]
+            hist.append( (h, coverage) )
+        
+        return hist
+
+    ## Category:Unidentified people
+    #def _collectPeople(self):
+    #    result = self._CVdetectObjects_Faces()
+    #
+    #    result = [{} for item in result]
+    #
+    #    return (u'Unidentified people', result, 1.0)
+
+    # Category:Faces
+    def _collectFaces(self):
         result = self._CVdetectObjects_Faces()
 
-        result = [{} for item in result]
+        if not ((len(result) == 1) and (result[0]['coverage'] >= .50)):
+            result = []
 
-        return (u'Unidentified people', result, 1.0)
+        result = [{'Coverage': "%.3f" % item['coverage']} for item in result]
+
+        return (u'Faces', result, 1.0)
 
     # Category:Portraits
     def _collectPortraits(self):
