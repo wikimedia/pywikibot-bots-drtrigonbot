@@ -88,6 +88,25 @@ project_inserted = [u'commons',]
 # <--------------------------- Change only above! ---------------------------> #
 ################################################################################
 
+#tmpl_FileContentsByBot = u"""{{FileContentsByBot
+#| botName = %(botName)s
+#<!--| dimX    = ?-->   <!-- is this REALLY needed...?? -->
+#<!--| dimY    = ?-->   <!-- is this REALLY needed...?? -->
+#|
+#%(items)s
+#}}"""
+tmpl_FileContentsByBot = u"""}}
+{{FileContentsByBot
+| botName = ~~~
+<!--| dimX    = ?-->   <!-- is this REALLY needed...?? -->
+<!--| dimY    = ?-->   <!-- is this REALLY needed...?? -->
+|"""
+
+# TODO: auto-generate this list during bot run, i.e. notify about NEW templates added
+#tmpl_available_spec = [ u'Unidentified people', u'Brown' ]
+tmpl_available_spec = []
+
+
 # Other common useful functions
 def printWithTimeZone(message):
     """ Function to print the messages followed by the TimeZone encoded
@@ -241,13 +260,14 @@ class main(checkimages.main):
         ret.append( u"[[%s|200px]]" % self.image.title() )
         #ret.append( u"[[%s]]" % self.image.title() )
         imaganot_done = False
+        content = self.append_to_template(content, u"Information", tmpl_FileContentsByBot)
         for i, item in enumerate(self._result_check):
             (cat, res, rel) = item
             report = (rel >= thrshld)
             report_topage = report_topage or report
 
-            if not i:
-                if (cat in [u'Faces', u'Groups']):
+            if not i:   # not very nice; if e.g. a color like 'Black' is first, nothing will be done!!!
+                if (cat in [u'Faces', u'Groups', u'Unidentified people']):
                     marker = self.make_markerblock(item, 200.)
                     ret.append( marker )
                 ret.append( u"</div>" )
@@ -257,7 +277,7 @@ class main(checkimages.main):
 # TODO: WHAT CATEGORY/-IES TO USE HERE?!?
             ret.append( u"=== [[:Category:%s]] [[File:%s|16px]] ===" % (cat, {True: 'ButtonGreen.svg', False: 'ButtonRed.svg'}[report]) )
 #            ret.append( u"=== [[:Category:%s (bot tagged)]] ===" % cat )
-            ret.append( info )
+            ret.append( tmpl_FileContentsByBot[3:] + info + u"\n}}" )
 
             if report:
                 tags.add( u"[[:Category:%s]]" % cat )
@@ -265,15 +285,11 @@ class main(checkimages.main):
                 content = self.add_category(content, u"Category:%s" % cat)
 #                content = self.add_category(content, u"Category:%s (bot tagged)" % cat)
                 if info:
-                    info = u"{{Information field|name=[[User:DrTrigonBot|Bot]] [[:Category:%s]] info|value=\n%s}}" % (cat, info)
-                    # works just once (for one iteration)
-                    #content = self.change_template(content, u"Information", {'other_versions':info})
-                    # works multiple times, but '|other_fields=' is missing at top (is that important?)
-                    content = self.append_to_template(content, u"Information", info)
-                if (cat in [u'Faces', u'Groups']) and (not imaganot_done):
-                    marker  = self.make_ImageAnnotatorBlock(item)
-                    content = self.add_template(content, marker, raw=True)
-                    imaganot_done = True
+                    content = self.append_to_template(content, u"FileContentsByBot", info)
+#                if (cat in [u'Faces', u'Groups', u'Unidentified people']) and (not imaganot_done):
+#                    marker  = self.make_ImageAnnotatorBlock(item)
+#                    content = self.add_template(content, marker, raw=True)
+#                    imaganot_done = True
 
         # again the same code as before but for other list
         # (HACKY; should be done more clever!!)
@@ -285,7 +301,7 @@ class main(checkimages.main):
 # TODO: WHAT CATEGORY/-IES TO USE HERE?!?
             ret.append( u"=== [[:Category:%s]] ===" % cat )
 #            ret.append( u"=== [[:Category:%s (bot tagged)]] ===" % cat )
-            ret.append( info )
+            ret.append( tmpl_FileContentsByBot[3:] + info + u"\n}}" )
 
             if report_topage:
                 tags.add( u"[[:Category:%s]]" % cat )
@@ -293,11 +309,8 @@ class main(checkimages.main):
                 content = self.add_category(content, u"Category:%s" % cat)
 #                content = self.add_category(content, u"Category:%s (bot tagged)" % cat)
                 if info:
-                    info = u"{{Information field|name=[[User:DrTrigonBot|Bot]] [[:Category:%s]] info|value=\n%s}}" % (cat, info)
-                    # works just once (for one iteration)
-                    #content = self.change_template(content, u"Information", {'other_versions':info})
-                    # works multiple times, but '|other_fields=' is missing at top (is that important?)
-                    content = self.append_to_template(content, u"Information", info)
+                    # works multiple times
+                    content = self.append_to_template(content, u"FileContentsByBot", info)
 
         if report_topage:
             tags.add( u"[[:Category:Categorized by bot]]" )
@@ -327,47 +340,62 @@ class main(checkimages.main):
         if os.path.exists(image_path_new):
             os.remove( image_path_new )
 
+#    def make_infoblock(self, item):
+#        (cat, res, rel) = item
+#        if not res:
+#            return u''
+#
+#        titles = res[0].keys()
+#        if not titles:
+#            return u''
+#        result = []
+#        result.append( u"{{(!}}" )
+#        #result.append( u'{{(!}}style="background:%s;"' % {True: 'green', False: 'red'}[report] )
+#        result.append( u"{{!}}-" )
+#        for key in titles:
+#            #if (key == 'Confidence'):
+#            #    result.append( u"!%s [[File:%s|16px]]" % (key, {True: 'ButtonGreen.svg', False: 'ButtonRed.svg'}[report]) )
+#            #else:
+#            #    result.append( u"!%s" % key )
+#            #    #result.append( u"{{!}}%s" % c )
+#            result.append( u"!%s" % key )
+#        result.append( u"{{!}}-" )
+#        for item in res:
+#            for key in titles:
+#                result.append( u"{{!}}%s" % str(item[key]) )
+#            result.append( u"{{!}}-" )
+#        result.append( u"{{!)}}" )
+#
+#        return u"\n".join( result )
+
     def make_infoblock(self, item):
         (cat, res, rel) = item
         if not res:
             return u''
 
-# TODO: USE HTML MARK-UP HERE?!?
+        generic = (cat not in tmpl_available_spec)
         titles = res[0].keys()
         if not titles:
             return u''
+
         result = []
-        result.append( u"{{(!}}" )
         #result.append( u'{{(!}}style="background:%s;"' % {True: 'green', False: 'red'}[report] )
-        result.append( u"{{!}}-" )
-        for key in titles:
-            #if (key == 'Confidence'):
-            #    result.append( u"!%s [[File:%s|16px]]" % (key, {True: 'ButtonGreen.svg', False: 'ButtonRed.svg'}[report]) )
-            #else:
-            #    result.append( u"!%s" % key )
-            #    #result.append( u"{{!}}%s" % c )
-            result.append( u"!%s" % key )
-        result.append( u"{{!}}-" )
-        for item in res:
+        if generic:
+            result.append( u"{{FileContentsByBot/generic|name=%s|" % cat )
+            buf = dict([ (key, []) for key in titles ])
+            for item in res:
+                for key in titles:
+                    buf[key].append( str(item[key]) )
             for key in titles:
-                result.append( u"{{!}}%s" % str(item[key]) )
-            result.append( u"{{!}}-" )
-        result.append( u"{{!)}}" )
-#        result.append( u"<table>" )
-#        #result.append( u'{{(!}}style="background:%s;"' % {True: 'green', False: 'red'}[report] )
-#        result.append( u"<tr>" )
-#        result.append( u"<td>Confidence</td>" )
-#        #result.append( u"{{!}}%s" % c )
-#        result.append( u"<td>[[File:%s]] %s</td>" % ({True: 'ButtonGreen.svg', False: 'ButtonRed.svg'}[report], c) )
-#        result.append( u"</tr>" )
-#        for r in res:
-#            if 'eyes' not in r:
-#                continue
-#            result.append( u"<tr>" )
-#            result.append( u"<td>Face / Eyes</td>" )
-#            result.append( u"<td>%s / %s</td>" % (r['face'], r['eyes']) )
-#            result.append( u"</tr>" )
-#        result.append( u"</table>" )
+                result.append( u"  {{FileContentsByBot/generic|name=%s|value=%s}}" % (key, u"; ".join(buf[key])) )
+        else:
+            result.append( u"{{FileContentsByBot/%s|" % cat )
+            for item in res:
+                result.append( u"  {{FileContentsByBot/%s" % cat )
+                for key in titles:
+                    result.append( u"  | %s = %s" % (key, str(item[key])) )
+                result.append( u"  }}" )
+        result.append( u"}}" )
 
         return u"\n".join( result )
 
