@@ -98,13 +98,11 @@ project_inserted = [u'commons',]
 tmpl_FileContentsByBot = u"""}}
 {{FileContentsByBot
 | botName = ~~~
-<!--| dimX    = ?-->   <!-- is this REALLY needed...?? -->
-<!--| dimY    = ?-->   <!-- is this REALLY needed...?? -->
 |"""
 
 # TODO: auto-generate this list during bot run, i.e. notify about NEW templates added
-#tmpl_available_spec = [ u'Unidentified people', u'Brown' ]
-tmpl_available_spec = []
+#tmpl_available_spec = [ u'Faces', u'ColorRegions', u'ColorAverage', u'Properties' ]
+tmpl_available_spec = [ u'Properties', u'ColorRegions', u'Faces' ]
 
 
 # Other common useful functions
@@ -148,7 +146,7 @@ class main(checkimages.main):
     def load_licenses(self):
         pywikibot.output(u'\n\t...Listing the procedures available...\n')
         for item in dir(self):
-            if ('_search' in item) or ('_guess' in item) or ('_collect' in item):
+            if ('_filter' in item) or ('_cat' in item) or ('_guess' in item):
                 pywikibot.output( item )
         return []
 
@@ -203,30 +201,33 @@ class main(checkimages.main):
         #print self.image_path
         pywikibot.output(self.image.title())
 
-        for attr in ['_result_classify', '_result_detectFaces', '_result_detectcolor']:
-            if hasattr(self, attr):
-                delattr(self, attr)
+        if gbv.useGuesses:
+            self.thrshld = 0.1
+        else:
+            self.thrshld = 0.75
 
-        self._result_info  = []
+        self._info         = {}
+        self._info_filter  = {}
         self._result_check = []
 
-        # use information collectors for generic data (rel = 1.0)
-        for item in dir(self):
-            if '_collect' in item:
-                (cat, result, rel) = self.__class__.__dict__[item](self)
-                #print cat, result, len(result)
-                if result:
-                    self._result_info.append( (cat, result, rel) )
+        # gather all information related to current image
+        self._gatherInformation()
 
-        # use explicit searches for classification (rel = ?)
+        # information template: use filter to select from gathered information
+        self._info_filter = {}
         for item in dir(self):
-            if '_search' in item:
-                (cat, result, rel) = self.__class__.__dict__[item](self)
-                #print cat, result, len(result)
-                if result:
-                    self._result_check.append( (cat, result, rel) )
+            if '_filter' in item[:7]:
+                self._info_filter.update( self.__class__.__dict__[item](self) )
 
-        # use guesses for unreliable classification (rel = 0.1)
+        # categorization: use explicit searches for classification (rel = ?)
+        for item in dir(self):
+            if '_cat' in item[:4]:
+                (cat, rel) = self.__class__.__dict__[item](self)
+                #print cat, result, len(result)
+                if rel:
+                    self._result_check.append( cat )
+
+        # categorization: use guesses for unreliable classification (rel = 0.1)
         if not gbv.useGuesses:
             return self._result_check
         for item in dir(self):
@@ -239,95 +240,68 @@ class main(checkimages.main):
         return self._result_check
 
     def tag_image(self, put = False):
-        if not self._result_check:
-            self.clean_cache()
+        put = False
+        self.clean_cache()
+
+        if len(self._info_filter) <= 1:     # 'Properties' is always present (!)
             return u""
 
         pywikibot.get_throttle()
         content = self.image.get()
 
-        if gbv.useGuesses:
-            thrshld = 0.1
-        else:
-            thrshld = 0.75
+        content = self.append_to_template(content, u"Information", tmpl_FileContentsByBot)
+        for i, key in enumerate(self._info_filter):
+            item = self._info_filter[key]
 
-        report_topage = False
-        ret  = []
+            info = self.make_infoblock(key, item)
+            content = self.append_to_template(content, u"FileContentsByBot", info)
+
         tags = set([])
+        for i, cat in enumerate(self._result_check):
+            tags.add( u"[[:Category:%s]]" % cat )
+#            tags.add( u"%s (bot tagged)" % cat )
+            content = self.add_category(content, u"Category:%s" % cat)
+#            content = self.add_category(content, u"Category:%s (bot tagged)" % cat)
+
+        tags.add( u"[[:Category:Categorized by bot]]" )
+        content = self.add_category(content, u"Category:Categorized by bot")
+        #content = self.add_template(content, u"Check categories", top=True)
+        content = self.add_template(content, u"Check categories|year={{subst:#time:Y}}|month={{subst:#time:F}}|day={{subst:#time:j}}|category=[[Category:Categorized by bot]]", top=True)
+        content = self.remove_category_or_template(content, u"Uncategorized")
+        content = self.gather_category(content)
+        print u"--- " * 20
+        print content
+        print u"--- " * 20
+        if put:
+            pywikibot.put_throttle()
+            #self.image.put( content, comment="bot automatic categorization" )
+            self.image.put( content, comment="bot automatic categorization; adding %s" % u", ".join(tags) )
+
+        print self.log_output()
+        raise
+        return self.log_output()
+
+    def log_output(self):
+        if len(self._info) <= 1:     # 'Properties' is always present (!)
+            return u""
+
+        ret  = []
         ret.append( u"" )
         ret.append( u"== [[:%s]] ==" % self.image.title() )
         ret.append( u'<div style="position:relative;">' )
         ret.append( u"[[%s|200px]]" % self.image.title() )
-        #ret.append( u"[[%s]]" % self.image.title() )
-        imaganot_done = False
-        content = self.append_to_template(content, u"Information", tmpl_FileContentsByBot)
-        for i, item in enumerate(self._result_check):
-            (cat, res, rel) = item
-            report = (rel >= thrshld)
-            report_topage = report_topage or report
+        marker = self.make_markerblock(self._info_filter[u'Faces'], 200.)
+        ret.append( marker )
+        ret.append( u"</div>" )
 
-            if not i:   # not very nice; if e.g. a color like 'Black' is first, nothing will be done!!!
-                if (cat in [u'Faces', u'Groups', u'Unidentified people']):
-                    marker = self.make_markerblock(item, 200.)
-                    ret.append( marker )
-                ret.append( u"</div>" )
+        info = []
+        for i, key in enumerate(self._info):
+            item = self._info[key]
 
-            info   = self.make_infoblock(item)
+            info.append( self.make_infoblock(key, item, []) )
+        ret.append( tmpl_FileContentsByBot[3:] + u"\n" + u"\n".join( info ) + u"\n}}" )
 
-# TODO: WHAT CATEGORY/-IES TO USE HERE?!?
-            ret.append( u"=== [[:Category:%s]] [[File:%s|16px]] ===" % (cat, {True: 'ButtonGreen.svg', False: 'ButtonRed.svg'}[report]) )
-#            ret.append( u"=== [[:Category:%s (bot tagged)]] ===" % cat )
-            ret.append( tmpl_FileContentsByBot[3:] + info + u"\n}}" )
-
-            if report:
-                tags.add( u"[[:Category:%s]]" % cat )
-#                tags.add( u"%s (bot tagged)" % cat )
-                content = self.add_category(content, u"Category:%s" % cat)
-#                content = self.add_category(content, u"Category:%s (bot tagged)" % cat)
-                if info:
-                    content = self.append_to_template(content, u"FileContentsByBot", info)
-#                if (cat in [u'Faces', u'Groups', u'Unidentified people']) and (not imaganot_done):
-#                    marker  = self.make_ImageAnnotatorBlock(item)
-#                    content = self.add_template(content, marker, raw=True)
-#                    imaganot_done = True
-
-        # again the same code as before but for other list
-        # (HACKY; should be done more clever!!)
-        for item in self._result_info:
-            (cat, res, rel) = item
-
-            info   = self.make_infoblock(item)
-
-# TODO: WHAT CATEGORY/-IES TO USE HERE?!?
-            ret.append( u"=== [[:Category:%s]] ===" % cat )
-#            ret.append( u"=== [[:Category:%s (bot tagged)]] ===" % cat )
-            ret.append( tmpl_FileContentsByBot[3:] + info + u"\n}}" )
-
-            if report_topage:
-                tags.add( u"[[:Category:%s]]" % cat )
-#                tags.add( u"%s (bot tagged)" % cat )
-                content = self.add_category(content, u"Category:%s" % cat)
-#                content = self.add_category(content, u"Category:%s (bot tagged)" % cat)
-                if info:
-                    # works multiple times
-                    content = self.append_to_template(content, u"FileContentsByBot", info)
-
-        if report_topage:
-            tags.add( u"[[:Category:Categorized by bot]]" )
-            content = self.add_category(content, u"Category:Categorized by bot")
-            #content = self.add_template(content, u"Check categories", top=True)
-            content = self.add_template(content, u"Check categories|year={{subst:#time:Y}}|month={{subst:#time:F}}|day={{subst:#time:j}}|category=[[Category:Categorized by bot]]", top=True)
-            content = self.remove_category_or_template(content, u"Uncategorized")
-            content = self.gather_category(content)
-            print u"--- " * 20
-            print content
-            print u"--- " * 20
-            if put:
-                pywikibot.put_throttle()
-                #self.image.put( content, comment="bot automatic categorization" )
-                self.image.put( content, comment="bot automatic categorization; adding %s" % u", ".join(tags) )
-
-        self.clean_cache()
+        ret.append( "bot automatic categorization; adding %s" % u", ".join(self._result_check) )
 
         return u"\n".join( ret )
 
@@ -368,12 +342,11 @@ class main(checkimages.main):
 #
 #        return u"\n".join( result )
 
-    def make_infoblock(self, item):
-        (cat, res, rel) = item
+    def make_infoblock(self, cat, res, tmpl_available=tmpl_available_spec):
         if not res:
             return u''
 
-        generic = (cat not in tmpl_available_spec)
+        generic = (cat not in tmpl_available)
         titles = res[0].keys()
         if not titles:
             return u''
@@ -385,7 +358,7 @@ class main(checkimages.main):
             buf = dict([ (key, []) for key in titles ])
             for item in res:
                 for key in titles:
-                    buf[key].append( str(item[key]) )
+                    buf[key].append( self.output_format(item[key]) )
             for key in titles:
                 result.append( u"  {{FileContentsByBot/generic|name=%s|value=%s}}" % (key, u"; ".join(buf[key])) )
         else:
@@ -393,18 +366,36 @@ class main(checkimages.main):
             for item in res:
                 result.append( u"  {{FileContentsByBot/%s" % cat )
                 for key in titles:
-                    result.append( u"  | %s = %s" % (key, str(item[key])) )
+                    if not (item[key] == []):   # (work-a-round for empty 'Eyes')
+                        result.append( self.output_format_flatten(key, item[key]) )
                 result.append( u"  }}" )
         result.append( u"}}" )
 
         return u"\n".join( result )
 
-    def make_markerblock(self, item, size):
+    def output_format(self, value):
+        if (type(value) == type(float())):
+            # round/strip floats
+            return "%.3f" % value
+        else:
+            # output string representation of variable
+            return str(value)
+
+    def output_format_flatten(self, key, value):
+        # flatten structured varible recursively
+        if (type(value) == type(tuple())) or (type(value) == type(list())):
+            buf = []
+            for i, t in enumerate(value):
+                buf.append( self.output_format_flatten(key + (u"-%02i" % i), t) )
+            return u"\n".join( buf )
+        else:
+            # end of recursion
+            return u"  | %s = %s" % (key, self.output_format(value))
+
+    def make_markerblock(self, res, size):
         import numpy
 
-        (cat, res, rel) = item
-
-        # same as in '_CVdetectObjects_Faces'
+        # same as in '_detectObjectFaces_CV'
         colors = [ (0,0,255),
             (0,128,255),
             (0,255,255),
@@ -421,7 +412,7 @@ class main(checkimages.main):
             
             #scale = r['size'][0]/size
             scale = self.image_size[0]/size
-            f     = list(numpy.array(r['Face'])/scale)
+            f     = list(numpy.array(r['Position'])/scale)
             
             result.append( u'<div class="face-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px solid #%s;"></div>' % tuple(f + [color]) )
 
@@ -439,7 +430,7 @@ class main(checkimages.main):
 
         (cat, res, rel) = item
 
-        # same as in '_CVdetectObjects_Faces'
+        # same as in '_detectObjectFaces_CV'
         colors = [ (0,0,255),
             (0,128,255),
             (0,255,255),
@@ -457,11 +448,11 @@ class main(checkimages.main):
             
             ##scale = r['size'][0]/size
             #scale = self.image_size[0]/size
-            #f     = list(numpy.array(r['Face'])/scale)
+            #f     = list(numpy.array(r['Position'])/scale)
             
             k += 1
-            param = {'id': k, 'x': r['Face'][0], 'y': r['Face'][1], 
-                     'w': r['Face'][2], 'h': r['Face'][3], 'dx': self.image_size[0], 'dy': self.image_size[1], 
+            param = {'id': k, 'x': r['Position'][0], 'y': r['Position'][1], 
+                     'w': r['Position'][2], 'h': r['Position'][3], 'dx': self.image_size[0], 'dy': self.image_size[1], 
                      'color': color}
             result.append( u'{{ImageNote|id=%(id)i|x=%(x)i|y=%(y)i|w=%(w)i|h=%(h)i|dimx=%(dx)i|dimy=%(dy)i|style=2}}' % param )
             result.append( u'{{LangSwitch' )
@@ -558,7 +549,7 @@ class main(checkimages.main):
 
     # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
     def append_to_template(self, text, name, append):
-        pattern  = re.compile(u"(\{\{%s.*?\n)(\s*\}\})" % name, flags=re.S)
+        pattern  = re.compile(u"(\{\{%s.*?\n)(\s*\}\}\n{2})" % name, flags=re.S)
         template = pattern.search(text).groups()
         
         template = u"".join( [template[0], append, u"\n", template[1]] )
@@ -566,46 +557,64 @@ class main(checkimages.main):
         text = pattern.sub(template, text)
         return text
 
-    ## Category:Faces
-    #def _searchFaces(self):
-    # Category:Unidentified people
-    def _searchPeople(self):
-        result = self._CVdetectObjects_Faces()
-        result = [{'Confidence': item['confidence'],
-                   'Face':       item['face'],
-                   'Eyes':       item['eyes'],
-                  } for item in result]
-        relevance = max([item['Confidence'] for item in result] + [0.])
+    #def _drawRect(self, faces): #function to modify the img
+    #    import Image, ImageDraw
+    #    image_path_new = os.path.join('cache', '0_DETECTED_' + self.image_filename)
+    #    im = Image.open(self.image_path)
+    #    draw = ImageDraw.Draw(im)
+    #    for f in faces:
+    #        (x, y, width, height) = f[0]
+    ##        (x, y, width, height) = f
+    #        #print("[(%d,%d) -> (%d,%d)]" % (f.x, f.y, f.x+f.width, f.y+f.height))
+    #        (x1, y1, x2, y2) = (x, y, x+width, y+height)
+    #        #print("[(%d,%d) -> (%d,%d)]" % (x1, y1, x2, y2))
+    ##        draw.rectangle([x1,y1,x2,y2], outline=(255,0,0))
+    #        draw.rectangle([x1,y1,x2,y2], outline="#ff0000")
+    #    im.save(image_path_new)
 
-        return (u'Unidentified people', result, relevance)
+    # gather data from all information interfaces and assign confidences
+    def _gatherInformation(self):
+        # Image size
+        self._detectProperties_PIL()
+        
+        # Faces and eyes
+        self._detectObjectFaces_CV()
+        
+        for i in range(len(self._info['Faces'])):
+            data = self._info['Faces'][i]
 
-    # Category:Groups
-    def _searchGroups(self):
-        result = self._CVdetectObjects_Faces()
-        result = [{'Number':     (i+1),
-                   'Face':       item['face'],
-                   'Eyes':       item['eyes'], # if anyone has 1 eye it is in 'Category:Faces' BUT STILL NEEDED for ImageAnnotation in 'tag_image'
-                  } for i, item in enumerate(result)]
-        # ...could also create a bounding box for the whole group 'group'
+            c = (len(data['Eyes']) + 2.) / 4.
+            self._info['Faces'][i]['Confidence'] = c
 
-        if not (len(result) > 1): # 5 should give 0.75 and get reported
-            result    = []
-            relevance = 0.
-        else:
-            relevance = 1 - 1./(len(result)-1)
+        # Segments and colors
+        self._detectSegmentColors_JSEGnPIL()
 
-        return (u'Groups', result, relevance)
+# TODO:
+        # ALSO GET AVERAGE COLOR OF IMAGE (average over full image)
 
-    # Category:Unidentified people
-    def _guessPeople(self):
-        #result  = self._CVdetectObjects_Faces()
-        #result += self._CVdetectObjects_People()
+        for i in range(len(self._info['ColorRegions'])):
+            data = self._info['ColorRegions'][i]
 
-        return (u'Unidentified people', self._CVclassifyObjects_All('person'), 0.1)
+            # has to be in descending order since only 1 resolves (!)
+            if   (data['Coverage'] >= 0.40) and (data['Delta_E']  <=  5.0):
+                c = 1.0
+            elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 15.0):
+                c = 0.75
+            elif (data['Coverage'] >= 0.10) and (data['Delta_E']  <= 20.0):
+                c = 0.5
+            else:
+                c = 0.1
+            self._info['ColorRegions'][i]['Confidence'] = c
+
+        # People
+        #self._detectObjectPeople_CV()
+
+        # general (trained) classification
+        #self._classifyObjectAll_CV()
 
     # .../opencv/samples/c/facedetect.cpp
     # http://opencv.willowgarage.com/documentation/python/genindex.html
-    def _CVdetectObjects_Faces(self, confidence=0.5):
+    def _detectObjectFaces_CV(self):
         """Converts an image to grayscale and prints the locations of any
            faces found"""
         # http://python.pastebin.com/m76db1d6b
@@ -614,9 +623,6 @@ class main(checkimages.main):
         # http://opencv.willowgarage.com/wiki/FaceDetection
         # http://blog.jozilla.net/2008/06/27/fun-with-python-opencv-and-face-detection/
         # http://www.cognotics.com/opencv/servo_2007_series/part_4/index.html
-
-        if hasattr(self, '_result_detectFaces'):
-            return self._result_detectFaces
 
         import cv, cv2, numpy
 
@@ -649,8 +655,6 @@ class main(checkimages.main):
         except AttributeError:
             pywikibot.output(u'WARNING: unknown file type')
             return []
-
-        self.image_size = (img.shape[1], img.shape[0])
 
         #detectAndDraw( image, cascade, nestedCascade, scale );
         # http://nullege.com/codes/search/cv.CvtColor
@@ -708,27 +712,24 @@ class main(checkimages.main):
                 #|CV_HAAR_DO_CANNY_PRUNING
                 |cv.CV_HAAR_SCALE_IMAGE,
                 (30, 30) )
-            c = (len(nestedObjects) + 2.) / 4.
-            data = { 'face': tuple(numpy.int_(r*scale)), 
-                     'eyes': [], 
-                     'confidence': c, 
-                     'size': self.image_size, }
-            data['coverage'] = float(data['face'][2]*data['face'][3])/(data['size'][0]*data['size'][1])
+            data = { 'ID':       (i+1),
+                     'Position': tuple(numpy.int_(r*scale)), 
+                     'Eyes':     [], }
+            data['Coverage'] = float(data['Position'][2]*data['Position'][3])/(self.image_size[0]*self.image_size[1])
             #if (c >= confidence):
             #    eyes = nestedObjects
             #    if not (type(eyes) == type(tuple())):
             #        eyes = tuple((eyes*scale).tolist())
-            #    result.append( {'face': r*scale, 'eyes': eyes, 'confidence': c} )
-            #print {'face': r, 'eyes': nestedObjects, 'confidence': c}
+            #    result.append( {'Position': r*scale, 'eyes': eyes, 'confidence': c} )
+            #print {'Position': r, 'eyes': nestedObjects, 'confidence': c}
             for nr in nestedObjects:
                 (nrx, nry, nrwidth, nrheight) = nr
                 cx = cv.Round((rx + nrx + nrwidth*0.5)*scale)
                 cy = cv.Round((ry + nry + nrheight*0.5)*scale)
                 radius = cv.Round((nrwidth + nrheight)*0.25*scale)
                 cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
-                data['eyes'].append( (cx-radius, cy-radius, 2*radius, 2*radius) )
-            if (c >= confidence):
-                result.append( data )
+                data['Eyes'].append( (cx-radius, cy-radius, 2*radius, 2*radius) )
+            result.append( data )
 
         # see '_drawRect'
         if result:
@@ -737,273 +738,106 @@ class main(checkimages.main):
             cv2.imwrite( image_path_new, img )
 
         #return faces.tolist()
-        self._result_detectFaces = result
-        return result
+        self._info['Faces'] = result
+        return
 
     # .../opencv/samples/cpp/peopledetect.cpp
-    def _CVdetectObjects_People(self):
+    def _detectObjectPeople_CV(self):
         # needs an .so (C++) module since python bindings are missing, but
         # results do not look very probising, so forget about it...
         pass
 
-    #def _drawRect(self, faces): #function to modify the img
-    #    import Image, ImageDraw
-    #    image_path_new = os.path.join('cache', '0_DETECTED_' + self.image_filename)
-    #    im = Image.open(self.image_path)
-    #    draw = ImageDraw.Draw(im)
-    #    for f in faces:
-    #        (x, y, width, height) = f[0]
-    ##        (x, y, width, height) = f
-    #        #print("[(%d,%d) -> (%d,%d)]" % (f.x, f.y, f.x+f.width, f.y+f.height))
-    #        (x1, y1, x2, y2) = (x, y, x+width, y+height)
-    #        #print("[(%d,%d) -> (%d,%d)]" % (x1, y1, x2, y2))
-    ##        draw.rectangle([x1,y1,x2,y2], outline=(255,0,0))
-    #        draw.rectangle([x1,y1,x2,y2], outline="#ff0000")
-    #    im.save(image_path_new)
-
-    ## Category:Unidentified maps
-    #def _guessMaps(self):
-    #    return (u'Unidentified maps', self._CVclassifyObjects_All('maps'), 0.1)
-
-    ## Category:Unidentified flags
-    #def _guessFlags(self):
-    #    return (u'Unidentified flags', self._CVclassifyObjects_All('flags'), 0.1)
-
-    # Category:Unidentified plants
-    def _guessPlants(self):
-        return (u'Unidentified plants', self._CVclassifyObjects_All('pottedplant'), 0.1)
-
-    ## Category:Unidentified coats of arms
-    #def _guessCoatsOfArms(self):
-    #    return (u'Unidentified coats of arms', self._CVclassifyObjects_All('coats of arms'), 0.1)
-
-    ## Category:Unidentified buildings
-    #def _guessBuildings(self):
-    #    return (u'Unidentified buildings', self._CVclassifyObjects_All('buildings'), 0.1)
-
-    # Category:Unidentified trains
-    def _guessTrains(self):
-        return (u'Unidentified trains', self._CVclassifyObjects_All('train'), 0.1)
-
-    # Category:Unidentified automobiles
-    def _guessAutomobiles(self):
-        result  = self._CVclassifyObjects_All('bus')
-        result += self._CVclassifyObjects_All('car')
-        result += self._CVclassifyObjects_All('motorbike')
-        return (u'Unidentified automobiles', result, 0.1)
-
-    # Category:Unidentified buses
-    def _guessBuses(self):
-        return (u'Unidentified buses', self._CVclassifyObjects_All('bus'), 0.1)
-
     # .../opencv/samples/cpp/bagofwords_classification.cpp
-    def _CVclassifyObjects_All(self, cls, confidence=0.5):
+    def _classifyObjectAll_CV(self, cls):
         """Uses the 'The Bag of Words model' for classification"""
 
-        # prevent multiple execute of code below
-        if not hasattr(self, '_result_classify'):
-            # http://app-solut.com/blog/2011/07/the-bag-of-words-model-in-opencv-2-2/
-            # http://app-solut.com/blog/2011/07/using-the-normal-bayes-classifier-for-image-categorization-in-opencv/
-            # http://authors.library.caltech.edu/7694/
-            # http://www.vision.caltech.edu/Image_Datasets/Caltech256/
-            # http://opencv.itseez.com/modules/features2d/doc/object_categorization.html
-            
-            # http://www.morethantechnical.com/2011/08/25/a-simple-object-classifier-with-bag-of-words-using-opencv-2-3-w-code/
-            #   source: https://github.com/royshil/FoodcamClassifier
-            # http://app-solut.com/blog/2011/07/using-the-normal-bayes-classifier-for-image-categorization-in-opencv/
-            #   source: http://code.google.com/p/open-cv-bow-demo/downloads/detail?name=bowdemo.tar.gz&can=2&q=
+        # http://app-solut.com/blog/2011/07/the-bag-of-words-model-in-opencv-2-2/
+        # http://app-solut.com/blog/2011/07/using-the-normal-bayes-classifier-for-image-categorization-in-opencv/
+        # http://authors.library.caltech.edu/7694/
+        # http://www.vision.caltech.edu/Image_Datasets/Caltech256/
+        # http://opencv.itseez.com/modules/features2d/doc/object_categorization.html
+        
+        # http://www.morethantechnical.com/2011/08/25/a-simple-object-classifier-with-bag-of-words-using-opencv-2-3-w-code/
+        #   source: https://github.com/royshil/FoodcamClassifier
+        # http://app-solut.com/blog/2011/07/using-the-normal-bayes-classifier-for-image-categorization-in-opencv/
+        #   source: http://code.google.com/p/open-cv-bow-demo/downloads/detail?name=bowdemo.tar.gz&can=2&q=
 
-            # parts of code here should/have to be placed into e.g. a own
-            # class in 'opencv/__init__.py' script/module
-            
-            trained = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus',
-                       'car', 'cat', 'chair', 'cow', 'diningtable', 'dog',
-                       'horse', 'motorbike', 'person', 'pottedplant', 'sheep',
-                       'sofa', 'train', 'tvmonitor',]
-            bowDescPath = '/home/ursin/data/toolserver/pywikipedia/opencv/data/bowImageDescriptors/000000.xml.gz'
+        # parts of code here should/have to be placed into e.g. a own
+        # class in 'opencv/__init__.py' script/module
+        
+        trained = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus',
+                   'car', 'cat', 'chair', 'cow', 'diningtable', 'dog',
+                   'horse', 'motorbike', 'person', 'pottedplant', 'sheep',
+                   'sofa', 'train', 'tvmonitor',]
+        bowDescPath = '/home/ursin/data/toolserver/pywikipedia/opencv/data/bowImageDescriptors/000000.xml.gz'
 
-            # https://code.ros.org/trac/opencv/browser/trunk/opencv/samples/cpp/bagofwords_classification.cpp?rev=3714
-            # stand-alone (in shell) for training e.g. with:
-            #   BoWclassify /data/toolserver/pywikipedia/opencv/VOC2007 /data/toolserver/pywikipedia/opencv/data FAST SURF BruteForce | tee run.log
-            #   BoWclassify /data/toolserver/pywikipedia/opencv/VOC2007 /data/toolserver/pywikipedia/opencv/data HARRIS SIFT BruteForce | tee run.log
-            # http://experienceopencv.blogspot.com/2011/02/object-recognition-bag-of-keypoints.html
-            import opencv
-            import StringIO#, numpy
+        # https://code.ros.org/trac/opencv/browser/trunk/opencv/samples/cpp/bagofwords_classification.cpp?rev=3714
+        # stand-alone (in shell) for training e.g. with:
+        #   BoWclassify /data/toolserver/pywikipedia/opencv/VOC2007 /data/toolserver/pywikipedia/opencv/data FAST SURF BruteForce | tee run.log
+        #   BoWclassify /data/toolserver/pywikipedia/opencv/VOC2007 /data/toolserver/pywikipedia/opencv/data HARRIS SIFT BruteForce | tee run.log
+        # http://experienceopencv.blogspot.com/2011/02/object-recognition-bag-of-keypoints.html
+        import opencv
+        import StringIO#, numpy
 
-            if os.path.exists(bowDescPath):
-                os.remove(bowDescPath)
+        if os.path.exists(bowDescPath):
+            os.remove(bowDescPath)
 
-            stdout = sys.stdout
-            sys.stdout = StringIO.StringIO()
-            #result = opencv.BoWclassify.main(0, '', '', '', '', '')
-            result = opencv.BoWclassify.main(6, 
-                                             '/data/toolserver/pywikipedia/opencv/VOC2007', 
-                                             '/data/toolserver/pywikipedia/opencv/data', 
-                                             'HARRIS',      # not important; given by training
-                                             'SIFT',        # not important; given by training
-                                             'BruteForce',  # not important; given by training
-                                             [str(os.path.abspath(self.image_path).encode('latin-1'))])
-            out = sys.stdout.getvalue()
-            sys.stdout = stdout
-            #print out
-            try:
-                if not result:
-                    raise
-                os.remove(bowDescPath)
-            except:
-                print "PROBLEM!!!"
-                #raise
-                self._result_classify = {}
-                return []
-            #result = list(numpy.abs(numpy.array(result)))
-            (mi, ma) = (min(result), max(result))
-            #for i in range(len(result)):
-            #    print "%12s %.3f" % (trained[i], result[i]), ((result[i] == mi) or (result[i] == ma))
+        stdout = sys.stdout
+        sys.stdout = StringIO.StringIO()
+        #result = opencv.BoWclassify.main(0, '', '', '', '', '')
+        result = opencv.BoWclassify.main(6, 
+                                         '/data/toolserver/pywikipedia/opencv/VOC2007', 
+                                         '/data/toolserver/pywikipedia/opencv/data', 
+                                         'HARRIS',      # not important; given by training
+                                         'SIFT',        # not important; given by training
+                                         'BruteForce',  # not important; given by training
+                                         [str(os.path.abspath(self.image_path).encode('latin-1'))])
+        out = sys.stdout.getvalue()
+        sys.stdout = stdout
+        #print out
+        try:
+            if not result:
+                raise
+            os.remove(bowDescPath)
+        except:
+            print "PROBLEM!!!"
+            #raise
+            self._info['Classify'] = {}
+            return []
+        #result = list(numpy.abs(numpy.array(result)))
+        (mi, ma) = (min(result), max(result))
+        #for i in range(len(result)):
+        #    print "%12s %.3f" % (trained[i], result[i]), ((result[i] == mi) or (result[i] == ma))
 
-            # now make the algo working; confer also
-            # http://www.xrce.xerox.com/layout/set/print/content/download/18763/134049/file/2004_010.pdf
-            # http://people.csail.mit.edu/torralba/shortCourseRLOC/index.html
+        # now make the algo working; confer also
+        # http://www.xrce.xerox.com/layout/set/print/content/download/18763/134049/file/2004_010.pdf
+        # http://people.csail.mit.edu/torralba/shortCourseRLOC/index.html
 
-            self._result_classify = dict([ (trained[i], abs(r)) for i, r in enumerate(result) ])
+        self._info['Classify'] = dict([ (trained[i], abs(r)) for i, r in enumerate(result) ])
+        return
 
-        if (self._result_classify.get(cls, 0.0) >= confidence): # >= threshold 50%
-            #result = [ {'confidence': self._result_classify[cls]} ] # ok
-            result = [ {'confidence': -self._result_classify[cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        else:
-            result = []                             # nothing found
+    def _detectSegmentColors_JSEGnPIL(self):
+        #from PIL import Image
+        import Image
 
-        return result
+        try:
+            i = Image.open(self.image_path)
+        except IOError:
+            pywikibot.output(u'WARNING: unknown file type')
+            return ([], [])
+        
+        result = []
+        #h = i.histogram()   # average over WHOLE IMAGE
+        hist = self._JSEGdetectColorSegmentsHist(i)  # split image into segments first
+        for i, (h, coverage) in enumerate(hist):
+            data = self._DeltaEaverageColor(h)
+            data['Coverage'] = coverage
+            data['ID']       = (i+1)
 
-    # Category:Black     (  0,   0,   0)
-    # Category:Blue‎      (  0,   0, 255)
-    # Category:Brown     (165,  42,  42)
-    # Category:Green     (  0, 255,   0)
-    # Category:Orange    (255, 165,   0)
-    # Category:Pink‎      (255, 192, 203)
-    # Category:Purple    (160,  32, 240)
-    # Category:Red‎       (255,   0,   0)
-    # Category:Turquoise ( 64, 224, 208)
-    # Category:White‎     (255, 255, 255)
-    # Category:Yellow    (255, 255,   0)
-    # http://www.farb-tabelle.de/en/table-of-color.htm
-    #def _collectColor(self):
-    def _searchBlack(self):
-        (result, info) = self._JSEGnPILdetectColorSegments()
-        if (u'Black' not in info):
-            return (u'Black', [], 0.)
+            result.append( data )
 
-        return (u'Black', [info[u'Black']], info[u'Black'][u'Confidence'])
-
-    def _searchBlue(self):
-        (result, info) = self._JSEGnPILdetectColorSegments()
-        if (u'Blue‎' not in info):
-            return (u'Blue‎', [], 0.)
-
-        return (u'Blue‎', [info[u'Blue‎']], info[u'Blue‎'][u'Confidence'])
-
-    def _searchBrown(self):
-        (result, info) = self._JSEGnPILdetectColorSegments()
-        if (u'Brown' not in info):
-            return (u'Brown', [], 0.)
-
-        return (u'Brown', [info[u'Brown']], info[u'Brown'][u'Confidence'])
-
-    def _searchGreen(self):
-        (result, info) = self._JSEGnPILdetectColorSegments()
-        if (u'Green' not in info):
-            return (u'Green', [], 0.)
-
-        return (u'Green', [info[u'Green']], info[u'Green'][u'Confidence'])
-
-    def _searchOrange(self):
-        (result, info) = self._JSEGnPILdetectColorSegments()
-        if (u'Orange' not in info):
-            return (u'Orange', [], 0.)
-
-        return (u'Orange', [info[u'Orange']], info[u'Orange'][u'Confidence'])
-
-    def _searchPink(self):
-        (result, info) = self._JSEGnPILdetectColorSegments()
-        if (u'Pink‎' not in info):
-            return (u'Pink‎', [], 0.)
-
-        return (u'Pink‎', [info[u'Pink‎']], info[u'Pink‎'][u'Confidence'])
-
-    def _searchPurple(self):
-        (result, info) = self._JSEGnPILdetectColorSegments()
-        if (u'Purple' not in info):
-            return (u'Purple', [], 0.)
-
-        return (u'Purple', [info[u'Purple']], info[u'Purple'][u'Confidence'])
-
-    def _searchRed(self):
-        (result, info) = self._JSEGnPILdetectColorSegments()
-        if (u'Red‎' not in info):
-            return (u'Red‎', [], 0.)
-
-        return (u'Red‎', [info[u'Red‎']], info[u'Red‎'][u'Confidence'])
-
-    def _searchTurquoise(self):
-        (result, info) = self._JSEGnPILdetectColorSegments()
-        if (u'Turquoise' not in info):
-            return (u'Turquoise', [], 0.)
-
-        return (u'Turquoise', [info[u'Turquoise']], info[u'Turquoise'][u'Confidence'])
-
-    def _searchWhite(self):
-        (result, info) = self._JSEGnPILdetectColorSegments()
-        if (u'White‎' not in info):
-            return (u'White‎', [], 0.)
-
-        return (u'White‎', [info[u'White‎']], info[u'White‎'][u'Confidence'])
-
-    def _searchYellow(self):
-        (result, info) = self._JSEGnPILdetectColorSegments()
-        if (u'Yellow' not in info):
-            return (u'Yellow', [], 0.)
-
-        return (u'Yellow', [info[u'Yellow']], info[u'Yellow'][u'Confidence'])
-
-    def _JSEGnPILdetectColorSegments(self):
-        if not hasattr(self, '_result_detectcolor'):
-            #from PIL import Image
-            import Image
-    
-            try:
-                i = Image.open(self.image_path)
-            except IOError:
-                pywikibot.output(u'WARNING: unknown file type')
-                return ([], [])
-            
-            result = []
-            info   = {}
-            #h = i.histogram()   # average over WHOLE IMAGE
-            hist = self._JSEGdetectColorSegmentsHist(i)  # split image into segments first
-            for h, coverage in hist:
-                data = self._DeltaEaverageColor(h)
-                data['coverage'] = coverage
-
-                # has to be in descending order since only 1 resolves (!)
-                if   (data['coverage'] >= 0.40) and (data['delta_e']  <=  5.0):
-                    data['confidence'] = 1.0
-                elif (data['coverage'] >= 0.20) and (data['delta_e']  <= 15.0):
-                    data['confidence'] = 0.75
-                elif (data['coverage'] >= 0.10) and (data['delta_e']  <= 20.0):
-                    data['confidence'] = 0.5
-                else:
-                    data['confidence'] = 0.1
-
-                #result.append( data )
-
-                if (info.get(data['color'], {'Confidence': 0.2})['Confidence'] < data['confidence']):
-                    info[data['color']] = {'RGB': data['rgb'], 
-                                           'Distance': u"%.3f" % data['delta_e'], 
-                                           'Coverage': u"%.3f" % data['coverage'],
-                                           'Confidence': data['confidence']}
-
-            self._result_detectcolor = (result, info)
-
-        return self._result_detectcolor
+        self._info['ColorRegions'] = result
+        return
 
     # http://stackoverflow.com/questions/2270874/image-color-detection-using-python
     # https://gist.github.com/1246268
@@ -1026,7 +860,7 @@ class main(checkimages.main):
         )
 
         data = { #'histogram': h,
-                 'rgb':       rgb, }
+                 'RGB':       rgb, }
 
         from colormath.color_objects import RGBColor
         
@@ -1078,9 +912,10 @@ class main(checkimages.main):
 
             r = color1.delta_e(color2, mode='cmc', pl=2, pc=1)
             if (r < res[0]):
-                res = (r, c)
-        data['color']   = res[1]
-        data['delta_e'] = res[0]
+                res = (r, c, colors[c])
+        data['Color']   = res[1]
+        data['Delta_E'] = res[0]
+        data['RGBref']  = res[2]
 
         return data
 
@@ -1090,7 +925,7 @@ class main(checkimages.main):
         tmpjpg = os.path.join(os.path.abspath(os.curdir), "cache/jseg_buf.jpg")
         tmpgif = os.path.join(os.path.abspath(os.curdir), "cache/jseg_buf.gif")
 
-        # same scale func as in '_CVdetectObjects_Faces'
+        # same scale func as in '_detectObjectFaces_CV'
         scale  = max([1., numpy.average(numpy.array(im.size)[0:2]/200.)])
         #print numpy.array(im.size)/scale, scale
         try:
@@ -1150,36 +985,250 @@ class main(checkimages.main):
         
         return hist
 
+    def _detectProperties_PIL(self):
+        import Image
+
+        try:
+            i = Image.open(self.image_path)
+        except IOError:
+            pywikibot.output(u'WARNING: unknown file type')
+
+        self._info['Properties'] = [{'Dimensions': i.size}]
+        self.image_size    = i.size
+        return
+
+    def _filterProperties(self):
+        # >>> never drop <<<
+        result = self._info['Properties']
+        return {'Properties': result}
+
+    def _filterFaces(self):
+        result = []
+        for item in self._info['Faces']:
+            # >>> drop if below thrshld <<<
+#            if (item['confidence'] >= self.thrshld):
+            if (item['Confidence'] >= .5):
+                result.append( item )
+        return {'Faces': result}
+
+    def _filterColorRegions(self):
+        result = {}
+        for data in self._info['ColorRegions']:
+            # >>> drop wrost ones... (ignore all below 0.2) <<<
+            if (result.get(data['Color'], {'Confidence': 0.2})['Confidence'] < data['Confidence']):
+                result[data['Color']] = data
+        return {'ColorRegions': [result[item] for item in result]}
+
+    ## Category:Faces
+    #def _searchFaces(self):
+    # Category:Unidentified people
+    def _catPeople(self):
+        relevance = bool(self._info_filter['Faces'])
+
+        return (u'Unidentified people', relevance)
+
+    # Category:Groups
+    def _catGroups(self):
+        result = self._info['Faces']
+
+        if not (len(result) > 1): # 5 should give 0.75 and get reported
+            relevance = 0.
+        else:
+            relevance = 1 - 1./(len(result)-1)
+
+        return (u'Groups', relevance)
+
+    # Category:Unidentified people
+    def _guessPeople(self):
+        #result  = copy.deepcopy(self._info['Faces'])
+        #result += self._detectObjectPeople_CV()
+
+        cls = 'person'
+        if (self._info['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        else:
+            result = []                             # nothing found
+
+        return (u'Unidentified people', result, 0.1)
+
+    ## Category:Unidentified maps
+    #def _guessMaps(self):
+    #    return (u'Unidentified maps', self._classifyObjectAll_CV('maps'), 0.1)
+
+    ## Category:Unidentified flags
+    #def _guessFlags(self):
+    #    return (u'Unidentified flags', self._classifyObjectAll_CV('flags'), 0.1)
+
+    # Category:Unidentified plants
+    def _guessPlants(self):
+        cls = 'pottedplant'
+        if (self._info['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        else:
+            result = []                             # nothing found
+
+        return (u'Unidentified plants', result, 0.1)
+
+    ## Category:Unidentified coats of arms
+    #def _guessCoatsOfArms(self):
+    #    return (u'Unidentified coats of arms', self._classifyObjectAll_CV('coats of arms'), 0.1)
+
+    ## Category:Unidentified buildings
+    #def _guessBuildings(self):
+    #    return (u'Unidentified buildings', self._classifyObjectAll_CV('buildings'), 0.1)
+
+    # Category:Unidentified trains
+    def _guessTrains(self):
+        cls = 'train'
+        if (self._info['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        else:
+            result = []                             # nothing found
+
+        return (u'Unidentified trains', result, 0.1)
+
+    # Category:Unidentified automobiles
+    def _guessAutomobiles(self):
+        cls = 'bus'
+        if (self._info['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        else:
+            result = []                             # nothing found
+        cls = 'car'
+        if (self._info['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info['classify'][cls]} ] # ok
+            result += [ {'confidence': -self._info['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        cls = 'motorbike'
+        if (self._info['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info['classify'][cls]} ] # ok
+            result += [ {'confidence': -self._info['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        return (u'Unidentified automobiles', result, 0.1)
+
+    # Category:Unidentified buses
+    def _guessBuses(self):
+        cls = 'bus'
+        if (self._info['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        else:
+            result = []                             # nothing found
+
+        return (u'Unidentified buses', result, 0.1)
+
+    # Category:Black     (  0,   0,   0)
+    # Category:Blue‎      (  0,   0, 255)
+    # Category:Brown     (165,  42,  42)
+    # Category:Green     (  0, 255,   0)
+    # Category:Orange    (255, 165,   0)
+    # Category:Pink‎      (255, 192, 203)
+    # Category:Purple    (160,  32, 240)
+    # Category:Red‎       (255,   0,   0)
+    # Category:Turquoise ( 64, 224, 208)
+    # Category:White‎     (255, 255, 255)
+    # Category:Yellow    (255, 255,   0)
+    # http://www.farb-tabelle.de/en/table-of-color.htm
+    #def _collectColor(self):
+    def _catBlack(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Black' == item[u'Color']):
+                return (u'Black', True)
+        return (u'Black', False)
+
+    def _catBlue(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Blue' == item[u'Color']):
+                return (u'Blue', True)
+        return (u'Blue', False)
+
+    def _catBrown(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Brown' == item[u'Color']):
+                return (u'Brown', True)
+        return (u'Brown', False)
+
+    def _catGreen(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Green' == item[u'Color']):
+                return (u'Green', True)
+        return (u'Green', False)
+
+    def _catOrange(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Orange' == item[u'Color']):
+                return (u'Orange', True)
+        return (u'Orange', False)
+
+    def _catPink(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Pink' == item[u'Color']):
+                return (u'Pink', True)
+        return (u'Pink', False)
+
+    def _catPurple(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Purple' == item[u'Color']):
+                return (u'Purple', True)
+        return (u'Purple', False)
+
+    def _catRed(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Red' == item[u'Color']):
+                return (u'Red', True)
+        return (u'Red', False)
+
+    def _catTurquoise(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Turquoise' == item[u'Color']):
+                return (u'Turquoise', True)
+        return (u'Turquoise', False)
+
+    def _catWhite(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'White' == item[u'Color']):
+                return (u'White', True)
+        return (u'White', False)
+
+    def _catYellow(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Yellow' == item[u'Color']):
+                return (u'Yellow', True)
+        return (u'Yellow', False)
+
     ## Category:Unidentified people
-    #def _collectPeople(self):
-    #    result = self._CVdetectObjects_Faces()
+    #def _catPeople(self):
+    #    result = copy.deepcopy(self._info['Faces'])
     #
     #    result = [{} for item in result]
     #
     #    return (u'Unidentified people', result, 1.0)
 
     # Category:Faces
-    def _collectFaces(self):
-        result = self._CVdetectObjects_Faces()
+    def _catFaces(self):
+        result = self._info['Faces']
 
-        if not ((len(result) == 1) and (result[0]['coverage'] >= .50)):
-            result = []
-
-        result = [{'Coverage': "%.3f" % item['coverage']} for item in result]
-
-        return (u'Faces', result, 1.0)
+        return (u'Faces', ((len(result) == 1) and (result[0]['Coverage'] >= .50)))
 
     # Category:Portraits
-    def _collectPortraits(self):
-        result = self._CVdetectObjects_Faces()
+    def _catPortraits(self):
+        result = self._info['Faces']
 
-        #if not ((len(result) == 1) and (result[0]['coverage'] >= .25)):
-        if not ((len(result) == 1) and (result[0]['coverage'] >= .20)):
-            result = []
-
-        result = [{'Coverage': "%.3f" % item['coverage']} for item in result]
-
-        return (u'Portraits', result, 1.0)
+        #return (u'Portraits', ((len(result) == 1) and (result[0]['Coverage'] >= .25)))
+        return (u'Portraits', ((len(result) == 1) and (result[0]['Coverage'] >= .20)))
 
 gbv = Global()
 
@@ -1203,7 +1252,8 @@ def checkbot():
     #sys.argv += ['-limit:20', '-break', '-lang:en']
     #sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-noguesses']#, '-start']
     #sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-noguesses', '-start']
-    sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-noguesses']
+#    sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-noguesses']
+    sys.argv += ['-limit:1', '-break', '-family:commons', '-lang:commons', '-noguesses']
     print "http://commons.wikimedia.org/wiki/User:Multichill/Using_OpenCV_to_categorize_files"
 
     firstPageTitle = None
