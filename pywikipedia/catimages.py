@@ -100,9 +100,9 @@ tmpl_FileContentsByBot = u"""}}
 | botName = ~~~
 |"""
 
-# TODO: auto-generate this list during bot run, i.e. notify about NEW templates added
-#tmpl_available_spec = [ u'Faces', u'ColorRegions', u'ColorAverage', u'Properties' ]
-tmpl_available_spec = [ u'Properties', u'ColorRegions', u'Faces' ]
+# this list is auto-generated during bot run (may be add notifcation about NEW templates)
+#tmpl_available_spec = [ u'Properties', u'ColorRegions', u'Faces', u'ColorAverage' ]
+tmpl_available_spec = []    # auto-generated
 
 
 # Other common useful functions
@@ -143,11 +143,32 @@ class main(checkimages.main):
 #    def report(self, newtext, image_to_report, notification=None, head=None,
 #               notification2 = None, unver=True, commTalk=None, commImage=None): pass
 
+    # or may be '__init__' ... ???
     def load_licenses(self):
         pywikibot.output(u'\n\t...Listing the procedures available...\n')
+        
+        listing = [ '_filter', '_cat', '_guess' ]
         for item in dir(self):
-            if ('_filter' in item) or ('_cat' in item) or ('_guess' in item):
-                pywikibot.output( item )
+            for lic in listing:
+                if (item[:len(lic)] == lic):
+                    pywikibot.output( item )
+
+        self.tmpl_available_spec = tmpl_available_spec
+        gen = pagegenerators.PrefixingPageGenerator(prefix = u'Template:FileContentsByBot/')
+        buf = []
+        for item in gen:
+            item = item.title()
+            if (item[-4:] == "/doc"):           # all docs
+                continue
+            item = os.path.split(item)[1]
+            if (item[0].lower() == item[0]):    # e.g. 'generic'
+                continue
+            buf.append( item )
+        if buf:
+            self.tmpl_available_spec = buf
+            pywikibot.output( u'\n\t...Following specialized templates found, check them since they are used now...\n' )
+            pywikibot.output( u'tmpl_available_spec = [ %s ]' % u", ".join(buf) )
+
         return []
 
     def downloadImage(self):
@@ -206,8 +227,8 @@ class main(checkimages.main):
         else:
             self.thrshld = 0.75
 
-        self._info         = {}
-        self._info_filter  = {}
+        self._info         = {}     # used for LOG/DEBUG OUTPUT ONLY
+        self._info_filter  = {}     # used for CATEGORIZATION
         self._result_check = []
 
         # gather all information related to current image
@@ -342,9 +363,12 @@ class main(checkimages.main):
 #
 #        return u"\n".join( result )
 
-    def make_infoblock(self, cat, res, tmpl_available=tmpl_available_spec):
+    def make_infoblock(self, cat, res, tmpl_available=None):
         if not res:
             return u''
+
+        if (tmpl_available == None):
+            tmpl_available = self.tmpl_available_spec
 
         generic = (cat not in tmpl_available)
         titles = res[0].keys()
@@ -426,7 +450,7 @@ class main(checkimages.main):
     # http://commons.wikimedia.org/wiki/Help:Gadget-ImageAnnotator
     # (example: http://commons.wikimedia.org/wiki/File:13054_1198498614793_1598345855_498977_4395881_n.jpg)
     def make_ImageAnnotatorBlock(self, item):
-        import numpy
+        #import numpy
 
         (cat, res, rel) = item
 
@@ -588,9 +612,8 @@ class main(checkimages.main):
 
         # Segments and colors
         self._detectSegmentColors_JSEGnPIL()
-
-# TODO:
-        # ALSO GET AVERAGE COLOR OF IMAGE (average over full image)
+        # Average color
+        self._detectAverageColor_PIL()
 
         for i in range(len(self._info['ColorRegions'])):
             data = self._info['ColorRegions'][i]
@@ -845,6 +868,26 @@ class main(checkimages.main):
     # http://code.google.com/p/python-colormath/
     # http://en.wikipedia.org/wiki/Color_difference
     # http://www.farb-tabelle.de/en/table-of-color.htm
+    def _detectAverageColor_PIL(self):
+        #from PIL import Image
+        import Image
+        
+        try:
+            i = Image.open(self.image_path)
+            h = i.histogram()
+        except IOError:
+            pywikibot.output(u'WARNING: unknown file type')
+            return
+        
+        self._info['ColorAverage'] = [self._DeltaEaverageColor(h)]
+        return
+
+    # http://stackoverflow.com/questions/2270874/image-color-detection-using-python
+    # https://gist.github.com/1246268
+    # colormath-1.0.8/examples/delta_e.py, colormath-1.0.8/examples/conversions.py
+    # http://code.google.com/p/python-colormath/
+    # http://en.wikipedia.org/wiki/Color_difference
+    # http://www.farb-tabelle.de/en/table-of-color.htm
     def _DeltaEaverageColor(self, h):
         # split into red, green, blue
         r = h[0:256]
@@ -967,7 +1010,8 @@ class main(checkimages.main):
         
         os.remove( tmpgif )
 
-# TODO: try to merge similar regions ...
+# TODO: -try to merge similar regions ...
+#       -locate regions; average over positions for center, min and max for width...
         imgsize = float(smallImg.size[0]*smallImg.size[1])
         hist = []
         for i in range(numpy.max(pix)+1):
@@ -993,8 +1037,18 @@ class main(checkimages.main):
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
 
-        self._info['Properties'] = [{'Dimensions': i.size}]
-        self.image_size    = i.size
+        self.image_size = i.size
+
+        result = { #'bands':      i.getbands(),
+                   #'bbox':       i.getbbox(),
+                   'Format':     i.format,
+                   'Mode':       i.mode,
+                   'Dimensions': i.size, }
+                   #'info':       i.info,
+                   #'filesize':   os.path.getsize(self.image_path),
+                   #'stat':       os.stat(self.image_path), }
+
+        self._info['Properties'] = [result]
         return
 
     def _filterProperties(self):
@@ -1003,12 +1057,15 @@ class main(checkimages.main):
         return {'Properties': result}
 
     def _filterFaces(self):
-        result = []
-        for item in self._info['Faces']:
-            # >>> drop if below thrshld <<<
-#            if (item['confidence'] >= self.thrshld):
-            if (item['Confidence'] >= .5):
-                result.append( item )
+        result = self._info['Faces']
+        if (len(result) < 5):
+            buf = []
+            for item in self._info['Faces']:
+                # >>> drop if below thrshld <<<
+#                if (item['Confidence'] >= self.thrshld):
+                if (item['Confidence'] >= .5):
+                    buf.append( item )
+            result = buf
         return {'Faces': result}
 
     def _filterColorRegions(self):
@@ -1019,8 +1076,11 @@ class main(checkimages.main):
                 result[data['Color']] = data
         return {'ColorRegions': [result[item] for item in result]}
 
-    ## Category:Faces
-    #def _searchFaces(self):
+    def _filterColorAverage(self):
+        # >>> never drop <<<
+        result = self._info['ColorAverage']
+        return {'ColorAverage': result}
+
     # Category:Unidentified people
     def _catPeople(self):
         relevance = bool(self._info_filter['Faces'])
@@ -1029,24 +1089,25 @@ class main(checkimages.main):
 
     # Category:Groups
     def _catGroups(self):
-        result = self._info['Faces']
+        result = self._info_filter['Faces']
 
-        if not (len(result) > 1): # 5 should give 0.75 and get reported
-            relevance = 0.
-        else:
-            relevance = 1 - 1./(len(result)-1)
+        #if not (len(result) > 1): # 5 should give 0.75 and get reported
+        #    relevance = 0.
+        #else:
+        #    relevance = 1 - 1./(len(result)-1)
+        relevance = (len(result) >= 5)
 
         return (u'Groups', relevance)
 
     # Category:Unidentified people
     def _guessPeople(self):
-        #result  = copy.deepcopy(self._info['Faces'])
+        #result  = copy.deepcopy(self._info_filter['Faces'])
         #result += self._detectObjectPeople_CV()
 
         cls = 'person'
-        if (self._info['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
         else:
             result = []                             # nothing found
 
@@ -1063,9 +1124,9 @@ class main(checkimages.main):
     # Category:Unidentified plants
     def _guessPlants(self):
         cls = 'pottedplant'
-        if (self._info['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
         else:
             result = []                             # nothing found
 
@@ -1082,9 +1143,9 @@ class main(checkimages.main):
     # Category:Unidentified trains
     def _guessTrains(self):
         cls = 'train'
-        if (self._info['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
         else:
             result = []                             # nothing found
 
@@ -1093,27 +1154,27 @@ class main(checkimages.main):
     # Category:Unidentified automobiles
     def _guessAutomobiles(self):
         cls = 'bus'
-        if (self._info['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
         else:
             result = []                             # nothing found
         cls = 'car'
-        if (self._info['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info['classify'][cls]} ] # ok
-            result += [ {'confidence': -self._info['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result += [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
         cls = 'motorbike'
-        if (self._info['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info['classify'][cls]} ] # ok
-            result += [ {'confidence': -self._info['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result += [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
         return (u'Unidentified automobiles', result, 0.1)
 
     # Category:Unidentified buses
     def _guessBuses(self):
         cls = 'bus'
-        if (self._info['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
         else:
             result = []                             # nothing found
 
@@ -1211,7 +1272,7 @@ class main(checkimages.main):
 
     ## Category:Unidentified people
     #def _catPeople(self):
-    #    result = copy.deepcopy(self._info['Faces'])
+    #    result = copy.deepcopy(self._info_filter['Faces'])
     #
     #    result = [{} for item in result]
     #
@@ -1219,13 +1280,13 @@ class main(checkimages.main):
 
     # Category:Faces
     def _catFaces(self):
-        result = self._info['Faces']
+        result = self._info_filter['Faces']
 
         return (u'Faces', ((len(result) == 1) and (result[0]['Coverage'] >= .50)))
 
     # Category:Portraits
     def _catPortraits(self):
-        result = self._info['Faces']
+        result = self._info_filter['Faces']
 
         #return (u'Portraits', ((len(result) == 1) and (result[0]['Coverage'] >= .25)))
         return (u'Portraits', ((len(result) == 1) and (result[0]['Coverage'] >= .20)))
