@@ -69,7 +69,7 @@ locale.setlocale(locale.LC_ALL, '')
 # debug tools
 # (look at 'bot_control.py' for more info)
 debug = []                       # no write, all users
-#debug.append( 'write2wiki' )    # write to wiki (operational mode)
+debug.append( 'write2wiki' )    # write to wiki (operational mode)
 #debug.append( 'code' )          # code debugging
 
 
@@ -261,10 +261,9 @@ class main(checkimages.main):
         return self._result_check
 
     def tag_image(self, put = False):
-        put = False
         self.clean_cache()
 
-        if len(self._info_filter) <= 1:     # 'Properties' is always present (!)
+        if not self._reportInformation(self._info_filter):
             return u""
 
         pywikibot.get_throttle()
@@ -275,19 +274,17 @@ class main(checkimages.main):
             item = self._info_filter[key]
 
             info = self.make_infoblock(key, item)
-            content = self.append_to_template(content, u"FileContentsByBot", info)
+            if info:
+                content = self.append_to_template(content, u"FileContentsByBot", info)
 
         tags = set([])
         for i, cat in enumerate(self._result_check):
             tags.add( u"[[:Category:%s]]" % cat )
-#            tags.add( u"%s (bot tagged)" % cat )
             content = self.add_category(content, u"Category:%s" % cat)
-#            content = self.add_category(content, u"Category:%s (bot tagged)" % cat)
 
-        tags.add( u"[[:Category:Categorized by bot]]" )
-        content = self.add_category(content, u"Category:Categorized by bot")
-        #content = self.add_template(content, u"Check categories", top=True)
-        content = self.add_template(content, u"Check categories|year={{subst:#time:Y}}|month={{subst:#time:F}}|day={{subst:#time:j}}|category=[[Category:Categorized by bot]]", top=True)
+        tags.add( u"[[:Category:Categorized by DrTrigonBot]]" )
+        content = self.add_category(content, u"Category:Categorized by DrTrigonBot")
+        content = self.add_template(content, u"Check categories|year={{subst:#time:Y}}|month={{subst:#time:F}}|day={{subst:#time:j}}|category=[[Category:Categorized by DrTrigonBot]]", top=True)
         content = self.remove_category_or_template(content, u"Uncategorized")
         content = self.gather_category(content)
         print u"--- " * 20
@@ -295,15 +292,12 @@ class main(checkimages.main):
         print u"--- " * 20
         if put:
             pywikibot.put_throttle()
-            #self.image.put( content, comment="bot automatic categorization" )
             self.image.put( content, comment="bot automatic categorization; adding %s" % u", ".join(tags) )
 
-        print self.log_output()
-        raise
-        return self.log_output()
+        return
 
     def log_output(self):
-        if len(self._info) <= 1:     # 'Properties' is always present (!)
+        if not self._reportInformation(self._info):
             return u""
 
         ret  = []
@@ -311,18 +305,21 @@ class main(checkimages.main):
         ret.append( u"== [[:%s]] ==" % self.image.title() )
         ret.append( u'<div style="position:relative;">' )
         ret.append( u"[[%s|200px]]" % self.image.title() )
-        marker = self.make_markerblock(self._info_filter[u'Faces'], 200.)
+        marker = self.make_markerblock(self._info[u'Faces'], 200.)
         ret.append( marker )
         ret.append( u"</div>" )
 
-        info = []
+        color = {True: "rgb(0,255,0)", False: "rgb(255,0,0)"}[bool(self._result_check)]
+        ret.append( u"<div style='background:%s'>'''automatic categorization''': %s</div>" % (color, u", ".join(self._result_check)) )
+
+        buf = []
         for i, key in enumerate(self._info):
             item = self._info[key]
 
-            info.append( self.make_infoblock(key, item, []) )
-        ret.append( tmpl_FileContentsByBot[3:] + u"\n" + u"\n".join( info ) + u"\n}}" )
-
-        ret.append( "bot automatic categorization; adding %s" % u", ".join(self._result_check) )
+            info = self.make_infoblock(key, item, [])
+            if info:
+                buf.append( info )
+        ret.append( tmpl_FileContentsByBot[3:] + u"\n" + u"\n".join( buf ) + u"\n}}" )
 
         return u"\n".join( ret )
 
@@ -334,34 +331,6 @@ class main(checkimages.main):
         image_path_new = self.image_path_JPEG.replace(u"cache/", u"cache/0_DETECTED_")
         if os.path.exists(image_path_new):
             os.remove( image_path_new )
-
-#    def make_infoblock(self, item):
-#        (cat, res, rel) = item
-#        if not res:
-#            return u''
-#
-#        titles = res[0].keys()
-#        if not titles:
-#            return u''
-#        result = []
-#        result.append( u"{{(!}}" )
-#        #result.append( u'{{(!}}style="background:%s;"' % {True: 'green', False: 'red'}[report] )
-#        result.append( u"{{!}}-" )
-#        for key in titles:
-#            #if (key == 'Confidence'):
-#            #    result.append( u"!%s [[File:%s|16px]]" % (key, {True: 'ButtonGreen.svg', False: 'ButtonRed.svg'}[report]) )
-#            #else:
-#            #    result.append( u"!%s" % key )
-#            #    #result.append( u"{{!}}%s" % c )
-#            result.append( u"!%s" % key )
-#        result.append( u"{{!}}-" )
-#        for item in res:
-#            for key in titles:
-#                result.append( u"{{!}}%s" % str(item[key]) )
-#            result.append( u"{{!}}-" )
-#        result.append( u"{{!)}}" )
-#
-#        return u"\n".join( result )
 
     def make_infoblock(self, cat, res, tmpl_available=None):
         if not res:
@@ -621,7 +590,8 @@ class main(checkimages.main):
             # has to be in descending order since only 1 resolves (!)
             if   (data['Coverage'] >= 0.40) and (data['Delta_E']  <=  5.0):
                 c = 1.0
-            elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 15.0):
+            #elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 15.0):
+            elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 10.0):
                 c = 0.75
             elif (data['Coverage'] >= 0.10) and (data['Delta_E']  <= 20.0):
                 c = 0.5
@@ -634,6 +604,16 @@ class main(checkimages.main):
 
         # general (trained) classification
         #self._classifyObjectAll_CV()
+
+    def _reportInformation(self, info):
+        ignore = ['Properties', 'ColorAverage']
+        result = []
+        for item in info:
+            if item in ignore:
+                continue
+            if info[item]:
+                result.append( item )
+        return result
 
     # .../opencv/samples/c/facedetect.cpp
     # http://opencv.willowgarage.com/documentation/python/genindex.html
@@ -663,6 +643,7 @@ class main(checkimages.main):
           'opencv/haarcascades/haarcascade_frontalface_alt.xml',
           )
 
+        self._info['Faces'] = []
         try:
             #image = cv.LoadImage(self.image_path)
             #img    = cv2.imread( self.image_path, 1 )
@@ -674,10 +655,10 @@ class main(checkimages.main):
             scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/500.)])
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
-            return []
+            return
         except AttributeError:
             pywikibot.output(u'WARNING: unknown file type')
-            return []
+            return
 
         #detectAndDraw( image, cascade, nestedCascade, scale );
         # http://nullege.com/codes/search/cv.CvtColor
@@ -843,6 +824,7 @@ class main(checkimages.main):
         #from PIL import Image
         import Image
 
+        self._info['ColorRegions'] = []
         try:
             i = Image.open(self.image_path)
         except IOError:
@@ -872,6 +854,7 @@ class main(checkimages.main):
         #from PIL import Image
         import Image
         
+        self._info['ColorAverage'] = []
         try:
             i = Image.open(self.image_path)
             h = i.histogram()
@@ -1032,10 +1015,12 @@ class main(checkimages.main):
     def _detectProperties_PIL(self):
         import Image
 
+        self._info['Properties'] = []
         try:
             i = Image.open(self.image_path)
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
+            return
 
         self.image_size = i.size
 
@@ -1043,9 +1028,9 @@ class main(checkimages.main):
                    #'bbox':       i.getbbox(),
                    'Format':     i.format,
                    'Mode':       i.mode,
-                   'Dimensions': i.size, }
+                   'Dimensions': i.size,
                    #'info':       i.info,
-                   #'filesize':   os.path.getsize(self.image_path),
+                   'Filesize':   os.path.getsize(self.image_path), }
                    #'stat':       os.stat(self.image_path), }
 
         self._info['Properties'] = [result]
@@ -1062,19 +1047,23 @@ class main(checkimages.main):
             buf = []
             for item in self._info['Faces']:
                 # >>> drop if below thrshld <<<
-#                if (item['Confidence'] >= self.thrshld):
-                if (item['Confidence'] >= .5):
+                if (item['Confidence'] >= self.thrshld):
                     buf.append( item )
             result = buf
         return {'Faces': result}
 
     def _filterColorRegions(self):
-        result = {}
-        for data in self._info['ColorRegions']:
-            # >>> drop wrost ones... (ignore all below 0.2) <<<
-            if (result.get(data['Color'], {'Confidence': 0.2})['Confidence'] < data['Confidence']):
-                result[data['Color']] = data
-        return {'ColorRegions': [result[item] for item in result]}
+        #result = {}
+        result = []
+        for item in self._info['ColorRegions']:
+            ## >>> drop wrost ones... (ignore all below 0.2) <<<
+            #if (result.get(item['Color'], {'Confidence': 0.2})['Confidence'] < item['Confidence']):
+            #    result[item['Color']] = item
+            # >>> drop if below thrshld <<<
+            if (item['Confidence'] >= self.thrshld):
+                result.append( item )
+        #return {'ColorRegions': [result[item] for item in result]}
+        return {'ColorRegions': result}
 
     def _filterColorAverage(self):
         # >>> never drop <<<
@@ -1314,7 +1303,7 @@ def checkbot():
     #sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-noguesses']#, '-start']
     #sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-noguesses', '-start']
 #    sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-noguesses']
-    sys.argv += ['-limit:1', '-break', '-family:commons', '-lang:commons', '-noguesses']
+    sys.argv += ['-limit:50', '-break', '-family:commons', '-lang:commons', '-noguesses']
     print "http://commons.wikimedia.org/wiki/User:Multichill/Using_OpenCV_to_categorize_files"
 
     firstPageTitle = None
@@ -1488,9 +1477,13 @@ def checkbot():
                 if response2 == False:
                     continue
             resultCheck = mainClass.checkStep()
-            ret = mainClass.tag_image(put=('write2wiki' in debug))
-            if ret:
-                outresult.append( ret )
+            try:
+                mainClass.tag_image(put=('write2wiki' in debug))
+                ret = mainClass.log_output()
+                if ret:
+                    outresult.append( ret )
+            except AttributeError:
+                pywikibot.output(u"ERROR: was not able to process image page!!!\n")
             limit += -1
             posfile = open(os.path.join('cache', 'catimages_pos'), "w")
             posfile.write( image.title().encode('utf-8') )
