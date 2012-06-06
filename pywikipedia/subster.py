@@ -572,7 +572,7 @@ class SubsterMailbox(mailbox.mbox):
 
                             counter += 1
 
-                            if not full:
+                            if (not full) and (not ind):
                                 break
 
                     break
