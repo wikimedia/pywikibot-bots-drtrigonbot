@@ -38,7 +38,7 @@ __version__ = '$Id$'
 #
 
 
-import re, sys, os
+import re, sys, os, string
 import difflib
 import BeautifulSoup
 import urllib, StringIO, zipfile, csv
@@ -528,7 +528,7 @@ class SubsterMailbox(mailbox.mbox):
         """
 
         url = (url[:7], ) + tuple(url[7:].split('/'))
-        content = ''
+        content = []
 
         for i, message in enumerate(self):
             sender   = message['from']          # Could possibly be None.
@@ -541,11 +541,14 @@ class SubsterMailbox(mailbox.mbox):
                 pywikibot.output('%i / %s / %s / %s' % (i, sender, subject, timestmp))
 
                 full = (url[2] == 'attachment-full')
+                ind  = 0    # default; ignore attachement index
                 if   (url[2] == 'all'):
-                    content = message.as_string(True)
+                    content = [ message.as_string(True) ]
                 elif (url[2] == 'attachment') or full:
+                    if len(url) > 3:
+                        ind = int(url[3])
                     counter = 1
-                    content = ''
+                    content = []
                     for part in message.walk():
                         # multipart/* are just containers
                         if part.get_content_maintype() == 'multipart':
@@ -560,16 +563,21 @@ class SubsterMailbox(mailbox.mbox):
                                     # Use a generic bag-of-bits extension
                                     ext = '.bin'
                                 filename = 'part-%03d%s' % (counter, ext)
+
+                            content += [ part.get_payload(decode=True) ]
+                            pywikibot.output('Found attachment # %i: "%s"' % (counter, filename))
+
+                            if counter == ind:
+                                return content[-1]
+
                             counter += 1
 
-                            content += part.get_payload(decode=True)
-                            pywikibot.output('Found attachment: "' + filename + '"')
-
-                            if not full: break
+                            if not full:
+                                break
 
                     break
 
-        return content
+        return string.join(content)
 
 
 def main():
