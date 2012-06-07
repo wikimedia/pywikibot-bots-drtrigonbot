@@ -44,8 +44,6 @@ def addAttributes(obj):
         # this cannot be looped because of lambda's scope (which is important for page)
         # look also at http://www.weask.us/entry/scope-python-lambda-functions-parameters
         obj.__dict__['isRedirectPage']        = lambda *args, **kwds: Page.__dict__['isRedirectPage'](obj, *args, **kwds)
-        obj.__dict__['purgeCache']            = lambda *args, **kwds: Page.__dict__['purgeCache'](obj, *args, **kwds)
-        obj.__dict__['userNameHuman']         = lambda *args, **kwds: Page.__dict__['userNameHuman'](obj, *args, **kwds)
         obj.__dict__['append']                = lambda *args, **kwds: Page.__dict__['append'](obj, *args, **kwds)
 
 
@@ -93,73 +91,6 @@ class Page(pywikibot.Page):
             self._getexception == pywikibot.IsRedirectPage
 
         return self._redir
-
-    ## @since   ? (ADDED; non-api purge can be done with wikipedia.Page.purge_address())
-    #  @remarks needed by various bots
-    def purgeCache(self):
-        """Purges the page cache with API.
-           ADDED METHOD: needed by various bots
-        """
-
-        # Make sure we re-raise an exception we got on an earlier attempt
-        if hasattr(self, '_getexception'):
-            return self._getexception
-
-        # call the wiki to execute the request
-        params = {
-            u'action'    : u'purge',
-            u'titles'    : self.title(),
-        }
-
-        pywikibot.get_throttle()
-        pywikibot.output(u"Purging page cache for %s." % self.title(asLink=True))
-
-        result = query.GetData(params, self.site())
-        r = result[u'purge'][0]
-
-        # store and return info
-        if (u'missing' in r):
-                self._getexception = pywikibot.NoPage
-                raise pywikibot.NoPage(self.site(), self.title(asLink=True),"Page does not exist. Was not able to purge cache!" )
-
-        return (u'purged' in r)
-
-    ## @since   r24 (ADDED)
-    #  @remarks needed by various bots
-    def userNameHuman(self):
-        """Return name or IP address of last human/non-bot user to edit page.
-           ADDED METHOD: needed by various bots
-
-           Returns the most recent human editor out of the last revisions
-           (optimal used with getAll()). If it was not able to retrieve a
-           human user returns None.
-        """
-
-        # was there already a call? already some info available?
-        if hasattr(self, '_userNameHuman'):
-            return self._userNameHuman
-
-        # get history (use preloaded if available)
-        (revid, timestmp, username, comment) = self.getVersionHistory(revCount=1)[0][:4]
-
-        # is the last/actual editor already a human?
-        import botlist # like watchlist
-        if not botlist.isBot(username):
-            self._userNameHuman = username
-            return username
-
-        # search the last human
-        self._userNameHuman = None
-        for vh in self.getVersionHistory()[1:]:
-            (revid, timestmp, username, comment) = vh[:4]
-
-            if username and (not botlist.isBot(username)):
-                # user is a human (not a bot)
-                self._userNameHuman = username
-                break
-
-        # store and return info
-        return self._userNameHuman
 
     ## @since   r49 (ADDED)
     #  @remarks to support appending to single sections
