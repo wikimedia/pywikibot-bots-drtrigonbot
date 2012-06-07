@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 
-"""Unit tests for userlib.py"""
-__version__ = '$Id: test_query.py 9837 2012-01-21 13:53:37Z valhallasw $'
+"""Unit tests for query.py"""
+__version__ = '$Id: test_query.py 10309 2012-06-07 23:01:11Z drtrigon $'
 
 import unittest
 import tests.test_pywiki
