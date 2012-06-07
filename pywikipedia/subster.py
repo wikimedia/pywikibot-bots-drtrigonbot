@@ -546,7 +546,7 @@ class SubsterMailbox(mailbox.mbox):
                     content = [ message.as_string(True) ]
                 elif (url[2] == 'attachment') or full:
                     if len(url) > 3:
-                        ind = int(url[3])
+                        ind = int(url[3])   # combine 'ind' with 'full=True'...?
                     counter = 1
                     content = []
                     for part in message.walk():

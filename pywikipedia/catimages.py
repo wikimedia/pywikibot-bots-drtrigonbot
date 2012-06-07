@@ -1084,7 +1084,7 @@ class main(checkimages.main):
         #    relevance = 0.
         #else:
         #    relevance = 1 - 1./(len(result)-1)
-        relevance = (len(result) >= 5)
+        relevance = (len(result) >= 3)
 
         return (u'Groups', relevance)
 
