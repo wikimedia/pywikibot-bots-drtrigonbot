@@ -11,7 +11,7 @@ and return a unicode string.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: textlib.py 9911 2012-02-19 14:24:41Z drtrigon $'
+__version__ = '$Id: textlib.py 10029 2012-03-19 13:36:57Z xqt $'
 
 
 import wikipedia as pywikibot
@@ -172,9 +172,14 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                         break
                     groupID = groupMatch.group('name') or \
                               int(groupMatch.group('number'))
-                    replacement = replacement[:groupMatch.start()] + \
-                                  match.group(groupID) + \
-                                  replacement[groupMatch.end():]
+                    try:
+                        replacement = replacement[:groupMatch.start()] + \
+                                      match.group(groupID) + \
+                                      replacement[groupMatch.end():]
+                    except IndexError:
+                        print '\nInvalid group reference:', groupID
+                        print 'Groups found:\n', match.groups()
+                        raise IndexError
             text = text[:match.start()] + replacement + text[match.end():]
 
             # continue the search on the remaining text
@@ -931,3 +936,14 @@ def glue_template_and_params(template_and_params):
         text +=  u'|%s=%s\n' % (item, params[item])
 
     return u'{{%s\n%s}}' % (template, text)
+
+#----------------------------------
+# Page parsing functionality
+#----------------------------------
+
+def does_text_contain_section(pagetext, section):
+    """ Determines whether the page text contains the given
+        section title.
+    """
+    m = re.search("=+[ ']*%s[ ']*=+" % re.escape(section), pagetext)
+    return bool(m)

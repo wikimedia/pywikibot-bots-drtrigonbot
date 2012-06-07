@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikisource_family.py 9890 2012-02-13 10:19:39Z xqt $'
+__version__ = '$Id: wikisource_family.py 10265 2012-06-01 22:40:42Z xqt $'
 
 # The Wikimedia family that is known as Wikisource
 
@@ -11,22 +11,17 @@ class Family(family.Family):
         self.name = 'wikisource'
 
         self.languages_by_size = [
-            'en', 'fr', 'ru', 'zh', 'pt', 'de', 'it', 'es', 'he', 'pl', 'fa',
-            'ar', 'hu', 'cs', 'th', 'ro', 'ko', 'sv', 'hr', 'te', 'fi', 'sl',
-            'vi', 'nl', 'bn', 'sa', 'tr', 'el', 'ca', 'sr', 'uk', 'ja', 'ml',
-            'br', 'la', 'hy', 'li', 'yi', 'az', 'mk', 'vec', 'ta', 'is', 'bs',
-            'no', 'id', 'da', 'eo', 'et', 'bg', 'sah', 'lt', 'gl', 'kn', 'cy',
-            'sk', 'mr', 'fo', 'zh-min-nan',
+            'fr', 'en', 'de', 'ru', 'it', 'zh', 'pt', 'he', 'pl', 'es', 'sv',
+            'fa', 'hu', 'ar', 'ca', 'cs', 'ko', 'sl', 'ro', 'fi', 'vi', 'te',
+            'sa', 'el', 'bn', 'th', 'hr', 'hy', 'nl', 'no', 'sr', 'la', 'vec',
+            'ml', 'tr', 'ja', 'yi', 'uk', 'br', 'mk', 'id', 'is', 'ta', 'eo',
+            'da', 'li', 'be', 'bg', 'sah', 'gu', 'bs', 'et', 'az', 'gl', 'lt',
+            'kn', 'mr', 'cy', 'zh-min-nan', 'sk', 'fo',
         ]
 
-        if family.config.SSL_connection:
-            for lang in self.languages_by_size:
-                self.langs[lang] = None
-            self.langs['-'] = None
-        else:
-            for lang in self.languages_by_size:
-                self.langs[lang] = '%s.wikisource.org' % lang
-            self.langs['-'] = 'wikisource.org'
+        for lang in self.languages_by_size:
+            self.langs[lang] = '%s.wikisource.org' % lang
+        self.langs['-'] = 'wikisource.org'
 
         # Override defaults
         self.namespaces[10]['zh'] = [u'Template', u'模板', u'样板', u'樣板']
@@ -34,12 +29,14 @@ class Family(family.Family):
         self.namespaces[14]['zh'] = [u'Category', u'分类', u'分類']
         self.namespaces[3]['ca'] = [u'Usuari Discussió']
         self.namespaces[2]['ca'] = [u'Usuari']
-        self.namespaces[3]['cs'] = [u'Diskuse s uživatelem', u'Diskuse s uživatelkou', u'Uživatel diskuse', u'Uživatelka diskuse']
+        self.namespaces[3]['cs'] = [u'Diskuse s uživatelem', u'Uživatel diskuse', u'Uživatelka diskuse', u'Diskuse s uživatelkou']
         self.namespaces[2]['cs'] = [u'Uživatel', u'Uživatelka']
+        self.namespaces[-2]['sr'] = [u'Медиј', u'Medija', u'Медија']
         self.namespaces[12]['nl'] = [u'Help']
         self.namespaces[3]['pt'] = [u'Utilizador Discussão', u'Usuário Discussão', u'Utilizadora Discussão']
         self.namespaces[2]['pt'] = [u'Utilizador', u'Usuário', u'Utilizadora']
         self.namespaces[6]['vec'] = [u'File', u'Imagine']
+        self.namespaces[9]['ro'] = [u'Discuție MediaWiki', u'Discuţie MediaWiki']
         self.namespaces[3]['pl'] = [u'Dyskusja wikiskryby', u'Dyskusja użytkownika', u'Dyskusja użytkowniczki']
         self.namespaces[2]['pl'] = [u'Wikiskryba', u'Użytkownik', u'Użytkowniczka']
         self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisateur']
@@ -51,8 +48,6 @@ class Family(family.Family):
         self.namespaces[12]['de'] = [u'Hilfe']
         self.namespaces[9]['da'] = [u'MediaWiki diskussion', u'MediaWiki-diskussion']
         self.namespaces[13]['da'] = [u'Hjælp diskussion', u'Hjælp-diskussion']
-        self.namespaces[3]['ro'] = [u'Discuție Utilizator', u'Discuţie Utilizator']
-        self.namespaces[9]['ro'] = [u'Discuție MediaWiki', u'Discuţie MediaWiki']
 
         # Most namespaces are inherited from family.Family.
         # Translation used on all wikis for the different namespaces.
@@ -64,6 +59,7 @@ class Family(family.Family):
             'ang': u'Wicifruma',
             'ar': [u'ويكي مصدر', u'وم'],
             'az': u'VikiMənbə',
+            'be': [u'Вікікрыніцы', u'Wikisource'],
             'bg': u'Уикиизточник',
             'bn': [u'উইকিসংকলন', u'Wikisource'],
             'br': u'Wikimammenn',
@@ -83,6 +79,7 @@ class Family(family.Family):
             'fo': [u'Wikiheimild', u'Wikisource'],
             'fr': u'Wikisource',
             'gl': u'Wikisource',
+            'gu': [u'વિકિસ્રોત', u'Wikisource'],
             'he': u'ויקיטקסט',
             'hr': u'Wikizvor',
             'ht': u'Wikisòrs',
@@ -99,7 +96,7 @@ class Family(family.Family):
             'lt': [u'Vikišaltiniai', u'Wikisource'],
             'mk': u'Wikisource',
             'ml': [u'വിക്കിഗ്രന്ഥശാല', u'Wikisource', u'WS'],
-            'mr': [u'विकिस्रोत', u'Wikisource'],
+            'mr': u'विकिस्रोत',
             'nb': u'Wikikilden',
             'nl': u'Wikisource',
             'no': u'Wikikilden',
@@ -130,6 +127,7 @@ class Family(family.Family):
             'ang': u'Wicifruma talk',
             'ar': [u'نقاش ويكي مصدر', u'نو'],
             'az': u'VikiMənbə müzakirəsi',
+            'be': [u'Размовы пра Вікікрыніцы', u'Вікікрыніцы размовы'],
             'bg': u'Уикиизточник беседа',
             'bn': [u'উইকিসংকলন আলোচনা', u'উইকিসংকলন আলাপ'],
             'br': u'Kaozeadenn Wikimammenn',
@@ -149,6 +147,7 @@ class Family(family.Family):
             'fo': [u'Wikiheimild-kjak', u'Wikiheimild kjak'],
             'fr': u'Discussion Wikisource',
             'gl': u'Conversa Wikisource',
+            'gu': u'વિકિસ્રોત ચર્ચા',
             'he': u'שיחת ויקיטקסט',
             'hr': u'Razgovor o Wikizvoru',
             'ht': u'Diskisyon Wikisòrs',
@@ -216,7 +215,7 @@ class Family(family.Family):
             'cs': u'Autor',
             'el': u'Σελίδα',
             'en': u'Portal',
-            'fa': u'درگاه',
+            'fa': [u'درگاه', u'Portal'],
             'fr': u'Transwiki',
             'he': u'קטע',
             'hr': u'Autor',
@@ -246,7 +245,7 @@ class Family(family.Family):
             'cs': u'Diskuse k autorovi',
             'el': u'Συζήτηση σελίδας',
             'en': u'Portal talk',
-            'fa': u'بحث درگاه',
+            'fa': [u'بحث درگاه', u'Portal talk'],
             'fr': u'Discussion Transwiki',
             'he': u'שיחת קטע',
             'hr': u'Razgovor o autoru',
@@ -270,6 +269,8 @@ class Family(family.Family):
         self.namespaces[102] = {
             'ar': u'مؤلف',
             'az': u'Müəllif',
+            'be': u'Аўтар',
+            'bn': u'নির্ঘণ্ট',
             'br': u'Pajenn',
             'ca': u'Pàgina',
             'da': u'Forfatter',
@@ -279,7 +280,7 @@ class Family(family.Family):
             'eo': u'Aŭtoro',
             'es': u'Página',
             'et': u'Lehekülg',
-            'fa': [u'پدیدآورنده', u'Autor'],
+            'fa': [u'پدیدآورنده', u'Author'],
             'fr': u'Auteur',
             'hr': u'Stranica',
             'hy': u'Պորտալ',
@@ -288,7 +289,7 @@ class Family(family.Family):
             'la': u'Scriptor',
             'mk': u'Автор',
             'ml': u'കവാടം',
-            'mr': u'सूची',
+            'mr': [u'साहित्यिक', u'Author'],
             'nb': u'Forfatter',
             'nl': u'Auteur',
             'no': u'Forfatter',
@@ -304,6 +305,8 @@ class Family(family.Family):
         self.namespaces[103] = {
             'ar': u'نقاش المؤلف',
             'az': u'Müəllif müzakirəsi',
+            'be': u'Размовы пра аўтара',
+            'bn': u'নির্ঘণ্ট আলাপ',
             'br': u'Kaozeadenn pajenn',
             'ca': u'Pàgina Discussió',
             'da': u'Forfatterdiskussion',
@@ -313,7 +316,7 @@ class Family(family.Family):
             'eo': u'Aŭtoro-Diskuto',
             'es': u'Página Discusión',
             'et': u'Lehekülje arutelu',
-            'fa': [u'گفتگو پدیدآورنده', u'Autor talk'],
+            'fa': [u'گفتگو پدیدآورنده', u'Author talk'],
             'fr': u'Discussion Auteur',
             'hr': u'Razgovor o stranici',
             'hy': u'Պորտալի քննարկում',
@@ -322,7 +325,7 @@ class Family(family.Family):
             'la': u'Disputatio Scriptoris',
             'mk': u'Разговор за автор',
             'ml': u'കവാടത്തിന്റെ സംവാദം',
-            'mr': u'सूची चर्चा',
+            'mr': [u'साहित्यिक चर्चा', u'Author talk'],
             'nb': u'Forfatterdiskusjon',
             'nl': u'Overleg auteur',
             'no': u'Forfatterdiskusjon',
@@ -336,16 +339,21 @@ class Family(family.Family):
         }
 
         self.namespaces[104] = {
-            '_default': u'Page',
+            '-': u'Page',
             'ar': u'صفحة',
+            'be': u'Старонка',
+            'bn': u'পাতা',
             'br': [u'Oberour', u'Author'],
             'ca': [u'Llibre', u'Index'],
             'da': u'Side',
             'de': u'Index',
+            'en': u'Page',
             'eo': u'Paĝo',
             'es': u'Índice',
             'et': [u'Register', u'Index'],
             'fa': [u'برگه', u'Page'],
+            'fr': u'Page',
+            'gu': u'પૃષ્ઠ',
             'he': u'עמוד',
             'hr': [u'Sadržaj', u'Index'],
             'hu': u'Oldal',
@@ -363,23 +371,28 @@ class Family(family.Family):
             'sa': u'पुटम्',
             'sl': [u'Kazalo', u'Index'],
             'sv': u'Sida',
-            'te': [u'పుట', u'పేజీ'],
+            'te': [u'పుట', u'పేజీ', u'Page'],
             'vec': [u'Indice', u'Index'],
             'vi': u'Trang',
+            'zh': u'Page',
         }
 
         self.namespaces[105] = {
-            '_default': u'Page talk',
+            '-': u'Page talk',
             'ar': u'نقاش الصفحة',
+            'be': u'Размовы пра старонку',
+            'bn': u'পাতা আলাপ',
             'br': [u'Kaozeadenn oberour', u'Author talk'],
             'ca': [u'Llibre Discussió', u'Index talk'],
             'da': u'Sidediskussion',
             'de': [u'Index Diskussion', u'Index talk'],
+            'en': u'Page talk',
             'eo': u'Paĝo-Diskuto',
             'es': u'Índice Discusión',
             'et': [u'Registri arutelu', u'Index talk'],
             'fa': u'گفتگوی برگه',
             'fr': u'Discussion Page',
+            'gu': u'પૃષ્ઠ ચર્ચા',
             'he': u'שיחת עמוד',
             'hr': [u'Razgovor o sadržaju', u'Index talk'],
             'hu': u'Oldal vita',
@@ -397,7 +410,7 @@ class Family(family.Family):
             'sa': u'पुटसंवाद',
             'sl': [u'Pogovor o kazalu', u'Index talk'],
             'sv': u'Siddiskussion',
-            'te': [u'పుట చర్చ', u'పేజీ చర్చ'],
+            'te': [u'పుట చర్చ', u'పేజీ చర్చ', u'Page talk'],
             'vec': [u'Discussion indice', u'Index talk'],
             'vi': u'Thảo luận Trang',
             'zh': u'Page talk',
@@ -406,6 +419,8 @@ class Family(family.Family):
         self.namespaces[106] = {
             '-': u'Index',
             'ar': u'فهرس',
+            'be': u'Індэкс',
+            'bn': u'প্রবেশদ্বার',
             'ca': u'Autor',
             'da': u'Indeks',
             'en': u'Index',
@@ -413,6 +428,7 @@ class Family(family.Family):
             'et': u'Autor',
             'fa': u'فهرست',
             'fr': u'Portail',
+            'gu': u'સૂચિ',
             'he': u'ביאור',
             'hu': u'Index',
             'hy': u'Ինդեքս',
@@ -420,7 +436,7 @@ class Family(family.Family):
             'it': u'Portale',
             'la': u'Liber',
             'ml': u'താൾ',
-            'mr': u'साहित्यिक',
+            'mr': [u'अनुक्रमणिका', u'Index'],
             'no': u'Indeks',
             'pt': u'Página',
             'ro': u'Index',
@@ -435,6 +451,8 @@ class Family(family.Family):
         self.namespaces[107] = {
             '-': u'Index talk',
             'ar': u'نقاش الفهرس',
+            'be': u'Размовы пра індэкс',
+            'bn': u'প্রবেশদ্বার আলাপ',
             'ca': u'Autor Discussió',
             'da': u'Indeksdiskussion',
             'en': u'Index talk',
@@ -442,6 +460,7 @@ class Family(family.Family):
             'et': u'Autori arutelu',
             'fa': u'گفتگوی فهرست',
             'fr': u'Discussion Portail',
+            'gu': u'સૂચિ ચર્ચા',
             'he': u'שיחת ביאור',
             'hu': u'Index vita',
             'hy': u'Ինդեքսի քննարկում',
@@ -449,7 +468,7 @@ class Family(family.Family):
             'it': u'Discussioni portale',
             'la': u'Disputatio Libri',
             'ml': u'താളിന്റെ സംവാദം',
-            'mr': u'साहित्यिक चर्चा',
+            'mr': [u'अनुक्रमणिका चर्चा', u'Index talk'],
             'no': u'Indeksdiskusjon',
             'pt': u'Página Discussão',
             'ro': u'Discuție Index',
@@ -463,6 +482,8 @@ class Family(family.Family):
 
         self.namespaces[108] = {
             '-': u'Author',
+            'be': u'Аўтар',
+            'gu': u'સર્જક',
             'he': u'מחבר',
             'it': u'Pagina',
             'pt': u'Em Tradução',
@@ -471,6 +492,8 @@ class Family(family.Family):
 
         self.namespaces[109] = {
             '-': u'Author talk',
+            'be': u'Размовы_пра_аўтара',
+            'gu': u'સર્જક ચર્ચા',
             'he': u'שיחת מחבר',
             'it': u'Discussioni pagina',
             'pt': u'Discussão Em Tradução',
@@ -499,12 +522,33 @@ class Family(family.Family):
             'he': u'שיחת מפתח',
         }
 
-        self.alphabetic = ['ang','ar','az','bg','bs','ca','cs','cy',
-                      'da','de','el','en','es','et','fa','fi',
-                      'fo','fr','gl','he','hr','ht','hu','id',
-                      'is','it','ja', 'ko','la','lt','ml','nl',
-                      'no','pl','pt','ro','ru','sk','sl','sr',
-                      'sv','te','th','tr','uk','vi','yi','zh']
+        # CentralAuth cross avaliable projects.
+        self.cross_projects = [
+            'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews',
+            'wikiversity', 'meta', 'mediawiki', 'test', 'incubator', 'commons',
+            'species',
+        ]
+
+        # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        self.cross_allowed = [
+            'ca', 'el', 'fa', 'it', 'ko', 'no', 'pl', 'vi', 'zh',
+        ]
+
+        # Which languages have a special order for putting interlanguage links,
+        # and what order is it? If a language is not in interwiki_putfirst,
+        # alphabetical order on language code is used. For languages that are in
+        # interwiki_putfirst, interwiki_putfirst is checked first, and
+        # languages are put in the order given there. All other languages are
+        # put after those, in code-alphabetical order.
+        self.interwiki_putfirst = {
+            'en': self.alphabetic,
+            'fi': self.alphabetic,
+            'fr': self.alphabetic,
+            'he': ['en'],
+            'hu': ['en'],
+            'pl': self.alphabetic,
+            'simple': self.alphabetic
+        }
 
         self.obsolete = {
             'ang': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikisource
@@ -517,25 +561,6 @@ class Family(family.Family):
             'zh-tw': 'zh',
             'zh-cn': 'zh'
         }
-
-        self.interwiki_putfirst = {
-            'en': self.alphabetic,
-            'fi': self.alphabetic,
-            'fr': self.alphabetic,
-            'he': ['en'],
-            'hu': ['en'],
-            'pl': self.alphabetic,
-            'simple': self.alphabetic
-        }
-        # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
-        self.cross_allowed = [
-            'el','fa','it','ko','no','vi','zh'
-        ]
-        # CentralAuth cross avaliable projects.
-        self.cross_projects = [
-            'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikinews', 'wikiversity',
-            'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
-        ]
 
         self.authornamespaces = {
             '_default': [0],
@@ -602,19 +627,6 @@ class Family(family.Family):
         return ('commons', 'commons')
 
     if family.config.SSL_connection:
-        def hostname(self, code):
-            return 'secure.wikimedia.org'
 
         def protocol(self, code):
             return 'https'
-
-        def scriptpath(self, code):
-            if code == '-':
-                return '/wikipedia/sources/w'
-
-            return '/%s/%s/w' % (self.name, code)
-
-        def nicepath(self, code):
-            if code == '-':
-                return '/wikipedia/sources/wiki/'
-            return '/%s/%s/wiki/' % (self.name, code)

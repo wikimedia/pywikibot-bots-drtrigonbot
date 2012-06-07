@@ -7,7 +7,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: version.py 9649 2011-10-23 06:24:55Z xqt $'
+__version__ = '$Id: version.py 10178 2012-05-05 09:27:47Z xqt $'
 
 import os
 import time
@@ -61,19 +61,19 @@ def getversion_svn():
         from datetime import datetime
         con = sqlite.connect(os.path.join(_program_dir, ".svn/wc.db"))
         cur = con.cursor()
-        cur.execute( '''select local_relpath, repos_path, revision, changed_date from nodes order by revision desc''')
+        cur.execute( '''select local_relpath, repos_path, revision, changed_date from nodes order by revision desc, changed_date desc''')
         name, tag, rev, date = cur.fetchone()
         con.close()
-        tag = tag.rstrip(name)
+        tag = tag[:-len(name)]
         date = time.gmtime(date/1000000)
     else:
-        for i in range(3):
+        for i in xrange(3):
             entries.readline()
         tag = entries.readline().strip()
         t = tag.split('://')
         t[1] = t[1].replace('svn.wikimedia.org/svnroot/pywikipedia/', '')
         tag = '[%s] %s' % (t[0], t[1])
-        for i in range(4):
+        for i in xrange(4):
             entries.readline()
         date = time.strptime(entries.readline()[:19],'%Y-%m-%dT%H:%M:%S')
         rev = entries.readline()[:-1]

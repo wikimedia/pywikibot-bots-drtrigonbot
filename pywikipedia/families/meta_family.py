@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: meta_family.py 9749 2011-11-11 03:29:50Z xqt $'
+__version__ = '$Id: meta_family.py 10214 2012-05-15 14:16:54Z shizhao $'
 
 import family
 
@@ -13,9 +13,6 @@ class Family(family.Family):
         self.langs = {
             'meta': 'meta.wikimedia.org',
         }
-
-        if family.config.SSL_connection:
-            self.langs ['meta'] = None
 
         self.namespaces[4] = {
             '_default': [u'Meta', self.namespaces[4]['_default']],
@@ -138,6 +135,12 @@ class Family(family.Family):
         self.namespaces[203] = {
             '_default': u'Research talk',
         }
+        self.namespaces[204] = {
+            '_default': u'Participation',
+        }
+        self.namespaces[205] = {
+            '_default': u'Participation talk',
+        }
         self.namespaces[1198] = {
             '_default': u'Translations',
         }
@@ -157,14 +160,6 @@ class Family(family.Family):
         return ('commons', 'commons')
 
     if family.config.SSL_connection:
-        def hostname(self, code):
-            return 'secure.wikimedia.org'
 
         def protocol(self, code):
             return 'https'
-
-        def scriptpath(self, code):
-            return '/wikipedia/meta/w'
-
-        def nicepath(self, code):
-            return '/wikipedia/meta/wiki/'

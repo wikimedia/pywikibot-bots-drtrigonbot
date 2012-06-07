@@ -34,7 +34,7 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 
-__version__='$Id: noreferences.py 9804 2011-12-17 13:27:59Z xqt $'
+__version__='$Id: noreferences.py 10272 2012-06-02 23:35:18Z xqt $'
 
 import re, sys
 import wikipedia as pywikibot
@@ -73,6 +73,9 @@ placeBeforeSections = {
         u'Siehe auch',
         u'Weblink',      # bad, but common singular form of Weblinks
     ],
+    'dsb':[
+        u'Nožki',
+    ],
     'en': [              # no explicit policy on where to put the references
         u'Further reading',
         u'External links',
@@ -110,6 +113,9 @@ placeBeforeSections = {
         u'Liens externes',
         u'Voir aussi',
         u'Notes'
+    ],
+    'hsb':[
+        u'Nóžki',
     ],
     'hu': [
         u'Külső hivatkozások',
@@ -176,8 +182,10 @@ placeBeforeSections = {
         u'Připisy',
     ],
     'zh': [
-        u'外部連结',
         u'外部链接',
+        u'外部連结',
+        u'外部連結',
+        u'外部连接',
     ],
 }
 
@@ -194,11 +202,16 @@ referencesSections = {
     ],
     'de': [             #see [[de:WP:REF]]
         u'Einzelnachweise',
-        u'Fußnoten',
         u'Anmerkungen',
         u'Belege',
+        u'Endnoten',
+        u'Fußnoten',
+        u'Fuß-/Endnoten',
         u'Quellen',
         u'Quellenangaben',
+    ],
+    'dsb':[
+        u'Nožki',
     ],
     'en': [             # not sure about which ones are preferred.
         u'References',
@@ -233,6 +246,9 @@ referencesSections = {
     ],
     'he': [
         u'הערות שוליים',
+    ],
+    'hsb':[
+        u'Nóžki',
     ],
     'hu': [
         u'Források és jegyzetek',
@@ -293,16 +309,12 @@ referencesSections = {
         u'Připisy',
     ],
     'zh': [
-        u'參考文獻',
-        u'参考文献',
         u'參考資料',
         u'参考资料',
+        u'參考文獻',
+        u'参考文献',
         u'資料來源',
         u'资料来源',
-        u'參見',
-        u'参见',
-        u'參閱',
-        u'参阅',
     ],
 }
 
@@ -313,6 +325,7 @@ referencesTemplates = {
         'ar': [u'Reflist', u'ثبت المراجع', u'قائمة المراجع'],
         'be': [u'Зноскі', u'Примечания', u'Reflist', u'Спіс заўваг', u'Заўвагі'],
         'da': [u'Reflist'],
+        'dsb':[u'Referency'],
         'en': [u'Reflist', u'Refs', u'FootnotesSmall', u'Reference',
                u'Ref-list', u'Reference list', u'References-small', u'Reflink',
                u'Footnotes', u'FootnotesSmall'],
@@ -322,6 +335,7 @@ referencesTemplates = {
                u'پانویس', u'پانویس‌ها ', u'پانویس ۲', u'پانویس۲',u'فهرست منابع'],
         'fi': [u'Viitteet', u'Reflist'],
         'fr': [u'Références', u'Notes', u'References', u'Reflist'],
+        'hsb':[u'Referency'],
         'hu': [u'reflist', u'források', u'references', u'megjegyzések'],
         'is': [u'reflist'],
         'it': [u'References'],
@@ -339,7 +353,7 @@ referencesTemplates = {
                u'Примечания', u'Список примечаний',
                u'Сноска', u'Сноски'],
         'szl':[u'Przipisy', u'Připisy'],
-        'zh': [u'Reflist'],
+        'zh': [u'Reflist', u'RefFoot', u'NoteFoot'],
     },
 }
 
@@ -349,11 +363,14 @@ referencesSubstitute = {
     'wikipedia': {
         'be': u'{{зноскі}}',
         'da': u'{{reflist}}',
+        'dsb':u'{{referency}}',
         'fi': u'{{viitteet}}',
+        'hsb':u'{{referency}}',
         'hu': u'{{Források}}',
         'pl': u'{{Przypisy}}',
         'ru': u'{{примечания}}',
         'szl':u'{{Przipisy}}',
+        'zh': u'{{reflist}}',
     },
 }
 
@@ -371,6 +388,7 @@ maintenance_category = {
         'en': u'Pages with missing references list',
         'ja': u'Refタグがあるのにreferencesタグがないページ',
         'simple': u'Wikipedia pages with broken references',
+        'zh': u'参考资料格式错误的页面',
     },
 }
 
@@ -402,7 +420,7 @@ class XmlDumpNoReferencesPageGenerator:
 
 class NoReferencesBot:
 
-    def __init__(self, generator, always = False):
+    def __init__(self, generator, always=False):
         self.generator = generator
         self.always = always
         self.site = pywikibot.getSite()
@@ -421,7 +439,7 @@ class NoReferencesBot:
         except KeyError:
             self.referencesText = u'<references />'
 
-    def lacksReferences(self, text, verbose = True):
+    def lacksReferences(self, text, verbose=True):
         """
         Checks whether or not the page is lacking a references tag.
         """
@@ -627,7 +645,7 @@ def main():
     for arg in pywikibot.handleArgs():
         if arg.startswith('-xml'):
             if len(arg) == 4:
-                xmlFilename = pywikibot.input(u'Please enter the XML dump\'s filename:')
+                xmlFilename = i18n.input('pywikibot-enter-xml-filename')
             else:
                 xmlFilename = arg[5:]
             gen = XmlDumpNoReferencesPageGenerator(xmlFilename)
@@ -657,7 +675,8 @@ def main():
             import catlib
             if not namespaces:
                 namespaces = [0]
-            cat = catlib.Category(site, "%s:%s" % (site.namespace(14), cat))
+            cat = catlib.Category(site, "%s:%s" % (site.category_namespace(),
+                                                   cat))
             gen = pagegenerators.CategorizedPageGenerator(cat)
     if not gen:
         pywikibot.showHelp('noreferences')

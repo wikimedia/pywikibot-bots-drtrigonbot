@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: mediawiki_family.py 9819 2011-12-29 11:52:55Z xqt $'
+__version__ = '$Id: mediawiki_family.py 10214 2012-05-15 14:16:54Z shizhao $'
 
 import family
 
@@ -15,8 +15,6 @@ class Family(family.Family):
         self.langs = {
             'mediawiki': 'www.mediawiki.org',
         }
-        if family.config.SSL_connection:
-            self.langs['mediawiki'] = None
 
         self.namespaces[4] = {
             '_default': [u'Project', self.namespaces[4]['_default']],
@@ -70,14 +68,6 @@ class Family(family.Family):
         return ('commons', 'commons')
 
     if family.config.SSL_connection:
-        def hostname(self, code):
-            return 'secure.wikimedia.org'
 
         def protocol(self, code):
             return 'https'
-
-        def scriptpath(self, code):
-            return '/wikipedia/mediawiki/w'
-
-        def nicepath(self, code):
-            return '/wikipedia/mediawiki/wiki/'

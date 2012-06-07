@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikinews_family.py 9862 2012-02-03 11:55:42Z xqt $'
+__version__ = '$Id: wikinews_family.py 10264 2012-06-01 22:38:50Z xqt $'
 
 # The Wikimedia family that is known as Wikinews
 
@@ -12,34 +12,31 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'sr', 'en', 'pl', 'fr', 'de', 'it', 'es', 'pt', 'zh', 'ru', 'ja',
-            'sv', 'ta', 'ca', 'cs', 'el', 'fa', 'fi', 'ro', 'ar', 'he', 'bg',
-            'tr', 'sd', 'sq', 'uk', 'no', 'bs', 'ko', 'eo',
+            'sv', 'ta', 'ca', 'el', 'cs', 'fa', 'ar', 'fi', 'ro', 'he', 'bg',
+            'tr', 'sd', 'sq', 'uk', 'no', 'bs', 'eo', 'ko',
         ]
 
-        if family.config.SSL_connection:
-            self.langs = dict([(lang, None) for lang in self.languages_by_size])
-        else:
-            self.langs = dict([(lang, '%s.wikinews.org' % lang) for lang in self.languages_by_size])
+        self.langs = dict([(lang, '%s.wikinews.org' % lang) for lang in self.languages_by_size])
 
         # Override defaults
+        self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisateur']
+        self.namespaces[2]['fr'] = [u'Utilisateur']
         self.namespaces[14]['en'] = [u'Category', u'CAT']
         self.namespaces[10]['zh'] = [u'Template', u'模板', u'样板', u'樣板']
         self.namespaces[12]['zh'] = [u'Help', u'帮助', u'幫助']
         self.namespaces[14]['zh'] = [u'Category', u'分类', u'分類']
-        self.namespaces[3]['ca'] = [u'Usuari Discussió']
-        self.namespaces[2]['ca'] = [u'Usuari']
-        self.namespaces[3]['cs'] = [u'Diskuse s redaktorem', u'Diskuse s redaktorkou', u'Diskuse s uživatelem', u'Redaktor diskuse', u'Redaktorka diskuse', u'Diskuse s uživatelkou', u'Uživatel diskuse', u'Uživatelka diskuse']
-        self.namespaces[2]['cs'] = [u'Redaktor', u'Redaktorka', u'Uživatel', u'Uživatelka']
         self.namespaces[3]['pt'] = [u'Utilizador Discussão', u'Usuário Discussão', u'Utilizadora Discussão']
         self.namespaces[2]['pt'] = [u'Utilizador', u'Usuário', u'Utilizadora']
-        self.namespaces[3]['ro'] = [u'Discuție Utilizator', u'Discuţie Utilizator']
-        self.namespaces[3]['pl'] = [u'Dyskusja wikireportera', u'Dyskusja wikireporterki']
-        self.namespaces[2]['pl'] = [u'Wikireporter', u'Wikireporterka']
-        self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisateur']
-        self.namespaces[2]['fr'] = [u'Utilisateur']
+        self.namespaces[-2]['sr'] = [u'Медиј', u'Medija', u'Медија']
+        self.namespaces[3]['ca'] = [u'Usuari Discussió']
+        self.namespaces[2]['ca'] = [u'Usuari']
         self.namespaces[3]['de'] = [u'Benutzer Diskussion', u'Benutzerin Diskussion']
         self.namespaces[13]['de'] = [u'Hilfe Diskussion']
         self.namespaces[12]['de'] = [u'Hilfe']
+        self.namespaces[3]['cs'] = [u'Diskuse s redaktorem', u'Diskuse s redaktorkou', u'Diskuse s uživatelem', u'Redaktor diskuse', u'Redaktorka diskuse', u'Uživatel diskuse', u'Uživatelka diskuse', u'Diskuse s uživatelkou']
+        self.namespaces[2]['cs'] = [u'Redaktor', u'Redaktorka', u'Uživatel', u'Uživatelka']
+        self.namespaces[3]['pl'] = [u'Dyskusja wikireportera', u'Dyskusja wikireporterki']
+        self.namespaces[2]['pl'] = [u'Wikireporter', u'Wikireporterka']
 
         # Most namespaces are inherited from family.Family.
         # Translation used on all wikis for the different namespaces.
@@ -182,6 +179,7 @@ class Family(family.Family):
             'bg': u'Мнения',
             'ca': u'Secció',
             'de': u'Meinungen',
+            'el': u'Σχόλια',
             'en': u'Comments',
             'fa': u'نظرها',
             'fr': u'Transwiki',
@@ -197,6 +195,7 @@ class Family(family.Family):
             'bg': u'Мнения беседа',
             'ca': u'Secció Discussió',
             'de': u'Meinungen Diskussion',
+            'el': u'Συζήτηση σχολίων',
             'en': u'Comments talk',
             'fa': u'بحث نظرها',
             'fr': u'Discussion Transwiki',
@@ -237,6 +236,30 @@ class Family(family.Family):
             'ja': u'短信‐ノート',
         }
 
+        # CentralAuth cross avaliable projects.
+        self.cross_projects = [
+            'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews',
+            'wikiversity', 'meta', 'mediawiki', 'test', 'incubator', 'commons',
+            'species',
+        ]
+
+        # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        self.cross_allowed = ['ca', 'cs', 'en', 'fa',]
+
+        # Which languages have a special order for putting interlanguage links,
+        # and what order is it? If a language is not in interwiki_putfirst,
+        # alphabetical order on language code is used. For languages that are in
+        # interwiki_putfirst, interwiki_putfirst is checked first, and
+        # languages are put in the order given there. All other languages are
+        # put after those, in code-alphabetical order.
+        self.interwiki_putfirst = {
+            'en': self.alphabetic,
+            'fi': self.alphabetic,
+            'fr': self.alphabetic,
+            'he': ['en'],
+            'hu': ['en'],
+            'pl': self.alphabetic,
+        }
 
         self.obsolete = {
             'hu': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=28342
@@ -248,29 +271,6 @@ class Family(family.Family):
             'zh-cn': 'zh'
         }
 
-        # Which languages have a special order for putting interlanguage links,
-        # and what order is it? If a language is not in interwiki_putfirst,
-        # alphabetical order on language code is used. For languages that are in
-        # interwiki_putfirst, interwiki_putfirst is checked first, and
-        # languages are put in the order given there. All other languages are put
-        # after those, in code-alphabetical order.
-        self.interwiki_putfirst = {
-            'en': self.alphabetic,
-            'fi': self.alphabetic,
-            'fr': self.alphabetic,
-            'he': ['en'],
-            'hu': ['en'],
-            'pl': self.alphabetic,
-        }
-
-        # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
-        self.cross_allowed = ['ca', 'cs', 'fa',]
-        # CentralAuth cross avaliable projects.
-        self.cross_projects = [
-            'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikiversity',
-            'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
-        ]
-
     def code2encoding(self, code):
         return 'utf-8'
 
@@ -278,14 +278,6 @@ class Family(family.Family):
         return ('commons', 'commons')
 
     if family.config.SSL_connection:
-        def hostname(self, code):
-            return 'secure.wikimedia.org'
 
         def protocol(self, code):
             return 'https'
-
-        def scriptpath(self, code):
-            return '/%s/%s/w' % (self.name, code)
-
-        def nicepath(self, code):
-            return '/%s/%s/wiki/' % (self.name, code)

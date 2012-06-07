@@ -6,58 +6,61 @@ Scripts to manage categories.
 Syntax: python category.py action [-option]
 
 where action can be one of these:
- * add         - mass-add a category to a list of pages
- * remove      - remove category tag from all pages in a category
- * move        - move all pages in a category to another category
- * tidy        - tidy up a category by moving its articles into subcategories
- * tree        - show a tree of subcategories of a given category
- * listify     - make a list of all of the articles that are in a category
+ * add          - mass-add a category to a list of pages
+ * remove       - remove category tag from all pages in a category
+ * move         - move all pages in a category to another category
+ * tidy         - tidy up a category by moving its articles into subcategories
+ * tree         - show a tree of subcategories of a given category
+ * listify      - make a list of all of the articles that are in a category
 
 and option can be one of these:
 
 Options for "add" action:
- * -person     - sort persons by their last name
- * -create     - If a page doesn't exist, do not skip it, create it instead
+ * -person      - sort persons by their last name
+ * -create      - If a page doesn't exist, do not skip it, create it instead
 
 If action is "add", the following options are supported:
 
 &params;
 
 Options for "listify" action:
- * -overwrite  - This overwrites the current page with the list even if
-                 something is already there.
- * -showimages - This displays images rather than linking them in the list.
- * -talkpages  - This outputs the links to talk pages of the pages to be
-                 listified in addition to the pages themselves.
+ * -overwrite   - This overwrites the current page with the list even if
+                  something is already there.
+ * -showimages  - This displays images rather than linking them in the list.
+ * -talkpages   - This outputs the links to talk pages of the pages to be
+                  listified in addition to the pages themselves.
 
 Options for "remove" action:
- * -nodelsum   - This specifies not to use the custom edit summary as the
-                 deletion reason.  Instead, it uses the default deletion reason
-                 for the language, which is "Category was disbanded" in English.
+ * -nodelsum    - This specifies not to use the custom edit summary as the
+                  deletion reason.  Instead, it uses the default deletion reason
+                  for the language, which is "Category was disbanded" in
+                  English.
 
 Options for "move" action:
- * -hist       - Creates a nice wikitable on the talk page of target category
-                 that contains detailed page history of the source category.
+ * -hist        - Creates a nice wikitable on the talk page of target category
+                  that contains detailed page history of the source category.
 
 Options for several actions:
- * -rebuild    - reset the database
- * -from:      - The category to move from (for the move option)
-                 Also, the category to remove from in the remove option
-                 Also, the category to make a list of in the listify option
- * -to:        - The category to move to (for the move option)
-               - Also, the name of the list to make in the listify option
+ * -rebuild     - reset the database
+ * -from:       - The category to move from (for the move option)
+                  Also, the category to remove from in the remove option
+                  Also, the category to make a list of in the listify option
+ * -to:         - The category to move to (for the move option)
+                - Also, the name of the list to make in the listify option
          NOTE: If the category names have spaces in them you may need to use
          a special syntax in your shell so that the names aren't treated as
          separate parameters.  For instance, in BASH, use single quotes,
          e.g. -from:'Polar bears'
- * -batch      - Don't prompt to delete emptied categories (do it
-                 automatically).
- * -summary:   - Pick a custom edit summary for the bot.
- * -inplace    - Use this flag to change categories in place rather than
-                 rearranging them.
- * -recurse    - Recurse through all subcategories of categories.
- * -match      - Only work on pages whose titles match the given regex (for
-                 move and remove actions).
+ * -batch       - Don't prompt to delete emptied categories (do it
+                  automatically).
+ * -summary:    - Pick a custom edit summary for the bot.
+ * -inplace     - Use this flag to change categories in place rather than
+                  rearranging them.
+ * -recurse     - Recurse through all subcategories of categories.
+ * -pagesonly   - While removing pages from a category, keep the subpage links
+                  and do not remove them
+ * -match       - Only work on pages whose titles match the given regex (for
+                  move and remove actions).
 
 For the actions tidy and tree, the bot will store the category structure
 locally in category.dump. This saves time and server load, but if it uses
@@ -85,9 +88,10 @@ This will move all pages in the category US to the category United States.
 # (C) leogregianin, 2004-2008
 # (C) Cyde, 2006-2010
 # (C) Anreas J Schwab, 2007
+# (C) xqt, 2009-2012
 # (C) Pywikipedia team, 2008-2012
 #
-__version__ = '$Id: category.py 9887 2012-02-12 17:48:14Z xqt $'
+__version__ = '$Id: category.py 10268 2012-06-02 20:07:26Z xqt $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -247,7 +251,7 @@ class AddCategory:
 
         '''
         page_name = pagelink.title()
-        site = pagelink.site()
+        site = pagelink.site
         # regular expression that matches a name followed by a space and
         # disambiguation brackets. Group 1 is the name without the rest.
         bracketsR = re.compile('(.*) \(.+?\)')
@@ -534,12 +538,16 @@ class CategoryListifyRobot:
 
 class CategoryRemoveRobot:
     '''Removes the category tag from all pages in a given category
-    and from the category pages of all subcategories, without prompting.
-    Does not remove category tags pointing at subcategories.
+    and if pagesonly parameter is False also from the category pages of all
+    subcategories, without prompting. If the category is empty, it will be
+    tagged for deleting. Does not remove category tags pointing at
+    subcategories.
 
     '''
 
-    def __init__(self, catTitle, batchMode = False, editSummary = '', useSummaryForDeletion = True, titleRegex = None, inPlace = False):
+    def __init__(self, catTitle, batchMode=False, editSummary='',
+                 useSummaryForDeletion=True, titleRegex=None, inPlace=False,
+                 pagesonly=False):
         self.editSummary = editSummary
         self.site = pywikibot.getSite()
         self.cat = catlib.Category(self.site, 'Category:'+ catTitle)
@@ -548,6 +556,7 @@ class CategoryRemoveRobot:
         self.batchMode = batchMode
         self.titleRegex = titleRegex
         self.inPlace = inPlace
+        self.pagesonly = pagesonly
         if not self.editSummary:
             self.editSummary = i18n.twtranslate(self.site, 'category-removing',
                                                 {'oldcat': self.cat.title()})
@@ -560,6 +569,9 @@ class CategoryRemoveRobot:
             for article in articles:
                 if not self.titleRegex or re.search(self.titleRegex,article.title()):
                     catlib.change_category(article, self.cat, None, comment = self.editSummary, inPlace = self.inPlace)
+        if self.pagesonly:
+            return
+
         # Also removes the category tag from subcategories' pages
         subcategories = self.cat.subcategoriesList(recurse = 0)
         if len(subcategories) == 0:
@@ -855,6 +867,7 @@ def main(*args):
     recurse = False
     withHistory = False
     titleRegex = None
+    pagesonly = False
 
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
@@ -916,6 +929,8 @@ def main(*args):
             talkPages = True
         elif arg == '-recurse':
             recurse = True
+        elif arg == '-pagesonly':
+            pagesonly = True
         elif arg == '-create':
             create_pages = True
         elif arg == '-hist':
@@ -944,7 +959,8 @@ def main(*args):
             oldCatTitle = pywikibot.input(
 u'Please enter the name of the category that should be removed:')
         bot = CategoryRemoveRobot(oldCatTitle, batchMode, editSummary,
-                                  useSummaryForDeletion, inPlace=inPlace)
+                                  useSummaryForDeletion, inPlace=inPlace,
+                                  pagesonly=pagesonly)
         bot.run()
     elif action == 'move':
         if (fromGiven == False):

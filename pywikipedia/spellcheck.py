@@ -51,36 +51,23 @@ Command-line options:
 """
 #
 # (C) Andre Engels, 2005
-# (C) Pywikipedia bot team, 2006-2011
+# (C) Pywikipedia bot team, 2006-2012
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: spellcheck.py 9367 2011-07-11 04:50:03Z xqt $'
+__version__ = '$Id: spellcheck.py 10271 2012-06-02 23:01:31Z xqt $'
 #
 
 import re, sys
 import string, codecs
 import wikipedia as pywikibot
+from pywikibot import i18n
 import pagegenerators
-
-msg={
-    'ar': u'تدقيق إملائي بمساعدة البوت',
-    'de': u'Bot-unterstützte Rechtschreibprüfung',
-    'en': u'Bot-aided spell checker',
-    'es': u'Bot asistido de correción ortográfica',
-    'fr': u'Correction orthographique par robot',
-    'he': u'בדיקת איות באמצעות בוט',
-    'ia': u'Correction de orthographia per robot',
-    'nl': u'Spellingscontrole',
-    'pl': u'Wspomagane przez robota sprawdzanie pisowni',
-    'pt': u'Bot de correção ortográfica',
-}
 
 
 class SpecialTerm(object):
     def __init__(self, text):
         self.style = text
-
 
 def distance(a,b):
     # Calculates the Levenshtein distance between a and b.
@@ -420,6 +407,17 @@ class Word(object):
             newwords.append(self.word)
         return self.alternatives
 
+def checkPage(page, checknames=True, knownonly=False):
+    try:
+        text = page.get()
+    except pywikibot.Error:
+        pass
+    else:
+        text = spellcheck(text, checknames=checknames, knownonly=knownonly, title=page.title())
+        if text != page.get():
+            summary = i18n.twtranslate(page.site, 'spellcheck-checking')
+            page.put(text, summary)
+
 try:
     pageskip = []
     edit = SpecialTerm("edit")
@@ -461,7 +459,6 @@ try:
     mysite = pywikibot.getSite()
     if not checklang:
         checklang = mysite.language()
-    pywikibot.setAction(pywikibot.translate(mysite,msg))
     filename = pywikibot.config.datafilepath('spelling',
                                       'spelling-' + checklang + '.txt')
     print "Getting wordlist"
@@ -499,38 +496,14 @@ except:
 try:
     if newpages:
         for (page, date, length, loggedIn, user, comment) in pywikibot.getSite().newpages(1000):
-            try:
-                text = page.get()
-            except pywikibot.Error:
-                pass
-            else:
-                text = spellcheck(text, checknames=checknames,
-                                  knownonly=knownonly, title=page.title())
-                if text != page.get():
-                    page.put(text)
+            checkPage(page, checknames, knownonly)
     elif start:
         for page in pagegenerators.PreloadingGenerator(pagegenerators.AllpagesPageGenerator(start=start,includeredirects=False)):
-            try:
-                text = page.get()
-            except pywikibot.Error:
-                pass
-            else:
-                text = spellcheck(text, checknames=checknames,
-                                  knownonly=knownonly, title=page.title())
-                if text != page.get():
-                    page.put(text)
+            checkPage(page, checknames, knownonly)
 
     if longpages:
         for (page, length) in pywikibot.getSite().longpages(500):
-            try:
-                text = page.get()
-            except pywikibot.Error:
-                pass
-            else:
-                text = spellcheck(text, checknames=checknames,
-                                  knownonly=knownonly, title=page.title())
-                if text != page.get():
-                    page.put(text)
+            checkPage(page, checknames, knownonly)
 
     else:
         title = ' '.join(title)
@@ -543,9 +516,7 @@ try:
             except pywikibot.IsRedirectPage:
                 print "Page is a redirect page"
             else:
-                text = spellcheck(text,knownonly=knownonly, title=page.title())
-                if text != page.get():
-                    page.put(text)
+                checkPage(page, knownonly=knownonly)
             title = pywikibot.input(u"Which page to check now? (enter to stop)")
 finally:
     pywikibot.stopme()

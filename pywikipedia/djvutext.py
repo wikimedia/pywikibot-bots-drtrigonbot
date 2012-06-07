@@ -10,6 +10,9 @@ The following parameters are supported:
                    what would have been changed.
     -ask           Ask for confirmation before uploading each page.
                    (Default: ask when overwriting pages)
+    -overwrite:no  When asking for confirmation, the answer is no.
+    -overwrite:yes When asking for confirmation, the answer is yes.
+                   (Default: ask for the answer)
     -djvu:...      Filename of the djvu file
     -index:...     Name of the index page
                    (Default: the djvu filename)
@@ -23,7 +26,7 @@ and the bot will only work on that single page.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: djvutext.py 9692 2011-10-30 15:03:29Z xqt $'
+__version__ = '$Id: djvutext.py 10037 2012-03-21 22:55:26Z valhallasw $'
 import wikipedia as pywikibot
 from pywikibot import i18n
 import os, sys
@@ -37,7 +40,7 @@ docuReplacements = {
 
 class DjVuTextBot:
 
-    def __init__(self, djvu, index, pages, ask=False, debug=False):
+    def __init__(self, djvu, index, pages, ask=False, overwrite='ask', debug=False):
         """
         Constructor. Parameters:
         djvu : filename
@@ -49,6 +52,7 @@ class DjVuTextBot:
         self.pages = pages
         self.dry = debug
         self.ask = ask
+        self.overwrite = overwrite
 
     def NoOfImages(self):
         cmd = u"djvused -e 'n' \"%s\"" % (self.djvu)
@@ -117,7 +121,7 @@ class DjVuTextBot:
         Loads the given page, does some changes, and saves it.
         """
         site = pywikibot.getSite()
-        page_namespace = site.family.namespaces[104][site.lang]
+        page_namespace = site.mediawiki_message('Proofreadpage namespace')
         page = pywikibot.Page(site, u'%s:%s/%d'
                               % (page_namespace, self.prefix, pageno))
         exists = page.exists()
@@ -154,8 +158,15 @@ class DjVuTextBot:
             pywikibot.inputChoice(u'Dry mode... Press enter to continue', [],
                                   [], 'dummy')
             return
-        if ask:
-            choice = pywikibot.inputChoice(u'Do you want to accept these changes?', ['Yes', 'No'], ['y', 'N'], 'N')
+        if ask: # True either when the -ask flag is used or if the page exists
+            if self.overwrite == 'n':
+                choice = 'n'
+                pywikibot.output(u"You did not accept these changes")
+            elif self.overwrite == 'y':
+                choice = 'y'
+                pywikibot.output(u"You accepted these changes")
+            else:
+                choice = pywikibot.inputChoice(u'Do you want to accept these changes?', ['Yes', 'No'], ['y', 'N'], 'N')
         else:
             choice = 'y'
         if choice == 'y':
@@ -179,6 +190,7 @@ def main():
     # what would have been changed.
     dry = False
     ask = False
+    overwrite = 'ask'
 
     # Parse command line arguments
     for arg in pywikibot.handleArgs():
@@ -186,6 +198,11 @@ def main():
             dry = True
         elif arg.startswith("-ask"):
             ask = True
+        elif arg.startswith("-overwrite:"):
+            overwrite = arg[11:12]
+            if overwrite != 'y' and overwrite != 'n':
+                pywikibot.output(u"Unknown argument %s; will ask before overwriting" % arg)
+                overwrite = 'ask'
         elif arg.startswith("-djvu:"):
             djvu = arg[6:]
         elif arg.startswith("-index:"):
@@ -211,7 +228,7 @@ def main():
             raise pywikibot.PageNotFound(u"Found family '%s'; Wikisource required." % site.family.name)
 
         if not index_page.exists() and index_page.namespace() == 0:
-            index_namespace = pywikibot.Page(site, 'MediaWiki:Proofreadpage index namespace').get()
+            index_namespace = site.mediawiki_message('Proofreadpage index namespace')
 
             index_page = pywikibot.Page(pywikibot.getSite(),
                                         u"%s:%s" % (index_namespace, index))
@@ -219,7 +236,7 @@ def main():
             raise pywikibot.NoPage(u"Page '%s' does not exist" % index)
         pywikibot.output(u"uploading text from %s to %s"
                          % (djvu, index_page.title(asLink=True)) )
-        bot = DjVuTextBot(djvu, index, pages, ask, dry)
+        bot = DjVuTextBot(djvu, index, pages, ask, overwrite, dry)
         if not bot.has_text():
             raise ValueError("No text layer in djvu file")
         bot.run()

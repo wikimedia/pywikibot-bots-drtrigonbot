@@ -1,31 +1,52 @@
 # -*- coding: utf-8 -*-
 msg = {
+	# Author: Csisc
+	'aeb': {
+		'capitalize_redirects-create-redirect': u'روبوت: إنشاء تحويلة إلى [[%(to)s]]',
+	},
+	# Author: Naudefj
+	'af': {
+		'capitalize_redirects-create-redirect': u'Robot: Skep aanstuur na [[%(to)s]]',
+	},
 	'ar': {
 		'capitalize_redirects-create-redirect': u'روبوت: إنشاء تحويلة إلى [[%(to)s]]',
 	},
 	# Author: Xuacu
+	# Author: Esbardu
 	'ast': {
-		'capitalize_redirects-create-redirect': u'Robot: Crear redireición a [[%(to)s]]',
+		'capitalize_redirects-create-redirect': u'Robó: Crear redireición a [[%(to)s]]',
 	},
 	# Author: Ebrahimi-amir
 	'az': {
 		'capitalize_redirects-create-redirect': u'Bot: [[%(to)s]] səhifəsinə istiqamətləndirildi',
 	},
 	# Author: EugeneZelenko
-	'be-tarask': {
+	'be-x-old': {
 		'capitalize_redirects-create-redirect': u'Робат: стварыў перанакіраваньне на [[%(to)s]]',
 	},
 	# Author: DCLXVI
 	'bg': {
 		'capitalize_redirects-create-redirect': u'Робот: Създаване на пренасочване към [[%(to)s]]',
 	},
+	# Author: Riemogerz
+	'bjn': {
+		'capitalize_redirects-create-redirect': u'Robot: Ulah paalihan ka [[%(to)s]]',
+	},
 	# Author: Y-M D
 	'br': {
 		'capitalize_redirects-create-redirect': u'Robot : Krouiñ un adkas evit [[%(to)s]]',
 	},
+	# Author: Edinwiki
+	'bs': {
+		'capitalize_redirects-create-redirect': u'Bot: Napravljeno preusmjerenje na [[%(to)s]].',
+	},
 	# Author: SMP
 	'ca': {
 		'capitalize_redirects-create-redirect': u'Robot: Crea una redirecció a [[%(to)s]]',
+	},
+	# Author: Asoxor
+	'ckb': {
+		'capitalize_redirects-create-redirect': u'ڕۆبۆت: دروستکردنی ڕەوانەکردنەوە بۆ [[%(to)s]]',
 	},
 	# Author: Spiffyk
 	'cs': {
@@ -45,6 +66,10 @@ msg = {
 	# Author: Eruedin
 	'de-ch': {
 		'capitalize_redirects-create-redirect': u'Bot: Weiterleitung angelegt auf [[%(to)s]]',
+	},
+	# Author: Erdemaslancan
+	'diq': {
+		'capitalize_redirects-create-redirect': u'Boti: pela [[%(to)s]] açarne',
 	},
 	# Author: Geraki
 	'el': {
@@ -86,15 +111,16 @@ msg = {
 		'capitalize_redirects-create-redirect': u'Bot: Creo unha redirección cara a "[[%(to)s]]"',
 	},
 	# Author: Als-Chlämens
-	'gsw': {
+	'als': {
 		'capitalize_redirects-create-redirect': u'Bötli: e Wyterleitig uff [[%(to)s]] aaglait',
 	},
 	'he': {
 		'capitalize_redirects-create-redirect': u'בוט: יוצר הפניה לדף [[%(to)s]]',
 	},
 	# Author: Dj
+	# Author: Bináris
 	'hu': {
-		'capitalize_redirects-create-redirect': u'Bot: árirányítás létrehozása a(z) [[%(to)s]] lapra.',
+		'capitalize_redirects-create-redirect': u'Bot: árirányítás létrehozása a(z) [[%(to)s]] lapra',
 	},
 	# Author: McDutchie
 	'ia': {
@@ -181,8 +207,9 @@ msg = {
 		'capitalize_redirects-create-redirect': u'Robô: Criando redirecionamento para [[%(to)s]]',
 	},
 	# Author: Giro720
+	# Author: 555
 	'pt-br': {
-		'capitalize_redirects-create-redirect': u'Robô: Criando redirecionamento para [[%(to)s]]',
+		'capitalize_redirects-create-redirect': u'Bot: Criando redirecionamento para [[%(to)s]]',
 	},
 	# Author: Minisarm
 	'ro': {
@@ -192,15 +219,16 @@ msg = {
 		'capitalize_redirects-create-redirect': u'Бот: Создано перенаправление на [[%(to)s]]',
 	},
 	# Author: Wizzard
+	# Author: Teslaton
 	'sk': {
-		'capitalize_redirects-create-redirect': u'Robot:Pridať presmerovanie na [[%(to)s]]',
+		'capitalize_redirects-create-redirect': u'Robot: Pridajte presmerovanie na [[%(to)s]]',
 	},
 	# Author: Dbc334
 	'sl': {
 		'capitalize_redirects-create-redirect': u'Robot: Ustvari preusmeritev na [[%(to)s]]',
 	},
 	# Author: Rancher
-	'sr-ec': {
+	'sr': {
 		'capitalize_redirects-create-redirect': u'Робот: направљено преусмерење на [[%(to)s]]',
 	},
 	# Author: Rancher
@@ -210,24 +238,29 @@ msg = {
 	'sv': {
 		'capitalize_redirects-create-redirect': u'Bot: Omdirigerar till [[%(to)s]]',
 	},
+	# Author: Aswn
+	'ta': {
+		'capitalize_redirects-create-redirect': u'தானியங்கி: [[%(to)s]] இற்கு வழிமாற்றி ஒன்றினை உருவாக்கு',
+	},
 	# Author: Гусейн
 	'tly': {
-		'capitalize_redirects-create-redirect': u'Робот: Офәјә быә унвони дәгиш кардеј бә [[%(to)s]]',
+		'capitalize_redirects-create-redirect': u'Робот: Офәјә быә унвони дәгиш карде бә [[%(to)s]]',
 	},
 	# Author: Khutuck
 	'tr': {
 		'capitalize_redirects-create-redirect': u'Bot: [[%(to)s]] sayfasına yönlendirildi',
 	},
 	# Author: Ajdar
-	'tt-cyrl': {
+	'tt': {
 		'capitalize_redirects-create-redirect': u'Бот: [[%(to)s]]ка юнәлтү эшләнгән',
 	},
 	'uk': {
 		'capitalize_redirects-create-redirect': u'Бот: Створено перенаправлення на [[%(to)s]]',
 	},
 	# Author: Candalua
+	# Author: Alunardon90
 	'vec': {
-		'capitalize_redirects-create-redirect': u'Bot: Crea rimando a [[%(to)s]]',
+		'capitalize_redirects-create-redirect': u'Robot: Crea rindirisamento a [[%(to)s]]',
 	},
 	# Author: Minh Nguyen
 	'vi': {
@@ -237,15 +270,16 @@ msg = {
 	'yi': {
 		'capitalize_redirects-create-redirect': u'באט: שאפן ווייטערפירונג צו בלאט [[%(to)s]]',
 	},
-	'zh': {
-		'capitalize_redirects-create-redirect': u'機器人: 建立重定向至[[%(to)s]]',
-	},
 	# Author: Anakmalaysia
-	'zh-hans': {
+	'zh': {
 		'capitalize_redirects-create-redirect': u'机械人：创建重定向至[[%(to)s]]',
 	},
 	# Author: Waihorace
 	'zh-hant': {
 		'capitalize_redirects-create-redirect': u'機械人：創建重定向至[[%(to)s]]',
+	},
+	# Author: Justincheng12345
+	'zh-hk': {
+		'capitalize_redirects-create-redirect': u'機械人創建重定向至[[%(to)s]]',
 	},
 }

@@ -115,11 +115,11 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 """
 from __future__ import generators
 #
-# (C) Pywikipedia bot team, 2003-2011
+# (C) Pywikipedia bot team, 2003-2012
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 9909 2012-02-17 23:09:15Z drtrigon $'
+__version__ = '$Id: wikipedia.py 10261 2012-05-31 15:45:34Z xqt $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -223,6 +223,8 @@ class Page(object):
     getVersionHistoryTable: Create a wiki table from the history data
     fullVersionHistory    : Return all past versions including wikitext
     contributingUsers     : Return set of users who have edited page
+    getCreator            : Function to get the first editor of a page
+    getLatestEditors      : Function to get the last editors of a page
     exists (*)            : True if the page actually exists, false otherwise
     isEmpty (*)           : True if the page has 4 characters or less content,
                             not counting interwiki and category links
@@ -427,6 +429,7 @@ not supported by PyWikipediaBot!"""
                 )
             raise
 
+    @property
     def site(self):
         """Return the Site object for the wiki on which this Page resides."""
         return self._site
@@ -453,7 +456,7 @@ not supported by PyWikipediaBot!"""
 
         @param underscore: if true, replace all ' ' characters with '_'
         @param withNamespace: if false, omit the namespace prefix
-        @param withSection: - not implemented yet -
+        @param withSection: if false, omit the section
         @param asUrl: - not implemented yet -
         @param asLink: if true, return the title in the form of a wikilink
         @param allowInterwiki: (only used if asLink is true) if true, format
@@ -486,7 +489,7 @@ not supported by PyWikipediaBot!"""
                 else:
                     title = u'[[%s%s:%s]]' % (colon, self._site.lang, title)
             elif textlink and (self.isImage() or self.isCategory()):
-                    title = u'[[:%s]]' % title
+                title = u'[[:%s]]' % title
             else:
                 title = u'[[%s]]' % title
         if savetitle or asLink:
@@ -494,6 +497,10 @@ not supported by PyWikipediaBot!"""
             title = title.replace(u"''", u'%27%27')
         if underscore:
             title = title.replace(' ', '_')
+        if not withSection:
+            sectionName = self.section(underscore=underscore)
+            if sectionName:
+                title = title[:-len(sectionName)-1]
         return title
 
     #@deprecated("Page.title(withNamespace=False)")
@@ -774,7 +781,7 @@ not supported by PyWikipediaBot!"""
                 raise BadTitle('BadTitle: %s' % self)
         elif 'revisions' in pageInfo: #valid Title
             lastRev = pageInfo['revisions'][0]
-            if lastRev['*'] is not None:
+            if isinstance(lastRev['*'], basestring):
                 textareaFound = True
         # I got page date with 'revisions' in pageInfo but
         # lastRev['*'] = False instead of the content. The Page itself was
@@ -823,14 +830,13 @@ not supported by PyWikipediaBot!"""
                 self._redirarg = redirtarget
             else:
                 raise IsRedirectPage(redirtarget)
-        if self.section():
-            m = re.search("=+[ ']*%s[ ']*=+" % re.escape(self.section()),
-                          pageInfo['revisions'][0]['*'])
-            if not m:
-                try:
-                    self._getexception
-                except AttributeError:
-                    raise SectionError # Page has no section by this name
+
+        if self.section() and \
+           not textlib.does_text_contain_section(pagetext, self.section()):
+            try:
+                self._getexception
+            except AttributeError:
+                raise SectionError # Page has no section by this name
         return pagetext
 
     def _getEditPageOld(self, get_redirect=False, throttle=True, sysop=False,
@@ -965,14 +971,13 @@ not supported by PyWikipediaBot!"""
                 self._redirarg = redirtarget
             else:
                 raise IsRedirectPage(redirtarget)
-        if self.section():
-            m = re.search("=+[ ']*%s[ ']*=+" % re.escape(self.section()),
-                          text)
-            if not m:
-                try:
-                    self._getexception
-                except AttributeError:
-                    raise SectionError # Page has no section by this name
+
+        if self.section() and \
+           not textlib.does_text_contain_section(text, self.section()):
+            try:
+                self._getexception
+            except AttributeError:
+                raise SectionError # Page has no section by this name
 
         return pagetext
 
@@ -1034,7 +1039,6 @@ not supported by PyWikipediaBot!"""
 
         """
         return self._editTime
-
 
     def previousRevision(self):
         """Return the revision id for the previous revision of this Page."""
@@ -1742,7 +1746,8 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
             #       self.get() calls self._getEditPage without this parameter
             self.get(force=True, change_edit_time=True)
             newtime = self.editTime()
-            if str(oldtime) != str(newtime): # page was changed
+            ### TODO: we have different timestamp formats
+            if re.sub('\D', '', str(oldtime)) != re.sub('\D', '', str(newtime)): # page was changed
                 raise EditConflict(u'Page has been changed after first read.')
             self._editrestriction = False
         # If no comment is given for the change, use the default
@@ -2922,6 +2927,24 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
         users = set([edit[2] for edit in edits])
         return users
 
+    def getCreator(self):
+        """ Function to get the first editor and time stamp of a page """
+        inf = self.getVersionHistory(reverseOrder=True, revCount=1)[0]
+        return inf[2], inf[1]
+
+    def getLatestEditors(self, limit=1):
+        """ Function to get the last editors of a page """
+        #action=query&prop=revisions&titles=API&rvprop=timestamp|user|comment
+        if hasattr(self, '_versionhistory'):
+            data = self.getVersionHistory(getAll=True, revCount=limit)
+        else:
+            data = self.getVersionHistory(revCount = limit)
+
+        result = []
+        for i in data:
+            result.append({'user':i[2], 'timestamp':i[1]})
+        return result
+
     def watch(self, unwatch=False):
         """Add this page to the watchlist"""
         if self.site().has_api:
@@ -3725,20 +3748,6 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
         else:
             return new_text
 
-    def getLatestEditors(self, limit = 1):
-        """ Function to get the last editors of a page """
-        #action=query&prop=revisions&titles=API&rvprop=timestamp|user|comment
-        if hasattr(self, '_versionhistory'):
-            data = self.getVersionHistory(getAll=True, revCount = limit)
-        else:
-            data = self.getVersionHistory(revCount = limit)
-
-        result = []
-        for i in data:
-            result.append({'user':i[2],'timestamp':i[1]})
-
-        return result
-
 
 class ImagePage(Page):
     """A subclass of Page representing an image descriptor wiki page.
@@ -3917,6 +3926,11 @@ class ImagePage(Page):
                 comment = match.group('comment') or ''
                 result.append((datetime, username, resolution, size, comment))
         return result
+
+    def getFirstUploader(self):
+        """ Function that uses the APIs to detect the first uploader of the image """
+        inf = self.getFileVersionHistory()[-1]
+        return [inf[1], inf[0]]
 
     def getLatestUploader(self):
         """ Function that uses the APIs to detect the latest uploader of the image """
@@ -4449,8 +4463,9 @@ def getall(site, pages, throttle=True, force=False):
     """
     # TODO: why isn't this a Site method?
     pages = list(pages)  # if pages is an iterator, we need to make it a list
-    output(u'Getting %d pages %sfrom %s...'
-           % (len(pages), (u'', u'via API ')[site.has_api() and debug], site))
+    output(u'Getting %d page%s %sfrom %s...'
+           % (len(pages), (u'', u's')[len(pages) != 1],
+              (u'', u'via API ')[site.has_api() and debug], site))
     limit = config.special_page_limit / 4 # default is 500/4, but It might have good point for server.
     if len(pages) > limit:
         # separate export pages for bulk-retrieve
@@ -4541,11 +4556,11 @@ def decodeEsperantoX(text):
                     # The first two chars represent an Esperanto letter.
                     # Following x's are doubled.
                     new = esperanto + ''.join([old[2 * i]
-                                               for i in range(1, len(old)/2)])
+                                               for i in xrange(1, len(old)/2)])
                 else:
                     # The first character stays latin; only the x's are doubled.
                     new = latin + ''.join([old[2 * i + 1]
-                                           for i in range(0, len(old)/2)])
+                                           for i in xrange(0, len(old)/2)])
                 result += text[pos : match.start() + pos] + new
                 pos += match.start() + len(old)
             else:
@@ -4573,7 +4588,7 @@ def encodeEsperantoX(text):
         if match:
             old = match.group()
             # the first letter stays; add an x after each X or x.
-            new = old[0] + ''.join([old[i] + 'x' for i in range(1, len(old))])
+            new = old[0] + ''.join([old[i] + 'x' for i in xrange(1, len(old))])
             result += text[pos : match.start() + pos] + new
             pos += match.start() + len(old)
         else:
@@ -4976,6 +4991,17 @@ class Site(object):
         for language in self.languages():
             if not language[0].upper() + language[1:] in self.namespaces():
                 self._validlanguages.append(language)
+
+    def __call__(self):
+        """Since the Page.site() method has a property decorator, return the
+        site object for backwards-compatibility if Page.site() call is still
+        used instead of Page.site as recommended.
+
+        """
+##        # DEPRECATED warning. Should be uncommented if scripts are actualized
+##        pywikibot.output('Page.site() method is DEPRECATED, '
+##                         'use Page.site instead.')
+        return self
 
     @property
     def family(self):
@@ -5487,6 +5513,10 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                     raise
             except Exception, e:
                 output(u'%s' %e)
+                if pywikibot.verbose:
+                    import traceback
+                    traceback.print_exc()
+
                 if config.retry_on_fail:
                     retry_attempt += 1
                     if retry_attempt > config.maxretries:
@@ -5743,7 +5773,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
         # Note that the link of anonymous users (which doesn't exist at all
         # in Wikimedia sites) has the ID pt-anonuserpage, and thus won't be
         # found here.
-        userpageR = re.compile('<li id="pt-userpage"><a href=".+?">(?P<username>.+?)</a></li>')
+        userpageR = re.compile('<li id="pt-userpage".*?><a href=".+?".*?>(?P<username>.+?)</a></li>')
         m = userpageR.search(text)
         if m:
             self._isLoggedIn[index] = True
@@ -6096,7 +6126,10 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                 for s in data['search']:
                     offset += 1
                     page = Page(self, s['title'])
-                    yield page, s['snippet'], '', s['size'], s['wordcount'], s['timestamp']
+                    if self.versionnumber() >= 16:
+                        yield page, s['snippet'], '', s['size'], s['wordcount'], s['timestamp']
+                    else:
+                        yield page, '', '', '', '', ''
         else:
             #Yield search results (using Special:Search page) for query.
             throttle = True
@@ -7614,7 +7647,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
         r = result[u'parse'][u'text'][u'*']
 
         # disable/remove comments
-        r = pywikibot.removeDisabledParts(r, tags = ['comments']).strip()        
+        r = pywikibot.removeDisabledParts(r, tags = ['comments']).strip()
 
         # disable/remove ALL tags
         if not (keeptags == [u'*']):
@@ -7662,7 +7695,7 @@ def getSite(code=None, fam=None, user=None, noLogin=False):
     if key not in _sites:
         _sites[key] = Site(code=code, fam=fam, user=user)
     ret =  _sites[key]
-    if not ret.family.isPublic() and not noLogin:
+    if not ret.family.isPublic(code) and not noLogin:
         ret.forceLogin()
     return ret
 
@@ -7688,6 +7721,10 @@ def calledModuleName():
     return os.path.basename(called)
 
 def _decodeArg(arg):
+    # We may pass a Unicode string to a script upon importing and calling
+    # main() from another script.
+    if isinstance(arg,unicode):
+        return arg
     if sys.platform == 'win32':
         if config.console_encoding in ('cp437', 'cp850'):
             # Western Windows versions give parameters encoded as windows-1252
@@ -7715,7 +7752,7 @@ def handleArgs(*args):
     args may be passed as an argument, thereby overriding sys.argv
 
     """
-    global default_code, default_family, verbose, debug
+    global default_code, default_family, verbose, debug, simulate
     # get commandline arguments if necessary
     if not args:
         args = sys.argv[1:]
@@ -7724,6 +7761,7 @@ def handleArgs(*args):
     # the module name will be used for the filename of the log.
     moduleName = calledModuleName()
     nonGlobalArgs = []
+    username = None
     do_help = False
     for arg in args:
         arg = _decodeArg(arg)
@@ -7735,12 +7773,16 @@ def handleArgs(*args):
             default_family = arg[8:]
         elif arg.startswith('-lang:'):
             default_code = arg[6:]
+        elif arg.startswith("-user:"):
+            username = arg[len("-user:") : ]
         elif arg.startswith('-putthrottle:'):
             config.put_throttle = int(arg[len("-putthrottle:") : ])
             put_throttle.setDelay()
         elif arg.startswith('-pt:'):
             config.put_throttle = int(arg[len("-pt:") : ])
             put_throttle.setDelay()
+        elif arg.startswith("-maxlag:"):
+            config.maxlag = int(arg[len("-maxlag:") : ])
         elif arg == '-log':
             setLogfileStatus(True)
         elif arg.startswith('-log:'):
@@ -7758,26 +7800,31 @@ def handleArgs(*args):
         elif arg == '-cosmeticchanges' or arg == '-cc':
             config.cosmetic_changes = not config.cosmetic_changes
             output(u'NOTE: option cosmetic_changes is %s\n' % config.cosmetic_changes)
+        elif arg == '-simulate':
+            if not getSite().has_api():
+                raise NotImplementedError(
+                    '-simulate option is implemented for API only')
+            simulate = True
         # global debug option for development purposes. Normally does nothing.
         elif arg == '-debug':
             debug = True
             config.special_page_limit = 500
-        elif arg == '-simulate':
-            config.actions_to_block = ['edit', 'watch', 'move', 'delete', 
-                                       'undelete', 'protect']
         else:
             # the argument is not global. Let the specific bot script care
             # about it.
             nonGlobalArgs.append(arg)
 
+    if username:
+        config.usernames[config.family][config.mylang] = username
+
     # TEST for bug #3081100
-    if unicode_error and (default_code == 'hi' or moduleName=='interwiki'):
+    if unicode_error:
         output("""
 
 ================================================================================
 \03{lightyellow}WARNING:\03{lightred} your python version might trigger issue #3081100\03{default}
-See http://goo.gl/W8lJB for more information.
-\03{lightyellow}Use an older python version (<2.6.5) if you are running on wikimedia sites!\03{default}
+More information: See https://sourceforge.net/support/tracker.php?aid=3081100
+\03{lightyellow}Please update python to 2.7.2+ if you are running on wikimedia sites!\03{default}
 ================================================================================
 
 """)
@@ -7812,6 +7859,8 @@ Global arguments available for all bots:
                   wikipedia, wiktionary, wikitravel, ...
                   This will override the configuration in user-config.py.
 
+-user:xyz         Log in as user 'xyz' instead of the default username.
+
 -daemonize:xyz    Immediately return control to the terminal and redirect
                   stdout and stderr to xyz (only use for bots that require
                   no input from stdin).
@@ -7823,6 +7872,10 @@ Global arguments available for all bots:
 
 -log:xyz          Enable the logfile, using 'xyz' as the filename.
 
+-maxlag           Sets a new maxlag parameter to a number of seconds. Defer bot
+                  edits during periods of database server lag. Default is set by
+                  config.py
+
 -nolog            Disable the logfile (if it is enabled by default).
 
 -putthrottle:n    Set the minimum time (in seconds) the bot will wait between
@@ -7830,14 +7883,13 @@ Global arguments available for all bots:
 
 -verbose          Have the bot provide additional output that may be
 -v                useful in debugging.
--debug            
 
 -cosmeticchanges  Toggles the cosmetic_changes setting made in config.py or
 -cc               user_config.py to its inverse and overrules it. All other
                   settings and restrictions are untouched.
 
--simulate         Toggles writing to the wikipedia server. Useful for testing
-                  and debugging of new code.
+-simulate         Disables writing to the server. Useful for testing
+                  and debugging of new code. (API only)
 '''# % moduleName
     output(globalHelp, toStdout=True)
     try:
@@ -7860,6 +7912,7 @@ exec "import %s_interface as uiModule" % config.userinterface
 ui = uiModule.UI()
 verbose = 0
 debug = False
+simulate = False
 
 # TEST for bug #3081100
 unicode_error = __import__('unicodedata').normalize(
@@ -8229,6 +8282,23 @@ if config.authenticate:
     MyURLopener.add_handler(authhandler)
 
 MyURLopener.addheaders = [('User-agent', useragent)]
+
+# This is a temporary part for the 2012 version survey
+# http://thread.gmane.org/gmane.comp.python.pywikipediabot.general/12473
+# Upon removing the connected lines from config.py should be removed, too.
+if not config.suppresssurvey:
+        output(
+"""
+\03{lightyellow}Dear Pywikipedia user!\03{default}
+Pywikibot has detected that you use this outdated version of Python:
+%s.
+We would like to hear your voice before ceasing support of this version.
+Please update to \03{lightyellow}Python 2.7.2\03{default} or higher if possible or visit
+http://www.mediawiki.org/wiki/Pywikipediabot/Survey2012 to tell us why we
+should support your version and to learn how to hide this message.
+After collecting opinions for a time we will decide and announce the deadline
+of deprecating use of old Python versions for Pywikipedia.
+""" % sys.version)
 
 if __name__ == '__main__':
     import doctest

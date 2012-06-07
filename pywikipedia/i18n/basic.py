@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 msg = {
+	# Author: Csisc
+	'aeb': {
+		'basic-changing': u'بوت: تغيير ...',
+	},
 	# Author: Naudefj
 	'af': {
 		'basic-changing': u'Bot: Wysig ...',
@@ -9,8 +13,9 @@ msg = {
 		'basic-changing': u'بوت: تغيير ...',
 	},
 	# Author: Xuacu
+	# Author: Esbardu
 	'ast': {
-		'basic-changing': u'Bot: Camudando ...',
+		'basic-changing': u'Robó: Camudando ...',
 	},
 	# Author: Cekli829
 	'az': {
@@ -22,12 +27,16 @@ msg = {
 		'basic-changing': u'Bot: Åpassen ...',
 	},
 	# Author: EugeneZelenko
-	'be-tarask': {
+	'be-x-old': {
 		'basic-changing': u'Робат: зьмяніў…',
 	},
 	# Author: DCLXVI
 	'bg': {
 		'basic-changing': u'Робот: Промяна...',
+	},
+	# Author: Riemogerz
+	'bjn': {
+		'basic-changing': u'Bot: Mangganti ...',
 	},
 	# Author: Wikitanvir
 	'bn': {
@@ -67,6 +76,10 @@ msg = {
 	# Author: Eruedin
 	'de-ch': {
 		'basic-changing': u'Bot: Ändere ...',
+	},
+	# Author: Erdemaslancan
+	'diq': {
+		'basic-changing': u'Boti: Keno bıvurno ...',
 	},
 	# Author: Glavkos
 	'el': {
@@ -116,7 +129,7 @@ msg = {
 		'basic-changing': u'Bot: Cambiando...',
 	},
 	# Author: Als-Chlämens
-	'gsw': {
+	'als': {
 		'basic-changing': u'Bötli: duet ändere...',
 	},
 	# Author: Amire80
@@ -171,8 +184,9 @@ msg = {
 	'it': {
 		'basic-changing': u'Bot: Modifica ...',
 	},
+	# Author: Shirayuki
 	'ja': {
-		'basic-changing': u'ロボットによる：編集',
+		'basic-changing': u'ロボットによる: 編集',
 	},
 	# Author: វ័ណថារិទ្ធ
 	'km': {
@@ -200,6 +214,10 @@ msg = {
 	# Author: Eitvys200
 	'lt': {
 		'basic-changing': u'Robotas: keitimas...',
+	},
+	# Author: RMizo
+	'lus': {
+		'basic-changing': u'Khawlmi: Tidanglam mék...',
 	},
 	# Author: GreenZeb
 	'lv': {
@@ -284,8 +302,9 @@ msg = {
 		'basic-changing': u'Robô: A alterar ...',
 	},
 	# Author: Giro720
+	# Author: 555
 	'pt-br': {
-		'basic-changing': u'Robô: Alterando ...',
+		'basic-changing': u'Bot: Alterando...',
 	},
 	# Author: Firilacroco
 	'ro': {
@@ -315,7 +334,7 @@ msg = {
 		'basic-changing': u'Bot: Ndryshimi ...',
 	},
 	# Author: Rancher
-	'sr-ec': {
+	'sr': {
 		'basic-changing': u'Робот: мења…',
 	},
 	# Author: Rancher
@@ -324,6 +343,10 @@ msg = {
 	},
 	'sv': {
 		'basic-changing': u'Bot: Ändrar ...',
+	},
+	# Author: Baba Tabita
+	'sw': {
+		'basic-changing': u'Karagosi: Yafanya mabadiliko ...',
 	},
 	# Author: செல்வா
 	'ta': {
@@ -347,15 +370,16 @@ msg = {
 		'basic-changing': u'Bot: Değiştiriliyor ...',
 	},
 	# Author: Zahidulla
-	'tt-cyrl': {
+	'tt': {
 		'basic-changing': u'Робот: үзгәртте ...',
 	},
 	'uk': {
 		'basic-changing': u'Бот: змінив ...',
 	},
 	# Author: Candalua
+	# Author: Alunardon90
 	'vec': {
-		'basic-changing': u'Bot: Canbiando...',
+		'basic-changing': u'Robot: Modifega...',
 	},
 	# Author: Minh Nguyen
 	'vi': {
@@ -365,16 +389,16 @@ msg = {
 	'yi': {
 		'basic-changing': u'באָט: ענדערן ...',
 	},
+	# Author: Yfdyh000
 	'zh': {
-		'basic-changing': u'機器人：編輯.....',
-	},
-	# Author: Hydra
-	# Author: Shizhao
-	'zh-hans': {
-		'basic-changing': u'机器人： 修改...',
+		'basic-changing': u'机器人：修改...',
 	},
 	# Author: Waihorace
 	'zh-hant': {
 		'basic-changing': u'機械人：修改中...',
+	},
+	# Author: Justincheng12345
+	'zh-hk': {
+		'basic-changing': u'機械人修改中...',
 	},
 }

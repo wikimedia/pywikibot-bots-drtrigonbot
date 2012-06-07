@@ -1,9 +1,9 @@
 # -*- coding: utf-8  -*-
-__version__ = '$Id: transliteration.py 9752 2011-11-11 08:58:24Z xqt $'
+__version__ = '$Id: transliteration.py 10119 2012-04-16 11:48:44Z valhallasw $'
 
 
 class transliterator(object):
-    def __init__(self):
+    def __init__(self, encoding):
         self.trans = {}
         for char in u"ÀÁÂẦẤẪẨẬÃĀĂẰẮẴẶẲȦǠẠḀȂĄǍẢ":
             self.trans[char] = u"A"
@@ -289,7 +289,7 @@ class transliterator(object):
                       u"Ӛ": u"Ë", u"Ӭ": u"Ë", u"ӛ": u"ë", u"ӭ": u"ë", u"Җ": u"Zhj",
                       u"җ": u"zhj", u"Ұ": u"U", u"ұ": u"u", u"ў": u"ù", u"Ў": u"Ù",
                       u"ѝ": u"ì", u"Ѝ": u"Ì", u"Ӑ": u"A", u"ă": u"a", u"Ӓ": u"Ä",
-                      u"ä": u"ä", u"Ҽ" : u"Ts", u"Ҿ": u"Ts", u"ҽ": u"ts", u"ҿ": u"ts",
+                      u"ҿ": u"ä", u"Ҽ" : u"Ts", u"Ҿ": u"Ts", u"ҽ": u"ts", u"ҿ": u"ts",
                       u"Ҙ": u"Dh", u"ҙ": u"dh", u"Ӏ": u"", u"ӏ": u"", u"Ӆ": u"L",
                       u"ӆ": u"l", u"Ӎ": u"M", u"ӎ": u"m", u"Ӧ": u"Ö", u"ӧ": u"ö",
                       u"Ҩ": u"u", u"ҩ": u"u", u"Ҧ": u"Ph", u"ҧ": u"ph", u"Ҏ": u"R",
@@ -1594,7 +1594,77 @@ class transliterator(object):
         self.trans[u"౼"] = u"1/16"
         self.trans[u"౽"] = u"1/8"
         self.trans[u"౾"] = u"3/16"
-
+        # Lao - note: pronounciation in initial position is used;
+        # different pronounciation in final position is ignored
+        self.trans[u"ກ"] = "k"
+        for char in u"ຂຄ":
+            self.trans[char] = "kh"
+        self.trans[u"ງ"] = "ng"
+        self.trans[u"ຈ"] = "ch"
+        for char in u"ສຊ":
+            self.trans[char] = "s"
+        self.trans[u"ຍ"] = "ny"
+        self.trans[u"ດ"] = "d"
+        self.trans[u"ຕ"] = "t"
+        for char in u"ຖທ":
+            self.trans[char] = "th"
+        self.trans[u"ນ"] = "n"
+        self.trans[u"ບ"] = "b"
+        self.trans[u"ປ"] = "p"
+        for char in u"ຜພ":
+            self.trans[char] = "ph"
+        for char in u"ຝຟ":
+            self.trans[char] = "f"
+        for char in u"ມໝ":
+            self.trans[char] = "m"
+        self.trans[u"ຢ"] = "y"
+        for char in u"ຣຼ":
+            self.trans[char] = "r"
+        for char in u"ລຼ":
+            self.trans[char] = "l"
+        self.trans[u"ວ"] = "v"
+        for char in u"ຮ":
+            self.trans[char] = "h"
+        self.trans[u"ອ"] = "'"
+        for char in u"ະັ":
+            self.trans[char] = "a"
+        self.trans[u"ິ"] = "i"
+        self.trans[u"ຶ"] = "ue"
+        self.trans[u"ຸ"] = "u"
+        self.trans[u"ເ"] = u"é"
+        self.trans[u"ແ"] = u"è"
+        for char in u"ໂົາໍ":
+            self.trans[char] = "o"
+        self.trans[u"ຽ"] = "ia"
+        self.trans[u"ເຶ"] = "uea"
+        self.trans[u"ຍ"] = "i"
+        for char in u"ໄໃ":
+            self.trans[char] = "ai"
+        self.trans[u"ຳ"] = "am"
+        self.trans[u"າ"] = "aa"
+        self.trans[u"ີ"] = "ii"
+        self.trans[u"ື"] = "yy"
+        self.trans[u"ູ"] = "uu"
+        self.trans[u"ເ"] = "e"
+        self.trans[u"ແ"] = "ei"
+        self.trans[u"໐"] = "0"
+        self.trans[u"໑"] = "1"
+        self.trans[u"໒"] = "2"
+        self.trans[u"໓"] = "3"
+        self.trans[u"໔"] = "4"
+        self.trans[u"໕"] = "5"
+        self.trans[u"໖"] = "6"
+        self.trans[u"໗"] = "7"
+        self.trans[u"໘"] = "8"
+        self.trans[u"໙"] = "9"
+        for char in self.trans:
+            value = self.trans[char]
+            if value == "?": continue
+            while value.encode(encoding, 'replace').decode(encoding) == "?" and value in self.trans:
+                assert value != self.trans[value], "%r == self.trans[%r]!" % (value, value)
+                value = self.trans[value]
+            self.trans[char] = value
+        
     def transliterate(self, char, default="?", prev="-", next="-"):
         if char in self.trans:
             return self.trans[char]
@@ -1606,5 +1676,11 @@ class transliterator(object):
             return self.transliterate(next)[0]
         if char in u"々仝ヽヾゝゞ〱〲〳〵〴〵":
             return prev
+        #Lao
+        if char == u"ຫ":
+            if next in u"ງຍນຣລຼຼວ":
+                return ""
+            else:
+                return "h"
         return default
 

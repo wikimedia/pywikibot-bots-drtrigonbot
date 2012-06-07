@@ -1,4 +1,4 @@
-__version__ = '$Id: tkinter_interface.py 9044 2011-03-13 10:26:54Z xqt $'
+__version__ = '$Id: tkinter_interface.py 10045 2012-03-26 00:17:53Z valhallasw $'
 
 import re
 import sys

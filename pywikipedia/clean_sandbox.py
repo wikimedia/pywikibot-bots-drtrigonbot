@@ -40,7 +40,7 @@ This script understands the following command-line arguments:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: clean_sandbox.py 9912 2012-02-19 20:39:42Z drtrigon $'
+__version__ = '$Id: clean_sandbox.py 10231 2012-05-20 19:56:01Z amir $'
 #
 
 import time
@@ -65,6 +65,7 @@ content = {
     'ja': u'{{subst:サンドボックス}}',
     'ko': u'{{연습장 안내문}}',
     'ksh':u'{{subst:/Schablon}}',
+    'mzn':u'{{ویکی‌پدیا:چنگ‌مویی صفحه/پیغوم}}\n<!-- سلام!اگه خواننی شه دچی‌ین مهارتون وسه تمرین هاکنین بتوننی اینتا صفحه جا ایستفاده هاکنین، اته لطف هاکنین اینتا پیغوم ره شه بقیه رفقون وسه بیلین. اینتا صفحه هرچند ساعت ربوت جا پاک بونه.-->',
     'nds':u'{{subst:/Vörlaag}}',
     'nl': u'{{subst:Wikipedia:Zandbak/schoon zand}}',
     'nn': u'{{sandkasse}}\n<!-- Ver snill og IKKJE FJERN DENNE LINA OG LINA OVER ({{sandkasse}}) Nedanføre kan du derimot ha det artig og prøve deg fram! Lykke til! :-)  -->',
@@ -72,7 +73,7 @@ content = {
     'pl': u'{{Prosimy - NIE ZMIENIAJ, NIE KASUJ, NIE PRZENOŚ tej linijki - pisz niżej}}',
     'pt': u'<!--não apague esta linha-->{{página de testes}}<!--não apagar-->\r\n',
     'ru': u'{{/Пишите ниже}}\n<!-- Не удаляйте, пожалуйста, эту строку, тестируйте ниже -->',
-    'simple': u'{{Please leave this line alone (sandbox heading)}}\n<!-- Hello! Feel free to try your formatting and editing skills below this line. As this page is for editing experiments, this page will automatically be cleaned every 2 hours. -->',
+    'simple': u'{{subst:/Text}}',
     'sco': u'Feel free tae test here',
     'sr': u'{{песак}}\n<!-- Молимо, испробавајте испод ове линије. Хвала. -->',
     'sv': u'{{subst:Sandlådan}}',
@@ -100,6 +101,7 @@ sandboxTitle = {
     'ja': u'Project:サンドボックス',
     'ko': u'Project:연습장',
     'ksh':u'Project:Shpillplaz',
+    'mzn':u'Project:چنگ‌مویی صفحه',
     'nds':u'Project:Speelwisch',
     'nl': u'Project:Zandbak',
     'no': u'Project:Sandkasse',

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 msg = {
-	'als': {
-		'clean_sandbox-cleaned': u'Bötli: Sandchaschte iigebnet.',
+	# Author: Csisc
+	'aeb': {
+		'clean_sandbox-cleaned': u'روبوت: هذه الصفحة سيتم تفريغها تلقائيا',
 	},
 	'ar': {
 		'clean_sandbox-cleaned': u'روبوت: هذه الصفحة سيتم تفريغها تلقائيا',
@@ -19,20 +20,29 @@ msg = {
 		'clean_sandbox-cleaned': u'Bot: Sétz d\' Spüwiesen zruck.',
 	},
 	# Author: EugeneZelenko
-	'be-tarask': {
+	'be-x-old': {
 		'clean_sandbox-cleaned': u'Робат: аўтаматычная ачыстка',
+	},
+	# Author: Riemogerz
+	'bjn': {
+		'clean_sandbox-cleaned': u'Bot: Tata ulang',
 	},
 	# Author: Fulup
 	'br': {
 		'clean_sandbox-cleaned': u'Robot : Kempennet ent emgefre',
 	},
 	# Author: CERminator
+	# Author: Edinwiki
 	'bs': {
-		'clean_sandbox-cleaned': u'Robot: Automatsko čišćenje',
+		'clean_sandbox-cleaned': u'Bot: Automatsko čišćenje',
 	},
 	# Author: SMP
 	'ca': {
 		'clean_sandbox-cleaned': u'Robot: Netejat automàticament',
+	},
+	# Author: Asoxor
+	'ckb': {
+		'clean_sandbox-cleaned': u'ڕۆبۆت: خۆگەڕانە پاککرایەوە',
 	},
 	'cs': {
 		'clean_sandbox-cleaned': u'Uhrabání pískoviště',
@@ -47,6 +57,10 @@ msg = {
 	'de': {
 		'clean_sandbox-cleaned': u'Bot: Setze Spielwiese zurück.',
 	},
+	# Author: Erdemaslancan
+	'diq': {
+		'clean_sandbox-cleaned': u'Boti: Caye cerbnayışi besterna',
+	},
 	# Author: Geraki
 	'el': {
 		'clean_sandbox-cleaned': u'Ρομπότ: Καθαρίστηκε αυτόματα',
@@ -59,8 +73,9 @@ msg = {
 		'clean_sandbox-cleaned': u'Roboto: Aŭtomate viŝita',
 	},
 	# Author: Dferg
+	# Author: Xqt
 	'es': {
-		'clean_sandbox-cleaned': u'Robot: limpieza automatizada',
+		'clean_sandbox-cleaned': u'Bot: limpieza automatizada',
 	},
 	# Author: An13sa
 	'eu': {
@@ -93,7 +108,7 @@ msg = {
 	'gl': {
 		'clean_sandbox-cleaned': u'Bot: Limpeza automática',
 	},
-	'gsw': {
+	'als': {
 		'clean_sandbox-cleaned': u'Bötli: Sandchaschte iigebnet.',
 	},
 	'he': {
@@ -194,8 +209,9 @@ msg = {
 		'clean_sandbox-cleaned': u'Robô: Limpeza da página de testes',
 	},
 	# Author: Giro720
+	# Author: 555
 	'pt-br': {
-		'clean_sandbox-cleaned': u'Robô: Limpado automaticamente',
+		'clean_sandbox-cleaned': u'Bot: Limpeza automática',
 	},
 	'qqq': {
 		'clean_sandbox-cleaned': u'Summary message when the bot cleans sandbox',
@@ -219,11 +235,8 @@ msg = {
 	'sl': {
 		'clean_sandbox-cleaned': u'Robot: Samodejno čiščenje',
 	},
-	'sr': {
-		'clean_sandbox-cleaned': u'Чишћење песка',
-	},
 	# Author: Rancher
-	'sr-ec': {
+	'sr': {
 		'clean_sandbox-cleaned': u'Робот: очишћен песак',
 	},
 	# Author: Rancher
@@ -232,6 +245,10 @@ msg = {
 	},
 	'sv': {
 		'clean_sandbox-cleaned': u'Robot krattar sandlådan.',
+	},
+	# Author: Aswn
+	'ta': {
+		'clean_sandbox-cleaned': u'தானியங்கி: தானாகவே சுத்தப்படுத்தப்பட்டது',
 	},
 	'th': {
 		'clean_sandbox-cleaned': u'โรบอต: กำลังจะเก็บกวาดหน้านี้โดยอัตโนมัติ',
@@ -245,26 +262,31 @@ msg = {
 		'clean_sandbox-cleaned': u'Bot: Deneme tahtası temizlendi',
 	},
 	# Author: Zahidulla
-	'tt-cyrl': {
+	'tt': {
 		'clean_sandbox-cleaned': u'Робот: автоматик рәвештә чистарту',
 	},
 	# Author: Тест
 	'uk': {
 		'clean_sandbox-cleaned': u'Робот: Автоматична очистка',
 	},
+	# Author: Alunardon90
+	'vec': {
+		'clean_sandbox-cleaned': u'Robot: Pułitura automatega',
+	},
 	# Author: Minh Nguyen
 	'vi': {
 		'clean_sandbox-cleaned': u'Bot: Tự động dọn sạch',
 	},
+	# Author: Yfdyh000
 	'zh': {
-		'clean_sandbox-cleaned': u'Bot: 本页被自动清理',
-	},
-	# Author: Hydra
-	'zh-hans': {
-		'clean_sandbox-cleaned': u'机器人： 自动清除',
+		'clean_sandbox-cleaned': u'机器人：自动清理',
 	},
 	# Author: Waihorace
 	'zh-hant': {
 		'clean_sandbox-cleaned': u'機械人：自動清除',
+	},
+	# Author: Justincheng12345
+	'zh-hk': {
+		'clean_sandbox-cleaned': u'機械人自動清除',
 	},
 }

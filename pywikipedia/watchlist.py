@@ -2,10 +2,10 @@
 """
 Allows access to the bot account's watchlist.
 
-The function refresh() downloads the current watchlist and saves
-it to disk. It is run automatically when a bot first tries to save a page
-retrieved via XML Export. The watchlist can be updated manually by running
-this script. The list will also be reloaded automatically once a month.
+The function refresh() downloads the current watchlist and saves it to disk. It
+is run automatically when a bot first tries to save a page retrieved. The
+watchlist can be updated manually by running this script. The list will also
+be reloaded automatically once a month.
 
 Syntax: python watchlist [-all]
 
@@ -15,12 +15,13 @@ Command line options:
     -new  -  Load watchlists for all wikis where accounts is setting in
              user-config.py
 """
-
+#
 # (C) Daniel Herding, 2005
+# (C) Pywikipedia bot team, 2005-2012
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: watchlist.py 9042 2011-03-13 10:14:47Z xqt $'
+__version__='$Id: watchlist.py 10255 2012-05-26 13:23:03Z xqt $'
 #
 
 import wikipedia as pywikibot

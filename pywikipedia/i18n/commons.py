@@ -1,14 +1,20 @@
 # -*- coding: utf-8 -*-
 msg = {
+	# Author: Csisc
+	'aeb': {
+		'commons-file-moved': u'[[:File:%(localfile)s|الصورة]] تم نقلها إلى [[:commons:File:%(commonsfile)s|كومنز]].',
+		'commons-file-now-available': u'الملف متوفر الآن في [[:commons:File:%(commonsfile)s|ويكيميديا كومنز]].',
+	},
 	# Author: Meno25
 	'ar': {
 		'commons-file-moved': u'[[:File:%(localfile)s|الصورة]] تم نقلها إلى [[:commons:File:%(commonsfile)s|كومنز]].',
 		'commons-file-now-available': u'الملف متوفر الآن في [[:commons:File:%(commonsfile)s|ويكيميديا كومنز]].',
 	},
 	# Author: Xuacu
+	# Author: Esbardu
 	'ast': {
-		'commons-file-moved': u'El [[:File:%(localfile)s|ficheru]] se treslladó a [[:commons:File:%(commonsfile)s|commons]].',
-		'commons-file-now-available': u'El ficheru ta disponible agora en [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
+		'commons-file-moved': u'[[:File:%(localfile)s|Ficheru]] treslladáu a [[:commons:File:%(commonsfile)s|commons]].',
+		'commons-file-now-available': u'El ficheru yá ta disponible en [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
 	},
 	# Author: Ebrahimi-amir
 	'az': {
@@ -21,7 +27,7 @@ msg = {
 		'commons-file-now-available': u'Daatei ist iatz auf [[:commons:File:%(commonsfile)s|Wikimedia Commons]] vafiagbor.',
 	},
 	# Author: EugeneZelenko
-	'be-tarask': {
+	'be-x-old': {
 		'commons-file-moved': u'[[:File:%(localfile)s|Файл]] перанесены ў [[:commons:File:%(commonsfile)s|ВікіCховішча]].',
 		'commons-file-now-available': u'Цяпер файл даступны ў [[:commons:File:%(commonsfile)s|ВікіCховішчы]].',
 	},
@@ -29,10 +35,20 @@ msg = {
 	'bg': {
 		'commons-file-now-available': u'Файлът вече е наличен в [[:commons:File:%(commonsfile)s|Общомедия]].',
 	},
+	# Author: Riemogerz
+	'bjn': {
+		'commons-file-moved': u'[[:Barakas:%(localfile)s|Barakas]] dipindahakan ka [[:commons:File:%(commonsfile)s|commons]].',
+		'commons-file-now-available': u'Barakas naya wahini ada di [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
+	},
 	# Author: Fulup
 	'br': {
 		'commons-file-moved': u'[[:File:%(localfile)s|Restr]] kaset da [[:commons:File:%(commonsfile)s|commons]].',
 		'commons-file-now-available': u'Emañ bremañ ar restr war [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
+	},
+	# Author: Edinwiki
+	'bs': {
+		'commons-file-moved': u'[[:File:%(localfile)s|Datoteka]] premještena na [[:commons:File:%(commonsfile)s|commons]].',
+		'commons-file-now-available': u'Ova datoteka je sada dostupna na [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
 	},
 	# Author: SMP
 	'ca': {
@@ -59,6 +75,11 @@ msg = {
 		'commons-file-moved': u'Bot: [[:File:%(localfile)s|Datei]] wurde nach [[:commons:File:%(commonsfile)s|commons]] verschoben.',
 		'commons-file-now-available': u'Datei ist jetzt auf [[:commons:File:%(commonsfile)s|Wikimedia Commons]] verfügbar.',
 	},
+	# Author: Erdemaslancan
+	'diq': {
+		'commons-file-moved': u'[[:Dosya:%(localfile)s|Dosya]], berd site da [[:commons:File:%(commonsfile)s|commons]]i.',
+		'commons-file-now-available': u'Ena dosya henda proce de[[:commons:File:%(commonsfile)s|Wikimedia Commons]] zeredeya.',
+	},
 	# Author: Geraki
 	'el': {
 		'commons-file-moved': u'Το [[:File:%(localfile)s|αρχείο]] μετακινήθηκε στα [[:commons:File:%(commonsfile)s|commons]].',
@@ -80,9 +101,10 @@ msg = {
 		'commons-file-now-available': u'El archivo ya está disponible en [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
 	},
 	# Author: Mjbmr
+	# Author: ZxxZxxZ
 	'fa': {
-		'commons-file-moved': u'[[:پرونده:%(localfile)s|پرونده]] به [[:commons:File:%(commonsfile)s|commons]] منتقل شد.',
-		'commons-file-now-available': u'پرونده اکنون در [[:commons:File:%(commonsfile)s|ویکی‌انبار]] در دسترس است.',
+		'commons-file-moved': u'[[:پرونده:%(localfile)s|پرونده]] به [[:commons:File:%(commonsfile)s|انبار]] منتقل شد.',
+		'commons-file-now-available': u'پرونده همکنون در [[:commons:File:%(commonsfile)s|انبار ویکی‌مدیا]] در دسترس است.',
 	},
 	# Author: Crt
 	'fi': {
@@ -115,7 +137,7 @@ msg = {
 		'commons-file-now-available': u'O ficheiro agora está dispoñible na [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
 	},
 	# Author: Als-Chlämens
-	'gsw': {
+	'als': {
 		'commons-file-moved': u'D [[:File:%(localfile)s|Datei]] isch uff [[:commons:File:%(commonsfile)s|d Allmänd]] verschobe worde.',
 		'commons-file-now-available': u'Die Datei isch jetz uff de [[:commons:File:%(commonsfile)s|Allmänd]] verfügbar.',
 	},
@@ -123,6 +145,10 @@ msg = {
 	'he': {
 		'commons-file-moved': u'[[:File:%(localfile)s|הקובץ]] הועבר [[:commons:File:%(commonsfile)s|לוויקישיתוף]].',
 		'commons-file-now-available': u'הקובץ זמין כעת [[:commons:File:%(commonsfile)s|בוויקישיתוף]].',
+	},
+	# Author: Michawiki
+	'hsb': {
+		'commons-file-now-available': u'Dataja steji nětko na [[:commons:File:%(commonsfile)s|Wikimedia Commons]] k dispoziciji.',
 	},
 	# Author: Dj
 	'hu': {
@@ -151,7 +177,7 @@ msg = {
 	},
 	# Author: Snævar
 	'is': {
-		'commons-file-moved': u'[[:Mynd:%(localfile)s|Skráin]] var færð yfir á [[:commons:File:%(commonsfile)s|commons]].',
+		'commons-file-moved': u'[[:File:%(localfile)s|Skráin]] var færð yfir á [[:commons:File:%(commonsfile)s|commons]].',
 		'commons-file-now-available': u'Myndin var færð yfir á [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
 	},
 	# Author: Beta16
@@ -250,9 +276,10 @@ msg = {
 		'commons-file-now-available': u'O ficheiro está agora no [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
 	},
 	# Author: Giro720
+	# Author: 555
 	'pt-br': {
-		'commons-file-moved': u'[[:File:%(localfile)s|File]] movido para o [[:commons:File:%(commonsfile)s|commons]].',
-		'commons-file-now-available': u'O arquivo está agora no [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
+		'commons-file-moved': u'[[:File:%(localfile)s|Arquivo]] movido para o [[:commons:File:%(commonsfile)s|commons]].',
+		'commons-file-now-available': u'O arquivo agora está disponível no [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
 	},
 	'qqq': {
 		'commons-file-moved': u'Edit summary when the bot replaces usage of an image available under a different name. %(localfile)s contains the local filename and %(commonsfile)s the filename at Commons.',
@@ -274,7 +301,9 @@ msg = {
 		'commons-file-now-available': u'File is now available on [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
 	},
 	# Author: Wizzard
+	# Author: Teslaton
 	'sk': {
+		'commons-file-moved': u'Súbor [[:File:%(localfile)s|File]] bol presunutý na [[:commons:File:%(commonsfile)s|commons]].',
 		'commons-file-now-available': u'Súbor je teraz k dispozícii na [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
 	},
 	# Author: Dbc334
@@ -283,7 +312,7 @@ msg = {
 		'commons-file-now-available': u'Datoteka je sedaj na voljo na [[:commons:File:%(commonsfile)s|Zbirki Wikimedia]].',
 	},
 	# Author: Rancher
-	'sr-ec': {
+	'sr': {
 		'commons-file-moved': u'[[:File:%(localfile)s|Датотека]] је премештена у [[:commons:File:%(commonsfile)s|Оставу]].',
 		'commons-file-now-available': u'Датотека је сада доступна у [[:commons:File:%(commonsfile)s|Викимедијиној остави]].',
 	},
@@ -308,7 +337,7 @@ msg = {
 		'commons-file-now-available': u'Dosya artık [[:commons:File:%(commonsfile)s|Wikimedia Commons]] projesinde bulunmaktadır.',
 	},
 	# Author: Ильнар
-	'tt-cyrl': {
+	'tt': {
 		'commons-file-moved': u'[[:File:%(localfile)s|Файл]]  [[:commons:File:%(commonsfile)s|Викиҗыентык]]ка күчерелде.',
 		'commons-file-now-available': u'Файлны хәзер  [[:commons:File:%(commonsfile)s|Викиҗыентык]]та карап була.',
 	},
@@ -318,22 +347,29 @@ msg = {
 		'commons-file-now-available': u'Файл тепер доступний на [[:commons:File:%(commonsfile)s|Вікісховищі]].',
 	},
 	# Author: Candalua
+	# Author: Alunardon90
 	'vec': {
 		'commons-file-moved': u'[[:File:%(localfile)s|File]] spostà su [[:commons:File:%(commonsfile)s|commons]].',
-		'commons-file-now-available': u'Sto file desso te lo cati su [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
+		'commons-file-now-available': u'Sto file deso te ło cati so [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
 	},
 	# Author: Minh Nguyen
 	'vi': {
 		'commons-file-moved': u'[[:File:%(localfile)s|Tập tin]] được chuyển qua [[:Commons:File:%(commonsfile)s|Commons]].',
 		'commons-file-now-available': u'Tập tin mới có sẵn tại [[:Commons:File:%(commonsfile)s|Wikimedia Commons]].',
 	},
-	'zh': {
-		'commons-file-moved': u'[[:File:%(localfile)s|本檔案]]已移至[[:commons:File:%(commonsfile)s|維基共享資源]]',
-		'commons-file-now-available': u'檔案已存在於維基共享資源。',
-	},
 	# Author: Hydra
-	'zh-hans': {
+	'zh': {
 		'commons-file-moved': u'[[:File:%(localfile)s|文件]] 已移动到 [[:commons:File:%(commonsfile)s|维基媒体共享资源]]。',
 		'commons-file-now-available': u'文件现已在 [[:commons:File:%(commonsfile)s|维基媒体共享资源]]。',
+	},
+	# Author: Justincheng12345
+	'zh-hant': {
+		'commons-file-moved': u'[[:File:%(localfile)s|檔案]]已移動到[[:commons:File:%(commonsfile)s|維基共享資源]]。',
+		'commons-file-now-available': u'[[:commons:File:%(commonsfile)s|維基共享資源]]已有此檔案。',
+	},
+	# Author: Justincheng12345
+	'zh-hk': {
+		'commons-file-moved': u'[[:File:%(localfile)s|檔案]]已移動到[[:commons:File:%(commonsfile)s|維基共享資源]]。',
+		'commons-file-now-available': u'[[:commons:File:%(commonsfile)s|維基共享資源]]已有此檔案。',
 	},
 }

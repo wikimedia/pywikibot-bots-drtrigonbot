@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiversity_family.py 9833 2012-01-20 16:03:17Z xqt $'
+__version__ = '$Id: wikiversity_family.py 10214 2012-05-15 14:16:54Z shizhao $'
 
 # The Wikimedia family that is known as Wikiversity
 
@@ -11,17 +11,14 @@ class Family(family.Family):
         self.name = 'wikiversity'
 
         self.languages_by_size = [
-            'en', 'fr', 'de', 'beta', 'ru', 'cs', 'it', 'pt', 'es', 'ar', 'el',
-            'sv', 'fi', 'ja',
+            'en', 'fr', 'de', 'beta', 'ru', 'cs', 'it', 'es', 'pt', 'ar', 'el',
+            'fi', 'sv', 'sl', 'ja',
         ]
 
-        if family.config.SSL_connection:
-            self.langs = dict([(lang, None) for lang in self.languages_by_size])
-        else:
-            self.langs = dict([(lang, '%s.wikiversity.org' % lang) for lang in self.languages_by_size])
+        self.langs = dict([(lang, '%s.wikiversity.org' % lang) for lang in self.languages_by_size])
 
         # Override defaults
-        self.namespaces[3]['cs'] = [u'Diskuse s uživatelem', u'Diskuse s uživatelkou', u'Uživatel diskuse', u'Uživatelka diskuse']
+        self.namespaces[3]['cs'] = [u'Diskuse s uživatelem', u'Uživatel diskuse', u'Uživatelka diskuse', u'Diskuse s uživatelkou']
         self.namespaces[2]['cs'] = [u'Uživatel', u'Uživatelka']
         self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisateur']
         self.namespaces[2]['fr'] = [u'Utilisateur']
@@ -50,6 +47,7 @@ class Family(family.Family):
             'ja': u'Wikiversity',
             'pt': [u'Wikiversidade', u'Wikiversity'],
             'ru': [u'Викиверситет', u'Wikiversity'],
+            'sl': [u'Wikiverza', u'Wikiversity'],
             'sv': u'Wikiversity',
         }
         self.namespaces[5] = {
@@ -67,6 +65,7 @@ class Family(family.Family):
             'ja': [u'Wikiversity・トーク', u'Wikiversity talk', u'Wikiversity‐ノート'],
             'pt': u'Wikiversidade Discussão',
             'ru': u'Обсуждение Викиверситета',
+            'sl': u'Pogovor o Wikiverzi',
             'sv': u'Wikiversitydiskussion',
         }
 
@@ -148,13 +147,12 @@ class Family(family.Family):
             'fr': u'Discussion Transwiki',
             'ja': u'Transwiki‐ノート',
         }
-        self.cross_allowed = [
-            'ja',
-        ]
+
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
-            'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews',
-            'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
+            'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews',
+            'wikiversity', 'meta', 'mediawiki', 'test', 'incubator', 'commons',
+            'species',
         ]
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
@@ -164,14 +162,6 @@ class Family(family.Family):
         return ('commons', 'commons')
 
     if family.config.SSL_connection:
-        def hostname(self, code):
-            return 'secure.wikimedia.org'
 
         def protocol(self, code):
             return 'https'
-
-        def scriptpath(self, code):
-            return '/%s/%s/w' % (self.name, code)
-
-        def nicepath(self, code):
-            return '/%s/%s/wiki/' % (self.name, code)

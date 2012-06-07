@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: test_family.py 9748 2011-11-11 03:28:35Z xqt $'
+__version__ = '$Id: test_family.py 10140 2012-04-20 16:08:24Z xqt $'
 
 import family
 

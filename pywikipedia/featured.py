@@ -37,37 +37,38 @@ This script understands various command-line arguments:
 
 -dry              for debug purposes. No changes will be made.
 
--query:#          a int. that determain number of pages will be checked each while
-                  (use for computers with a small amount of RAM e.g. toolserver users)
-                  default is 500
-
 usage: featured.py [-interactive] [-nocache] [-top] [-after:zzzz] [-fromlang:xx,yy--zz|-fromall]
 
 """
-__version__ = '$Id: featured.py 9720 2011-11-02 03:46:45Z jhsoby $'
+__version__ = '$Id: featured.py 10217 2012-05-16 13:55:16Z xqt $'
 
 #
 # (C) Maxim Razin, 2005
 # (C) Leonardo Gregianin, 2005-2008
-# (C) xqt, 2009-2011
-# (C) Pywikipedia bot team, 2005-2011
+# (C) xqt, 2009-2012
+# (C) Pywikipedia bot team, 2005-2012
 #
 # Distributed under the terms of the MIT license.
 #
 
 import sys, re, pickle, os.path
+from copy import copy
 import wikipedia as pywikibot
 from pywikibot import i18n
 import catlib, config
+from pagegenerators import PreloadingGenerator
 
-def CAT(site,name):
+def CAT(site, name, hide):
     name = site.namespace(14) + ':' + name
     cat=catlib.Category(site, name)
-    return cat.articles()
+    for article in cat.articles(endsort=hide):
+        yield article
+    if hide:
+        for article in cat.articles(startFrom=unichr(ord(hide)+1)):
+            yield article
 
-def BACK(site,name):
-    name = site.namespace(10) + ':' + name
-    p=pywikibot.Page(site, name)
+def BACK(site, name, hide):
+    p=pywikibot.Page(site, name, defaultNamespace=10)
     return [page for page in p.getReferences(follow_redirects=False,
                                              onlyTemplateInclusion=True)]
 
@@ -130,6 +131,7 @@ featured_name = {
     'als':(CAT, u"Wikipedia:Bsunders glungener Artikel"),
     'am': (CAT, u"Wikipedia:Featured article"),
     'an': (CAT, u"Articlos destacatos"),
+    'ang':(CAT, u"Fulgōd ȝeƿritu"),
     'ar': (CAT, u"مقالات مختارة"),
     'ast':(CAT, u"Uiquipedia:Artículos destacaos"),
     'az': (BACK,u"Seçilmiş məqalə"),
@@ -142,16 +144,14 @@ featured_name = {
     'bs': (CAT, u"Odabrani članci"),
     'ca': (CAT, u"Llista d'articles de qualitat"),
     'ceb':(CAT, u"Mga napiling artikulo"),
-    'cs': (CAT, u"Nejlepší články"),
-    'cy': (CAT, u"Erthyglau dethol"),
+    'cs': (CAT, u"Wikipedie:Nejlepší články"),
+    'cy': (BACK,u"Erthygl ddethol"),
     'da': (CAT, u"Fremragende artikler"),
     'de': (CAT, u"Wikipedia:Exzellent"),
-   #'dsb':(CAT, u"Ekscelentny"),
     'dv': (BACK, u"Featured article"),
-   #'dv': (CAT, u"Featured Articles"),
     'el': (BACK,u"Αξιόλογο άρθρο"),
-    'eo': (CAT, u"Elstaraj artikoloj"),
     'en': (CAT, u"Featured articles"),
+    'eo': (CAT, u"Elstaraj artikoloj"),
     'es': (BACK, u"Artículo destacado"),
     'et': (CAT, u"Eeskujulikud artiklid"),
     'eu': (CAT, u"Nabarmendutako artikuluak"),
@@ -161,6 +161,7 @@ featured_name = {
     'fo': (CAT, u"Mánaðargrein"),
     'fr': (CAT, u"Article de qualité"),
     'frr':(BACK,u"Exzellent"),
+    'gl': (CAT, u"Wikipedia:Artigos de calidade"),
     'gv': (CAT, u"Artyn reiht"),
     'he': (CAT, u"ערכים מומלצים"),
     'hi': (BACK,u"निर्वाचित लेख"),
@@ -170,25 +171,27 @@ featured_name = {
     'hy': (BACK,u"Ընտրված հոդված"),
     'ia': (CAT, u"Wikipedia:Articulos eminente"),
     'id': (BACK, u"Featured article"),
-   #'id': (CAT, u"Artikel bagus utama"),
     'is': (CAT, u"Wikipedia:Úrvalsgreinar"),
     'it': (CAT, u"Voci in vetrina"),
     'ja': (BACK,u"Featured article"),
     'ka': (CAT, u"რჩეული სტატიები"),
+    'kk': (CAT, u"Уикипедия:Таңдаулы мақалалар"),
+    'kl': (CAT, u"Anbefalet"),
     'km': (BACK,u"អត្ថបទពិសេស"),
     'kn': (BACK,u"ವಿಶೇಷ ಲೇಖನ"),
     'ko': (CAT, u"알찬 글"),
-    'ksh':(CAT, u"Exzälenter Aatikkel"),
+    'krc':(CAT, u"Википедия:Сайланнган статьяла"),
     'kv': (CAT, u"Википедия:Бур гижӧдъяс"),
     'la': (CAT, u"Paginae mensis"),
+    'lad':(CAT, u"Artikolos valutosos"),
     'li': (CAT, u"Wikipedia:Sjterartikele"),
     'lmo':(CAT, u"Articol ben faa"),
     'lo': (CAT, u"ບົດຄວາມດີເດັ່ນ"),
     'lt': (CAT, u"Vikipedijos pavyzdiniai straipsniai"),
     'lv': (CAT, u"Vērtīgi raksti"),
-   #'lv': (CAT, u"Nedēļas raksti"),
     'mk': (BACK, u"Избрана"),
     'ml': (BACK,u"Featured"),
+    'mt': (CAT, u"Artikli fil-vetrina"),
     'mr': (CAT, u"मुखपृष्ठ सदर लेख"),
     'ms': (BACK,u"Rencana pilihan"),
     'nah':(BACK,u"Featured article"),
@@ -200,6 +203,7 @@ featured_name = {
     'oc': (CAT, u"Article de qualitat"),
     'pl': (CAT, u"Artykuły na medal"),
     'pt': (CAT, u"!Artigos destacados"),
+    'qu': (CAT, u"Wikipidiya:Kusa qillqa"),
     'ro': (CAT, u"Articole de calitate"),
     'ru': (BACK, u"Избранная статья"),
     'sco':(CAT, u"Featurt"),
@@ -216,8 +220,10 @@ featured_name = {
     'te': (CAT, u"విశేషవ్యాసాలు"),
     'th': (BACK,u"บทความคัดสรร"),
     'tl': (BACK,u"Napiling artikulo"),
+    'tn': (CAT, u"Featured articles"),
     'tr': (BACK,u"Seçkin madde"),
     'tt': (CAT, u"Сайланган мәкаләләр"),
+    'udm':(CAT, u"Википедия:Быръем статьяос"),
     'uk': (CAT, u"Вибрані статті"),
     'ur': (CAT, u"منتخب مقالے"),
     'uz': (CAT, u"Vikipediya:Tanlangan maqolalar"),
@@ -248,7 +254,6 @@ good_name = {
     'fr': (CAT, u"Bon article"),
     'hsb':(CAT, u"Namjet za pohódnoćenje"),
     'id': (BACK,u"Artikel bagus"),
-   #'id': (CAT, u"Artikel bagus"),
     'is': (CAT, u"Wikipedia:Gæðagreinar"),
     'ja': (BACK,u"Good article"),
     'ko': (CAT, u"좋은 글"),
@@ -260,7 +265,7 @@ good_name = {
     'pl': (CAT, u"Dobre artykuły"),
     'pt': (CAT, u"Artigos bons"),
     'ro': (BACK, u"Articol bun"),
-    'ru': (CAT, u"Википедия:Хорошие статьи"),
+    'ru': (CAT, u"Википедия:Хорошие статьи по алфавиту"),
     'simple': (CAT, u"Good articles"),
     'sr': (BACK,u"Иконица добар"),
     'sv': (CAT, u"Wikipedia:Bra artiklar"),
@@ -289,64 +294,59 @@ lists_name = {
     'tr': (BACK, u'Seçkin liste'),
     'uk': (BACK, u'Вибраний список'),
     'vi': (BACK, u'Sao danh sách chọn lọc'),
-    'zh': (BACK, u'Featured list'),
-    'da': (BACK, u'FremragendeListe'),
+    'zh': (BACK, u'特色列表'),
 }
 
+# Third parameter is the sort key indicating articles to hide from the given list
 former_name = {
-    'th': (CAT, u"บทความคัดสรรในอดีต"),
-    'pt': (CAT, u"!Ex-Artigos_destacados"),
-    'fa': (CAT, u"مقاله‌های برگزیده پیشین"),
-    'es': (CAT, u"Wikipedia:Artículos anteriormente destacados"),
-    'hu': (CAT, u"Korábbi kiemelt cikkek"),
-    'ru': (CAT, u"Википедия:Устаревшие избранные статьи"),
     'ca': (CAT, u"Arxiu de propostes de la retirada de la distinció"),
+    'en': (CAT, u"Wikipedia former featured articles", "#"),
     'es': (CAT, u"Wikipedia:Artículos anteriormente destacados"),
+    'fa': (CAT, u"مقاله‌های برگزیده پیشین"),
+    'hu': (CAT, u"Korábbi kiemelt cikkek"),
+    'pt': (CAT, u"!Ex-Artigos_destacados"),
+    'ru': (CAT, u"Википедия:Устаревшие избранные статьи"),
+    'th': (CAT, u"บทความคัดสรรในอดีต"),
     'tr': (CAT, u"Vikipedi eski seçkin maddeler"),
-    'zh': (CAT, u"Wikipedia_former_featured_articles"),
+    'zh': (CAT, u"已撤销的特色条目"),
 }
-
-# globals
-interactive=0
-nocache=0
-afterpage=u"!"
-cache={}
 
 def featuredArticles(site, pType):
-    arts=[]
+    articles=[]
+    if pType == 'good':
+        info = good_name
+    elif pType == 'former':
+        info = former_name
+    elif pType == 'list':
+        info = lists_name
+    else:
+        info = featured_name
     try:
-        if pType == 'good':
-            method = good_name[site.lang][0]
-        elif pType == 'former':
-            method = former_name[site.lang][0]
-        elif pType == 'list':
-            method = lists_name[site.lang][0]
-        else:
-            method = featured_name[site.lang][0]
+        method = info[site.lang][0]
     except KeyError:
         pywikibot.output(
             u'Error: language %s doesn\'t has %s category source.'
             % (site.lang, pType))
-        return arts
-    if pType == 'good':
-        name = good_name[site.lang][1]
-    elif pType == 'former':
-        name = former_name[site.lang][1]
-    elif pType == 'list':
-        name = lists_name[site.lang][1]
-    else:
-        name = featured_name[site.lang][1]
-    raw = method(site, name)
+        return
+    name = info[site.lang][1]
+    # hide #-sorted items on en-wiki
+    try:
+        hide = info[site.lang][2]
+    except IndexError:
+        hide = None
+    raw = method(site, name, hide)
     for p in raw:
         if p.namespace() == 0: # Article
-            arts.append(p)
+            articles.append(p)
         # Article talk (like in English)
         elif p.namespace() == 1 and site.lang <> 'el':
-            arts.append(pywikibot.Page(p.site(), p.title(withNamespace=False)))
+            articles.append(pywikibot.Page(p.site(),
+                            p.title(withNamespace=False)))
     pywikibot.output(
         '\03{lightred}** wikipedia:%s has %i %s articles\03{default}'
-        % (site.lang, len(arts), pType))
-    return arts
+        % (site.lang, len(articles), pType))
+    for p in articles:
+        yield copy(p)
 
 def findTranslated(page, oursite=None, quiet=False):
     if not oursite:
@@ -431,15 +431,27 @@ def getTemplateList (lang, pType):
             templates = template['_default']
     return templates
 
-def featuredbot(arts, cc, tosite, template_on_top, pType, quiet, dry):
+def featuredWithInterwiki(fromsite, tosite, template_on_top, pType, quiet,
+                          dry=False):
+    if not fromsite.lang in cache:
+        cache[fromsite.lang] = {}
+    if not tosite.lang in cache[fromsite.lang]:
+        cache[fromsite.lang][tosite.lang] = {}
+    cc = cache[fromsite.lang][tosite.lang]
+    if nocache:
+        cc={}
     templatelist = getTemplateList(tosite.lang, pType)
     findtemplate = '(' + '|'.join(templatelist) + ')'
     re_Link_FA=re.compile(ur"\{\{%s\|%s\}\}"
                           % (findtemplate.replace(u' ', u'[ _]'),
                              fromsite.lang), re.IGNORECASE)
     re_this_iw=re.compile(ur"\[\[%s:[^]]+\]\]" % fromsite.lang)
+
+    gen = featuredArticles(fromsite, pType)
+    gen = PreloadingGenerator(gen)
+
     pairs=[]
-    for a in arts:
+    for a in gen:
         if a.title() < afterpage:
             continue
         if u"/" in a.title() and a.namespace() != 0:
@@ -535,28 +547,13 @@ def featuredbot(arts, cc, tosite, template_on_top, pType, quiet, dry):
         except pywikibot.PageNotSaved, e:
             pywikibot.output(u"Page not saved")
 
-def featuredWithInterwiki(fromsite, tosite, template_on_top, pType, quiet,
-                          dry=False, query=500):
-    if not fromsite.lang in cache:
-        cache[fromsite.lang] = {}
-    if not tosite.lang in cache[fromsite.lang]:
-        cache[fromsite.lang][tosite.lang] = {}
-    cc = cache[fromsite.lang][tosite.lang]
-    if nocache:
-        cc={}
+def main(*args):
+    global nocache, interactive, afterpage, cache
+    nocache = 0
+    interactive = 0
+    afterpage = u"!"
+    cache = {}
 
-    arts = featuredArticles(fromsite, pType)
-    top = 0
-    if len(arts) > query:
-        while top < len(arts):
-            bottom = top
-            top += query
-            featuredbot(arts[bottom:top], cc, tosite, template_on_top, pType,
-                        quiet, dry)
-    else:
-        featuredbot(arts, cc, tosite, template_on_top, pType, quiet, dry)
-
-if __name__=="__main__":
     template_on_top = True
     featuredcount = False
     fromlang=[]
@@ -565,7 +562,6 @@ if __name__=="__main__":
     part  = False
     quiet = False
     dry = False
-    query=500
     for arg in pywikibot.handleArgs():
         if arg == '-interactive':
             interactive=1
@@ -574,11 +570,6 @@ if __name__=="__main__":
         elif arg.startswith('-fromlang:'):
             fromlang=arg[10:].split(",")
             part = True
-        elif arg.startswith('-query:'):
-            try:
-                query=int(arg[7:])
-            except:
-                query=500
         elif arg == '-fromall':
             doAll = True
         elif arg.startswith('-after:'):
@@ -601,34 +592,34 @@ if __name__=="__main__":
     if part:
         try:
             # BUG: range with zh-min-nan (3 "-")
-            if len(fromlang)==1 and fromlang[0].index("-")>=0:
-                ll1,ll2=fromlang[0].split("--",1)
-                if not ll1: ll1=""
-                if not ll2: ll2="zzzzzzz"
+            if len(fromlang) == 1 and fromlang[0].index("-") >= 0:
+                start, end = fromlang[0].split("--", 1)
+                if not start: start = ""
+                if not end: end = "zzzzzzz"
                 if processType == 'good':
-                    fromlang=[ll for ll in good_name.keys()
-                              if ll>=ll1 and ll<=ll2]
+                    fromlang = [lang for lang in good_name.keys()
+                                if lang >= start and lang <= end]
                 elif processType == 'list':
-                    fromlang=[ll for ll in good_lists.keys()
-                              if ll>=ll1 and ll<=ll2]
+                    fromlang = [lang for lang in lists_name.keys()
+                                if lang >= start and lang <= end]
                 elif processType == 'former':
-                    fromlang=[ll for ll in former_lists.keys()
-                              if ll>=ll1 and ll<=ll2]
+                    fromlang = [lang for lang in former_name.keys()
+                                if lang >= start and lang <= end]
                 else:
-                    fromlang=[ll for ll in featured_name.keys()
-                              if ll>=ll1 and ll<=ll2]
+                    fromlang = [lang for lang in featured_name.keys()
+                                if lang >= start and lang <= end]
         except:
             pass
 
     if doAll:
         if processType == 'good':
-            fromlang=good_name.keys()
+            fromlang = good_name.keys()
         elif processType == 'list':
-            fromlang=lists_name.keys()
+            fromlang = lists_name.keys()
         elif processType == 'former':
-            fromlang=former_name.keys()
+            fromlang = former_name.keys()
         else:
-            fromlang=featured_name.keys()
+            fromlang = featured_name.keys()
 
     filename="cache/" + processType
     try:
@@ -654,7 +645,10 @@ if __name__=="__main__":
         for ll in fromlang:
             fromsite = pywikibot.getSite(ll)
             if featuredcount:
-                featuredArticles(fromsite, processType)
+                try:
+                    featuredArticles(fromsite, processType).next()
+                except StopIteration:
+                    continue
             elif not hasTemplate:
                 pywikibot.output(
                     u'\nNOTE: %s arcticles are not implemented at %s-wiki.'
@@ -663,11 +657,15 @@ if __name__=="__main__":
                 break
             elif  fromsite != pywikibot.getSite():
                 featuredWithInterwiki(fromsite, pywikibot.getSite(),
-                                      template_on_top, processType, quiet, dry,
-                                      query)
+                                      template_on_top, processType, quiet, dry)
     except KeyboardInterrupt:
         pywikibot.output('\nQuitting program...')
     finally:
-        pywikibot.stopme()
         if not nocache:
             pickle.dump(cache,file(filename,"wb"))
+
+if __name__ == "__main__":
+    try:
+        main()
+    finally:
+        pywikibot.stopme()

@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: i18n_family.py 9300 2011-06-18 23:51:32Z siebrand $'
+__version__ = '$Id: i18n_family.py 10162 2012-04-30 22:08:03Z siebrand $'
 
 import family
 
@@ -220,4 +220,4 @@ class Family(family.Family):
             '_default': [u'Kiwix talk'],
         }
     def version(self, code):
-        return "1.19alpha"
+        return "1.20alpha"

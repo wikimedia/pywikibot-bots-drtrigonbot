@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikipedia_family.py 9898 2012-02-16 17:04:35Z jhsoby $'
+__version__ = '$Id: wikipedia_family.py 10265 2012-06-01 22:40:42Z xqt $'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 
@@ -11,40 +11,37 @@ class Family(family.Family):
         self.name = 'wikipedia'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'nl', 'it', 'pl', 'es', 'ru', 'ja', 'pt', 'sv',
-            'zh', 'ca', 'uk', 'no', 'vi', 'fi', 'cs', 'hu', 'ko', 'id', 'tr',
-            'ro', 'fa', 'ar', 'da', 'eo', 'sr', 'lt', 'sl', 'sk', 'ms', 'he',
-            'bg', 'kk', 'eu', 'vo', 'war', 'hr', 'hi', 'et', 'az', 'gl', 'nn',
-            'simple', 'th', 'la', 'new', 'el', 'roa-rup', 'oc', 'tl', 'ka',
-            'mk', 'sh', 'ht', 'pms', 'te', 'ta', 'ceb', 'be-x-old', 'br', 'sq',
-            'lv', 'be', 'jv', 'mg', 'lb', 'cy', 'mr', 'is', 'bs', 'yo', 'an',
-            'bpy', 'lmo', 'fy', 'hy', 'sw', 'bn', 'io', 'ml', 'gu', 'af', 'pnb',
-            'ne', 'nds', 'scn', 'ku', 'ur', 'zh-yue', 'su', 'qu', 'diq', 'ba',
-            'ast', 'tt', 'ga', 'nap', 'ia', 'cv', 'bat-smg', 'map-bms', 'wa',
-            'am', 'kn', 'als', 'bug', 'my', 'zh-min-nan', 'tg', 'vec', 'yi',
-            'roa-tara', 'gd', 'hif', 'os', 'sco', 'arz', 'nah', 'sah', 'uz',
-            'pam', 'sa', 'mn', 'hsb', 'mi', 'li', 'si', 'co', 'gan', 'glk',
-            'bcl', 'fo', 'ckb', 'bar', 'bo', 'mrj', 'ky', 'ilo', 'fiu-vro',
-            'nds-nl', 'tk', 'vls', 'se', 'gv', 'dv', 'nrm', 'rue', 'pag', 'pa',
-            'rm', 'ps', 'mzn', 'km', 'udm', 'fur', 'csb', 'mt', 'wuu', 'ug',
-            'lij', 'koi', 'kv', 'mhr', 'ang', 'pi', 'lad', 'bh', 'sc', 'zea',
-            'zh-classical', 'nov', 'ksh', 'cbk-zam', 'so', 'nv', 'hak', 'or',
-            'kw', 'frp', 'stq', 'szl', 'ext', 'xmf', 'pcd', 'ie', 'frr', 'xal',
-            'haw', 'rw', 'ln', 'pdc', 'ay', 'pfl', 'krc', 'ace', 'to', 'eml',
-            'crh', 'ce', 'gn', 'myv', 'kl', 'arc', 'pap', 'bjn', 'gag', 'lbe',
-            'tpi', 'as', 'wo', 'jbo', 'dsb', 'mdf', 'av', 'kab', 'ty', 'sn',
-            'srn', 'lo', 'ab', 'ig', 'na', 'kg', 'tet', 'mwl', 'ltg', 'kaa',
-            'nso', 'rmy', 'cu', 'tn', 'kbd', 'sm', 'bi', 'sd', 'bm', 'ik', 'iu',
-            'ss', 'pih', 'za', 'chr', 'pnt', 'got', 'cdo', 'ee', 'ha', 'zu',
-            'ti', 'ks', 'om', 'bxr', 've', 'ts', 'sg', 'rn', 'cr', 'dz', 'lg',
-            'ak', 'fj', 'tum', 'chy', 'ff', 'st', 'ch', 'ny', 'tw', 'xh', 'ki',
-            'vep',
+            'en', 'de', 'fr', 'nl', 'it', 'pl', 'es', 'ru', 'ja', 'pt', 'zh',
+            'sv', 'vi', 'uk', 'ca', 'no', 'fi', 'cs', 'hu', 'ko', 'fa', 'id',
+            'tr', 'ro', 'ar', 'sk', 'eo', 'da', 'sr', 'lt', 'ms', 'eu', 'he',
+            'sl', 'bg', 'kk', 'vo', 'war', 'hr', 'hi', 'et', 'az', 'gl',
+            'simple', 'nn', 'la', 'th', 'el', 'new', 'roa-rup', 'oc', 'sh',
+            'ka', 'mk', 'tl', 'ht', 'pms', 'te', 'ta', 'be-x-old', 'ceb', 'br',
+            'be', 'lv', 'sq', 'jv', 'mg', 'cy', 'lb', 'mr', 'is', 'bs', 'yo',
+            'an', 'hy', 'bpy', 'fy', 'lmo', 'ml', 'sw', 'pnb', 'bn', 'io', 'af',
+            'gu', 'zh-yue', 'ne', 'nds', 'ku', 'ast', 'ur', 'scn', 'su', 'qu',
+            'diq', 'ba', 'tt', 'my', 'ga', 'cv', 'ia', 'nap', 'bat-smg',
+            'map-bms', 'wa', 'kn', 'am', 'als', 'bug', 'tg', 'gd', 'zh-min-nan',
+            'yi', 'vec', 'hif', 'sco', 'roa-tara', 'os', 'arz', 'nah', 'uz',
+            'sah', 'mn', 'mzn', 'sa', 'pam', 'hsb', 'mi', 'li', 'ky', 'si',
+            'co', 'gan', 'glk', 'ckb', 'bo', 'fo', 'bar', 'bcl', 'ilo', 'mrj',
+            'fiu-vro', 'nds-nl', 'tk', 'vls', 'se', 'gv', 'ps', 'rue', 'dv',
+            'nrm', 'pag', 'koi', 'pa', 'rm', 'km', 'kv', 'udm', 'csb', 'mhr',
+            'fur', 'mt', 'wuu', 'lij', 'ug', 'lad', 'pi', 'zea', 'sc', 'bh',
+            'zh-classical', 'nov', 'ksh', 'or', 'ang', 'kw', 'so', 'nv', 'stq',
+            'xmf', 'hak', 'ay', 'frp', 'frr', 'ext', 'szl', 'pcd', 'ie', 'gag',
+            'haw', 'xal', 'ln', 'rw', 'pdc', 'pfl', 'krc', 'crh', 'eml', 'ace',
+            'gn', 'to', 'ce', 'kl', 'arc', 'myv', 'dsb', 'vep', 'pap', 'bjn',
+            'as', 'tpi', 'lbe', 'wo', 'mdf', 'jbo', 'kab', 'av', 'cbk-zam',
+            'sn', 'ty', 'srn', 'kbd', 'lo', 'ab', 'lez', 'mwl', 'ltg', 'ig',
+            'na', 'kg', 'tet', 'za', 'kaa', 'nso', 'zu', 'rmy', 'cu', 'tn',
+            'chr', 'sm', 'bi', 'bm', 'iu', 'chy', 'ik', 'pih', 'ss', 'got',
+            'sd', 'pnt', 'cdo', 'ee', 'ha', 'ti', 'bxr', 'om', 'ks', 'ts', 've',
+            'sg', 'rn', 'ki', 'dz', 'cr', 'lg', 'ak', 'tum', 'fj', 'st', 'tw',
+            'ch', 'ny', 'ff', 'xh',
         ]
 
-        if family.config.SSL_connection:
-            self.langs = dict([(lang, None) for lang in self.languages_by_size])
-        else:
-            self.langs = dict([(lang, '%s.wikipedia.org' % lang) for lang in self.languages_by_size])
+        self.langs = dict([(lang, '%s.wikipedia.org' % lang) for lang in self.languages_by_size])
 
         # Override defaults
         self.namespaces[1]['ja'] = [u'ノート', u'トーク']
@@ -75,7 +72,7 @@ class Family(family.Family):
             'ar': [u'ويكيبيديا', u'وب'],
             'arc': [u'ܘܝܩܝܦܕܝܐ', u'Wikipedia'],
             'arz': u'ويكيبيديا',
-            'as': [u'ৱিকিপিডিয়া', u'Wikipedia', u'প্ৰকল্প'],
+            'as': [u'ৱিকিপিডিয়া', u'Wikipedia', u'প্ৰকল্প', u'WP'],
             'ast': u'Uiquipedia',
             'av': u'Wikipedia',
             'ay': u'Wikipidiya',
@@ -161,7 +158,7 @@ class Family(family.Family):
             'hsb': u'Wikipedija',
             'ht': [u'Wikipedya', u'Wikipedia'],
             'hu': u'Wikipédia',
-            'hy': u'Վիքիփեդիա',
+            'hy': u'Վիքիպեդիա',
             'ia': u'Wikipedia',
             'id': u'Wikipedia',
             'ie': u'Wikipedia',
@@ -171,7 +168,7 @@ class Family(family.Family):
             'io': [u'Wikipedio', u'Wikipedia'],
             'is': u'Wikipedia',
             'it': [u'Wikipedia', u'WP'],
-            'iu': u'Wikipedia',
+            'iu': [u'ᐅᐃᑭᐱᑎᐊ', u'Wikipedia'],
             'ja': u'Wikipedia',
             'jbo': u'Wikipedia',
             'jv': u'Wikipedia',
@@ -191,13 +188,14 @@ class Family(family.Family):
             'ks': u'Wikipedia',
             'ksh': u'Wikipedia',
             'ku': u'Wîkîpediya',
-            'kv': u'Wikipedia',
+            'kv': [u'Википедия', u'Wikipedia'],
             'kw': u'Wikipedia',
             'ky': u'Wikipedia',
             'la': u'Vicipaedia',
             'lad': u'Vikipedya',
             'lb': u'Wikipedia',
             'lbe': u'Википедия',
+            'lez': u'Википедия',
             'lg': u'Wikipedia',
             'li': u'Wikipedia',
             'lij': u'Wikipedia',
@@ -267,7 +265,7 @@ class Family(family.Family):
             'ru': [u'Википедия', u'ВП'],
             'rue': u'Вікіпедія',
             'rw': u'Wikipedia',
-            'sa': u'विकिपीडिया',
+            'sa': [u'विकिपीडिया', u'WP', u'Wikipedia'],
             'sah': u'Бикипиэдьийэ',
             'sc': u'Wikipedia',
             'scn': u'Wikipedia',
@@ -284,7 +282,7 @@ class Family(family.Family):
             'sn': u'Wikipedia',
             'so': u'Wikipedia',
             'sq': u'Wikipedia',
-            'sr': u'Википедија',
+            'sr': [u'Википедија', u'Vikipedija'],
             'srn': u'Wikipedia',
             'ss': u'Wikipedia',
             'st': u'Wikipedia',
@@ -438,7 +436,7 @@ class Family(family.Family):
             'hsb': u'Wikipedija diskusija',
             'ht': [u'Diskisyon Wikipedya', u'Wikipedia talk'],
             'hu': [u'Wikipédia-vita', u'Wikipédia vita'],
-            'hy': u'Վիքիփեդիայի քննարկում',
+            'hy': u'Վիքիպեդիայի քննարկում',
             'ia': u'Discussion Wikipedia',
             'id': u'Pembicaraan Wikipedia',
             'ie': u'Wikipedia Discussion',
@@ -448,7 +446,7 @@ class Family(family.Family):
             'io': [u'Wikipedio Debato', u'Wikipedia talk'],
             'is': u'Wikipediaspjall',
             'it': u'Discussioni Wikipedia',
-            'iu': u'Wikipedia talk',
+            'iu': [u'ᐅᐃᑭᐱᑎᐊ talk', u'Wikipedia talk'],
             'ja': [u'Wikipedia‐ノート', u'Wikipedia・トーク'],
             'jbo': u'Wikipedia talk',
             'jv': u'Dhiskusi Wikipedia',
@@ -468,13 +466,14 @@ class Family(family.Family):
             'ks': u'Wikipedia talk',
             'ksh': u'Wikipedia Klaaf',
             'ku': u'Wîkîpediya nîqaş',
-            'kv': u'Обсуждение Wikipedia',
+            'kv': [u'Википедия донъялӧм', u'Обсуждение Wikipedia'],
             'kw': [u'Kescows Wikipedia', u'Cows Wikipedia', u'Keskows Wikipedia'],
             'ky': u'Wikipedia talk',
             'la': [u'Disputatio Vicipaediae', u'Disputatio Wikipedia'],
             'lad': [u'Diskusyón de Vikipedya', u'Vikipedya Discusión', u'Diskussión de Vikipedya'],
             'lb': u'Wikipedia Diskussioun',
             'lbe': u'Википедиялиясса ихтилат',
+            'lez': u'Википедия веревирд авун',
             'lg': u'Wikipedia talk',
             'li': u'Euverlèk Wikipedia',
             'lij': [u'Discûscioîn Wikipedia', u'Discussioni Wikipedia'],
@@ -518,7 +517,7 @@ class Family(family.Family):
             'oc': u'Discussion Wikipèdia',
             'om': u'Wikipedia talk',
             'or': [u'ଉଇକିପିଡ଼ିଆ ଆଲୋଚନା', u'Wikipedia talk', u'WT'],
-            'os': u'Дискусси Википеди',
+            'os': [u'Википедийы тæрхон', u'Дискусси Википеди'],
             'pa': u'ਵਿਕਿਪੀਡਿਆ ਚਰਚਾ',
             'pag': u'Wikipedia talk',
             'pam': u'Wikipedia talk',
@@ -544,7 +543,7 @@ class Family(family.Family):
             'ru': u'Обсуждение Википедии',
             'rue': u'Діскузія ку Вікіпедії',
             'rw': u'Wikipedia talk',
-            'sa': [u'विकिपीडियासम्भाषणम्', u'विकिपीडियासंभाषणं'],
+            'sa': [u'विकिपीडियासम्भाषणम्', u'WT', u'Wikipedia talk', u'विकिपीडियासंभाषणं'],
             'sah': u'Бикипиэдьийэ ырытыыта',
             'sc': [u'Cuntierra Wikipedia', u'Wikipedia discussioni'],
             'scn': u'Discussioni Wikipedia',
@@ -599,7 +598,7 @@ class Family(family.Family):
             'vls': u'Discuusje Wikipedia',
             'vo': [u'Bespik dö Vükiped', u'Wikipedia talk'],
             'wa': u'Wikipedia copene',
-            'war': u'Wikipedia talk',
+            'war': u'Hiruhimangraw hiton Wikipedia',
             'wo': [u'Wikipedia waxtaan', u'Discussion Wikipedia'],
             'wuu': u'Wikipedia讨论',
             'xal': [u'Wikipedia туск меткән', u'Wikipedia тускар ухалвр'],
@@ -639,7 +638,7 @@ class Family(family.Family):
             'an': u'Portal',
             'ar': u'بوابة',
             'arz': u'بوابة',
-            'as': u'ৱিকিচৰা',
+            'as': u'ৱিকিচ\'ৰা',
             'az': u'Portal',
             'bar': u'Portal',
             'be': u'Партал',
@@ -738,7 +737,7 @@ class Family(family.Family):
             'an': u'Descusión Portal',
             'ar': u'نقاش البوابة',
             'arz': [u'مناقشة بوابة', u'Portal talk'],
-            'as': u'ৱিকিচৰা আলোচনা',
+            'as': u'ৱিকিচ\'ৰা আলোচনা',
             'az': u'Portal müzakirəsi',
             'bar': u'Portal Diskussion',
             'be': [u'Размовы пра партал', u'Portal talk'],
@@ -879,7 +878,7 @@ class Family(family.Family):
             'lt': u'Vikiprojekto aptarimas',
             'lv': u'Vikiprojekta diskusija',
             'oc': u'Discussion Projècte',
-            'pl': u'Dyskusja Wikiprojektu',
+            'pl': u'Dyskusja wikiprojektu',
             'pt': u'Anexo Discussão',
             'ro': u'Discuție Proiect',
             'ru': u'Обсуждение Инкубатора',
@@ -911,10 +910,12 @@ class Family(family.Family):
 
         self.namespaces[106] = {
             'als': u'Text',
+            'ru': u'Арбитраж',
         }
 
         self.namespaces[107] = {
             'als': u'Text Diskussion',
+            'ru': u'Обсуждение арбитража',
         }
 
         self.namespaces[108] = {
@@ -941,28 +942,28 @@ class Family(family.Family):
 
         self.category_redirect_templates = {
             '_default': (),
-            'ar': (u"تحويل تصنيف",
-                   u"تحويلة تصنيف",
-                   u"Category redirect",
-                   u"تحويلة تصنيف",),
+            'ar': (u'تحويل تصنيف',
+                   u'تحويلة تصنيف',
+                   u'Category redirect',),
             'arz': (u'تحويل تصنيف',),
             'cs': (u'Zastaralá kategorie',),
             'da': (u'Kategoriomdirigering',),
-            'de': (u'Kategorieweiterleitung',),
-            'en': (u"Category redirect",
-                   u"Category redirect3",
+            # 'de' has removed its template
+            'en': (u'Category redirect',
+                   u'Category redirect3',
                    u"Categoryredirect",
-                   u"CR",
-                   u"Catredirect",
-                   u"Cat redirect",
-                   u"Catredir",
-                   u"Seecat",),
+                   u'CR',
+                   u'Catredirect',
+                   u'Cat redirect',
+                   u'Catredir',
+                   u'Seecat',),
             'es': (u'Categoría redirigida',),
             'eu': (u'Kategoria redirect',),
             'fa': (u'رده بهتر',
                    u'انتقال رده',
                    u'فیلم‌های امریکایی',),
             'fr': (u'Redirection de catégorie',),
+            'gv': (u'Aastiurey ronney',),
             'hi': (u'श्रेणीअनुप्रेषित',
                    u'Categoryredirect',),
             'hu': (u'Kat-redir',
@@ -971,18 +972,18 @@ class Family(family.Family):
             'id': (u'Alih kategori',
                    u'Alihkategori',),
             # 'it' has removed its template
-            # 'ja' is discussing to remove this template
-            'ja': (u"Category redirect",),
+            'ja': (u'Category redirect',),
             'ko': (u'분류 넘겨주기',),
             'mk': (u'Премести категорија',),
+            'ml': (u'Category redirect',),
             'ms': (u'Pengalihan kategori',
                    u'Categoryredirect',
                    u'Category redirect',),
             'mt': (u'Redirect kategorija',),
             # 'nl' has removed its template
-            'no': (u"Category redirect",
-                   u"Kategoriomdirigering",
-                   u"Kategori-omdirigering",),
+            'no': (u'Category redirect',
+                   u'Kategoriomdirigering',
+                   u'Kategori-omdirigering',),
             'pl': (u'Przekierowanie kategorii',
                    u'Category redirect',),
             'pt': (u'Redirecionamento de categoria',
@@ -994,9 +995,10 @@ class Family(family.Family):
                    u'CategoryRedirect',
                    u'Category redirect',
                    u'Catredirect',),
-            'simple': (u"Category redirect",
-                       u"Categoryredirect",
-                       u"Catredirect",),
+            'simple': (u'Category redirect',
+                       u'Categoryredirect',
+                       u'Catredirect',),
+            'sl': (u'Category redirect',),
             'sq': (u'Kategori e zhvendosur',
                    u'Category redirect',),
             'sv': (u'Kategoriomdirigering',
@@ -1176,41 +1178,52 @@ class Family(family.Family):
 
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
-            'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews', 'wikiversity',
-            'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species',
+            'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews',
+            'wikiversity', 'meta', 'mediawiki', 'test', 'incubator', 'commons',
+            'species',
         ]
+
         # Global bot allowed languages on
         # http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
             'ab', 'ace', 'af', 'ak', 'als', 'am', 'an', 'ang', 'arc', 'arz',
-            'as', 'ast', 'av', 'ay', 'az', 'ba', 'bat-smg', 'bar', 'bcl',
-            'be-x-old', 'be', 'bg', 'bh', 'bi', 'bm', 'bo', 'bpy', 'bug', 'bxr',
-            'cbk-zam', 'cdo', 'ce', 'ceb', 'ch', 'chr', 'chy', 'ckb', 'co',
-            'crh', 'cr', 'csb', 'cu', 'cv', 'cy', 'diq', 'dsb', 'dz', 'ee',
-            'el', 'eml', 'eo', 'et', 'eu', 'ext', 'fa', 'ff', 'fj', 'fo', 'frp',
-            'frr', 'fur', 'ga', 'gan', 'gd', 'glk', 'gn', 'got', 'gu', 'gv',
-            'ha', 'hak', 'haw', 'hif', 'hi', 'hr', 'hsb', 'ht', 'hu', 'hy',
-            'ia', 'ie', 'ig', 'ik', 'ilo', 'iu', 'ja', 'jbo', 'jv', 'kaa',
-            'kab', 'ka', 'kg', 'ki', 'kk', 'kl', 'km', 'kn', 'ko', 'koi', 'ks',
-            'ku', 'kv', 'kw', 'ky', 'lad', 'lb', 'lbe', 'lg', 'li', 'lij',
-            'lmo', 'ln', 'lo', 'lv', 'map-bms', 'mdf', 'mg', 'mhr', 'mi', 'mk',
-            'mn', 'mrj', 'ms', 'mwl', 'myv', 'my', 'mzn', 'nah', 'na', 'nap',
-            'nds-nl', 'ne', 'new', 'nl', 'nov', 'nrm', 'nv', 'ny', 'oc', 'om',
-            'or', 'os', 'pam', 'pap', 'pa', 'pag', 'pdc', 'pfl', 'pi', 'pih',
-            'pms', 'pnb', 'pnt', 'ps', 'qu', 'rm', 'rmy', 'rn', 'roa-rup',
-            'roa-tara', 'rw', 'sah', 'sa', 'sc', 'scn', 'sco', 'sd', 'se', 'sg',
-            'sh', 'simple', 'si', 'sk', 'sm', 'sn', 'so', 'srn', 'stq', 'st',
-            'su', 'sw', 'szl', 'ta', 'te', 'tet', 'tg', 'th', 'ti', 'tk', 'tl',
-            'tn', 'to', 'tpi', 'ts', 'tt', 'tum', 'tw', 'ty', 'udm', 'ug', 'uz',
-            've', 'vls', 'wa', 'war', 'wo', 'wuu', 'xal', 'xh', 'yi', 'yo',
-            'za', 'zea', 'zh', 'zh-classical', 'zh-min-nan', 'zu',
+            'as', 'ast', 'av', 'ay', 'az', 'ba', 'bar', 'bat-smg', 'bcl', 'be',
+            'be-x-old', 'bg', 'bh', 'bi', 'bjn', 'bm', 'bo', 'bpy', 'bug',
+            'bxr', 'ca', 'cbk-zam', 'cdo', 'ce', 'ceb', 'ch', 'chr', 'chy',
+            'ckb', 'co', 'cr', 'crh', 'csb', 'cu', 'cv', 'cy', 'da', 'diq',
+            'dsb', 'dz', 'ee', 'el', 'eml', 'en', 'eo', 'et', 'eu', 'ext', 'fa',
+            'ff', 'fi', 'fj', 'fo', 'frp', 'frr', 'fur', 'ga', 'gag', 'gan',
+            'gd', 'glk', 'gn', 'got', 'gu', 'gv', 'ha', 'hak', 'haw', 'he',
+            'hi', 'hif', 'hr', 'hsb', 'ht', 'hu', 'hy', 'ia', 'ie', 'ig', 'ik',
+            'ilo', 'io', 'iu', 'ja', 'jbo', 'jv', 'ka', 'kaa', 'kab', 'kg',
+            'ki', 'kk', 'kl', 'km', 'kn', 'ko', 'koi', 'krc', 'ks', 'ku', 'kv',
+            'kw', 'ky', 'la', 'lad', 'lb', 'lbe', 'lez', 'lg', 'li', 'lij',
+            'lmo', 'ln', 'lo', 'ltg', 'lv', 'map-bms', 'mdf', 'mg', 'mhr', 'mi',
+            'mk', 'ml', 'mn', 'mrj', 'ms', 'mwl', 'my', 'myv', 'mzn', 'na',
+            'nah', 'nap', 'nds-nl', 'ne', 'new', 'nl', 'no', 'nov', 'nrm', 'nv',
+            'ny', 'oc', 'om', 'or', 'os', 'pa', 'pag', 'pam', 'pap', 'pdc',
+            'pfl', 'pi', 'pih', 'pms', 'pnb', 'pnt', 'ps', 'qu', 'rm', 'rmy',
+            'rn', 'roa-rup', 'roa-tara', 'ru', 'rue', 'rw', 'sa', 'sah', 'sc',
+            'scn', 'sco', 'sd', 'se', 'sg', 'sh', 'si', 'simple', 'sk', 'sm',
+            'sn', 'so', 'srn', 'ss', 'st', 'stq', 'su', 'sv', 'sw', 'szl', 'ta',
+            'te', 'tet', 'tg', 'th', 'ti', 'tk', 'tl', 'tn', 'to', 'tpi', 'tr',
+            'ts', 'tt', 'tum', 'tw', 'ty', 'udm', 'ug', 'uz', 've', 'vec',
+            'vep', 'vls', 'vo', 'wa', 'war', 'wo', 'xal', 'xh', 'yi', 'yo',
+            'za', 'zea', 'zh', 'zh-classical', 'zh-min-nan', 'zh-yue', 'zu',
         ]
 
         # On most Wikipedias page names must start with a capital letter,
         # but some languages don't use this.
         self.nocapitalize = ['jbo',]
 
-        self.alphabetic_latin = [
+        # Which languages have a special order for putting interlanguage links,
+        # and what order is it? If a language is not in interwiki_putfirst,
+        # alphabetical order on language code is used. For languages that are in
+        # interwiki_putfirst, interwiki_putfirst is checked first, and
+        # languages are put in the order given there. All other languages are
+        # put after those, in code-alphabetical order.
+
+        self.alphabetic_sr = [
             'ace', 'kbd', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an',
             'arc', 'roa-rup', 'frp', 'arz', 'as', 'ast', 'gn', 'av', 'ay', 'az',
             'bjn', 'id', 'ms', 'bg', 'bm', 'zh-min-nan', 'nan', 'map-bms', 'jv',
@@ -1225,29 +1238,22 @@ class Family(family.Family):
             'os', 'xh', 'zu', 'is', 'it', 'ja', 'ka', 'kl', 'kr', 'pam', 'krc',
             'csb', 'kk', 'kw', 'rw', 'ky', 'mrj', 'rn', 'sw', 'km', 'kn', 'ko',
             'kv', 'kg', 'ht', 'ks', 'ku', 'kj', 'lad', 'lbe', 'la', 'ltg', 'lv',
-            'to', 'lb', 'lt', 'lij', 'li', 'ln', 'lo', 'jbo', 'lg', 'lmo', 'hu',
-            'mk', 'mg', 'mt', 'mi', 'cdo', 'mwl', 'ml', 'mdf', 'mo', 'mn', 'mr',
-            'mus', 'my', 'mzn', 'nah', 'fj', 'ne', 'nl', 'nds-nl', 'cr', 'new',
-            'nap', 'ce', 'frr', 'pih', 'no', 'nb', 'nn', 'nrm', 'nov', 'oc',
-            'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pfl', 'pag', 'pap',
-            'koi', 'pi', 'pcd', 'pms', 'nds', 'pnb', 'pl', 'pt', 'pnt', 'ps',
-            'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'ru',
-            'rue', 'sa', 'sah', 'se', 'sg', 'sc', 'sco', 'sd', 'stq', 'st',
-            'nso', 'tn', 'sq', 'si', 'scn', 'simple', 'ss', 'sk', 'sl', 'cu',
-            'szl', 'so', 'ckb', 'srn', 'sr', 'sh', 'fi', 'sv', 'ta', 'tl',
-            'kab', 'roa-tara', 'tt', 'te', 'tet', 'th', 'ti', 'vi', 'tg',
-            'tokipona', 'tp', 'tpi', 'chy', 've', 'tr', 'tk', 'tw', 'udm', 'uk',
-            'ur', 'ug', 'za', 'vec', 'vep', 'vo', 'fiu-vro', 'wa', 'vls', 'war',
-            'wo', 'wuu', 'ts', 'xmf', 'yi', 'yo', 'diq', 'zea', 'zh', 'zh-tw',
-            'zh-cn', 'zh-classical', 'zh-yue', 'bat-smg',
+            'to', 'lb', 'lez', 'lt', 'lij', 'li', 'ln', 'lo', 'jbo', 'lg',
+            'lmo', 'hu', 'mk', 'mg', 'mt', 'mi', 'cdo', 'mwl', 'ml', 'mdf',
+            'mo', 'mn', 'mr', 'mus', 'my', 'mzn', 'nah', 'fj', 'ne', 'nl',
+            'nds-nl', 'cr', 'new', 'nap', 'ce', 'frr', 'pih', 'no', 'nb', 'nn',
+            'nrm', 'nov', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa',
+            'pfl', 'pag', 'pap', 'koi', 'pi', 'pcd', 'pms', 'nds', 'pnb', 'pl',
+            'pt', 'pnt', 'ps', 'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro', 'rmy',
+            'rm', 'qu', 'ru', 'rue', 'sa', 'sah', 'se', 'sg', 'sc', 'sco', 'sd',
+            'stq', 'st', 'nso', 'tn', 'sq', 'si', 'scn', 'simple', 'ss', 'sk',
+            'sl', 'cu', 'szl', 'so', 'ckb', 'srn', 'sr', 'sh', 'fi', 'sv', 'ta',
+            'shi', 'tl', 'kab', 'roa-tara', 'tt', 'te', 'tet', 'th', 'ti', 'vi',
+            'tg', 'tokipona', 'tp', 'tpi', 'chy', 've', 'tr', 'tk', 'tw', 'udm',
+            'uk', 'ur', 'ug', 'za', 'vec', 'vep', 'vo', 'fiu-vro', 'wa', 'vls',
+            'war', 'wo', 'wuu', 'ts', 'xmf', 'yi', 'yo', 'diq', 'zea', 'zh',
+            'zh-tw', 'zh-cn', 'zh-classical', 'zh-yue', 'bat-smg',
         ]
-
-        # Which languages have a special order for putting interlanguage links,
-        # and what order is it? If a language is not in interwiki_putfirst,
-        # alphabetical order on language code is used. For languages that are in
-        # interwiki_putfirst, interwiki_putfirst is checked first, and
-        # languages are put in the order given there. All other languages are
-        # put after those, in code-alphabetical order.
 
         self.interwiki_putfirst = {
             'be-x-old': self.alphabetic,
@@ -1261,14 +1267,15 @@ class Family(family.Family):
             'lb': self.alphabetic,
             'mk': self.alphabetic,
             'ms': self.alphabetic_revised,
-            'nds': ['nds-nl', 'pdt'], # Note: as of 2008-02-24, pdt:
-            'nds-nl': ['nds', 'pdt'], # (Plautdietsch) is still in the Incubator.
-            'nn': ['no', 'nb', 'sv', 'da'] + self.alphabetic,
+            'nds': ['nds-nl'],
+            'nds-nl': ['nds'],
+            'nn': ['no', 'sv', 'da'] + self.alphabetic,
             'no': self.alphabetic,
+            'nv': ['en', 'es'] + self.alphabetic,
             'pdc': ['de', 'en'],
             'pl': self.alphabetic,
             'simple': self.alphabetic,
-            'sr': self.alphabetic_latin,
+            'sr': self.alphabetic_sr,
             'sv': self.alphabetic,
             'te': ['en', 'hi', 'kn', 'ta', 'ml'],
             'ur': ['ar', 'fa', 'en'] + self.alphabetic,
@@ -1493,14 +1500,6 @@ class Family(family.Family):
         return ('commons', 'commons')
 
     if family.config.SSL_connection:
-        def hostname(self, code):
-            return 'secure.wikimedia.org'
 
         def protocol(self, code):
             return 'https'
-
-        def scriptpath(self, code):
-            return '/%s/%s/w' % (self.name, code)
-
-        def nicepath(self, code):
-            return '/%s/%s/wiki/' % (self.name, code)

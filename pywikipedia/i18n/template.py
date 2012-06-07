@@ -1,15 +1,22 @@
 # -*- coding: utf-8 -*-
 msg = {
+	# Author: Csisc
+	'aeb': {
+		'template-changing': u'روبوت: تغيير {{PLURAL:%(num)d|القالب|القوالب}}: %(list)s',
+		'template-removing': u'روبوت: إزالة {{PLURAL:%(num)d|القالب|القوالب}}: %(list)s',
+		'template-substituting': u'روبوت: نسخ {{PLURAL:%(num)d|القالب|القوالب}}: %(list)s',
+	},
 	'ar': {
 		'template-changing': u'روبوت: تغيير {{PLURAL:%(num)d|القالب|القوالب}}: %(list)s',
 		'template-removing': u'روبوت: إزالة {{PLURAL:%(num)d|القالب|القوالب}}: %(list)s',
 		'template-substituting': u'روبوت: نسخ {{PLURAL:%(num)d|القالب|القوالب}}: %(list)s',
 	},
 	# Author: Xuacu
+	# Author: Esbardu
 	'ast': {
-		'template-changing': u'Robot: Camudando {{PLURAL:%(num)d|plantía|plantíes}}: %(list)s',
-		'template-removing': u'Robot: Desaniciando {{PLURAL:%(num)d|plantía|plantíes}}: %(list)s',
-		'template-substituting': u'Robot: Trocando {{PLURAL:%(num)d|plantía|plantíes}}: %(list)s',
+		'template-changing': u'Robó: Camudando {{PLURAL:%(num)d|plantía|plantíes}}: %(list)s',
+		'template-removing': u'Robó: Desaniciando {{PLURAL:%(num)d|plantía|plantíes}}: %(list)s',
+		'template-substituting': u'Robó: Trocando {{PLURAL:%(num)d|plantía|plantíes}}: %(list)s',
 	},
 	# Author: Vago
 	'az': {
@@ -17,7 +24,7 @@ msg = {
 		'template-removing': u'Bot: {{PLURAL:%(num)d|şablonu}} dəyişdirilir: %(list)s',
 	},
 	# Author: EugeneZelenko
-	'be-tarask': {
+	'be-x-old': {
 		'template-changing': u'Робат: зьмяніў{{PLURAL:%(num)d|шаблён|шаблёны|шаблёнаў}}: %(list)s',
 		'template-removing': u'Робат: выдаліў {{PLURAL:%(num)d|шаблён|шаблёны|шаблёнаў}}: %(list)s',
 		'template-substituting': u'Робат: падставіў {{PLURAL:%(num)d|шаблён|шаблёны|шаблёнаў}}: %(list)s',
@@ -28,11 +35,23 @@ msg = {
 		'template-removing': u'Robot : O tiverkañ ar {{PLURAL:%(num)d|patrom|patromoù}}: %(list)s',
 		'template-substituting': u'Robot : Oc\'h erlec\'hiañ ar {{PLURAL:%(num)d|patrom|patromoù}}: %(list)s',
 	},
+	# Author: Edinwiki
+	'bs': {
+		'template-changing': u'Bot: Izmjena {{PLURAL:%(num)d|šablona|šablona}}: %(list)s.',
+		'template-removing': u'Bot: Brisanje {{PLURAL:%(num)d|šablona|šablona}}: %(list)s.',
+		'template-substituting': u'Bot: Zamjena {{PLURAL:%(num)d|šablona|šablona}}: %(list)s.',
+	},
 	# Author: SMP
 	'ca': {
 		'template-changing': u'Robot: Canviant {{PLURAL:%(num)d|plantilla|plantilles}}: %(list)s',
 		'template-removing': u'Robot: Retirant {{PLURAL:%(num)d|plantilla|plantilles}}: %(list)s',
 		'template-substituting': u'Robot: Substituint {{PLURAL:%(num)d|plantilla|plantilles}}: %(list)s',
+	},
+	# Author: Asoxor
+	'ckb': {
+		'template-changing': u'ڕۆبۆت: گۆڕینی {{PLURAL:%(num)d|داڕێژە|داڕێژەکان}}: %(list)s',
+		'template-removing': u'ڕۆبۆت: لابردنی {{PLURAL:%(num)d|داڕێژە|داڕێژەکان}}: %(list)s',
+		'template-substituting': u'ڕۆبۆت: لەجێدانانی {{PLURAL:%(num)d|داڕێژە|داڕێژەکان}}: %(list)s',
 	},
 	# Author: Spiffyk
 	'cs': {
@@ -50,6 +69,12 @@ msg = {
 		'template-removing': u'Bot: Entferne {{PLURAL:%(num)d|Vorlage|Vorlagen}}: %(list)s',
 		'template-substituting': u'Bot: Umgehe {{PLURAL:%(num)d|Vorlage|Vorlagen}}: %(list)s',
 	},
+	# Author: Erdemaslancan
+	'diq': {
+		'template-changing': u'Robot: {{PLURAL:%(num)d|şablon|şablona}}: %(list)s ra Vurneno',
+		'template-removing': u'Bot: Veceno: {{PLURAL:%(num)d|template|templates}}: %(list)s',
+		'template-substituting': u'Robot: {{PLURAL:%(num)d|şablon|şablon}}: %(list)s Cay cı vurneno',
+	},
 	# Author: Geraki
 	'el': {
 		'template-changing': u'Ρομπότ: Αλλαγή {{PLURAL:%(num)d| προτύπου|προτύπων}}: %(list)s',
@@ -61,15 +86,17 @@ msg = {
 		'template-removing': u'Robot: Removing {{PLURAL:%(num)d|template|templates}}: %(list)s',
 		'template-substituting': u'Robot: Substituting {{PLURAL:%(num)d|template|templates}}: %(list)s',
 	},
+	# Author: Xqt
 	'es': {
 		'template-changing': u'Bot: Cambiada la {{PLURAL:%(num)d|la plantilla|las plantillas}}: %(list)s',
-		'template-removing': u'Robot: Retirando {{PLURAL:%(num)d|la plantilla|las plantillas}}: %(list)s',
-		'template-substituting': u'Robot: Sustituyendo la {{PLURAL:%(num)d|la plantilla|las plantillas}}: %(list)s',
+		'template-removing': u'Bot: Retirando {{PLURAL:%(num)d|la plantilla|las plantillas}}: %(list)s',
+		'template-substituting': u'Bot: Sustituyendo la {{PLURAL:%(num)d|la plantilla|las plantillas}}: %(list)s',
 	},
+	# Author: ZxxZxxZ
 	'fa': {
-		'template-changing': u'ربات:تغییر {{PLURAL:%(num)d|الگو|الگوها}}: %(list)s',
+		'template-changing': u'ربات: تغییر {{PLURAL:%(num)d|الگو|الگوها}}: %(list)s',
 		'template-removing': u'ربات:حذف {{PLURAL:%(num)d|الگو|الگوها}}: %(list)s',
-		'template-substituting': u'ربات: جایگزینی {{PLURAL:%(num)d|الگو|الگوها}}: %(list)s',
+		'template-substituting': u'ربات: جانشانی {{PLURAL:%(num)d|الگو|الگوها}}: %(list)s',
 	},
 	# Author: Crt
 	'fi': {
@@ -101,7 +128,7 @@ msg = {
 		'template-substituting': u'Bot: Substitúo {{PLURAL:%(num)d|o modelo|varios modelos}}: %(list)s',
 	},
 	# Author: Als-Chlämens
-	'gsw': {
+	'als': {
 		'template-changing': u'Bötli: Due d {{PLURAL:%(num)d|Vorlag|Vorlage}} ändere: %(list)s',
 		'template-removing': u'Bötli: Due d {{PLURAL:%(num)d|Vorlag|Vorlage}} ussenee: %(list)s',
 		'template-substituting': u'Bötli: Due d {{PLURAL:%(num)d|Vorlag|Vorlage}} usstuusche: %(list)s',
@@ -142,10 +169,11 @@ msg = {
 		'template-substituting': u'Robot: Sostituzione di {{PLURAL:%(num)d|template|template}}: %(list)s',
 	},
 	# Author: Fryed-peach
+	# Author: Shirayuki
 	'ja': {
-		'template-changing': u'ロボット: {{PLURAL:%(num)d|テンプレート}}の変更: %(list)s',
-		'template-removing': u'ロボット: {{PLURAL:%(num)d|テンプレート}}の除去: %(list)s',
-		'template-substituting': u'ロボット: {{PLURAL:%(num)d|テンプレート}}の展開: %(list)s',
+		'template-changing': u'ロボットによる: {{PLURAL:%(num)d|テンプレート}}の変更: %(list)s',
+		'template-removing': u'ロボットによる: {{PLURAL:%(num)d|テンプレート}}の除去: %(list)s',
+		'template-substituting': u'ロボットによる: {{PLURAL:%(num)d|テンプレート}}の展開: %(list)s',
 	},
 	'kk': {
 		'template-changing': u'Бот: Мына {{PLURAL:%(num)d|үлгі|үлгілер}} өзгертілді: %(list)s',
@@ -167,6 +195,12 @@ msg = {
 	'lt': {
 		'template-changing': u'robotas: {{PLURAL:%(num)d|Keičiamas šablonas|Keičiami šablonai}}: %(list)s',
 		'template-removing': u'robotas: {{PLURAL:%(num)d|Šalinamas šablonas|Šalinami šablonai}}: %(list)s',
+	},
+	# Author: StefanusRA
+	'map-bms': {
+		'template-changing': u'Bot: Ngowahi {{PLURAL:%(num)d|cithakan|cithakan}}: %(list)s',
+		'template-removing': u'Bot: Mbusek {{PLURAL:%(num)d|cithakan|cithakan}}: %(list)s',
+		'template-substituting': u'Bot: Ngganti {{PLURAL:%(num)d|cithakan|cithakan}}: %(list)s',
 	},
 	# Author: Bjankuloski06
 	# Author: Rancher
@@ -190,6 +224,12 @@ msg = {
 		'template-changing': u'Bot: {{PLURAL:%(num)d|Vörlaag|Vörlagen}} utwesselt: %(list)s',
 		'template-removing': u'Bot: {{PLURAL:%(num)d|Vörlaag|Vörlagen}} rut: %(list)s',
 		'template-substituting': u'Bot: {{PLURAL:%(num)d|Vörlaag|Vörlagen}} in Text övernahmen: %(list)s',
+	},
+	# Author: Servien
+	'nds-nl': {
+		'template-changing': u'Bot: {{PLURAL:%(num)d|mal|mallen}} vervangen: %(list)s',
+		'template-removing': u'Bot: {{PLURAL:%(num)d|mal|mallen}} vortdoon: %(list)s',
+		'template-substituting': u'Bot: {{PLURAL:%(num)d|mal|mallen}} substitueren: %(list)s',
 	},
 	# Author: Siebrand
 	'nl': {
@@ -217,15 +257,28 @@ msg = {
 		'template-substituting': u'Robô: A substituir {{PLURAL:%(num)d|predefinição|predefinições}}: %(list)s',
 	},
 	# Author: Pedroca cerebral
+	# Author: 555
 	'pt-br': {
-		'template-changing': u'Robô: Alterando {{PLURAL:%(num)d|predefinição|predefinições}}: %(list)s',
-		'template-removing': u'Robô: Removendo {{PLURAL:%(num)d|predefinição|predefinições}}: %(list)s',
-		'template-substituting': u'Robô: Substituindo {{PLURAL:%(num)d|predefinição|predefinições}}: %(list)s',
+		'template-changing': u'Bot: Alterando {{PLURAL:%(num)d|predefinição|predefinições}}: %(list)s',
+		'template-removing': u'Bot: Removendo {{PLURAL:%(num)d|predefinição|predefinições}}: %(list)s',
+		'template-substituting': u'Bot: Substituindo {{PLURAL:%(num)d|predefinição|predefinições}}: %(list)s',
+	},
+	# Author: Minisarm
+	'ro': {
+		'template-changing': u'Robot: Modificat {{PLURAL:%(num)d|formatul|formatele}}: %(list)s',
+		'template-removing': u'Robot: Înlăturat {{PLURAL:%(num)d|formatul|formatele}}: %(list)s',
+		'template-substituting': u'Robot: Substituit {{PLURAL:%(num)d|formatul|formatele}}: %(list)s',
 	},
 	'ru': {
 		'template-changing': u'Бот: замена {{PLURAL:%(num)d|шаблона|шаблонов}}: %(list)s',
 		'template-removing': u'Бот: удаление {{PLURAL:%(num)d|шаблона|шаблонов}}: %(list)s',
 		'template-substituting': u'Бот: подстановка {{PLURAL:%(num)d|шаблона|шаблонов}}: %(list)s',
+	},
+	# Author: Teslaton
+	'sk': {
+		'template-changing': u'Robot: Úprava {{PLURAL:%(num)d|šablóny|šablón}}: %(list)s',
+		'template-removing': u'Robot: Odstránenie {{PLURAL:%(num)d|šablóny|šablón}}: %(list)s',
+		'template-substituting': u'Robot: Náhrada {{PLURAL:%(num)d|šablóny|šablón}}: %(list)s',
 	},
 	# Author: Dbc334
 	'sl': {
@@ -234,7 +287,7 @@ msg = {
 		'template-substituting': u'Robot: Zamenjava {{PLURAL:%(num)d|predloge|predlog}}: %(list)s',
 	},
 	# Author: Rancher
-	'sr-ec': {
+	'sr': {
 		'template-changing': u'Робот: {{PLURAL:%(num)d|промењен шаблон|промењени шаблони}}: %(list)s',
 		'template-removing': u'Робот: {{PLURAL:%(num)d|уклоњен шаблон|уклоњени шаблони}}: %(list)s',
 		'template-substituting': u'Робот: {{PLURAL:%(num)d|замењен шаблон|замењени шаблони}}: %(list)s',
@@ -250,6 +303,11 @@ msg = {
 		'template-changing': u'Bot: Ändrade {{PLURAL:%(num)d|mall|mallar}}: %(list)s',
 		'template-removing': u'Bot: Tog bort {{PLURAL:%(num)d|mall|mallar}}: %(list)s',
 		'template-substituting': u'Bot: Ersatte {{PLURAL:%(num)d|mall|mallar}}: %(list)s',
+	},
+	# Author: Aswn
+	'ta': {
+		'template-changing': u'தானியங்கி:{{PLURAL:%(num)d|வார்ப்புரு|வார்ப்புருக்கள்}} மாற்றப்பட்டது: %(list)s',
+		'template-removing': u'தானியங்கி: {{PLURAL:%(num)d|வார்ப்புரு|வார்ப்புருக்கள்}} நீக்கப்பட்டது: %(list)s',
 	},
 	# Author: Гусейн
 	'tly': {
@@ -268,16 +326,34 @@ msg = {
 		'template-removing': u'Робот: видалення {{PLURAL:%(num)d|шаблону|шаблонів}}: %(list)s',
 		'template-substituting': u'Робот: підстановка {{PLURAL:%(num)d|шаблону|шаблонів}}: %(list)s',
 	},
+	# Author: Alunardon90
+	'vec': {
+		'template-changing': u'Robot: Modifega de {{PLURAL:%(num)d|modeło|modełi}}: %(list)s',
+		'template-removing': u'Robot: Rimosion de {{PLURAL:%(num)d|modeło|modełi}}: %(list)s',
+		'template-substituting': u'Robot: Sostitusion de {{PLURAL:%(num)d|modeło|modełi}}: %(list)s',
+	},
 	# Author: Minh Nguyen
 	'vi': {
 		'template-changing': u'Bot: Thay đổi {{PLURAL:%(num)d|bản mẫu|các bản mẫu}}: %(list)s',
 		'template-removing': u'Bot: Tháo gỡ {{PLURAL:%(num)d|bản mẫu|các bản mẫu}}: %(list)s',
 		'template-substituting': u'Bot: Đổ mã nguồn của {{PLURAL:%(num)d|bản mẫu|các bản mẫu}}: %(list)s',
 	},
-	# Author: Anakmalaysia
-	'zh-hans': {
-		'template-changing': u'机器人：修改{{PLURAL:%(num)d|模板|模板}}：%(list)s',
-		'template-removing': u'机器人：删除{{PLURAL:%(num)d|模板|模板}}：%(list)s',
-		'template-substituting': u'机器人：替换{{PLURAL:%(num)d|模板|模板}}：%(list)s',
+	# Author: Yfdyh000
+	'zh': {
+		'template-changing': u'机器人：修改%(num)d个模板：%(list)s',
+		'template-removing': u'机器人：删除%(num)d个模板：%(list)s',
+		'template-substituting': u'机器人：替换%(num)d个模板：%(list)s',
+	},
+	# Author: Justincheng12345
+	'zh-hant': {
+		'template-changing': u'機械人更改%(num)d個模板：%(list)s',
+		'template-removing': u'機械人刪除%(num)d個模板：%(list)s',
+		'template-substituting': u'機械人替換%(num)d個模板：%(list)s',
+	},
+	# Author: Justincheng12345
+	'zh-hk': {
+		'template-changing': u'機械人更改%(num)d個模板：%(list)s',
+		'template-removing': u'機械人刪除%(num)d個模板：%(list)s',
+		'template-substituting': u'機械人替換%(num)d個模板：%(list)s',
 	},
 }

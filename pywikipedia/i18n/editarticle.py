@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 msg = {
+	# Author: Csisc
+	'aeb': {
+		'editarticle-edit': u'تعديل يدوي: %(description)s',
+	},
 	'ar': {
 		'editarticle-edit': u'تعديل يدوي: %(description)s',
 	},
 	# Author: Xuacu
+	# Author: Esbardu
 	'ast': {
-		'editarticle-edit': u'Edición manual con bot: %(description)s',
+		'editarticle-edit': u'Edición manual con robó: %(description)s',
 	},
 	# Author: Ebrahimi-amir
 	'az': {
@@ -16,16 +21,28 @@ msg = {
 		'editarticle-edit': u'Manuelle Beorweitung: %(description)s',
 	},
 	# Author: EugeneZelenko
-	'be-tarask': {
+	'be-x-old': {
 		'editarticle-edit': u'Ручное рэдагаваньне з робатам: %(description)s',
+	},
+	# Author: Riemogerz
+	'bjn': {
+		'editarticle-edit': u'Babakan manual lawan bot: %(description)s',
 	},
 	# Author: Fulup
 	'br': {
 		'editarticle-edit': u'Kemmm dornel a-drugarez d\'ur bot : %(description)s',
 	},
+	# Author: Edinwiki
+	'bs': {
+		'editarticle-edit': u'Ručna izmjena sa botom: %(description)s.',
+	},
 	# Author: SMP
 	'ca': {
 		'editarticle-edit': u'Edició manual amb robot: %(description)s',
+	},
+	# Author: Asoxor
+	'ckb': {
+		'editarticle-edit': u'چاکسازیی دەستی بە ڕۆبۆت: %(description)s',
 	},
 	# Author: Spiffyk
 	'cs': {
@@ -37,6 +54,10 @@ msg = {
 	},
 	'de': {
 		'editarticle-edit': u'Manuelle Bearbeitung: %(description)s',
+	},
+	# Author: Erdemaslancan
+	'diq': {
+		'editarticle-edit': u'Boti: %(description)s xo desti timar ke',
 	},
 	# Author: Geraki
 	'el': {
@@ -53,8 +74,9 @@ msg = {
 	'es': {
 		'editarticle-edit': u'Edición manual con bot: %(description)s',
 	},
+	# Author: ZxxZxxZ
 	'fa': {
-		'editarticle-edit': u'ویرایش دستی: %(description)s',
+		'editarticle-edit': u'ویرایش دستی با ربات: %(description)s',
 	},
 	# Author: Crt
 	'fi': {
@@ -81,7 +103,7 @@ msg = {
 		'editarticle-edit': u'Edición manual con bot: %(description)s',
 	},
 	# Author: Als-Chlämens
-	'gsw': {
+	'als': {
 		'editarticle-edit': u'Manuelli Bearbeitig: %(description)s',
 	},
 	'he': {
@@ -124,6 +146,14 @@ msg = {
 	# Author: Robby
 	'lb': {
 		'editarticle-edit': u'Manuell Ännerungen mam Bot: %(description)s',
+	},
+	# Author: Ooswesthoesbes
+	'li': {
+		'editarticle-edit': u'Handjmaotige botbewirking: %(description)s',
+	},
+	# Author: StefanusRA
+	'map-bms': {
+		'editarticle-edit': u'Suntingan manual nganggo bot: %(description)s',
 	},
 	# Author: Jagwar
 	'mg': {
@@ -168,15 +198,17 @@ msg = {
 		'editarticle-edit': u'A editar manualmente com bot: %(description)s',
 	},
 	# Author: Giro720
+	# Author: 555
 	'pt-br': {
-		'editarticle-edit': u'Editando manualmente com um bot: %(description)s',
+		'editarticle-edit': u'Edição manual via Bot: %(description)s',
 	},
 	'qqq': {
 		'editarticle-edit': u'Edit summary when the bot owner edits a text while the bot invoked an editor. <code>%(descriptions)s</code> gives further informations.',
 	},
 	# Author: KlaudiuMihaila
+	# Author: Minisarm
 	'ro': {
-		'editarticle-edit': u'Modificare manuală cu bot: %(description)s',
+		'editarticle-edit': u'Modificare manuală cu robot: %(description)s',
 	},
 	# Author: Александр Сигачёв
 	'ru': {
@@ -195,7 +227,7 @@ msg = {
 		'editarticle-edit': u'Ročno urejanje z botom: %(description)s',
 	},
 	# Author: Rancher
-	'sr-ec': {
+	'sr': {
 		'editarticle-edit': u'Ручно уређивање с роботом: %(description)s',
 	},
 	# Author: Rancher
@@ -214,7 +246,7 @@ msg = {
 		'editarticle-edit': u'Bot hesabından elle düzenleme: %(description)s',
 	},
 	# Author: Ильнар
-	'tt-cyrl': {
+	'tt': {
 		'editarticle-edit': u'Бот белән идарә итү өчен кулланма: %(description)s',
 	},
 	# Author: Dim Grits
@@ -222,18 +254,24 @@ msg = {
 		'editarticle-edit': u'Ручне редагування за допомогою бота: %(description)s',
 	},
 	# Author: Candalua
+	# Author: Alunardon90
 	'vec': {
-		'editarticle-edit': u'Modifica a man tramite bot: %(description)s',
+		'editarticle-edit': u'Modifega a man tramite robot: %(description)s',
 	},
 	# Author: Minh Nguyen
 	'vi': {
 		'editarticle-edit': u'Sửa đổi thủ công dùng bot: %(description)s',
 	},
-	'zh': {
-		'editarticle-edit': u'手動編輯: %(description)s',
-	},
 	# Author: Hydra
-	'zh-hans': {
+	'zh': {
 		'editarticle-edit': u'利用机器方式手动编辑：%(description)s',
+	},
+	# Author: Justincheng12345
+	'zh-hant': {
+		'editarticle-edit': u'手動控制機械人進行更改：%(description)s',
+	},
+	# Author: Justincheng12345
+	'zh-hk': {
+		'editarticle-edit': u'手動控制機械人進行更改：%(description)s',
 	},
 }

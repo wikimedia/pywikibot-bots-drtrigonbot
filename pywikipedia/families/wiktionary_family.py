@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wiktionary_family.py 9890 2012-02-13 10:19:39Z xqt $'
+__version__ = '$Id: wiktionary_family.py 10265 2012-06-01 22:40:42Z xqt $'
 
 # The Wikimedia family that is known as Wiktionary
 
@@ -11,26 +11,23 @@ class Family(family.Family):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'en', 'fr', 'mg', 'zh', 'lt', 'ko', 'ru', 'tr', 'pl', 'ta', 'vi',
-            'de', 'io', 'el', 'kn', 'fi', 'pt', 'hu', 'nl', 'sv', 'no', 'it',
-            'my', 'id', 'hi', 'et', 'li', 'ja', 'ml', 'fa', 'es', 'lo', 'ku',
-            'ar', 'ro', 'te', 'gl', 'cs', 'ca', 'uk', 'bg', 'eu', 'eo', 'vo',
-            'oc', 'is', 'hr', 'br', 'simple', 'scn', 'th', 'sr', 'af', 'fy',
-            'sw', 'tl', 'ur', 'cy', 'he', 'fj', 'ast', 'la', 'sq', 'hy', 'da',
-            'sl', 'wa', 'tt', 'zh-min-nan', 'az', 'ka', 'lv', 'ne', 'tk', 'ps',
-            'hsb', 'lb', 'kk', 'nn', 'ky', 'wo', 'bs', 'km', 'be', 'ang', 'ga',
-            'co', 'mr', 'gn', 'ia', 'sk', 'csb', 'ms', 'nah', 'st', 'nds', 'sd',
-            'kl', 'sh', 'si', 'tg', 'ug', 'ti', 'mk', 'bn', 'zu', 'pnb', 'an',
-            'gu', 'ss', 'chr', 'qu', 'am', 'ts', 'fo', 'rw', 'kw', 'om', 'gv',
-            'iu', 'su', 'roa-rup', 'sa', 'mn', 'so', 'yi', 'ie', 'gd', 'za',
-            'pa', 'mt', 'mi', 'tpi', 'dv', 'ik', 'sg', 'na', 'uz', 'ln', 'jv',
-            'sm', 'tn', 'ha', 'ay', 'ks', 'jbo', 'dz',
+            'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'ko', 'tr', 'el', 'pl', 'ta',
+            'vi', 'de', 'kn', 'sv', 'io', 'fi', 'nl', 'hu', 'pt', 'no', 'my',
+            'id', 'it', 'li', 'ml', 'et', 'ja', 'es', 'fa', 'ku', 'ar', 'ro',
+            'lo', 'gl', 'ca', 'cs', 'uk', 'eu', 'bg', 'eo', 'te', 'vo', 'br',
+            'oc', 'is', 'hr', 'th', 'simple', 'scn', 'sr', 'af', 'cy', 'fy',
+            'sw', 'tl', 'ast', 'fj', 'ur', 'he', 'la', 'sq', 'da', 'hy', 'wa',
+            'sl', 'zh-min-nan', 'tt', 'hi', 'az', 'lv', 'ka', 'lb', 'pnb', 'nn',
+            'tk', 'hsb', 'kk', 'bs', 'nah', 'km', 'be', 'wo', 'ga', 'mk', 'ang',
+            'co', 'ms', 'gn', 'mr', 'csb', 'sk', 'st', 'nds', 'ia', 'si', 'sh',
+            'sd', 'tg', 'ug', 'ky', 'kl', 'an', 'zu', 'gu', 'mn', 'fo', 'kw',
+            'rw', 'ss', 'ie', 'qu', 'gv', 'om', 'roa-rup', 'iu', 'bn', 'ps',
+            'so', 'sa', 'su', 'chr', 'za', 'am', 'gd', 'mt', 'tpi', 'mi', 'ik',
+            'yi', 'ln', 'uz', 'ti', 'sg', 'na', 'jv', 'pa', 'sm', 'or', 'tn',
+            'jbo', 'dv', 'ne', 'ha', 'ks', 'ay', 'ts', 'dz',
         ]
 
-        if family.config.SSL_connection:
-            self.langs = dict([(lang, None) for lang in self.languages_by_size])
-        else:
-            self.langs = dict([(lang, '%s.wiktionary.org' % lang) for lang in self.languages_by_size])
+        self.langs = dict([(lang, '%s.wiktionary.org' % lang) for lang in self.languages_by_size])
 
         # Override defaults
         self.namespaces[3]['eo'] = [u'Uzanta diskuto', u'Vikipediista diskuto', u'Uzula diskuto']
@@ -39,6 +36,7 @@ class Family(family.Family):
         self.namespaces[14]['zh'] = [u'Category', u'分类', u'分類']
         self.namespaces[3]['pt'] = [u'Utilizador Discussão', u'Usuário Discussão', u'Utilizadora Discussão']
         self.namespaces[2]['pt'] = [u'Utilizador', u'Usuário', u'Utilizadora']
+        self.namespaces[-2]['sr'] = [u'Медиј', u'Medija', u'Медија']
         self.namespaces[15]['bn'] = [u'বিষয়শ্রেণী আলোচনা']
         self.namespaces[14]['bn'] = [u'বিষয়শ্রেণী']
         self.namespaces[13]['de'] = [u'Hilfe Diskussion']
@@ -47,6 +45,32 @@ class Family(family.Family):
         self.namespaces[2]['fr'] = [u'Utilisateur']
         self.namespaces[13]['da'] = [u'Hjælp diskussion', u'Hjælp-diskussion']
         self.namespaces[9]['da'] = [u'MediaWiki diskussion', u'MediaWiki-diskussion']
+        self.namespaces[10]['ky'] = [u'Калып']
+        self.namespaces[12]['ky'] = [u'Жардам']
+        self.namespaces[14]['ky'] = [u'Категория']
+        self.namespaces[6]['ky'] = [u'Файл']
+        self.namespaces[1]['ky'] = [u'Баарлашуу']
+        self.namespaces[3]['ky'] = [u'Колдонуучунун баарлашуулары']
+        self.namespaces[2]['ky'] = [u'Колдонуучу']
+        self.namespaces[-1]['ky'] = [u'Атайын']
+        self.namespaces[-2]['ky'] = [u'Медиа']
+        self.namespaces[11]['gd'] = [u'Deasbaireachd na teamplaid']
+        self.namespaces[10]['gd'] = [u'Teamplaid']
+        self.namespaces[13]['gd'] = [u'Deasbaireachd na cobharach']
+        self.namespaces[12]['gd'] = [u'Cobhair']
+        self.namespaces[15]['gd'] = [u'Deasbaireachd na roinn-seòrsa']
+        self.namespaces[14]['gd'] = [u'Roinn-seòrsa']
+        self.namespaces[6]['gd'] = [u'Faidhle']
+        self.namespaces[1]['gd'] = [u'Deasbaireachd']
+        self.namespaces[3]['gd'] = [u'Deasbaireachd a\' chleachdaiche']
+        self.namespaces[2]['gd'] = [u'Cleachdaiche']
+        self.namespaces[-1]['gd'] = [u'Sònraichte']
+        self.namespaces[7]['gd'] = [u'Deasbaireachd an fhaidhle']
+        self.namespaces[-2]['gd'] = [u'Meadhan']
+        self.namespaces[9]['gd'] = [u'Deasbaireachd MediaWiki']
+        self.namespaces[3]['cs'] = [u'Diskuse s uživatelem', u'Uživatel diskuse', u'Uživatelka diskuse', u'Diskuse s uživatelkou']
+        self.namespaces[2]['cs'] = [u'Uživatel', u'Uživatelka']
+        self.namespaces[12]['nl'] = [u'Help']
         self.namespaces[11]['hi'] = [u'साँचा वार्ता']
         self.namespaces[10]['hi'] = [u'साँचा']
         self.namespaces[15]['hi'] = [u'श्रेणी वार्ता']
@@ -55,10 +79,6 @@ class Family(family.Family):
         self.namespaces[2]['hi'] = [u'सदस्य']
         self.namespaces[9]['hi'] = [u'मीडियाविकि वार्ता']
         self.namespaces[8]['hi'] = [u'मीडियाविकि']
-        self.namespaces[3]['cs'] = [u'Diskuse s uživatelem', u'Diskuse s uživatelkou', u'Uživatel diskuse', u'Uživatelka diskuse']
-        self.namespaces[2]['cs'] = [u'Uživatel', u'Uživatelka']
-        self.namespaces[12]['nl'] = [u'Help']
-        self.namespaces[3]['ro'] = [u'Discuție Utilizator', u'Discuţie Utilizator']
         self.namespaces[9]['ro'] = [u'Discuție MediaWiki', u'Discuţie MediaWiki']
         self.namespaces[3]['ca'] = [u'Usuari Discussió']
         self.namespaces[2]['ca'] = [u'Usuari']
@@ -163,6 +183,7 @@ class Family(family.Family):
             'no': u'Wiktionary',
             'oc': [u'Wikiccionari', u'Wiktionary'],
             'om': u'Wiktionary',
+            'or': u'Wiktionary',
             'pa': u'Wiktionary',
             'pl': [u'Wikisłownik', u'WS'],
             'pnb': [u'وکشنری', u'Wiktionary'],
@@ -192,7 +213,7 @@ class Family(family.Family):
             'sv': [u'Wiktionary', u'WT'],
             'sw': u'Wiktionary',
             'ta': [u'விக்சனரி', u'Wiktionary', u'விக்கிபீடியா'],
-            'te': u'Wiktionary',
+            'te': [u'విక్షనరీ', u'Wiktionary'],
             'tg': u'Wiktionary',
             'th': u'Wiktionary',
             'ti': u'Wiktionary',
@@ -232,7 +253,7 @@ class Family(family.Family):
             'ay': u'Wiktionary discusión',
             'az': u'Wiktionary müzakirəsi',
             'ba': u'Wiktionary б-са фекер алышыу',
-            'be': u'Wiktionary размовы',
+            'be': [u'Размовы пра Wiktionary', u'Wiktionary размовы'],
             'bg': u'Уикиречник беседа',
             'bm': u'Discussion Wiktionary',
             'bn': [u'উইকিঅভিধান আলোচনা', u'উইকিঅভিধান আলাপ'],
@@ -261,7 +282,7 @@ class Family(family.Family):
             'fr': u'Discussion Wiktionnaire',
             'fy': u'Wiktionary oerlis',
             'ga': u'Plé Vicífhoclóra',
-            'gd': u'Wiktionary talk',
+            'gd': u'An deasbaireachd aig Wiktionary',
             'gl': u'Conversa Wiktionary',
             'gn': u'Wiktionary myangekõi',
             'gu': u'વિક્ષનરી ચર્ચા',
@@ -293,7 +314,7 @@ class Family(family.Family):
             'ks': u'Wiktionary talk',
             'ku': u'Wîkîferheng nîqaş',
             'kw': [u'Kescows Wiktionary', u'Cows Wiktionary', u'Keskows Wiktionary'],
-            'ky': u'Wiktionary talk',
+            'ky': u'Wiktionary баарлашуу',
             'la': u'Disputatio Victionarii',
             'lb': [u'Wiktionnaire Diskussioun', u'Wiktionary Diskussioun'],
             'li': u'Euverlèk Wiktionary',
@@ -320,6 +341,7 @@ class Family(family.Family):
             'no': u'Wiktionary-diskusjon',
             'oc': u'Discussion Wikiccionari',
             'om': u'Wiktionary talk',
+            'or': [u'Wiktionary ଆଲୋଚନା', u'ଉଇକିପିଡ଼ିଆ ଆଲୋଚନା'],
             'pa': u'Wiktionary ਚਰਚਾ',
             'pl': u'Wikidyskusja',
             'pnb': u'گل ات',
@@ -350,7 +372,7 @@ class Family(family.Family):
             'sv': [u'Wiktionarydiskussion', u'WT-diskussion'],
             'sw': [u'Majadiliano ya Wiktionary', u'Wiktionary majadiliano'],
             'ta': [u'விக்சனரி பேச்சு', u'விக்கிபீடியா பேச்சு'],
-            'te': u'Wiktionary చర్చ',
+            'te': [u'విక్షనరీ చర్చ', u'Wiktionary చర్చ'],
             'tg': u'Баҳси Wiktionary',
             'th': u'คุยเรื่องWiktionary',
             'ti': u'Wiktionary talk',
@@ -591,23 +613,36 @@ class Family(family.Family):
 
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
-            'wikipedia', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews', 'wikiversity',
-            'meta', 'mediawiki', 'test', 'incubator', 'commons', 'species'
+            'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews',
+            'wikiversity', 'meta', 'mediawiki', 'test', 'incubator', 'commons',
+            'species',
         ]
+
         # Global bot allowed languages on
         # http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
-            'ang', 'ast', 'az', 'bg', 'bn', 'da', 'eo', 'es', 'fa', 'fy', 'ga',
-            'gd', 'hu', 'ia', 'ie', 'ik', 'jv', 'ka', 'li', 'lt', 'mk', 'nl',
-            'no', 'oc', 'pt', 'sk', 'tg', 'th', 'ti', 'ts', 'ug', 'uk', 'vo',
-            'za', 'zh-min-nan', 'zh', 'zu',
+            'am', 'an', 'ang', 'ast', 'ay', 'az', 'be', 'bg', 'bn', 'br', 'bs',
+            'ca', 'chr', 'co', 'cy', 'da', 'dv', 'eo', 'es', 'et', 'eu', 'fa',
+            'fi', 'fj', 'fo', 'fy', 'ga', 'gd', 'gl', 'gv', 'hu', 'ia', 'id',
+            'ie', 'ik', 'io', 'jv', 'ka', 'kn', 'ky', 'lb', 'lo', 'lt', 'lv',
+            'mg', 'mk', 'ml', 'my', 'ne', 'nl', 'no', 'oc', 'pt', 'sh',
+            'simple', 'sk', 'sl', 'sm', 'su', 'tg', 'th', 'ti', 'tk', 'tn',
+            'tpi', 'ts', 'ug', 'uk', 'vo', 'wa', 'wo', 'za', 'zh', 'zh-min-nan',
+            'zu',
         ]
 
         # Other than most Wikipedias, page names must not start with a capital
         # letter on ALL Wiktionaries.
         self.nocapitalize = self.langs.keys()
 
-        self.alphabetic_roman = [
+        # Which languages have a special order for putting interlanguage links,
+        # and what order is it? If a language is not in interwiki_putfirst,
+        # alphabetical order on language code is used. For languages that are in
+        # interwiki_putfirst, interwiki_putfirst is checked first, and
+        # languages are put in the order given there. All other languages are
+        # put after those, in code-alphabetical order.
+
+        self.alphabetic_sv = [
             'aa', 'af', 'ak', 'als', 'an', 'roa-rup', 'ast', 'gn', 'ay', 'az',
             'id', 'ms', 'bm', 'zh-min-nan', 'jv', 'su', 'mt', 'bi', 'bo', 'bs',
             'br', 'ca', 'cs', 'ch', 'sn', 'co', 'za', 'cy', 'da', 'de', 'na',
@@ -626,14 +661,6 @@ class Family(family.Family):
             'dz', 'ka', 'ti', 'am', 'chr', 'iu', 'km', 'zh', 'ja', 'ko',
            ]
 
-
-        # Which languages have a special order for putting interlanguage links,
-        # and what order is it? If a language is not in interwiki_putfirst,
-        # alphabetical order on language code is used. For languages that are in
-        # interwiki_putfirst, interwiki_putfirst is checked first, and
-        # languages are put in the order given there. All other languages are put
-        # after those, in code-alphabetical order.
-
         self.interwiki_putfirst = {
             'da': self.alphabetic,
             'en': self.alphabetic,
@@ -644,7 +671,7 @@ class Family(family.Family):
             'hu': ['en'],
             'ms': self.alphabetic_revised,
             'pl': self.alphabetic_revised,
-            'sv': self.alphabetic_roman,
+            'sv': self.alphabetic_sv,
             'simple': self.alphabetic,
         }
 
@@ -668,7 +695,6 @@ class Family(family.Family):
             'mo': 'ro', # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wiktionary
             'minnan':'zh-min-nan',
             'nb': 'no',
-            'or': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Oriya_Wiktionary
             'pi': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Pali_Bhasa_Wiktionary
             'rm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Rhaetian_Wiktionary
             'rn': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kirundi_Wiktionary
@@ -692,14 +718,6 @@ class Family(family.Family):
         return ('commons', 'commons')
 
     if family.config.SSL_connection:
-        def hostname(self, code):
-            return 'secure.wikimedia.org'
 
         def protocol(self, code):
             return 'https'
-
-        def scriptpath(self, code):
-            return '/%s/%s/w' % (self.name, code)
-
-        def nicepath(self, code):
-            return '/%s/%s/wiki/' % (self.name, code)

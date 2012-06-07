@@ -7,7 +7,7 @@ Library to work with users, their pages and talk pages.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: userlib.py 9791 2011-12-08 18:36:00Z xqt $'
+__version__ = '$Id: userlib.py 10306 2012-06-07 09:22:57Z xqt $'
 
 import re
 import wikipedia as pywikibot
@@ -35,8 +35,14 @@ class InvalidUser(pywikibot.InvalidTitle):
     """The mediawiki API does not allow IP lookups."""
     pass
 
-ip_regexp = re.compile(r'^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}' \
-                       r'(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
+ip_regexp = re.compile(r'^(?:(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}'
+                       r'(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|'
+                       r'(((?=(?=(.*?(::)))\3(?!.+\4)))\4?|[\dA-F]{1,4}:)'
+                       r'([\dA-F]{1,4}(\4|:\b)|\2){5}'
+                       r'(([\dA-F]{1,4}(\4|:\b|$)|\2){2}|'
+                       r'(((2[0-4]|1\d|[1-9])?\d|25[0-5])\.?\b){4}))\Z',
+                       re.IGNORECASE)
+
 
 class User(object):
     """A class that represents a Wiki user.
@@ -62,8 +68,11 @@ class User(object):
             self._site = pywikibot.getSite(site)
         else:
             self._site = site
+        if self._site.lang in self._site.family.nocapitalize:
+            self._name = name
+        else:
+            self._name = name[0].upper() + name[1:]
         # None means not loaded
-        self._name = name
         self._blocked = None
         self._groups = None
         self._registrationTime = -1
@@ -176,7 +185,7 @@ class User(object):
         return pywikibot.Page(self.site(), self.name() + subpage,
                               defaultNamespace=3)
 
-    def sendMail(self, subject=u'', text=u'', ccMe = False):
+    def sendMail(self, subject=u'', text=u'', ccMe=False):
         """ Send an email to this user via mediawiki's email interface.
         Return True on success, False otherwise.
         This method can raise an UserActionRefuse exception in case this user
@@ -189,10 +198,12 @@ class User(object):
         @type text: unicode
         @param ccme: if True, sends a copy of this email to the bot
         @type ccme: bool
+
         """
         if not self.isEmailable():
             raise UserActionRefuse('This user is not mailable')
-        if not self.site().isAllowed('sendemail'):
+        if self.site().versionnumber() >= 16 and \
+           not self.site().isAllowed('sendemail'):
             raise UserActionRefuse('You don\'t have permission to send mail')
 
         if not self.site().has_api() or self.site().versionnumber() < 14:

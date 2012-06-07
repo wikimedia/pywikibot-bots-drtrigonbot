@@ -1,29 +1,54 @@
 # -*- coding: utf-8 -*-
 msg = {
+	# Author: Csisc
+	'aeb': {
+		'movepages-moving': u'روبوت: نقل الصفحة',
+	},
+	# Author: Naudefj
+	'af': {
+		'movepages-moving': u'Robot: bladsynaam gewysig',
+	},
 	'ar': {
 		'movepages-moving': u'روبوت: نقل الصفحة',
 	},
 	# Author: Xuacu
+	# Author: Esbardu
 	'ast': {
-		'movepages-moving': u'Robot: Páxina treslladada',
+		'movepages-moving': u'Robó: Páxina treslladada',
 	},
 	# Author: EugeneZelenko
-	'be-tarask': {
+	'be-x-old': {
 		'movepages-moving': u'робат перанёс старонку',
 	},
 	# Author: Fulup
 	'br': {
 		'movepages-moving': u'Robot: Pajenn adanvet',
 	},
+	# Author: Edinwiki
+	'bs': {
+		'movepages-moving': u'Bot: Premještena stranica.',
+	},
 	# Author: Gemmaa
 	'ca': {
 		'movepages-moving': u'Robot: Moure pàgina',
 	},
+	# Author: Asoxor
+	'ckb': {
+		'movepages-moving': u'ڕۆبۆت: پەڕەی گواستەوە',
+	},
 	'cs': {
 		'movepages-moving': u'Robot přesunul stránku',
 	},
+	# Author: Sarrus
+	'da': {
+		'movepages-moving': u'Robot: Flyttede side',
+	},
 	'de': {
 		'movepages-moving': u'Bot: Seite verschoben',
+	},
+	# Author: Erdemaslancan
+	'diq': {
+		'movepages-moving': u'Boti:Pela wedarne',
 	},
 	'el': {
 		'movepages-moving': u'Μετακίνηση σελίδων με bot',
@@ -34,6 +59,10 @@ msg = {
 	# Author: Vivaelcelta
 	'es': {
 		'movepages-moving': u'Bot: Página trasladada',
+	},
+	# Author: Pikne
+	'et': {
+		'movepages-moving': u'Robot: lehekülg teisaldatud',
 	},
 	'fa': {
 		'movepages-moving': u'ربات: صفحه منتقل شد',
@@ -60,7 +89,7 @@ msg = {
 		'movepages-moving': u'Bot: Páxina trasladada',
 	},
 	# Author: Als-Chlämens
-	'gsw': {
+	'als': {
 		'movepages-moving': u'Bötli: Syte verschobe',
 	},
 	'he': {
@@ -97,6 +126,14 @@ msg = {
 	'lb': {
 		'movepages-moving': u'Bot: Säit geréckelt',
 	},
+	# Author: Ooswesthoesbes
+	'li': {
+		'movepages-moving': u'Bot: verplaats pagina',
+	},
+	# Author: StefanusRA
+	'map-bms': {
+		'movepages-moving': u'Bot: Mindahna kaca',
+	},
 	# Author: Jagwar
 	'mg': {
 		'movepages-moving': u'Rôbô : Pejy voaova anarana',
@@ -113,11 +150,19 @@ msg = {
 	'no': {
 		'movepages-moving': u'Robot: Flyttet side',
 	},
+	# Author: Servien
+	'nds-nl': {
+		'movepages-moving': u'Bot: paginanaam ewiezigd',
+	},
 	'nl': {
 		'movepages-moving': u'Robot: paginanaam gewijzigd',
 	},
 	'nn': {
 		'movepages-moving': u'robot: flytta sida',
+	},
+	# Author: Xqt
+	'pdc': {
+		'movepages-moving': u'Waddefresser: Blatt gezoge',
 	},
 	'pl': {
 		'movepages-moving': u'Przeniesienie artykułu przez robota',
@@ -130,8 +175,13 @@ msg = {
 		'movepages-moving': u'Robô: Página movida',
 	},
 	# Author: Pedroca cerebral
+	# Author: 555
 	'pt-br': {
-		'movepages-moving': u'Robô: Página movida',
+		'movepages-moving': u'Bot: Página movida',
+	},
+	# Author: Minisarm
+	'ro': {
+		'movepages-moving': u'Robot: Redenumit pagina',
 	},
 	'ru': {
 		'movepages-moving': u'Переименование страницы при помощи робота',
@@ -145,7 +195,7 @@ msg = {
 		'movepages-moving': u'Robot: Prestavil stran',
 	},
 	# Author: Rancher
-	'sr-ec': {
+	'sr': {
 		'movepages-moving': u'Робот: премештена страница',
 	},
 	# Author: Rancher
@@ -155,6 +205,10 @@ msg = {
 	# Author: WikiPhoenix
 	'sv': {
 		'movepages-moving': u'Bot: Flyttade sida',
+	},
+	# Author: Baba Tabita
+	'sw': {
+		'movepages-moving': u'Karagosi: Kuhamisha ukurasa',
 	},
 	# Author: Aswn
 	'ta': {
@@ -172,6 +226,10 @@ msg = {
 	'uk': {
 		'movepages-moving': u'Робот: перейменування сторінки',
 	},
+	# Author: Alunardon90
+	'vec': {
+		'movepages-moving': u'Robot: Pajina spostà',
+	},
 	# Author: Minh Nguyen
 	'vi': {
 		'movepages-moving': u'Bot: Di chuyển trang',
@@ -180,11 +238,17 @@ msg = {
 	'yi': {
 		'movepages-moving': u'באט: באַוועגט בלאַט',
 	},
-	'zh': {
-		'movepages-moving': u'機器人:移動頁面',
-	},
 	# Author: Anakmalaysia
-	'zh-hans': {
+	'zh': {
 		'movepages-moving': u'机器人：移动页面',
+	},
+	# Author: Breawycker
+	# Author: Justincheng12345
+	'zh-hant': {
+		'movepages-moving': u'機械人：移動頁面',
+	},
+	# Author: Justincheng12345
+	'zh-hk': {
+		'movepages-moving': u'機械人移動頁面',
 	},
 }

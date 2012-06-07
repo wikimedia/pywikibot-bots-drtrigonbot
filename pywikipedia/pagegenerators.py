@@ -18,10 +18,10 @@ These parameters are supported to specify which pages titles to print:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: pagegenerators.py 9689 2011-10-30 13:55:07Z xqt $'
+__version__='$Id: pagegenerators.py 10218 2012-05-16 15:10:55Z xqt $'
 
 import wikipedia as pywikibot
-from pywikibot import deprecate_arg
+from pywikibot import deprecate_arg, i18n
 import config
 
 import traceback
@@ -73,8 +73,10 @@ parameterHelp = u"""\
                   across all namespaces.
 
 -namespace        Filter the page generator to only yield pages in the
--ns               specified namespaces.  Separate multiple namespace
-                  numbers with commas. Example "-ns:0,2,4"
+-ns               specified namespaces.  Separate multiple namespace numbers
+                  with commas. Example: -ns:"0,2,4" (Take care of quotation
+                  marks as comma may qualify as command line separator.)
+                  Will ask for namespaces if you write just -namespace or -ns.
 
 -interwiki        Work on the given page and all equivalent pages in other
                   languages. This can, for example, be used to fight
@@ -240,7 +242,7 @@ class GeneratorFactory(object):
     def getCategoryGen(self, arg, length, recurse=False):
         site = pywikibot.getSite()
         if len(arg) == length:
-            categoryname = pywikibot.input(u'Please enter the category name:')
+            categoryname = i18n.input('pywikibot-enter-category-name')
         else:
             categoryname = arg[length + 1:]
         categoryname = categoryname.replace('#', '|')
@@ -257,7 +259,7 @@ class GeneratorFactory(object):
     def setSubCategoriesGen(self, arg, length, recurse = False):
         site = pywikibot.getSite()
         if len(arg) == length:
-            categoryname = pywikibot.input(u'Please enter the category name:')
+            categoryname = i18n.input('pywikibot-enter-category-name')
         else:
             categoryname = arg[length + 1:]
 
@@ -287,8 +289,8 @@ class GeneratorFactory(object):
         if arg.startswith('-filelinks'):
             fileLinksPageTitle = arg[11:]
             if not fileLinksPageTitle:
-                fileLinksPageTitle = pywikibot.input(
-                    u'Links to which image page should be processed?')
+                fileLinksPageTitle = i18n.input(
+                                        'pywikibot-enter-file-links-processing')
             if fileLinksPageTitle.startswith(site.namespace(6)
                                              + ":"):
                 fileLinksPage = pywikibot.ImagePage(site,
@@ -323,7 +325,7 @@ class GeneratorFactory(object):
         elif arg.startswith('-interwiki'):
             title = arg[11:]
             if not title:
-                title = pywikibot.input(u'Which page should be processed?')
+                title = i18n.input('pywikibot-enter-page-processing')
             page = pywikibot.Page(site, title)
             gen = InterwikiPageGenerator(page)
         elif arg.startswith('-randomredirect'):
@@ -432,9 +434,6 @@ class GeneratorFactory(object):
             gen = AllpagesPageGenerator(firstPageTitle, namespace,
                                         includeredirects=False)
         elif arg.startswith('-start'):
-            if arg.startswith('-startxml'):
-                pywikibot.output(u'-startxml : wrong parameter')
-                sys.exit()
             firstPageTitle = arg[7:]
             if not firstPageTitle:
                 firstPageTitle = pywikibot.input(
@@ -760,13 +759,13 @@ def ShortPagesPageGenerator(number = 100, repeat = False, site = None):
 def RandomPageGenerator(number = 10, site = None):
     if site is None:
         site = pywikibot.getSite()
-    for i in range(number):
+    for i in xrange(number):
         yield site.randompage()
 
 def RandomRedirectPageGenerator(number = 10, site = None):
     if site is None:
         site = pywikibot.getSite()
-    for i in range(number):
+    for i in xrange(number):
         yield site.randomredirectpage()
 
 def PagesFromTitlesGenerator(iterable, site=None):
@@ -1024,14 +1023,17 @@ def NamespaceFilterPageGenerator(generator, namespaces, site = None):
     of the given namespaces.
 
     The namespace list can contain both integers (namespace numbers) and
-    strings/unicode strings (namespace names).
+    strings/unicode strings (namespace names). Namespace may also be a single
+    number or a single string.
     """
     # convert namespace names to namespace numbers
     if site is None:
         site = pywikibot.getSite()
+    if isinstance(namespaces, (int, basestring)):
+        namespaces = [namespaces]
     for i in xrange(len(namespaces)):
         ns = namespaces[i]
-        if isinstance(ns, unicode) or isinstance(ns, str):
+        if isinstance(ns, basestring):
             index = site.getNamespaceIndex(ns)
             if index is None:
                 raise ValueError(u'Unknown namespace: %s' % ns)
@@ -1147,6 +1149,15 @@ def CategoryGenerator(generator):
     """
     for page in generator:
         yield catlib.Category(page.site(), page.title())
+
+def ImageGenerator(generator):
+    """
+    Wraps around another generator. Yields the same pages, but as Image
+    objects instead of Page objects. Makes sense only if it is ascertained
+    that only categories are being retrieved.
+    """
+    for page in generator:
+        yield pywikibot.ImagePage(page.site(), page.title())
 
 def PageWithTalkPageGenerator(generator):
     """

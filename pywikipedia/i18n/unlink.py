@@ -1,33 +1,64 @@
 # -*- coding: utf-8 -*-
 msg = {
+	# Author: Csisc
+	'aeb': {
+		'unlink-unlinking': u'روبوت: إزالة وصلات "%s"',
+	},
 	'ar': {
 		'unlink-unlinking': u'روبوت: إزالة وصلات "%s"',
 	},
 	# Author: Xuacu
+	# Author: Esbardu
 	'ast': {
-		'unlink-unlinking': u'Robot: Desenllazando "%s"',
+		'unlink-unlinking': u'Robó: Desenllaciando «%s»',
 	},
 	# Author: EugeneZelenko
-	'be-tarask': {
+	'be-x-old': {
 		'unlink-unlinking': u'Робат: Выдаленьне спасылак на «%s»',
 	},
 	# Author: Fulup
 	'br': {
 		'unlink-unlinking': u'Robot: O tiliammañ "%s"',
 	},
+	# Author: Edinwiki
+	'bs': {
+		'unlink-unlinking': u'Bot: Odvajanje "%s".',
+	},
 	# Author: Utar
 	'cs': {
 		'unlink-unlinking': u'Robot: Odlinkovávám "%s"',
+	},
+	# Author: Peter Alberti
+	'da': {
+		'unlink-unlinking': u'Robot: fjerner henvisning til "%s"',
 	},
 	# Author: Purodha
 	'de': {
 		'unlink-unlinking': u'Bot: Entlinke „%s“',
 	},
+	# Author: Erdemaslancan
+	'diq': {
+		'unlink-unlinking': u'Robot: "%s" bê gıreyo',
+	},
+	# Author: Geraki
+	'el': {
+		'unlink-unlinking': u'Ρομπότ: Αποσύνδεση του "%s"',
+	},
 	'en': {
 		'unlink-unlinking': u'Robot: Unlinking "%s"',
 	},
+	# Author: Armando-Martin
+	# Author: Xqt
+	'es': {
+		'unlink-unlinking': u'Bot: Eliminando el enlace "%s"',
+	},
+	# Author: Pikne
+	'et': {
+		'unlink-unlinking': u'Robot: eemaldatud link "%s"',
+	},
+	# Author: ZxxZxxZ
 	'fa': {
-		'unlink-unlinking': u'ربات: حذف پیوند %s',
+		'unlink-unlinking': u'ربات: از پیوند درآوردن «%s»',
 	},
 	'fi': {
 		'unlink-unlinking': u'Botti poisti linkin sivulle "%s"',
@@ -35,9 +66,17 @@ msg = {
 	'fr': {
 		'unlink-unlinking': u'Robot: Retire le lien "%s"',
 	},
+	# Author: Murma174
+	'frr': {
+		'unlink-unlinking': u'Bot: Nem link wech faan „%s“',
+	},
 	# Author: Toliño
 	'gl': {
 		'unlink-unlinking': u'Bot: Quito a ligazón cara a "%s"',
+	},
+	# Author: Als-Holder
+	'als': {
+		'unlink-unlinking': u'Bot: „%s“ entlinkt',
 	},
 	'he': {
 		'unlink-unlinking': u'בוט: מסיר קישורים לדף "%s"',
@@ -62,6 +101,10 @@ msg = {
 	'it': {
 		'unlink-unlinking': u'Bot: Eliminazione collegamenti a "%s"',
 	},
+	# Author: Shirayuki
+	'ja': {
+		'unlink-unlinking': u'ロボット: リンクを解除中 "%s"',
+	},
 	# Author: Purodha
 	'ksh': {
 		'unlink-unlinking': u'Bot: Lenk op „%s“ fott nämme.',
@@ -69,6 +112,18 @@ msg = {
 	# Author: Robby
 	'lb': {
 		'unlink-unlinking': u'Bot: Entlinke vun "%s"',
+	},
+	# Author: Ooswesthoesbes
+	'li': {
+		'unlink-unlinking': u'Bot: wös verwiezing nao "%s"',
+	},
+	# Author: RMizo
+	'lus': {
+		'unlink-unlinking': u'Khawlmi: "%s" zawmna phelh mek a ni',
+	},
+	# Author: StefanusRA
+	'map-bms': {
+		'unlink-unlinking': u'Bot: ngeculna pranala "%s"',
 	},
 	# Author: Bjankuloski06
 	'mk': {
@@ -80,6 +135,10 @@ msg = {
 	},
 	'no': {
 		'unlink-unlinking': u'robot: fjerner lenke til "%s"',
+	},
+	# Author: Servien
+	'nds-nl': {
+		'unlink-unlinking': u'Bot: verwiezing naor "%s" vortedaon',
 	},
 	# Author: Siebrand
 	'nl': {
@@ -95,43 +154,77 @@ msg = {
 	'pms': {
 		'unlink-unlinking': u'Trigomiro: Dëscoleghé "%s"',
 	},
+	# Author: Xqt
 	'pt': {
-		'unlink-unlinking': u'Bot: Retirando link para "%s"',
+		'unlink-unlinking': u'Robô: Retirando link para "%s"',
 	},
 	# Author: Pedroca cerebral
+	# Author: 555
 	'pt-br': {
-		'unlink-unlinking': u'Bot: Retirando link para "%s"',
+		'unlink-unlinking': u'Bot: Removendo link para "%s"',
+	},
+	# Author: Minisarm
+	'ro': {
+		'unlink-unlinking': u'Robot: Eliminat legături către „%s”',
 	},
 	# Author: Eleferen
 	'ru': {
 		'unlink-unlinking': u'Бот: Удаление ссылки «%s»',
+	},
+	# Author: Teslaton
+	'sk': {
+		'unlink-unlinking': u'Robot: Odstránenie prepojenia na "%s"',
 	},
 	# Author: Dbc334
 	'sl': {
 		'unlink-unlinking': u'Robot: Odstranjevanje povezave na »%s«',
 	},
 	# Author: Rancher
-	'sr-ec': {
+	'sr': {
 		'unlink-unlinking': u'Робот: уклоњена веза „%s“',
 	},
 	# Author: Rancher
 	'sr-el': {
 		'unlink-unlinking': u'Robot: uklonjena veza „%s“',
 	},
+	# Author: Lokal Profil
+	'sv': {
+		'unlink-unlinking': u'Robot: avlänkar "%s"',
+	},
+	# Author: Aswn
+	'ta': {
+		'unlink-unlinking': u'தானியங்கி: "%s" இணைப்பு நீக்கப்படுகின்றது',
+	},
 	# Author: Гусейн
 	'tly': {
 		'unlink-unlinking': u'Робот: Сәбони моле «%s»',
+	},
+	# Author: Incelemeelemani
+	'tr': {
+		'unlink-unlinking': u'Robot: " %s " bağlantısı kaldırıldı',
 	},
 	# Author: Dim Grits
 	'uk': {
 		'unlink-unlinking': u'Бот: Вилучення посилання "%s"',
 	},
+	# Author: Alunardon90
+	'vec': {
+		'unlink-unlinking': u'Robot: Eliminasion cołegamenti a "%s"',
+	},
 	# Author: Minh Nguyen
 	'vi': {
 		'unlink-unlinking': u'Bot: Bỏ liên kết đến “%s”',
 	},
-	# Author: Anakmalaysia
-	'zh-hans': {
-		'unlink-unlinking': u'机器人：取消“%s”链接',
+	# Author: Yfdyh000
+	'zh': {
+		'unlink-unlinking': u'机器人：断开“%s”链接',
+	},
+	# Author: Breawycker
+	'zh-hant': {
+		'unlink-unlinking': u'機器人： 斷開連結" %s "',
+	},
+	# Author: Justincheng12345
+	'zh-hk': {
+		'unlink-unlinking': u'機械人取消“%s”鏈接',
 	},
 }

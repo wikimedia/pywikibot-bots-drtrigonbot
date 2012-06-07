@@ -21,7 +21,7 @@ def xuniqueCombinations(items, n):
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: casechecker.py 9692 2011-10-30 15:03:29Z xqt $'
+__version__ = '$Id: casechecker.py 10230 2012-05-20 14:05:22Z xqt $'
 
 #
 # Windows Concose colors
@@ -105,7 +105,7 @@ class CaseChecker( object ):
         u'^[' + romanNumChars + ']+[' + localLowerLtr + ']+$')
 
     whitelists = {
-        'ru': u'ВП:КЛ/Whitelist'
+        'ru': u'User:Rubinbot/Whitelist',
         }
 
     latLtr = u'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'

@@ -70,13 +70,14 @@ or you need some help regarding this script, you can find us here:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: add_text.py 9378 2011-07-15 05:58:03Z xqt $'
+__version__ = '$Id: add_text.py 10039 2012-03-23 15:34:47Z xqt $'
 #
 
 import re, pagegenerators, urllib2, urllib
 import wikipedia as pywikibot
 from pywikibot import i18n
 import codecs, config
+import webbrowser
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -144,6 +145,7 @@ def add_text(page = None, addText = None, summary = None, regexSkip = None,
     # format) to make the stars appear.
     starsList = [
         u'bueno',
+        u'bom interwiki',
         u'cyswllt[ _]erthygl[ _]ddethol', u'dolen[ _]ed',
         u'destacado', u'destaca[tu]',
         u'enllaç[ _]ad',
@@ -277,11 +279,17 @@ Match was: %s''' % result)
             if not always:
                 choice = pywikibot.inputChoice(
                     u'Do you want to accept these changes?',
-                    ['Yes', 'No', 'All'], ['y', 'N', 'a'], 'N')
+                    ['Yes', 'No', 'All', 'open in Browser'], ['y', 'N', 'a', 'b'], 'N')
                 if choice == 'a':
                     always = True
                 elif choice == 'n':
                     return (False, False, always)
+                elif choice == 'b':
+                    webbrowser.open("http://%s%s" % (
+                        page.site().hostname(),
+                        page.site().nice_get_address(page.title())
+                    ))
+                    pywikibot.input("Press Enter when finished in browser.")
             if always or choice == 'y':
                 try:
                     if always:
