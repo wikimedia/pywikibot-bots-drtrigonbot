@@ -304,9 +304,6 @@ if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(TestModuleImports)
   unittest.TextTestRunner(verbosity=2).run(suite)
 
-  suite = unittest.TestLoader().loadTestsFromTestCase(TestFunctionStability)
-  unittest.TextTestRunner(verbosity=2).run(suite)
-
   #suite = unittest.TestLoader().loadTestsFromTestCase(TestWorkerFunction)
   suite = unittest.TestSuite()
   # wikipedia.py

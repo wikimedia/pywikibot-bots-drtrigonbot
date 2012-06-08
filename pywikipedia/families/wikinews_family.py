@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikinews_family.py 10264 2012-06-01 22:38:50Z xqt $'
+__version__ = '$Id: wikinews_family.py 10313 2012-06-08 06:20:49Z xqt $'
 
 # The Wikimedia family that is known as Wikinews
 
@@ -27,7 +27,6 @@ class Family(family.Family):
         self.namespaces[14]['zh'] = [u'Category', u'分类', u'分類']
         self.namespaces[3]['pt'] = [u'Utilizador Discussão', u'Usuário Discussão', u'Utilizadora Discussão']
         self.namespaces[2]['pt'] = [u'Utilizador', u'Usuário', u'Utilizadora']
-        self.namespaces[-2]['sr'] = [u'Медиј', u'Medija', u'Медија']
         self.namespaces[3]['ca'] = [u'Usuari Discussió']
         self.namespaces[2]['ca'] = [u'Usuari']
         self.namespaces[3]['de'] = [u'Benutzer Diskussion', u'Benutzerin Diskussion']

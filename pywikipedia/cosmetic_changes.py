@@ -52,12 +52,12 @@ your user-config.py:
     cosmetic_changes_disable['wikipedia'] = ('de', 'en', 'fr')
 """
 #
-# (C) xqt, 2009-2011
+# (C) xqt, 2009-2012
 # (C) Pywikipedia bot team, 2006-2012
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: cosmetic_changes.py 10302 2012-06-06 15:38:28Z xqt $'
+__version__ = '$Id: cosmetic_changes.py 10312 2012-06-08 06:11:57Z xqt $'
 #
 import sys, re
 import wikipedia as pywikibot
@@ -352,7 +352,7 @@ class CosmeticChangesToolkit:
             if nsNumber in (2, 3):
                 # Skip user namespace, maybe gender is used
                 continue
-            namespaces = list(self.site.namespace(nsNumber, all = True))
+            namespaces = list(self.site.namespace(nsNumber, all=True))
             thisNs = namespaces.pop(0)
             if nsNumber == 6 and family.name == 'wikipedia':
                 if self.site.lang in ('en', 'fr'):

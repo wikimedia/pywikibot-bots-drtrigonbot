@@ -57,10 +57,6 @@ Syntax example:
     python sum_disc.py -rollback_history:[number of runs to roll-back]
         Loads old history entry of all Users, e.g. for debuging.
 """
-#
-#    python sum_disc.py -test_run
-#        Loads old history entry of all Users, e.g. for debuging.
-#"""
 ## @package sum_disc
 #  @brief   Summarize Discussions Robot
 #
@@ -77,7 +73,7 @@ Syntax example:
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__ = '$Id$'
+__version__ = '$Id: sum_disc.py 10324 2012-06-08 09:22:51Z drtrigon $'
 #
 
 

@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: family.py 10307 2012-06-07 17:07:05Z xqt $'
+__version__='$Id: family.py 10322 2012-06-08 07:29:39Z xqt $'
 
 import config
 import re
@@ -3649,7 +3649,7 @@ class Family:
         # one-after-another on a single line
         self.interwiki_on_one_line = []
         # String used as separator between interwiki links and the text
-        self.interwiki_text_separator = '\r\n\r\n'
+        self.interwiki_text_separator = config.line_separator * 2
 
         # Similar for category
         self.category_attop = []
@@ -3657,7 +3657,7 @@ class Family:
         # one-after-another on a single line
         self.category_on_one_line = []
         # String used as separator between category links and the text
-        self.category_text_separator = '\r\n\r\n'
+        self.category_text_separator = config.line_separator * 2
         # When both at the bottom should categories come after interwikilinks?
         self.categories_last = []
 
