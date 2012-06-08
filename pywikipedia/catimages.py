@@ -591,7 +591,8 @@ class main(checkimages.main):
             if   (data['Coverage'] >= 0.40) and (data['Delta_E']  <=  5.0):
                 c = 1.0
             #elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 15.0):
-            elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 10.0):
+            #elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 10.0):
+            elif (data['Coverage'] >= 0.25) and (data['Delta_E']  <= 10.0):
                 c = 0.75
             elif (data['Coverage'] >= 0.10) and (data['Delta_E']  <= 20.0):
                 c = 0.5
@@ -629,8 +630,6 @@ class main(checkimages.main):
 
         import cv, cv2, numpy
 
-        scale = 1.
-
         # https://code.ros.org/trac/opencv/browser/trunk/opencv_extra/testdata/gpu/haarcascade?rev=HEAD
         #nestedCascade = cv.Load(
         nestedCascade = cv2.CascadeClassifier(
@@ -644,6 +643,7 @@ class main(checkimages.main):
           )
 
         self._info['Faces'] = []
+        scale = 1.
         try:
             #image = cv.LoadImage(self.image_path)
             #img    = cv2.imread( self.image_path, 1 )
@@ -822,15 +822,21 @@ class main(checkimages.main):
 
     def _detectSegmentColors_JSEGnPIL(self):
         #from PIL import Image
-        import Image
+        import Image, math
 
         self._info['ColorRegions'] = []
         try:
-            i = Image.open(self.image_path)
+            im = Image.open(self.image_path)
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
             return ([], [])
         
+        # crop 25% of the image in order to give the bot a more human eye
+        scale  = 0.75    # crop 25% percent (area) bounding box
+        (w, h) = (self.image_size[0]*math.sqrt(scale),self.image_size[1]*math.sqrt(scale))
+        (l, t) = ( (self.image_size[0]-w)/2, (self.image_size[1]-h)/2 )
+        i = im.crop( (int(l), int(t), int(l+w), int(t+h)) )
+
         result = []
         #h = i.histogram()   # average over WHOLE IMAGE
         hist = self._JSEGdetectColorSegmentsHist(i)  # split image into segments first
@@ -1351,8 +1357,10 @@ def checkbot():
                     firstPageTitle = posfile.read().decode('utf-8')
                     print firstPageTitle
                     posfile.close()
+                    generator = pagegenerators.GeneratorFactory().getCategoryGen(u"-catr:Media_needing_categories", len('-catr'), recurse = True)
             elif len(arg) > 6:
-                firstPageTitle = arg[7:]
+                firstPageTitle = ""
+                generator = [pywikibot.Page(pywikibot.getSite(), arg[7:])]
             firstPageTitle = firstPageTitle.split(":")[1:]
             #generator = pywikibot.getSite().allpages(start=firstPageTitle, namespace=6)
             #repeat = False
@@ -1380,8 +1388,8 @@ def checkbot():
         elif arg == '-noguesses':
             gbv.useGuesses = False
             
-    #generator = pagegenerators.GeneratorFactory().getCategoryGen(u"-catr:Media_needing_categories|fromtitle", len('-catr'), recurse = True)
-    generator = pagegenerators.GeneratorFactory().getCategoryGen(u"-catr:Media_needing_categories", len('-catr'), recurse = True)
+    ##generator = pagegenerators.GeneratorFactory().getCategoryGen(u"-catr:Media_needing_categories|fromtitle", len('-catr'), recurse = True)
+    #generator = pagegenerators.GeneratorFactory().getCategoryGen(u"-catr:Media_needing_categories", len('-catr'), recurse = True)
 
     # Understand if the generator it's the default or not.
     try:

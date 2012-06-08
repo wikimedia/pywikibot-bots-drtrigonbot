@@ -8,7 +8,7 @@ the page class from there.
 ## @package dtbext.dtbext_wikipedia
 #  @brief   Deviation of @ref wikipedia
 #
-#  @copyright Dr. Trigon, 2008-2010
+#  @copyright Dr. Trigon, 2008-2012
 #
 #  @section FRAMEWORK
 #
