@@ -45,14 +45,14 @@ __version__ = '$Id$'
 #
 
 
-import sys, os
+import sys, os, time
 import copy
 import StringIO
 import re
 import __builtin__
 import logging
 
-import config
+import config, basic
 import dtbext
 # Splitting the bot into library parts
 import wikipedia as pywikibot
@@ -105,7 +105,7 @@ docuReplacements = {
 }
 
 
-class ScriptWUIBot(dtbext.basic.BasicBot):
+class ScriptWUIBot(basic.AutoBasicBot):
     '''
     Robot which will run framework scripts as (sub-)bot and provides a
     WikiUserInterface (WUI) for users.
@@ -118,13 +118,30 @@ class ScriptWUIBot(dtbext.basic.BasicBot):
 
         pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
 
-        dtbext.basic.BasicBot.__init__(self, debug=debug)
-        self.site = pywikibot.getSite()
+        logging.basicConfig(level=logging.DEBUG if ('code' in debug) else logging.INFO)
+
+        basic.AutoBasicBot.__init__(self)
+        #self.site = pywikibot.getSite()
+
+        # modification of timezone to be in sync with wiki
+        os.environ['TZ'] = 'Europe/Amsterdam'
+        time.tzset()
+        pywikibot.output(u'Setting process TimeZone (TZ): %s' % str(time.tzname))    # ('CET', 'CEST')
+
+        # init constants
+        self._bot_config = bot_config
+        # convert e.g. namespaces to corret language
+        self._bot_config['TemplateName'] = pywikibot.Page(self.site, self._bot_config['TemplateName']).title()
+        self._template_regex = re.compile('\{\{' + self._bot_config['TemplateName'] + '(.*?)\}\}', re.S)
+
+        self._debug = debug
+
 
         # init constants
         pywikibot.output(u'\03{lightred}** Receiving Job Queue\03{default}')
         page = pywikibot.Page(self.site, bot_config['commandlist'])
-        self._commandlist = self.loadJobQueue(page, bot_config['queue_security'])
+        self._commandlist = self.loadJobQueue(page, bot_config['queue_security'],
+                                              reset=('write2wiki' in self._debug))
         logging.getLogger('script_wui').debug( self._commandlist )
 
         # code debugging

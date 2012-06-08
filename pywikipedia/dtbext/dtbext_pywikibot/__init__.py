@@ -22,7 +22,6 @@ __version__ = '$Id$'
 #
 
 from dtbext_exceptions import *
-from dtbext_textlib import *
 
 #import dtbext_wikipedia as wikipedia	# not needed
 

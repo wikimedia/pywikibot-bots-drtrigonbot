@@ -38,7 +38,7 @@ __version__ = '$Id$'
 #
 
 
-import re, sys, os, string
+import re, sys, os, string, time
 import difflib
 import BeautifulSoup
 import urllib, StringIO, zipfile, csv
@@ -49,7 +49,7 @@ import logging
 import copy
 import ast
 
-import pagegenerators
+import pagegenerators, basic
 import dtbext
 # Splitting the bot into library parts
 import wikipedia as pywikibot
@@ -114,7 +114,7 @@ debug = []                       # no write, all users
 #debug.append( 'code' )          # code debugging
 
 
-class SubsterBot(dtbext.basic.BasicBot):
+class SubsterBot(basic.AutoBasicBot):
     '''
     Robot which will does substitutions of tags within wiki page content with external or
     other wiki text data. Like dynamic text updating.
@@ -137,7 +137,23 @@ class SubsterBot(dtbext.basic.BasicBot):
 
         pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
 
-        dtbext.basic.BasicBot.__init__(self, bot_config, debug)
+        logging.basicConfig(level=logging.DEBUG if ('code' in debug) else logging.INFO)
+
+        basic.AutoBasicBot.__init__(self)
+
+        # modification of timezone to be in sync with wiki
+        os.environ['TZ'] = 'Europe/Amsterdam'
+        time.tzset()
+        pywikibot.output(u'Setting process TimeZone (TZ): %s' % str(time.tzname))    # ('CET', 'CEST')
+
+        # init constants
+        self._bot_config = bot_config
+        # convert e.g. namespaces to corret language
+        self._bot_config['TemplateName'] = pywikibot.Page(self.site, self._bot_config['TemplateName']).title()
+        self._template_regex = re.compile('\{\{' + self._bot_config['TemplateName'] + '(.*?)\}\}', re.S)
+
+        self._debug = debug
+
 
         # init constants
         self._userListPage        = pywikibot.Page(self.site, bot_config['TemplateName'])
@@ -168,7 +184,8 @@ class SubsterBot(dtbext.basic.BasicBot):
 
                 # get page content and operating mode
                 content = self.load(page)
-                params = self.loadTemplates(page, default=self._param_default)
+                params = self.loadTemplates(page, self._bot_config['TemplateName'],
+                                            default=self._param_default)
 
             if not params: continue
 

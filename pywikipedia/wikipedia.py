@@ -119,7 +119,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 10311 2012-06-08 00:08:13Z drtrigon $'
+__version__ = '$Id: wikipedia.py 10323 2012-06-08 09:12:42Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
