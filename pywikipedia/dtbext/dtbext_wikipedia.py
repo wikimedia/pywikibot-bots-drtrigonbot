@@ -44,7 +44,6 @@ def addAttributes(obj):
         # this cannot be looped because of lambda's scope (which is important for page)
         # look also at http://www.weask.us/entry/scope-python-lambda-functions-parameters
         obj.__dict__['isRedirectPage']        = lambda *args, **kwds: Page.__dict__['isRedirectPage'](obj, *args, **kwds)
-        obj.__dict__['append']                = lambda *args, **kwds: Page.__dict__['append'](obj, *args, **kwds)
 
 
 ## @since   ? (MODIFIED)
@@ -91,44 +90,3 @@ class Page(pywikibot.Page):
             self._getexception == pywikibot.IsRedirectPage
 
         return self._redir
-
-    ## @since   r49 (ADDED)
-    #  @remarks to support appending to single sections
-    #
-    #  @todo    submit upstream and include into framework, maybe in wikipedia.Page.put()
-    #           (this function is very simple and not mature/worked out yet, has to be completed)
-    #           \n[ JIRA: ticket? ]
-    def append(self, newtext, comment=None, minorEdit=True, section=0):
-        """Append the wiki-text to the page.
-           ADDED METHOD: to support appending to single sections
-
-           Returns the result of text append to page section number 'section'.
-           0 for the top section, 'new' for a new section.
-        """
-
-        # If no comment is given for the change, use the default
-        comment = comment or pywikibot.action
-
-        # send mail by POST request
-        params = {
-            'action'     : 'edit',
-            #'title'      : self.title().encode(self.site().encoding()),
-            'title'      : self.title(),
-            'section'    : '%i' % section,
-            'appendtext' : self._encodeArg(newtext, 'text'),
-            'token'      : self.site().getToken(),
-            'summary'    : self._encodeArg(comment, 'summary'),
-            'bot'        : 1,
-            }
-
-        if minorEdit:
-            params['minor'] = 1
-        else:
-            params['notminor'] = 1
-
-        response, data = query.GetData(params, self.site(), back_response = True)
-
-        if not (data['edit']['result'] == u"Success"):
-            raise PageNotSaved('Bad result returned: %s' % data['edit']['result'])
-
-        return response.code, response.msg, data

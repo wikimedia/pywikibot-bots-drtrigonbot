@@ -119,7 +119,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 10310 2012-06-07 23:45:48Z drtrigon $'
+__version__ = '$Id: wikipedia.py 10311 2012-06-08 00:08:13Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -2512,6 +2512,41 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
                 raise PageNotSaved
 
             return response.code, response.msg, data
+
+    ## @since   r10311
+    #  @remarks to support appending to single sections
+    def append(self, newtext, comment=None, minorEdit=True, section=0):
+        """Append the wiki-text to the page.
+
+           Returns the result of text append to page section number 'section'.
+           0 for the top section, 'new' for a new section (end of page).
+        """
+
+        # If no comment is given for the change, use the default
+        comment = comment or pywikibot.action
+
+        # send data by POST request
+        params = {
+            'action'     : 'edit',
+            'title'      : self.title(),
+            'section'    : '%s' % section,
+            'appendtext' : self._encodeArg(newtext, 'text'),
+            'token'      : self.site().getToken(),
+            'summary'    : self._encodeArg(comment, 'summary'),
+            'bot'        : 1,
+            }
+
+        if minorEdit:
+            params['minor'] = 1
+        else:
+            params['notminor'] = 1
+
+        response, data = query.GetData(params, self.site(), back_response = True)
+
+        if not (data['edit']['result'] == u"Success"):
+            raise PageNotSaved('Bad result returned: %s' % data['edit']['result'])
+
+        return response.code, response.msg, data
 
     def protection(self):
         """Return list of dicts of this page protection level. like:
