@@ -69,7 +69,7 @@ locale.setlocale(locale.LC_ALL, '')
 # debug tools
 # (look at 'bot_control.py' for more info)
 debug = []                       # no write, all users
-debug.append( 'write2wiki' )    # write to wiki (operational mode)
+#debug.append( 'write2wiki' )    # write to wiki (operational mode)
 #debug.append( 'code' )          # code debugging
 
 
@@ -143,15 +143,21 @@ class main(checkimages.main):
 #    def report(self, newtext, image_to_report, notification=None, head=None,
 #               notification2 = None, unver=True, commTalk=None, commImage=None): pass
 
+    #ignore = []
+    ignore = ['color']
+
     # or may be '__init__' ... ???
     def load_licenses(self):
         pywikibot.output(u'\n\t...Listing the procedures available...\n')
         
-        listing = [ '_filter', '_cat', '_guess' ]
+        self._funcs = {'filter': [], 'cat': [], 'guess': []}
+
         for item in dir(self):
-            for lic in listing:
-                if (item[:len(lic)] == lic):
-                    pywikibot.output( item )
+            s = item.split('_')
+            if (len(s) < 3) or (s[1] not in self._funcs) or (s[2] in self.ignore):
+                continue
+            pywikibot.output( item )
+            self._funcs[s[1]].append( item )
 
         self.tmpl_available_spec = tmpl_available_spec
         gen = pagegenerators.PrefixingPageGenerator(prefix = u'Template:FileContentsByBot/')
@@ -236,27 +242,24 @@ class main(checkimages.main):
 
         # information template: use filter to select from gathered information
         self._info_filter = {}
-        for item in dir(self):
-            if '_filter' in item[:7]:
-                self._info_filter.update( self.__class__.__dict__[item](self) )
+        for item in self._funcs['filter']:
+            self._info_filter.update( self.__class__.__dict__[item](self) )
 
         # categorization: use explicit searches for classification (rel = ?)
-        for item in dir(self):
-            if '_cat' in item[:4]:
-                (cat, rel) = self.__class__.__dict__[item](self)
-                #print cat, result, len(result)
-                if rel:
-                    self._result_check.append( cat )
+        for item in self._funcs['cat']:
+            (cat, rel) = self.__class__.__dict__[item](self)
+            #print cat, result, len(result)
+            if rel:
+                self._result_check.append( cat )
 
         # categorization: use guesses for unreliable classification (rel = 0.1)
         if not gbv.useGuesses:
             return self._result_check
-        for item in dir(self):
-            if '_guess' in item:
-                (cat, result, rel) = self.__class__.__dict__[item](self)
-                #print cat, result, len(result)
-                if result:
-                    self._result_check.append( (cat, result, rel) )
+        for item in self._funcs['guess']:
+            (cat, result, rel) = self.__class__.__dict__[item](self)
+            #print cat, result, len(result)
+            if result:
+                self._result_check.append( (cat, result, rel) )
 
         return self._result_check
 
@@ -305,8 +308,9 @@ class main(checkimages.main):
         ret.append( u"== [[:%s]] ==" % self.image.title() )
         ret.append( u'<div style="position:relative;">' )
         ret.append( u"[[%s|200px]]" % self.image.title() )
-        marker = self.make_markerblock(self._info[u'Faces'], 200.)
-        ret.append( marker )
+        ret.append( self.make_markerblock(self._info[u'Faces'], 200.) )
+        ret.append( self.make_markerblock(self._info[u'ColorRegions'], 200.,
+                                          structure=['Position']) )
         ret.append( u"</div>" )
 
         color = {True: "rgb(0,255,0)", False: "rgb(255,0,0)"}[bool(self._result_check)]
@@ -385,7 +389,7 @@ class main(checkimages.main):
             # end of recursion
             return u"  | %s = %s" % (key, self.output_format(value))
 
-    def make_markerblock(self, res, size):
+    def make_markerblock(self, res, size, structure=['Position', 'Eyes'], line='solid'):
         import numpy
 
         # same as in '_detectObjectFaces_CV'
@@ -399,20 +403,25 @@ class main(checkimages.main):
             (255,0,255) ]
         result = []
         for i, r in enumerate(res):
-            color = list(colors[i%8])
+            if ('RGB' in r):
+                color = list(numpy.array((255,255,255))-numpy.array(r['RGBref']))
+                line  = 'dashed'
+            else:
+                color = list(colors[i%8])
             color.reverse()
             color = u"%02x%02x%02x" % tuple(color)
             
             #scale = r['size'][0]/size
             scale = self.image_size[0]/size
-            f     = list(numpy.array(r['Position'])/scale)
+            f     = list(numpy.array(r[structure[0]])/scale)
             
-            result.append( u'<div class="face-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px solid #%s;"></div>' % tuple(f + [color]) )
+            result.append( u'<div class="%s-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px %s #%s;"></div>' % tuple([structure[0].lower()] + f + [line, color]) )
 
-            for e in r['Eyes']:
-                e = list(numpy.array(e)/scale)
-
-                result.append( u'<div class="eye-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px solid #%s;"></div>' % tuple(e + [color]) )
+            if (len(structure) > 1):
+                for e in r[structure[1]]:
+                    e = list(numpy.array(e)/scale)
+    
+                    result.append( u'<div class="%s-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px solid #%s;"></div>' % tuple([structure[1].lower()] + e + [color]) )
 
         return u"\n".join( result )
 
@@ -584,20 +593,27 @@ class main(checkimages.main):
         # Average color
         self._detectAverageColor_PIL()
 
+        max_dim = max(self.image_size)
         for i in range(len(self._info['ColorRegions'])):
             data = self._info['ColorRegions'][i]
 
             # has to be in descending order since only 1 resolves (!)
-            if   (data['Coverage'] >= 0.40) and (data['Delta_E']  <=  5.0):
-                c = 1.0
-            #elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 15.0):
-            #elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 10.0):
-            elif (data['Coverage'] >= 0.25) and (data['Delta_E']  <= 10.0):
-                c = 0.75
-            elif (data['Coverage'] >= 0.10) and (data['Delta_E']  <= 20.0):
-                c = 0.5
-            else:
-                c = 0.1
+            #if   (data['Coverage'] >= 0.40) and (data['Delta_E']  <=  5.0):
+            #    c = 1.0
+            ##elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 15.0):
+            ##elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 10.0):
+            #elif (data['Coverage'] >= 0.25) and (data['Delta_E']  <= 10.0):
+            #    c = 0.75
+            #elif (data['Coverage'] >= 0.10) and (data['Delta_E']  <= 20.0):
+            #    c = 0.5
+            #else:
+            #    c = 0.1
+            ca = (data['Coverage'])**(1./4)                 # 0.35 -> ~0.75
+            #cb = (0.02 * (50. - data['Delta_E']))**(1./2)   # 20.0 -> ~0.75
+            cb = (0.02 * (50. - data['Delta_E']))**(1./3)   # 25.0 -> ~0.75
+            cc = (1. - (data['Delta_R']/max_dim))**(1.)     # 0.25 -> ~0.75
+            c  = ( ca + 2*cb ) / 3
+            #c  = ( cc + 2*ca + 4*cb ) / 7
             self._info['ColorRegions'][i]['Confidence'] = c
 
         # People
@@ -820,7 +836,12 @@ class main(checkimages.main):
         self._info['Classify'] = dict([ (trained[i], abs(r)) for i, r in enumerate(result) ])
         return
 
-    def _detectSegmentColors_JSEGnPIL(self):
+    # a lot mor paper and possible algos exist; (those with code are...)
+    # http://www.lix.polytechnique.fr/~schwander/python-srm/
+    # http://library.wolfram.com/infocenter/Demos/5725/#downloads
+    # http://code.google.com/p/pymeanshift/wiki/Examples
+    # (http://pythonvision.org/basic-tutorial, http://luispedro.org/software/mahotas, http://packages.python.org/pymorph/)
+    def _detectSegmentColors_JSEGnPIL(self):    # may be SLIC other other too...
         #from PIL import Image
         import Image, math
 
@@ -829,23 +850,38 @@ class main(checkimages.main):
             im = Image.open(self.image_path)
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
-            return ([], [])
-        
+            return
+
         # crop 25% of the image in order to give the bot a more human eye
         scale  = 0.75    # crop 25% percent (area) bounding box
-        (w, h) = (self.image_size[0]*math.sqrt(scale),self.image_size[1]*math.sqrt(scale))
+        (w, h) = ( self.image_size[0]*math.sqrt(scale), self.image_size[1]*math.sqrt(scale) )
         (l, t) = ( (self.image_size[0]-w)/2, (self.image_size[1]-h)/2 )
         i = im.crop( (int(l), int(t), int(l+w), int(t+h)) )
 
         result = []
         #h = i.histogram()   # average over WHOLE IMAGE
-        hist = self._JSEGdetectColorSegmentsHist(i)  # split image into segments first
-        for i, (h, coverage) in enumerate(hist):
+        (pic, scale) = self._JSEGdetectColorSegments(i)          # split image into segments first
+        #(pic, scale) = self._SLICdetectColorSegments(i)          # split image into superpixel first
+        hist = self._getColorSegmentsHist(i, pic, scale)         #
+        pic  = self._ColorRegionsMerge_ColorSimplify(pic, hist)  # iteratively in order to merge similar regions
+        (pic, scale_) = self._JSEGdetectColorSegments(pic)       # (final split)
+        #(pic, scale) = self._JSEGdetectColorSegments(pic)        # (final split)
+        hist = self._getColorSegmentsHist(i, pic, scale)         #
+        i = 0
+        for (h, coverage, (center, bbox)) in hist:
+            #if (coverage < 0.05):    # at least 10% coverage needed (help for debugging)
+            #    continue
+
             data = self._DeltaEaverageColor(h)
             data['Coverage'] = coverage
             data['ID']       = (i+1)
+            data['Center']   = (int(center[0]+l), int(center[1]+t))
+            data['Position'] = (int(bbox[0]+l), int(bbox[1]+t), int(bbox[2]), int(bbox[3]))
+            data['Delta_R']  = math.sqrt( (self.image_size[0]/2 - center[0])**2 + \
+                                          (self.image_size[1]/2 - center[1])**2 )
 
             result.append( data )
+            i += 1
 
         self._info['ColorRegions'] = result
         return
@@ -912,19 +948,34 @@ class main(checkimages.main):
         #color2 = LabColor(lab_l=0.7, lab_a=14.2, lab_b=-1.80)
         color2 = lab
 
-        # according to Categories available in Commons
-        # (only using these color makes sense, detect other is useles...)
-        colors = { u'Black':     (  0,   0,   0),
-                   u'Blue':      (  0,   0, 255),
-                   u'Brown':     (165,  42,  42),
-                   u'Green':     (  0, 255,   0),
-                   u'Orange':    (255, 165,   0),
-                   u'Pink':      (255, 192, 203),
-                   u'Purple':    (160,  32, 240),
-                   u'Red':       (255,   0,   0),
-                   u'Turquoise': ( 64, 224, 208),
-                   u'White':     (255, 255, 255),
-                   u'Yellow':    (255, 255,   0), }
+        # according to Categories available in Commons and more
+        colors = { u'Black':       (  0,   0,   0),
+                   u'DarkBlue':    (  0,   0, 139),
+                   u'DarkCyan':    (  0, 139, 139),
+                   u'LightBlue':   (173, 216, 230),
+                   u'LightCyan':   (224, 255, 255),
+                   u'Blue':        (  0,   0, 255),
+                   u'Cyan':        (  0, 255, 255),
+                   u'Turquoise':   ( 64, 224, 208),
+                   u'Brown':       (165,  42,  42),
+                   u'DimGray':     (105, 105, 105),
+                   u'LightGray':   (211, 211, 211),
+                   u'Gray':        (190, 190, 190),
+                   u'DarkGreen':   (  0, 100,   0),
+                   u'LightGreen':  (144, 238, 144),
+                   u'Green':       (  0, 255,   0),
+                   u'DarkOrange':  (	255,140,0),
+                   u'Orange':      (255, 165,   0),
+                   u'DarkRed':     (139,   0,   0),
+                   u'DeepPink':    (255,  20, 147),
+                   u'Pink':        (255, 192, 203),
+                   u'DarkMagenta': (139,   0, 139),
+                   u'Magenta':     (255,   0, 255),
+                   u'Purple':      (160,  32, 240),
+                   u'Red':         (255,   0,   0),
+                   u'Violet':      (238, 130, 238),
+                   u'White':       (255, 255, 255),
+                   u'Yellow':      (255, 255,   0), }
 
         res = (1.E100, '')
         for c in colors:
@@ -951,7 +1002,7 @@ class main(checkimages.main):
 
         return data
 
-    def _JSEGdetectColorSegmentsHist(self, im):
+    def _JSEGdetectColorSegments(self, im):
         import Image, numpy, os
         
         tmpjpg = os.path.join(os.path.abspath(os.curdir), "cache/jseg_buf.jpg")
@@ -964,7 +1015,7 @@ class main(checkimages.main):
             smallImg = im.resize( tuple(numpy.int_(numpy.array(im.size)/scale)), Image.ANTIALIAS )
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
-            return []
+            return
         
         #im.thumbnail(size, Image.ANTIALIAS) # size is 640x480
         smallImg.convert('RGB').save(tmpjpg, "JPEG", quality=100, optimize=True)
@@ -996,27 +1047,134 @@ class main(checkimages.main):
         # http://stackoverflow.com/questions/384759/pil-and-numpy
         pic = Image.open(tmpgif)
         pix = numpy.array(pic)
+        #Image.fromarray(10*pix).show()
         
         os.remove( tmpgif )
 
-# TODO: -try to merge similar regions ...
-#       -locate regions; average over positions for center, min and max for width...
+        return (pic, scale)
+
+    # http://planet.scipy.org/
+    # http://peekaboo-vision.blogspot.ch/2012/05/superpixels-for-python-pretty-slic.html
+    # http://ivrg.epfl.ch/supplementary_material/RK_SLICSuperpixels/index.html
+    def _SLICdetectColorSegments(self, img):
+        import numpy as np
+        #import Image
+        import slic
+
+        im = np.array(img)
+        image_argb = np.dstack([im[:, :, :1], im]).copy("C")
+        #region_labels = slic.slic_n(image_argb, 1000, 10)
+        region_labels = slic.slic_n(image_argb, 1000, 50)
+        slic.contours(image_argb, region_labels, 10)
+        #import matplotlib.pyplot as plt
+        #plt.imshow(image_argb[:, :, 1:].copy())
+        #plt.show()
+
+        #pic = Image.fromarray(region_labels)
+        #pic.show()
+
+        #return (pic, 1.)
+        return (region_labels, 1.)
+
+    def _getColorSegmentsHist(self, im, pic, scale):
+        import Image, numpy
+        
+        if not (type(numpy.ndarray(None)) == type(pic)):
+            pix = numpy.array(pic)
+            #Image.fromarray(10*pix).show()
+        else:
+            pix = pic
+            #Image.fromarray(255*pix/numpy.max(pix)).show()
+
+        try:
+            smallImg = im.resize( tuple(numpy.int_(numpy.array(im.size)/scale)), Image.ANTIALIAS )
+        except IOError:
+            pywikibot.output(u'WARNING: unknown file type')
+            return
+
         imgsize = float(smallImg.size[0]*smallImg.size[1])
         hist = []
         for i in range(numpy.max(pix)+1):
-            mask = numpy.uint8(pix == i)
+            mask   = numpy.uint8(pix == i)*255
+            (y, x) = numpy.where(mask != 0)
+            center = (numpy.average(x)*scale, numpy.average(y)*scale)
+            bbox   = (numpy.min(x)*scale, numpy.min(y)*scale, 
+                      (numpy.max(x)-numpy.min(x))*scale, (numpy.max(y)-numpy.min(y))*scale)
             coverage = numpy.count_nonzero(mask)/imgsize
             mask = Image.fromarray( mask )
             h    = smallImg.histogram(mask)
+            #smallImg.show()
+            #dispImg = Image.new('RGBA', smallImg.size)
+            #dispImg.paste(smallImg, mask)
+            #dispImg.show()
             if (len(h) == 256):
                 print "gray scale image, try to fix..."
                 h = h*3
             if (len(h) == 256*4):
                 print "4-ch. image, try to fix (can include transperancy)..."
                 h = h[0:(256*3)]
-            hist.append( (h, coverage) )
+            hist.append( (h, coverage, (center, bbox)) )
         
         return hist
+
+    # http://www.scipy.org/SciPyPackages/Ndimage
+    # http://www.pythonware.com/library/pil/handbook/imagefilter.htm
+    def _ColorRegionsMerge_ColorSimplify(self, im, hist):
+        # merge regions by simplifying through average color and re-running
+        # JSEG again...
+
+        import Image, numpy 
+        from scipy import ndimage
+        
+        if not (type(numpy.ndarray(None)) == type(im)):
+            pix = numpy.array(im)
+        else:
+            pix = im
+            im  = Image.fromarray(255*pix/numpy.max(pix))
+
+        im = im.convert('RGB')
+
+        for j, (h, coverage, (center, bbox)) in enumerate(hist):
+            # split into red, green, blue
+            r = h[0:256]
+            g = h[256:256*2]
+            b = h[256*2: 256*3]
+            
+            # perform the weighted average of each channel:
+            # the *index* 'i' is the channel value, and the *value* 'w' is its weight
+            rgb = (
+                    sum( i*w for i, w in enumerate(r) ) / max(1, sum(r)),
+                    sum( i*w for i, w in enumerate(g) ) / max(1, sum(g)),
+                    sum( i*w for i, w in enumerate(b) ) / max(1, sum(b))
+            )
+            # color frequency analysis; do not average regions with high fluctations
+            #rgb2 = (
+            #        sum( i*i*w for i, w in enumerate(r) ) / max(1, sum(r)),
+            #        sum( i*i*w for i, w in enumerate(g) ) / max(1, sum(g)),
+            #        sum( i*i*w for i, w in enumerate(b) ) / max(1, sum(b))
+            #)
+            #if ( 500. < numpy.average( (
+            #       rgb2[0] - rgb[0]**2,
+            #       rgb2[1] - rgb[1]**2,
+            #       rgb2[2] - rgb[2]**2, ) ) ):
+            #           continue
+
+            mask = numpy.uint8(pix == j)*255
+            mask = Image.fromarray( mask )
+            #dispImg = Image.new('RGB', im.size)
+            #dispImg.paste(rgb, mask=mask)
+            #dispImg.show()
+            im.paste(rgb, mask=mask)
+
+        pix = numpy.array(im)
+        pix[:,:,0] = ndimage.gaussian_filter(pix[:,:,0], .5)
+        pix[:,:,1] = ndimage.gaussian_filter(pix[:,:,1], .5)
+        pix[:,:,2] = ndimage.gaussian_filter(pix[:,:,2], .5)
+        im = Image.fromarray( pix, mode='RGB' )
+        #import ImageFilter
+        #im = im.filter(ImageFilter.BLUR)   # or 'SMOOTH'
+
+        return im
 
     def _detectProperties_PIL(self):
         import Image
@@ -1042,12 +1200,12 @@ class main(checkimages.main):
         self._info['Properties'] = [result]
         return
 
-    def _filterProperties(self):
+    def _filter_Properties(self):
         # >>> never drop <<<
         result = self._info['Properties']
         return {'Properties': result}
 
-    def _filterFaces(self):
+    def _filter_Faces(self):
         result = self._info['Faces']
         if (len(result) < 5):
             buf = []
@@ -1058,7 +1216,7 @@ class main(checkimages.main):
             result = buf
         return {'Faces': result}
 
-    def _filterColorRegions(self):
+    def _filter_ColorRegions(self):
         #result = {}
         result = []
         for item in self._info['ColorRegions']:
@@ -1071,19 +1229,19 @@ class main(checkimages.main):
         #return {'ColorRegions': [result[item] for item in result]}
         return {'ColorRegions': result}
 
-    def _filterColorAverage(self):
+    def _filter_ColorAverage(self):
         # >>> never drop <<<
         result = self._info['ColorAverage']
         return {'ColorAverage': result}
 
     # Category:Unidentified people
-    def _catPeople(self):
+    def _cat_face_People(self):
         relevance = bool(self._info_filter['Faces'])
 
         return (u'Unidentified people', relevance)
 
     # Category:Groups
-    def _catGroups(self):
+    def _cat_face_Groups(self):
         result = self._info_filter['Faces']
 
         #if not (len(result) > 1): # 5 should give 0.75 and get reported
@@ -1095,7 +1253,7 @@ class main(checkimages.main):
         return (u'Groups', relevance)
 
     # Category:Unidentified people
-    def _guessPeople(self):
+    def _guess__People(self):
         #result  = copy.deepcopy(self._info_filter['Faces'])
         #result += self._detectObjectPeople_CV()
 
@@ -1109,15 +1267,15 @@ class main(checkimages.main):
         return (u'Unidentified people', result, 0.1)
 
     ## Category:Unidentified maps
-    #def _guessMaps(self):
+    #def _guess__Maps(self):
     #    return (u'Unidentified maps', self._classifyObjectAll_CV('maps'), 0.1)
 
     ## Category:Unidentified flags
-    #def _guessFlags(self):
+    #def _guess__Flags(self):
     #    return (u'Unidentified flags', self._classifyObjectAll_CV('flags'), 0.1)
 
     # Category:Unidentified plants
-    def _guessPlants(self):
+    def _guess__Plants(self):
         cls = 'pottedplant'
         if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
             #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
@@ -1136,7 +1294,7 @@ class main(checkimages.main):
     #    return (u'Unidentified buildings', self._classifyObjectAll_CV('buildings'), 0.1)
 
     # Category:Unidentified trains
-    def _guessTrains(self):
+    def _guess__Trains(self):
         cls = 'train'
         if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
             #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
@@ -1147,7 +1305,7 @@ class main(checkimages.main):
         return (u'Unidentified trains', result, 0.1)
 
     # Category:Unidentified automobiles
-    def _guessAutomobiles(self):
+    def _guess__Automobiles(self):
         cls = 'bus'
         if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
             #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
@@ -1165,7 +1323,7 @@ class main(checkimages.main):
         return (u'Unidentified automobiles', result, 0.1)
 
     # Category:Unidentified buses
-    def _guessBuses(self):
+    def _guess__Buses(self):
         cls = 'bus'
         if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
             #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
@@ -1188,77 +1346,77 @@ class main(checkimages.main):
     # Category:Yellow    (255, 255,   0)
     # http://www.farb-tabelle.de/en/table-of-color.htm
     #def _collectColor(self):
-    def _catBlack(self):
+    def _cat_color_Black(self):
         info = self._info_filter['ColorRegions']
         for item in info:
             if (u'Black' == item[u'Color']):
                 return (u'Black', True)
         return (u'Black', False)
 
-    def _catBlue(self):
+    def _cat_color_Blue(self):
         info = self._info_filter['ColorRegions']
         for item in info:
             if (u'Blue' == item[u'Color']):
                 return (u'Blue', True)
         return (u'Blue', False)
 
-    def _catBrown(self):
+    def _cat_color_Brown(self):
         info = self._info_filter['ColorRegions']
         for item in info:
             if (u'Brown' == item[u'Color']):
                 return (u'Brown', True)
         return (u'Brown', False)
 
-    def _catGreen(self):
+    def _cat_color_Green(self):
         info = self._info_filter['ColorRegions']
         for item in info:
             if (u'Green' == item[u'Color']):
                 return (u'Green', True)
         return (u'Green', False)
 
-    def _catOrange(self):
+    def _cat_color_Orange(self):
         info = self._info_filter['ColorRegions']
         for item in info:
             if (u'Orange' == item[u'Color']):
                 return (u'Orange', True)
         return (u'Orange', False)
 
-    def _catPink(self):
+    def _cat_color_Pink(self):
         info = self._info_filter['ColorRegions']
         for item in info:
             if (u'Pink' == item[u'Color']):
                 return (u'Pink', True)
         return (u'Pink', False)
 
-    def _catPurple(self):
+    def _cat_color_Purple(self):
         info = self._info_filter['ColorRegions']
         for item in info:
             if (u'Purple' == item[u'Color']):
                 return (u'Purple', True)
         return (u'Purple', False)
 
-    def _catRed(self):
+    def _cat_color_Red(self):
         info = self._info_filter['ColorRegions']
         for item in info:
             if (u'Red' == item[u'Color']):
                 return (u'Red', True)
         return (u'Red', False)
 
-    def _catTurquoise(self):
+    def _cat_color_Turquoise(self):
         info = self._info_filter['ColorRegions']
         for item in info:
             if (u'Turquoise' == item[u'Color']):
                 return (u'Turquoise', True)
         return (u'Turquoise', False)
 
-    def _catWhite(self):
+    def _cat_color_White(self):
         info = self._info_filter['ColorRegions']
         for item in info:
             if (u'White' == item[u'Color']):
                 return (u'White', True)
         return (u'White', False)
 
-    def _catYellow(self):
+    def _cat_color_Yellow(self):
         info = self._info_filter['ColorRegions']
         for item in info:
             if (u'Yellow' == item[u'Color']):
@@ -1274,13 +1432,13 @@ class main(checkimages.main):
     #    return (u'Unidentified people', result, 1.0)
 
     # Category:Faces
-    def _catFaces(self):
+    def _cat_face_Faces(self):
         result = self._info_filter['Faces']
 
         return (u'Faces', ((len(result) == 1) and (result[0]['Coverage'] >= .50)))
 
     # Category:Portraits
-    def _catPortraits(self):
+    def _cat_face_Portraits(self):
         result = self._info_filter['Faces']
 
         #return (u'Portraits', ((len(result) == 1) and (result[0]['Coverage'] >= .25)))
@@ -1348,6 +1506,8 @@ def checkbot():
                 wait = True
                 waitTime = int(arg[6:])
         elif arg.startswith('-start'):
+            firstPageTitle = ""
+            generator = pagegenerators.GeneratorFactory().getCategoryGen(u"-catr:Media_needing_categories", len('-catr'), recurse = True)
             if len(arg) == 6:
                 #firstPageTitle = pywikibot.input(u'From witch page do you want to start?')
                 if os.path.exists( os.path.join('cache', 'catimages_pos') ):
@@ -1355,11 +1515,8 @@ def checkbot():
                     shutil.copy2(os.path.join('cache', 'catimages_pos'), os.path.join('cache', 'catimages_pos.bak'))
                     posfile = open(os.path.join('cache', 'catimages_pos'), "r")
                     firstPageTitle = posfile.read().decode('utf-8')
-                    print firstPageTitle
                     posfile.close()
-                    generator = pagegenerators.GeneratorFactory().getCategoryGen(u"-catr:Media_needing_categories", len('-catr'), recurse = True)
             elif len(arg) > 6:
-                firstPageTitle = ""
                 generator = [pywikibot.Page(pywikibot.getSite(), arg[7:])]
             firstPageTitle = firstPageTitle.split(":")[1:]
             #generator = pywikibot.getSite().allpages(start=firstPageTitle, namespace=6)
