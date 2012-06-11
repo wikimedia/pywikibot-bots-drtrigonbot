@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikinews_family.py 10313 2012-06-08 06:20:49Z xqt $'
+__version__ = '$Id: wikinews_family.py 10343 2012-06-10 14:28:09Z xqt $'
 
 # The Wikimedia family that is known as Wikinews
 
@@ -265,6 +265,7 @@ class Family(family.Family):
             'jp': 'ja',
             'nb': 'no',
             'nl': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=20325
+            'sd': None,
             'th': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=28341
             'zh-tw': 'zh',
             'zh-cn': 'zh'

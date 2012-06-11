@@ -57,7 +57,7 @@ your user-config.py:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: cosmetic_changes.py 10312 2012-06-08 06:11:57Z xqt $'
+__version__ = '$Id: cosmetic_changes.py 10346 2012-06-11 05:35:41Z xqt $'
 #
 import sys, re
 import wikipedia as pywikibot
@@ -140,6 +140,7 @@ deprecatedTemplates = {
         ],
     }
 }
+
 
 class CosmeticChangesToolkit:
     def __init__(self, site, debug=False, redirect=False, namespace=None,
@@ -358,6 +359,11 @@ class CosmeticChangesToolkit:
                 if self.site.lang in ('en', 'fr'):
                     # do not change "Image" on en-wiki and fr-wiki
                     for image in [u'Image', u'image']:
+                        if image in namespaces:
+                            namespaces.remove(image)
+                if self.site.lang == 'hu':
+                    # do not change "Kép" on hu-wiki
+                    for image in [u'Kép', u'kép']:
                         if image in namespaces:
                             namespaces.remove(image)
                 elif self.site.lang == 'pt':
@@ -805,6 +811,7 @@ class CosmeticChangesToolkit:
             r'\1== {{int:license}} ==', exceptions, True)
         return text
 
+
 class CosmeticChangesBot:
     def __init__(self, generator, acceptall=False,
                  comment=u'Robot: Cosmetic changes', async=False):
@@ -861,6 +868,7 @@ class CosmeticChangesBot:
                 self.treat(page)
         except KeyboardInterrupt:
             pywikibot.output('\nQuitting program...')
+
 
 def main():
     #page generator

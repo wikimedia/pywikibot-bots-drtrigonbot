@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: test_family.py 10140 2012-04-20 16:08:24Z xqt $'
+__version__ = '$Id: test_family.py 10338 2012-06-09 14:48:11Z multichill $'
 
 import family
 
@@ -155,14 +155,7 @@ class Family(family.Family):
         return ('commons', 'commons')
 
     if family.config.SSL_connection:
-        def hostname(self, code):
-            return 'secure.wikimedia.org'
-
         def protocol(self, code):
             return 'https'
 
-        def scriptpath(self, code):
-            return '/wikipedia/test/w'
 
-        def nicepath(self, code):
-            return '/wikipedia/test/wiki/'

@@ -119,7 +119,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 10323 2012-06-08 09:12:42Z drtrigon $'
+__version__ = '$Id: wikipedia.py 10347 2012-06-11 10:49:54Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -1067,7 +1067,7 @@ not supported by PyWikipediaBot!"""
 
             # code debugging
             if verbose:
-                debugDump( 'Page.getSections', self.site, err, debug_data.encode(config.textfile_encoding) )
+                debugDump( 'Page.getSections', self.site, 'Page.getSections', debug_data.encode(config.textfile_encoding) )
 
             for setting in [(0.05,0.95), (0.4,0.8), (0.05,0.8), (0.0,0.8)]:  # 0.6 is default upper border
                 try:
@@ -1980,7 +1980,8 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
             self._editrestriction = False
         # If no comment is given for the change, use the default
         comment = comment or action
-        if config.cosmetic_changes and not self.isTalkPage() and not calledModuleName() == 'cosmetic_changes':
+        if config.cosmetic_changes and not self.isTalkPage() and \
+           not calledModuleName() in ('cosmetic_changes', 'touch'):
             if config.cosmetic_changes_mylang_only:
                 cc = (self.site().family.name == config.family and self.site().lang == config.mylang) or \
                      self.site().family.name in config.cosmetic_changes_enable.keys() and \

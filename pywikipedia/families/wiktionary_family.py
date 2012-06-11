@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wiktionary_family.py 10313 2012-06-08 06:20:49Z xqt $'
+__version__ = '$Id: wiktionary_family.py 10343 2012-06-10 14:28:09Z xqt $'
 
 # The Wikimedia family that is known as Wiktionary
 
@@ -18,12 +18,12 @@ class Family(family.Family):
             'oc', 'is', 'hr', 'th', 'simple', 'scn', 'sr', 'af', 'cy', 'fy',
             'sw', 'tl', 'ast', 'fj', 'ur', 'he', 'la', 'sq', 'da', 'hy', 'wa',
             'sl', 'zh-min-nan', 'tt', 'hi', 'az', 'lv', 'ka', 'lb', 'pnb', 'nn',
-            'tk', 'hsb', 'kk', 'bs', 'nah', 'km', 'be', 'wo', 'ga', 'mk', 'ang',
+            'tk', 'hsb', 'kk', 'bs', 'nah', 'km', 'mk', 'be', 'wo', 'ga', 'ang',
             'co', 'ms', 'gn', 'mr', 'csb', 'sk', 'st', 'nds', 'ia', 'si', 'sh',
             'sd', 'tg', 'ug', 'ky', 'kl', 'an', 'zu', 'gu', 'mn', 'fo', 'kw',
-            'rw', 'ss', 'ie', 'qu', 'gv', 'om', 'roa-rup', 'iu', 'bn', 'ps',
-            'so', 'sa', 'su', 'chr', 'za', 'am', 'gd', 'mt', 'tpi', 'mi', 'ik',
-            'yi', 'ln', 'uz', 'ti', 'sg', 'na', 'jv', 'pa', 'sm', 'or', 'tn',
+            'rw', 'ss', 'ie', 'qu', 'gv', 'om', 'ps', 'roa-rup', 'iu', 'bn',
+            'so', 'sa', 'chr', 'su', 'za', 'gd', 'am', 'mt', 'tpi', 'mi', 'ik',
+            'yi', 'ln', 'uz', 'ti', 'sg', 'jv', 'na', 'pa', 'sm', 'or', 'tn',
             'jbo', 'dv', 'ne', 'ha', 'ks', 'ay', 'ts', 'dz',
         ]
 
@@ -666,6 +666,7 @@ class Family(family.Family):
             'ch': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Chamorro_Wiktionary
             'cr': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nehiyaw_Wiktionary
             'dk': 'da',
+            'dz': None,
             'jp': 'ja',
             'mh': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Marshallese_Wiktionary
             'mo': 'ro', # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wiktionary

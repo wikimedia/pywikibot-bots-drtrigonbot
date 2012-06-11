@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiquote_family.py 10313 2012-06-08 06:20:49Z xqt $'
+__version__ = '$Id: wikiquote_family.py 10343 2012-06-10 14:28:09Z xqt $'
 
 # The Wikimedia family that is known as Wikiquote
 
@@ -311,6 +311,7 @@ class Family(family.Family):
             'ang': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=29150
             'ast': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=28964
             'bm': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bambara_Wikiquote
+            'co': None,
             'cr': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nehiyaw_Wikiquote
             'dk': 'da',
             'ga': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Gaeilge_Wikiquote
@@ -319,6 +320,7 @@ class Family(family.Family):
             'kr': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kanuri_Wikiquote
             'ks': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kashmiri_Wikiquote
             'kw': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kernewek_Wikiquote
+            'lb': None,
             'minnan':'zh-min-nan',
             'na': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nauruan_Wikiquote
             'nb': 'no',
