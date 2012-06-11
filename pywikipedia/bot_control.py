@@ -321,11 +321,16 @@ class BotLoggerObject:
     def __init__(self, logger, color=False, err=False):
         self._logger = logger
         self._color  = color
+        self._last   = ''
         if err:
             self._func = self._logger.error
         else:
             self._func = self._logger.info
     def write(self, string):
+        if (string == '\n') and (self._last != '\n'): # patch for direct \n flush and
+            self._last = string                       # r10043 upstream
+            return                                    # (behaviour is still strange)
+        self._last = string                           #
         if not self._color:
             string = self._REGEX_boc.sub('', string)  # make more readable
             string = self._REGEX_eoc.sub('', string)  #
