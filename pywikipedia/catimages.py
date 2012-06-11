@@ -14,36 +14,21 @@ Everything that needs customisation is indicated by comments.
 
 This script understands the following command-line arguments:
 
+-cat[:#]            Use a category as recursive generator
+                    (if no given 'Category:Media_needing_categories' is used)
+
+-start[:#]          Start already form File:[:#] or if no file given start
+                    from top (instead of resuming last run).
+
 -limit              The number of images to check (default: 80)
-
--duplicates[:#]     Checking if the image has duplicates (if arg, set how many
-                    rollback wait before reporting the image in the report
-                    instead of tag the image) default: 1 rollback.
-
--duplicatesreport   Report the duplicates in a log *AND* put the template in
-                    the images.
-
--sendemail          Send an email after tagging.
-
--break              To break the bot after the first check (default: recursive)
-
--time[:#]           Time in seconds between repeat runs (default: 30)
-
--wait[:#]           Wait x second before check the images (default: 0)
-
--start[:#]          Start already form File:[:#] or if no file given resume
-                    last run.
-
--cat[:#]            Use a category as generator
-
--untagged[:#]       Use daniel's tool as generator:
-                    http://toolserver.org/~daniel/WikiSense/UntaggedImages.php
-
--nologerror         If given, this option will disable the error that is risen
-                    when the log is full.
 
 -noguesses          If given, this option will disable all guesses (which are
                     less reliable than true searches).
+
+X-sendemail          Send an email after tagging.
+
+X-untagged[:#]       Use daniel's tool as generator:
+X                    http://toolserver.org/~daniel/WikiSense/UntaggedImages.php
 
 
 """
@@ -58,9 +43,9 @@ This script understands the following command-line arguments:
 __version__ = '$Id$'
 #
 
-import re, time, urllib, urllib2, os, locale, sys, datetime
+import re, time, urllib2, os, locale, sys, datetime
 import wikipedia as pywikibot
-import config, pagegenerators, catlib, query, userlib
+import pagegenerators, catlib
 import checkimages
 
 locale.setlocale(locale.LC_ALL, '')
@@ -122,16 +107,9 @@ def printWithTimeZone(message):
 class Global(object):
     # default environment settings
     # Command line configurable parameters
-    repeat = True            # Restart after having check all the images?
     limit = 80               # How many images check?
-    time_sleep = 30          # How many time sleep after the check?
-    waitTime = 0             # How many time sleep before the check?
-    normal = False           # Check the new images or use another generator?
     untagged = False         # Use the untagged generator
-    duplicatesActive = False # Use the duplicate option
-    duplicatesReport = False # Use the duplicate-report option
     sendemailActive = False  # Use the send-email
-    logFullError = True      # Raise an error when the log is full
     useGuesses = True        # Use guesses which are less reliable than true searches
 
 
@@ -173,7 +151,7 @@ class main(checkimages.main):
         if buf:
             self.tmpl_available_spec = buf
             pywikibot.output( u'\n\t...Following specialized templates found, check them since they are used now...\n' )
-            pywikibot.output( u'tmpl_available_spec = [ %s ]' % u", ".join(buf) )
+            pywikibot.output( u'tmpl_available_spec = [ %s ]\n' % u", ".join(buf) )
 
         return []
 
@@ -848,15 +826,15 @@ class main(checkimages.main):
         self._info['ColorRegions'] = []
         try:
             im = Image.open(self.image_path)
+
+            # crop 25% of the image in order to give the bot a more human eye
+            scale  = 0.75    # crop 25% percent (area) bounding box
+            (w, h) = ( self.image_size[0]*math.sqrt(scale), self.image_size[1]*math.sqrt(scale) )
+            (l, t) = ( (self.image_size[0]-w)/2, (self.image_size[1]-h)/2 )
+            i = im.crop( (int(l), int(t), int(l+w), int(t+h)) )
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
             return
-
-        # crop 25% of the image in order to give the bot a more human eye
-        scale  = 0.75    # crop 25% percent (area) bounding box
-        (w, h) = ( self.image_size[0]*math.sqrt(scale), self.image_size[1]*math.sqrt(scale) )
-        (l, t) = ( (self.image_size[0]-w)/2, (self.image_size[1]-h)/2 )
-        i = im.crop( (int(l), int(t), int(l+w), int(t+h)) )
 
         result = []
         #h = i.histogram()   # average over WHOLE IMAGE
@@ -1200,12 +1178,12 @@ class main(checkimages.main):
         self._info['Properties'] = [result]
         return
 
-    def _filter_Properties(self):
+    def _filter_general_Properties(self):
         # >>> never drop <<<
         result = self._info['Properties']
         return {'Properties': result}
 
-    def _filter_Faces(self):
+    def _filter_face_Faces(self):
         result = self._info['Faces']
         if (len(result) < 5):
             buf = []
@@ -1216,7 +1194,7 @@ class main(checkimages.main):
             result = buf
         return {'Faces': result}
 
-    def _filter_ColorRegions(self):
+    def _filter_color_ColorRegions(self):
         #result = {}
         result = []
         for item in self._info['ColorRegions']:
@@ -1229,7 +1207,7 @@ class main(checkimages.main):
         #return {'ColorRegions': [result[item] for item in result]}
         return {'ColorRegions': result}
 
-    def _filter_ColorAverage(self):
+    def _filter_color_ColorAverage(self):
         # >>> never drop <<<
         result = self._info['ColorAverage']
         return {'ColorAverage': result}
@@ -1449,28 +1427,28 @@ gbv = Global()
 def checkbot():
     """ Main function """
     # Command line configurable parameters
-    repeat = True # Restart after having check all the images?
     limit = 80 # How many images check?
-    time_sleep = 30 # How many time sleep after the check?
-    waitTime = 0 # How many time sleep before the check?
-    normal = False # Check the new images or use another generator?
     untagged = False # Use the untagged generator
-    duplicatesActive = False # Use the duplicate option
-    duplicatesReport = False # Use the duplicate-report option
     sendemailActive = False # Use the send-email
-    logFullError = True # Raise an error when the log is full
 
-    # emulate:  'python checkimages_content.py -limit:5 -break -lang:en'
-    # debug:    'python catimages.py -noguesses -debug'
+    # default
+    if len(sys.argv) < 2:
+        sys.argv += ['-cat']
+
+    # debug:    'python catimages.py -debug'
     # run/test: 'python catimages.py [-start:File:abc]'
-    #sys.argv += ['-limit:20', '-break', '-lang:en']
-    #sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-noguesses']#, '-start']
-    #sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-noguesses', '-start']
-#    sys.argv += ['-limit:100', '-break', '-family:commons', '-lang:commons', '-noguesses']
-    sys.argv += ['-limit:50', '-break', '-family:commons', '-lang:commons', '-noguesses']
-    print "http://commons.wikimedia.org/wiki/User:Multichill/Using_OpenCV_to_categorize_files"
+    sys.argv += ['-family:commons', '-lang:commons']
+    sys.argv += ['-noguesses']
 
-    firstPageTitle = None
+    # try to resume last run and continue
+    if os.path.exists( os.path.join('cache', 'catimages_start') ):
+        import shutil
+        shutil.copy2(os.path.join('cache', 'catimages_start'), os.path.join('cache', 'catimages_start.bak'))
+        posfile = open(os.path.join('cache', 'catimages_start'), "r")
+        firstPageTitle = posfile.read().decode('utf-8')
+        posfile.close()
+    else:
+        firstPageTitle = None
 
     # Here below there are the parameters.
     for arg in pywikibot.handleArgs():
@@ -1479,81 +1457,38 @@ def checkbot():
                 limit = int(pywikibot.input(u'How many files do you want to check?'))
             else:
                 limit = int(arg[7:])
-        if arg.startswith('-time'):
-            if len(arg) == 5:
-                time_sleep = int(pywikibot.input(u'How many seconds do you want runs to be apart?'))
-            else:
-                time_sleep = int(arg[6:])
-        elif arg == '-break':
-            repeat = False
-        elif arg == '-nologerror':
-            logFullError = False
-        elif arg.startswith('-duplicates'):
-            duplicatesActive = True
-            if len(arg) == 11:
-                duplicates_rollback = 1
-            elif len(arg) > 11:
-                duplicates_rollback = int(arg[12:])
-        elif arg == '-duplicatereport':
-            duplicatesReport = True
-        elif arg == '-sendemail':
-            sendemailActive = True
-        elif arg.startswith('-wait'):
-            if len(arg) == 5:
-                wait = True
-                waitTime = int(pywikibot.input(u'How many time do you want to wait before checking the files?'))
-            elif len(arg) > 5:
-                wait = True
-                waitTime = int(arg[6:])
+#        elif arg == '-sendemail':
+#            sendemailActive = True
         elif arg.startswith('-start'):
-            firstPageTitle = ""
-            generator = pagegenerators.GeneratorFactory().getCategoryGen(u"-catr:Media_needing_categories", len('-catr'), recurse = True)
             if len(arg) == 6:
-                #firstPageTitle = pywikibot.input(u'From witch page do you want to start?')
-                if os.path.exists( os.path.join('cache', 'catimages_pos') ):
-                    import shutil
-                    shutil.copy2(os.path.join('cache', 'catimages_pos'), os.path.join('cache', 'catimages_pos.bak'))
-                    posfile = open(os.path.join('cache', 'catimages_pos'), "r")
-                    firstPageTitle = posfile.read().decode('utf-8')
-                    posfile.close()
+                firstPageTitle = None
             elif len(arg) > 6:
-                generator = [pywikibot.Page(pywikibot.getSite(), arg[7:])]
-            firstPageTitle = firstPageTitle.split(":")[1:]
-            #generator = pywikibot.getSite().allpages(start=firstPageTitle, namespace=6)
-            #repeat = False
+                firstPageTitle = arg[7:]
+#            firstPageTitle = firstPageTitle.split(":")[1:]
+#            generator = pywikibot.getSite().allpages(start=firstPageTitle, namespace=6)
         elif arg.startswith('-cat'):
             if len(arg) == 4:
-                catName = str(pywikibot.input(u'In which category do I work?'))
+                catName = u'Media_needing_categories'
             elif len(arg) > 4:
                 catName = str(arg[5:])
             catSelected = catlib.Category(pywikibot.getSite(), 'Category:%s' % catName)
-            generator = pagegenerators.CategorizedPageGenerator(catSelected)
-            repeat = False
-        elif arg.startswith('-ref'):
-            if len(arg) == 4:
-                refName = str(pywikibot.input(u'The references of what page should I parse?'))
-            elif len(arg) > 4:
-                refName = str(arg[5:])
-            generator = pagegenerators.ReferringPageGenerator(pywikibot.Page(pywikibot.getSite(), refName))
-            repeat = False
-        elif arg.startswith('-untagged'):
-            untagged = True
-            if len(arg) == 9:
-                projectUntagged = str(pywikibot.input(u'In which project should I work?'))
-            elif len(arg) > 9:
-                projectUntagged = str(arg[10:])
+            generator = pagegenerators.CategorizedPageGenerator(catSelected, recurse = True)
+#        elif arg.startswith('-untagged'):
+#            untagged = True
+#            if len(arg) == 9:
+#                projectUntagged = str(pywikibot.input(u'In which project should I work?'))
+#            elif len(arg) > 9:
+#                projectUntagged = str(arg[10:])
         elif arg == '-noguesses':
             gbv.useGuesses = False
-            
-    ##generator = pagegenerators.GeneratorFactory().getCategoryGen(u"-catr:Media_needing_categories|fromtitle", len('-catr'), recurse = True)
-    #generator = pagegenerators.GeneratorFactory().getCategoryGen(u"-catr:Media_needing_categories", len('-catr'), recurse = True)
 
-    # Understand if the generator it's the default or not.
+    # Understand if the generator is present or not.
     try:
         generator
-    except NameError:
-        normal = True
-    
+    except:
+        pywikibot.output(u'no generator defined... EXIT.')
+        sys.exit()
+            
     # Define the site.
     site = pywikibot.getSite()
 
@@ -1561,121 +1496,76 @@ def checkbot():
     image_old_namespace = u"%s:" % site.image_namespace()
     image_namespace = u"File:"
 
-    # If the images to skip are 0, set the skip variable to False (the same for the wait time)
-    if waitTime == 0:
-        wait = False
-
     # A little block-statement to ensure that the bot will not start with en-parameters
     if site.lang not in project_inserted:
         pywikibot.output(u"Your project is not supported by this script. You have to edit the script and add it!")
         return
 
-    # Reading the log of the new images if another generator is not given.
-    if normal == True:
-        if limit == 1:
-            pywikibot.output(u"Retrieving the latest file for checking...")
-        else:
-            pywikibot.output(u"Retrieving the latest %d files for checking..." % limit)
-    # Main Loop
-    while 1:
-        # Defing the Main Class.
-        mainClass = main(site, sendemailActive = sendemailActive,
-                         duplicatesReport = duplicatesReport, logFullError = logFullError)
-        # Untagged is True? Let's take that generator
-        if untagged == True:
-            generator =  mainClass.untaggedGenerator(projectUntagged, limit)
-            normal = False # Ensure that normal is False
-        # Normal True? Take the default generator
-        if normal == True:
-            generator = site.newimages(number = limit)
-        # Ok, We (should) have a generator, so let's go on.
-        # Take the additional settings for the Project
-        mainClass.takesettings()
-        # Not the main, but the most important loop.
-        #parsed = False
-        if wait:
-            # Let's sleep...
-            generator = mainClass.wait(waitTime, generator, normal, limit)
-        outresult = []
-        for image in generator:
-            if firstPageTitle and not (image.title() == u":".join([u'File']+firstPageTitle)):
-                pywikibot.output( u"skipping page '%s' ..." % image.title() )
-                continue
-            if firstPageTitle and (image.title() == u":".join([u'File']+firstPageTitle)):
-                pywikibot.output( u"skipping page '%s' ..." % image.title() )
+    # Defing the Main Class.
+    mainClass = main(site, sendemailActive = sendemailActive,
+                     duplicatesReport = False, logFullError = False)
+    # Untagged is True? Let's take that generator
+    if untagged == True:
+        generator =  mainClass.untaggedGenerator(projectUntagged, limit)
+    # Ok, We (should) have a generator, so let's go on.
+    # Take the additional settings for the Project
+    mainClass.takesettings()
+    # Not the main, but the most important loop.
+    #parsed = False
+    outresult = []
+    for image in generator:
+        if firstPageTitle:
+            if (image.title() == firstPageTitle):
+                pywikibot.output( u"found starting page '%s' ..." % image.title() )
                 firstPageTitle = None
-                continue
-            if normal == False:
-                if image_namespace.lower() not in image.title().lower() and \
-                image_old_namespace.lower() not in image.title().lower() and 'file:' not in image.title().lower():
-                    pywikibot.output(u'%s seems not an file, skip it...' % image.title())
-                    continue
-            if normal:
-                imageData = image
-                image = imageData[0]
-                #20100511133318L --- 15:33, 11 mag 2010 e 18 sec
-                #b = str(imageData[1]) # use b as variable to make smaller the timestamp-formula used below..
-                # fixing the timestamp to the format that we normally use..
-                timestamp = imageData[1]#"%s-%s-%sT%s:%s:%sZ" % (b[0:4], b[4:6], b[6:8], b[8:10], b[10:12], b[12:14])
-                uploader = imageData[2]
-                comment = imageData[3] # useless, in reality..
             else:
-                timestamp = None
-                uploader = None
-                comment = None # useless, also this, let it here for further developments
-            try:
-                imageName = image.title().split(image_namespace)[1] # Deleting the namespace (useless here)
-            except IndexError:# Namespace image not found, that's not an image! Let's skip...
-                try:
-                    imageName = image.title().split(image_old_namespace)[1]
-                except IndexError:
-                    pywikibot.output(u"%s is not a file, skipping..." % image.title())
-                    continue
-            mainClass.setParameters(imageName, timestamp, uploader) # Setting the image for the main class
-            try:
-                mainClass.downloadImage()
-            except pywikibot.exceptions.NoPage:
+                pywikibot.output( u"skipping page '%s' ..." % image.title() )
                 continue
-            # Check if there are duplicates of the image on the project selected
-            if duplicatesActive == True:
-                response2 = mainClass.checkImageDuplicated(duplicates_rollback)
-                if response2 == False:
-                    continue
-            resultCheck = mainClass.checkStep()
-            try:
-                mainClass.tag_image(put=('write2wiki' in debug))
-                ret = mainClass.log_output()
-                if ret:
-                    outresult.append( ret )
-            except AttributeError:
-                pywikibot.output(u"ERROR: was not able to process image page!!!\n")
-            limit += -1
-            posfile = open(os.path.join('cache', 'catimages_pos'), "w")
-            posfile.write( image.title().encode('utf-8') )
-            posfile.close()
-            if limit < 0:
-                break
-            if pywikibot.debug:
-                break
-            if resultCheck:
-                continue
-    # A little block to perform the repeat or to break.
-        if repeat == True:
-            printWithTimeZone(u"Waiting for %s seconds," % time_sleep)
-            time.sleep(time_sleep)
-        else:
-            if outresult:
-                outpage = pywikibot.Page(site, u"User:DrTrigon/Category:Unidentified people (bot tagged)")
-                outresult = [ outpage.get() ] + outresult
-                if ('write2wiki' in debug):
-                    outpage.put( u"\n".join(outresult), comment="bot adding test results" )
-                else:
-                    print u"--- " * 20
-                    print u"--- " * 20
-                    print u"\n".join(outresult[1:])
 
-            pywikibot.output(u"\t\t\t>> STOP! <<")
-            break # Exit
+        timestamp = None
+        uploader = None
+        comment = None # useless, also this, let it here for further developments
+        try:
+            imageName = image.title().split(image_namespace)[1] # Deleting the namespace (useless here)
+        except IndexError:# Namespace image not found, that's not an image! Let's skip...
+            try:
+                imageName = image.title().split(image_old_namespace)[1]
+            except IndexError:
+                pywikibot.output(u"%s is not a file, skipping..." % image.title())
+                continue
+        mainClass.setParameters(imageName, timestamp, uploader) # Setting the image for the main class
+        try:
+            mainClass.downloadImage()
+        except pywikibot.exceptions.NoPage:
+            continue
+        resultCheck = mainClass.checkStep()
+        try:
+            mainClass.tag_image(put=('write2wiki' in debug))
+            ret = mainClass.log_output()
+            if ret:
+                outresult.append( ret )
+        except AttributeError:
+            pywikibot.output(u"ERROR: was not able to process image page!!!\n")
+        limit += -1
+        posfile = open(os.path.join('cache', 'catimages_start'), "w")
+        posfile.write( image.title().encode('utf-8') )
+        posfile.close()
+        if limit < 0:
+            break
+        if pywikibot.debug:
+            break
+        if resultCheck:
+            continue
+
+    if outresult:
+        outpage = pywikibot.Page(site, u"User:DrTrigon/Category:Unidentified people (bot tagged)")
+        outresult = [ outpage.get() ] + outresult
+        if ('write2wiki' in debug):
+            outpage.put( u"\n".join(outresult), comment="bot adding test results" )
+        else:
+            print u"--- " * 20
+            print u"--- " * 20
+            print u"\n".join(outresult[1:])
 
 
 # Main loop will take all the (name of the) images and then i'll check them.
