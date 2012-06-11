@@ -93,8 +93,8 @@ import logging
 import logging.handlers
 
 # wikipedia-bot imports
-import pagegenerators, userlib, botlist
-import clean_sandbox, sum_disc, subster, script_wui, subster_irc
+import pagegenerators, userlib, botlist, basic
+import clean_sandbox, sum_disc, subster, script_wui, subster_irc, catimages
 import dtbext
 # Splitting the bot into library parts
 import wikipedia as pywikibot
@@ -114,10 +114,11 @@ error_mail          = (u'DrTrigon', u'Bot ERROR')    # error mail via wiki mail 
 infolist = [ pywikibot.__version__, pywikibot.config.__version__,     # framework
              pywikibot.query.__version__, pagegenerators.__version__, #
              botlist.__version__, clean_sandbox.__version__,          #
-             dtbext.pywikibot.__version__, dtbext.basic.__version__,  # DrTrigonBot extensions
-             dtbext.userlib.__version__,                              #
+             basic.__version__,                                       #
+             dtbext.pywikibot.__version__,                            # DrTrigonBot extensions
              __version__, sum_disc.__version__, subster.__version__,  # bots
-             script_wui.__version__, subster_irc.__version__, ]       #
+             script_wui.__version__, subster_irc.__version__,         #
+             catimages.__version__, ]                                 #
 
 # bots to run and control
 bot_list = { 'clean_user_sandbox': ( clean_sandbox, ['-user'], 
@@ -496,12 +497,17 @@ if __name__ == "__main__":
             logfile = logfile.replace('.log', '_ar.log')
 
         log = BotLogger(logfile, not cron)
+        pywikibot.ui.stdout = sys.stdout    # patch needed for pywikibot.output
+        pywikibot.ui.stderr = sys.stderr    # (look at terminal_iterface_base.py)
 
         no_magic_words = ("-no_magic_words" in arg)
 
         error = BotErrorHandler(error_ec)
     else:
         log = BotLogger(logfile)
+        pywikibot.ui.stdout = sys.stdout    # patch needed for pywikibot.output
+        pywikibot.ui.stderr = sys.stderr    # (look at terminal_iterface_base.py)
+
         choice = pywikibot.inputChoice('Do you want to compress the histories?', ['Yes', 'No'], ['y', 'n'])
         if choice == 'y':
             logs = os.listdir(u'logs')
