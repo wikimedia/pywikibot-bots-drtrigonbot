@@ -83,7 +83,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '10348'
+__framework_rev__ = '10351'
 __release_ver__   = '1.2'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -131,9 +131,11 @@ bot_list = { 'clean_user_sandbox': ( clean_sandbox, ['-user'],
                                      u'"SubsterBot"'),
              'script_wui':         ( script_wui, [], 
                                      u'Script WikiUserInterface (beta)'),
+             'catimages':          ( catimages, ['-cat', '-limit:1'], 
+                                     u'Categorize Images (by content)'),
              'subster_irc':        ( subster_irc, [], 
                                      u'"SubsterBot" IRC surveillance (beta)'), }
-bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'script_wui', 'subster', 'subster_irc' ]
+bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'script_wui', 'catimages', 'subster', 'subster_irc' ]
 
 # SGE: exit errorlevel
 error_SGE_ok      = 0    # successful termination, nothing more to do
@@ -480,6 +482,8 @@ if __name__ == "__main__":
                              'sum_disc':           True,
                              'subster':            True,
                              'script_wui':         True,
+#                             'catimages':          True,
+                             'catimages':          False,
             })
         elif ("-compress_history:[]" in arg):          # muss alleine laufen, sollte aber mit allen 
             do_dict['compress_history'] = True         # anderen kombiniert werden können (siehe 'else')...!
@@ -495,6 +499,7 @@ if __name__ == "__main__":
                              'sum_disc':           ("-sum_disc" in arg),
                              'subster':            ("-subster" in arg),
                              'script_wui':         ("-script_wui" in arg),
+                             'catimages':          ("-catimages" in arg),
             })
 
         # hack/work-a-round for hourly runs on 'ar' not to flood mainbot logs

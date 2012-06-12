@@ -128,12 +128,6 @@ class ScriptWUIBot(basic.AutoBasicBot):
         time.tzset()
         pywikibot.output(u'Setting process TimeZone (TZ): %s' % str(time.tzname))    # ('CET', 'CEST')
 
-        # init constants
-        self._bot_config = bot_config
-        # convert e.g. namespaces to corret language
-        self._bot_config['TemplateName'] = pywikibot.Page(self.site, self._bot_config['TemplateName']).title()
-        self._template_regex = re.compile('\{\{' + self._bot_config['TemplateName'] + '(.*?)\}\}', re.S)
-
         self._debug = debug
 
 

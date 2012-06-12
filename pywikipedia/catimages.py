@@ -25,6 +25,8 @@ This script understands the following command-line arguments:
 -noguesses          If given, this option will disable all guesses (which are
                     less reliable than true searches).
 
+-single:#           Run for one (any) single page only.
+
 X-sendemail          Send an email after tagging.
 
 X-untagged[:#]       Use daniel's tool as generator:
@@ -114,7 +116,7 @@ class Global(object):
 
 
 # EXPERIMENTAL BOT SCRIPT DERIVED FROM 'checkimages.py' and should use 'catlib.py'
-class main(checkimages.main):
+class CatImagesBot(checkimages.main):
 #    def __init__(self, site, logFulNumber = 25000, sendemailActive = False,
 #                 duplicatesReport = False, logFullError = True): pass
 #    def setParameters(self, imageName, timestamp, uploader): pass
@@ -126,7 +128,8 @@ class main(checkimages.main):
 
     # or may be '__init__' ... ???
     def load_licenses(self):
-        pywikibot.output(u'\n\t...Listing the procedures available...\n')
+        #pywikibot.output(u'\n\t...Listing the procedures available...\n')
+        pywikibot.output(u'\n\t...Listing the procedures used...\n')
         
         self._funcs = {'filter': [], 'cat': [], 'guess': []}
 
@@ -200,7 +203,7 @@ class main(checkimages.main):
         except:
             self.image_path_JPEG = self.image_path
 
-    # LOOK ALSO AT: checkimages.main.checkStep
+    # LOOK ALSO AT: checkimages.CatImagesBot.checkStep
     # (and category scripts/bots too...)
     def checkStep(self):
         #print self.image_path
@@ -278,7 +281,10 @@ class main(checkimages.main):
         return
 
     def log_output(self):
-        if not self._reportInformation(self._info):
+        # ColorRegions always applies here since there is at least 1 (THE average) color...
+        ignore = ['Properties', 'ColorAverage', 'ColorRegions'] # + ColorRegions
+        #if not self._reportInformation(self._info):
+        if not self._reportInformation(self._info, ignore = ignore):
             return u""
 
         ret  = []
@@ -586,12 +592,14 @@ class main(checkimages.main):
             #    c = 0.5
             #else:
             #    c = 0.1
-            ca = (data['Coverage'])**(1./4)                 # 0.35 -> ~0.75
-            #cb = (0.02 * (50. - data['Delta_E']))**(1./2)   # 20.0 -> ~0.75
-            cb = (0.02 * (50. - data['Delta_E']))**(1./3)   # 25.0 -> ~0.75
+            ca = (data['Coverage'])**(1./5)                 # 0.25 -> ~0.75
+            #ca = (data['Coverage'])**(1./4)                 # 0.35 -> ~0.75
+            #cb = (0.02 * (50. - data['Delta_E']))**(1.2)    # 10.0 -> ~0.75
+            cb = (0.02 * (50. - data['Delta_E']))**(1./2)   # 20.0 -> ~0.75
+            #cb = (0.02 * (50. - data['Delta_E']))**(1./3)   # 25.0 -> ~0.75
             cc = (1. - (data['Delta_R']/max_dim))**(1.)     # 0.25 -> ~0.75
-            c  = ( ca + 2*cb ) / 3
-            #c  = ( cc + 2*ca + 4*cb ) / 7
+            c  = ( 3*ca + cb ) / 4
+            #c  = ( cc + 6*ca + 2*cb ) / 9
             self._info['ColorRegions'][i]['Confidence'] = c
 
         # People
@@ -600,8 +608,7 @@ class main(checkimages.main):
         # general (trained) classification
         #self._classifyObjectAll_CV()
 
-    def _reportInformation(self, info):
-        ignore = ['Properties', 'ColorAverage']
+    def _reportInformation(self, info, ignore = ['Properties', 'ColorAverage']):
         result = []
         for item in info:
             if item in ignore:
@@ -814,7 +821,7 @@ class main(checkimages.main):
         self._info['Classify'] = dict([ (trained[i], abs(r)) for i, r in enumerate(result) ])
         return
 
-    # a lot mor paper and possible algos exist; (those with code are...)
+    # a lot more paper and possible algos exist; (those with code are...)
     # http://www.lix.polytechnique.fr/~schwander/python-srm/
     # http://library.wolfram.com/infocenter/Demos/5725/#downloads
     # http://code.google.com/p/pymeanshift/wiki/Examples
@@ -841,14 +848,15 @@ class main(checkimages.main):
         (pic, scale) = self._JSEGdetectColorSegments(i)          # split image into segments first
         #(pic, scale) = self._SLICdetectColorSegments(i)          # split image into superpixel first
         hist = self._getColorSegmentsHist(i, pic, scale)         #
-        pic  = self._ColorRegionsMerge_ColorSimplify(pic, hist)  # iteratively in order to merge similar regions
-        (pic, scale_) = self._JSEGdetectColorSegments(pic)       # (final split)
-        #(pic, scale) = self._JSEGdetectColorSegments(pic)        # (final split)
-        hist = self._getColorSegmentsHist(i, pic, scale)         #
+        #pic  = self._ColorRegionsMerge_ColorSimplify(pic, hist)  # iteratively in order to MERGE similar regions
+        #(pic, scale_) = self._JSEGdetectColorSegments(pic)       # (final split)
+        ##(pic, scale) = self._JSEGdetectColorSegments(pic)        # (final split)
+        #hist = self._getColorSegmentsHist(i, pic, scale)         #
         i = 0
+        # (may be do an additional region merge according to same color names...)
         for (h, coverage, (center, bbox)) in hist:
-            #if (coverage < 0.05):    # at least 10% coverage needed (help for debugging)
-            #    continue
+            if (coverage < 0.05):    # at least 5% coverage needed (help for debugging/log_output)
+                continue
 
             data = self._DeltaEaverageColor(h)
             data['Coverage'] = coverage
@@ -1481,6 +1489,11 @@ def checkbot():
 #                projectUntagged = str(arg[10:])
         elif arg == '-noguesses':
             gbv.useGuesses = False
+        elif arg.startswith('-single'):
+            if len(arg) > 7:
+                pageName = str(arg[8:])
+            generator = [ pywikibot.Page(pywikibot.getSite(), pageName) ]
+            firstPageTitle = None
 
     # Understand if the generator is present or not.
     try:
@@ -1502,7 +1515,7 @@ def checkbot():
         return
 
     # Defing the Main Class.
-    mainClass = main(site, sendemailActive = sendemailActive,
+    mainClass = CatImagesBot(site, sendemailActive = sendemailActive,
                      duplicatesReport = False, logFullError = False)
     # Untagged is True? Let's take that generator
     if untagged == True:
@@ -1519,7 +1532,7 @@ def checkbot():
                 pywikibot.output( u"found starting page '%s' ..." % image.title() )
                 firstPageTitle = None
             else:
-                pywikibot.output( u"skipping page '%s' ..." % image.title() )
+                #pywikibot.output( u"skipping page '%s' ..." % image.title() )
                 continue
 
         timestamp = None
@@ -1550,7 +1563,7 @@ def checkbot():
         posfile = open(os.path.join('cache', 'catimages_start'), "w")
         posfile.write( image.title().encode('utf-8') )
         posfile.close()
-        if limit < 0:
+        if limit <= 0:
             break
         if pywikibot.debug:
             break
@@ -1558,8 +1571,8 @@ def checkbot():
             continue
 
     if outresult:
-        outpage = pywikibot.Page(site, u"User:DrTrigon/Category:Unidentified people (bot tagged)")
-        outresult = [ outpage.get() ] + outresult
+        outpage = pywikibot.Page(site, u"User:DrTrigon/User:DrTrigonBot/logging")
+        #outresult = [ outpage.get() ] + outresult   # append to page
         if ('write2wiki' in debug):
             outpage.put( u"\n".join(outresult), comment="bot adding test results" )
         else:
@@ -1567,12 +1580,15 @@ def checkbot():
             print u"--- " * 20
             print u"\n".join(outresult[1:])
 
+main = checkbot
+
 
 # Main loop will take all the (name of the) images and then i'll check them.
 if __name__ == "__main__":
     old = datetime.datetime.strptime(str(datetime.datetime.utcnow()).split('.')[0], "%Y-%m-%d %H:%M:%S") #timezones are UTC
     try:
         checkbot()
+        #main()
     finally:
         final = datetime.datetime.strptime(str(datetime.datetime.utcnow()).split('.')[0], "%Y-%m-%d %H:%M:%S") #timezones are UTC
         delta = final - old
