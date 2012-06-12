@@ -125,6 +125,10 @@ class CatImagesBot(checkimages.main):
 
     #ignore = []
     ignore = ['color']
+    
+    _thrhld_group_size = 4
+    _thrshld_guesses = 0.1
+    _thrshld_default = 0.75
 
     # or may be '__init__' ... ???
     def load_licenses(self):
@@ -210,9 +214,9 @@ class CatImagesBot(checkimages.main):
         pywikibot.output(self.image.title())
 
         if gbv.useGuesses:
-            self.thrshld = 0.1
+            self.thrshld = self._thrshld_guesses
         else:
-            self.thrshld = 0.75
+            self.thrshld = self._thrshld_default
 
         self._info         = {}     # used for LOG/DEBUG OUTPUT ONLY
         self._info_filter  = {}     # used for CATEGORIZATION
@@ -247,7 +251,8 @@ class CatImagesBot(checkimages.main):
     def tag_image(self, put = False):
         self.clean_cache()
 
-        if not self._reportInformation(self._info_filter):
+        #if not self._reportInformation(self._info_filter):  # information available?
+        if not self._result_check:                          # category available?
             return u""
 
         pywikibot.get_throttle()
@@ -283,8 +288,9 @@ class CatImagesBot(checkimages.main):
     def log_output(self):
         # ColorRegions always applies here since there is at least 1 (THE average) color...
         ignore = ['Properties', 'ColorAverage', 'ColorRegions'] # + ColorRegions
-        #if not self._reportInformation(self._info):
-        if not self._reportInformation(self._info, ignore = ignore):
+        #if not self._reportInformation(self._info):  # information available?
+        # information available? AND/OR category available?
+        if not (self._reportInformation(self._info, ignore = ignore) or self._result_check):
             return u""
 
         ret  = []
@@ -884,7 +890,8 @@ class CatImagesBot(checkimages.main):
         
         self._info['ColorAverage'] = []
         try:
-            i = Image.open(self.image_path)
+            # we need to have 3 channels (but e.g. grayscale 'P' has only 1)
+            i = Image.open(self.image_path).convert(mode = 'RGB')
             h = i.histogram()
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
@@ -1180,20 +1187,21 @@ class CatImagesBot(checkimages.main):
                    'Mode':       i.mode,
                    'Dimensions': i.size,
                    #'info':       i.info,
-                   'Filesize':   os.path.getsize(self.image_path), }
-                   #'stat':       os.stat(self.image_path), }
+                   'Filesize':   os.path.getsize(self.image_path),
+                   #'stat':       os.stat(self.image_path),
+                   'Palette':    str(len(i.palette.palette)) if i.palette else u'-', }
 
         self._info['Properties'] = [result]
         return
 
-    def _filter_general_Properties(self):
+    def _filter_Properties(self):
         # >>> never drop <<<
         result = self._info['Properties']
         return {'Properties': result}
 
-    def _filter_face_Faces(self):
+    def _filter_Faces(self):
         result = self._info['Faces']
-        if (len(result) < 5):
+        if (len(result) < self._thrhld_group_size):
             buf = []
             for item in self._info['Faces']:
                 # >>> drop if below thrshld <<<
@@ -1202,7 +1210,7 @@ class CatImagesBot(checkimages.main):
             result = buf
         return {'Faces': result}
 
-    def _filter_color_ColorRegions(self):
+    def _filter_ColorRegions(self):
         #result = {}
         result = []
         for item in self._info['ColorRegions']:
@@ -1215,7 +1223,7 @@ class CatImagesBot(checkimages.main):
         #return {'ColorRegions': [result[item] for item in result]}
         return {'ColorRegions': result}
 
-    def _filter_color_ColorAverage(self):
+    def _filter_ColorAverage(self):
         # >>> never drop <<<
         result = self._info['ColorAverage']
         return {'ColorAverage': result}
@@ -1234,7 +1242,7 @@ class CatImagesBot(checkimages.main):
         #    relevance = 0.
         #else:
         #    relevance = 1 - 1./(len(result)-1)
-        relevance = (len(result) >= 3)
+        relevance = (len(result) >= self._thrhld_group_size)
 
         return (u'Groups', relevance)
 
@@ -1435,7 +1443,7 @@ gbv = Global()
 def checkbot():
     """ Main function """
     # Command line configurable parameters
-    limit = 80 # How many images check?
+    limit = 100 # How many images check?
     untagged = False # Use the untagged generator
     sendemailActive = False # Use the send-email
 
@@ -1472,8 +1480,8 @@ def checkbot():
                 firstPageTitle = None
             elif len(arg) > 6:
                 firstPageTitle = arg[7:]
-#            firstPageTitle = firstPageTitle.split(":")[1:]
-#            generator = pywikibot.getSite().allpages(start=firstPageTitle, namespace=6)
+            #firstPageTitle = firstPageTitle.split(":")[1:]
+            #generator = pywikibot.getSite().allpages(start=firstPageTitle, namespace=6)
         elif arg.startswith('-cat'):
             if len(arg) == 4:
                 catName = u'Media_needing_categories'
@@ -1574,7 +1582,7 @@ def checkbot():
         outpage = pywikibot.Page(site, u"User:DrTrigon/User:DrTrigonBot/logging")
         #outresult = [ outpage.get() ] + outresult   # append to page
         if ('write2wiki' in debug):
-            outpage.put( u"\n".join(outresult), comment="bot adding test results" )
+            outpage.put( u"\n".join(outresult), comment="bot writing log for last run" )
         else:
             print u"--- " * 20
             print u"--- " * 20

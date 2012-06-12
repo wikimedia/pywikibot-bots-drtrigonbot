@@ -84,7 +84,7 @@ Options/parameters:
 #
 __version__       = '$Id$'
 __framework_rev__ = '10351'
-__release_ver__   = '1.2'   # increase minor (1.x) at re-merges with framework
+__release_ver__   = '1.3'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
 
@@ -131,7 +131,7 @@ bot_list = { 'clean_user_sandbox': ( clean_sandbox, ['-user'],
                                      u'"SubsterBot"'),
              'script_wui':         ( script_wui, [], 
                                      u'Script WikiUserInterface (beta)'),
-             'catimages':          ( catimages, ['-cat', '-limit:1'], 
+             'catimages':          ( catimages, ['-cat'],#, '-limit:1'], 
                                      u'Categorize Images (by content)'),
              'subster_irc':        ( subster_irc, [], 
                                      u'"SubsterBot" IRC surveillance (beta)'), }
