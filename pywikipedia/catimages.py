@@ -216,7 +216,7 @@ class CatImagesBot(checkimages.main):
         self._result_check = []
 
         # gather all information related to current image
-        self._gatherInformation()
+        self.gatherInformation()
 
         # information template: use filter to select from gathered information
         self._info_filter = {}
@@ -244,31 +244,31 @@ class CatImagesBot(checkimages.main):
     def tag_image(self):
         self.clean_cache()
 
-        #if not self._reportInformation(self._info_filter):  # information available?
+        #if not self._existInformation(self._info_filter):  # information available?
         if not self._result_check:                          # category available?
             return u""
 
         pywikibot.get_throttle()
         content = self.image.get()
 
-        content = self.append_to_template(content, u"Information", tmpl_FileContentsByBot)
+        content = self._append_to_template(content, u"Information", tmpl_FileContentsByBot)
         for i, key in enumerate(self._info_filter):
             item = self._info_filter[key]
 
-            info = self.make_infoblock(key, item)
+            info = self._make_infoblock(key, item)
             if info:
-                content = self.append_to_template(content, u"FileContentsByBot", info)
+                content = self._append_to_template(content, u"FileContentsByBot", info)
 
         tags = set([])
         for i, cat in enumerate(self._result_check):
             tags.add( u"[[:Category:%s]]" % cat )
-            content = self.add_category(content, u"Category:%s" % cat)
+            content = self._add_category(content, u"Category:%s" % cat)
 
         tags.add( u"[[:Category:Categorized by DrTrigonBot]]" )
-        content = self.add_category(content, u"Category:Categorized by DrTrigonBot")
-        content = self.add_template(content, u"Check categories|year={{subst:#time:Y}}|month={{subst:#time:F}}|day={{subst:#time:j}}|category=[[Category:Categorized by DrTrigonBot]]", top=True)
-        content = self.remove_category_or_template(content, u"Uncategorized")
-        content = self.gather_category(content)
+        content = self._add_category(content, u"Category:Categorized by DrTrigonBot")
+        content = self._add_template(content, u"Check categories|year={{subst:#time:Y}}|month={{subst:#time:F}}|day={{subst:#time:j}}|category=[[Category:Categorized by DrTrigonBot]]", top=True)
+        content = self._remove_category_or_template(content, u"Uncategorized")
+        content = self._gather_category(content)
         print u"--- " * 20
         print content
         print u"--- " * 20
@@ -280,9 +280,9 @@ class CatImagesBot(checkimages.main):
     def log_output(self):
         # ColorRegions always applies here since there is at least 1 (THE average) color...
         ignore = ['Properties', 'ColorAverage', 'ColorRegions'] # + ColorRegions
-        #if not self._reportInformation(self._info):  # information available?
+        #if not self._existInformation(self._info):  # information available?
         # information available? AND/OR category available?
-        if not (self._reportInformation(self._info, ignore = ignore) or self._result_check):
+        if not (self._existInformation(self._info, ignore = ignore) or self._result_check):
             return u""
 
         ret  = []
@@ -290,8 +290,8 @@ class CatImagesBot(checkimages.main):
         ret.append( u"== [[:%s]] ==" % self.image.title() )
         ret.append( u'<div style="position:relative;">' )
         ret.append( u"[[%s|200px]]" % self.image.title() )
-        ret.append( self.make_markerblock(self._info[u'Faces'], 200.) )
-        ret.append( self.make_markerblock(self._info[u'ColorRegions'], 200.,
+        ret.append( self._make_markerblock(self._info[u'Faces'], 200.) )
+        ret.append( self._make_markerblock(self._info[u'ColorRegions'], 200.,
                                           structure=['Position']) )
         ret.append( u"</div>" )
 
@@ -302,7 +302,7 @@ class CatImagesBot(checkimages.main):
         for i, key in enumerate(self._info):
             item = self._info[key]
 
-            info = self.make_infoblock(key, item, [])
+            info = self._make_infoblock(key, item, [])
             if info:
                 buf.append( info )
         ret.append( tmpl_FileContentsByBot[3:] + u"\n" + u"\n".join( buf ) + u"\n}}" )
@@ -318,7 +318,7 @@ class CatImagesBot(checkimages.main):
         if os.path.exists(image_path_new):
             os.remove( image_path_new )
 
-    def make_infoblock(self, cat, res, tmpl_available=None):
+    def _make_infoblock(self, cat, res, tmpl_available=None):
         if not res:
             return u''
 
@@ -337,7 +337,7 @@ class CatImagesBot(checkimages.main):
             buf = dict([ (key, []) for key in titles ])
             for item in res:
                 for key in titles:
-                    buf[key].append( self.output_format(item[key]) )
+                    buf[key].append( self._output_format(item[key]) )
             for key in titles:
                 result.append( u"  {{FileContentsByBot/generic|name=%s|value=%s}}" % (key, u"; ".join(buf[key])) )
         else:
@@ -346,13 +346,13 @@ class CatImagesBot(checkimages.main):
                 result.append( u"  {{FileContentsByBot/%s" % cat )
                 for key in titles:
                     if not (item[key] == []):   # (work-a-round for empty 'Eyes')
-                        result.append( self.output_format_flatten(key, item[key]) )
+                        result.append( self._output_format_flatten(key, item[key]) )
                 result.append( u"  }}" )
         result.append( u"}}" )
 
         return u"\n".join( result )
 
-    def output_format(self, value):
+    def _output_format(self, value):
         if (type(value) == type(float())):
             # round/strip floats
             return "%.3f" % value
@@ -360,18 +360,18 @@ class CatImagesBot(checkimages.main):
             # output string representation of variable
             return str(value)
 
-    def output_format_flatten(self, key, value):
+    def _output_format_flatten(self, key, value):
         # flatten structured varible recursively
         if (type(value) == type(tuple())) or (type(value) == type(list())):
             buf = []
             for i, t in enumerate(value):
-                buf.append( self.output_format_flatten(key + (u"-%02i" % i), t) )
+                buf.append( self._output_format_flatten(key + (u"-%02i" % i), t) )
             return u"\n".join( buf )
         else:
             # end of recursion
-            return u"  | %s = %s" % (key, self.output_format(value))
+            return u"  | %s = %s" % (key, self._output_format(value))
 
-    def make_markerblock(self, res, size, structure=['Position', 'Eyes'], line='solid'):
+    def _make_markerblock(self, res, size, structure=['Position', 'Eyes'], line='solid'):
         import numpy
 
         # same as in '_detectObjectFaces_CV'
@@ -407,66 +407,13 @@ class CatImagesBot(checkimages.main):
 
         return u"\n".join( result )
 
-    # http://commons.wikimedia.org/wiki/Help:Gadget-ImageAnnotator
-    # (example: http://commons.wikimedia.org/wiki/File:13054_1198498614793_1598345855_498977_4395881_n.jpg)
-    def make_ImageAnnotatorBlock(self, item):
-        #import numpy
-
-        (cat, res, rel) = item
-
-        # same as in '_detectObjectFaces_CV'
-        colors = [ (0,0,255),
-            (0,128,255),
-            (0,255,255),
-            (0,255,0),
-            (255,128,0),
-            (255,255,0),
-            (255,0,0),
-            (255,0,255) ]
-        result = []
-        k = 0
-        for i, r in enumerate(res):
-            color = list(colors[i%8])
-            color.reverse()
-            color = u"%02x%02x%02x" % tuple(color)
-            
-            ##scale = r['size'][0]/size
-            #scale = self.image_size[0]/size
-            #f     = list(numpy.array(r['Position'])/scale)
-            
-            k += 1
-            param = {'id': k, 'x': r['Position'][0], 'y': r['Position'][1], 
-                     'w': r['Position'][2], 'h': r['Position'][3], 'dx': self.image_size[0], 'dy': self.image_size[1], 
-                     'color': color}
-            result.append( u'{{ImageNote|id=%(id)i|x=%(x)i|y=%(y)i|w=%(w)i|h=%(h)i|dimx=%(dx)i|dimy=%(dy)i|style=2}}' % param )
-            result.append( u'{{LangSwitch' )
-            result.append( u'|en=face' )
-            result.append( u'}}' )
-            #result.append( u'{{ImageNoteColors|inner=#%(color)s|active=#%(color)s}}' % param )
-            result.append( u'{{ImageNoteEnd|id=%(id)i}}' % param )
-
-            for j, e in enumerate(r['Eyes']):
-                #e = list(numpy.array(e)/scale)
-
-                k += 1
-                param.update({'id': k, 'x': e[0], 'y': e[1], 
-                              'w': e[2], 'h': e[3]})
-                result.append( u'{{ImageNote|id=%(id)i|x=%(x)i|y=%(y)i|w=%(w)i|h=%(h)i|dimx=%(dx)i|dimy=%(dy)i|style=2}}' % param )
-                result.append( u'{{LangSwitch' )
-                result.append( u'|en=eye' )
-                result.append( u'}}' )
-                #result.append( u'{{ImageNoteColors|inner=#%(color)s|active=#%(color)s}}' % param )
-                result.append( u'{{ImageNoteEnd|id=%(id)i}}' % param )
-
-        return u"\n".join( result )
-
     # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
-    def remove_category_or_template(self, text, name):
+    def _remove_category_or_template(self, text, name):
         text = re.sub(u"[\{\[]{2}%s.*?[\}\]]{2}\n?" % name, u"", text)
         return text
 
     # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
-    def gather_category(self, text):
+    def _gather_category(self, text):
         cat  = []
         page = []
         for line in text.split(u"\n"):
@@ -477,15 +424,17 @@ class CatImagesBot(checkimages.main):
         return u"\n".join( page + cat )
 
     # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
-    def add_category(self, text, name, top=False):
+    def _add_category(self, text, name, top=False):
         if top:
             buf = [(u"[[%s]]" % name), text]
         else:
             buf = [text, (u"[[%s]]" % name)]
         return u"\n".join( buf )
+    #    import catlib
+    #    catlib.add_category(self.image, category, comment=None, createEmptyPages=False)
 
     # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
-    def add_template(self, text, name, params={}, top=False, raw=False):
+    def _add_template(self, text, name, params={}, top=False, raw=False):
         if top:
             buf = [(u"{{%s}}" % name), text]
         else:
@@ -495,44 +444,8 @@ class CatImagesBot(checkimages.main):
                 buf = [text, (u"{{%s}}" % name)]
         return u"\n".join( buf )
 
-    ## place into 'textlib' (or else e.g. 'catlib'/'templib'...)
-    #def change_category(self, text, oldname, newname):
-    #    text = re.sub(u"\[\[%s\]\]" % oldname, u"\[\[%s\]\]" % newname, text)
-    #    return text
-    #
-    #    import catlib
-    ##    catlib.change_category(article, oldCat, newCat, comment=None, sortKey=None,
-    ##                inPlace=False)
-    #    catlib.add_category(self.image, category, comment=None, createEmptyPages=False)
-
-    ## place into 'textlib' (or else e.g. 'catlib'/'templib'...)
-    #def change_template(self, text, name, params={}):
-    ##    templates = pywikibot.textlib.extract_templates_and_params(text)
-    ##    params = None
-    ##    for t, p in templates:
-    ##        if t == name:
-    ##            params = p
-    ##            break
-    ##    if params == None:
-    ##        raise
-    ##    print params
-    #
-    #    pattern  = re.compile(u"\{\{%s.*?\n\s*\}\}" % name, flags=re.S)
-    #    template = pattern.search(text).group()
-    #
-    #    for item in params:
-    #        new = re.sub(u"\|%s\s*=\s*?\n" % item, u"|%s = %s\n" % (item, params[item]), template)
-    #        if not (template == new):
-    #            break
-    #    if not (template == new):
-    #        pass    # append param, since it was not used until here
-    #    template = new
-    #
-    #    text = pattern.sub(template, text)
-    #    return text
-
     # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
-    def append_to_template(self, text, name, append):
+    def _append_to_template(self, text, name, append):
         pattern  = re.compile(u"(\{\{%s.*?\n)(\s*\}\}\n{2})" % name, flags=re.S)
         template = pattern.search(text).groups()
         
@@ -557,7 +470,7 @@ class CatImagesBot(checkimages.main):
     #    im.save(image_path_new)
 
     # gather data from all information interfaces and assign confidences
-    def _gatherInformation(self):
+    def gatherInformation(self):
         # Image size
         self._detectProperties_PIL()
         
@@ -590,7 +503,8 @@ class CatImagesBot(checkimages.main):
             #    c = 0.5
             #else:
             #    c = 0.1
-            ca = (data['Coverage'])**(1./5)                 # 0.25 -> ~0.75
+            ca = (data['Coverage'])**(1./6)                 # 0.20 -> ~0.75
+            #ca = (data['Coverage'])**(1./5)                 # 0.25 -> ~0.75
             #ca = (data['Coverage'])**(1./4)                 # 0.35 -> ~0.75
             #cb = (0.02 * (50. - data['Delta_E']))**(1.2)    # 10.0 -> ~0.75
             cb = (0.02 * (50. - data['Delta_E']))**(1./2)   # 20.0 -> ~0.75
@@ -606,7 +520,7 @@ class CatImagesBot(checkimages.main):
         # general (trained) classification
         #self._classifyObjectAll_CV()
 
-    def _reportInformation(self, info, ignore = ['Properties', 'ColorAverage']):
+    def _existInformation(self, info, ignore = ['Properties', 'ColorAverage']):
         result = []
         for item in info:
             if item in ignore:
@@ -614,6 +528,242 @@ class CatImagesBot(checkimages.main):
             if info[item]:
                 result.append( item )
         return result
+
+    def _filter_Properties(self):
+        # >>> never drop <<<
+        result = self._info['Properties']
+        return {'Properties': result}
+
+    def _filter_Faces(self):
+        result = self._info['Faces']
+        if (len(result) < self._thrhld_group_size):
+            buf = []
+            for item in self._info['Faces']:
+                # >>> drop if below thrshld <<<
+                if (item['Confidence'] >= self.thrshld):
+                    buf.append( item )
+            result = buf
+        return {'Faces': result}
+
+    def _filter_ColorRegions(self):
+        #result = {}
+        result = []
+        for item in self._info['ColorRegions']:
+            ## >>> drop wrost ones... (ignore all below 0.2) <<<
+            #if (result.get(item['Color'], {'Confidence': 0.2})['Confidence'] < item['Confidence']):
+            #    result[item['Color']] = item
+            # >>> drop if below thrshld <<<
+            if (item['Confidence'] >= self.thrshld):
+                result.append( item )
+        #return {'ColorRegions': [result[item] for item in result]}
+        return {'ColorRegions': result}
+
+    def _filter_ColorAverage(self):
+        # >>> never drop <<<
+        result = self._info['ColorAverage']
+        return {'ColorAverage': result}
+
+    # Category:Unidentified people
+    def _cat_face_People(self):
+        relevance = bool(self._info_filter['Faces'])
+
+        return (u'Unidentified people', relevance)
+
+    # Category:Groups
+    def _cat_face_Groups(self):
+        result = self._info_filter['Faces']
+
+        #if not (len(result) > 1): # 5 should give 0.75 and get reported
+        #    relevance = 0.
+        #else:
+        #    relevance = 1 - 1./(len(result)-1)
+        relevance = (len(result) >= self._thrhld_group_size)
+
+        return (u'Groups', relevance)
+
+    # Category:Faces
+    def _cat_face_Faces(self):
+        result = self._info_filter['Faces']
+
+        return (u'Faces', ((len(result) == 1) and (result[0]['Coverage'] >= .50)))
+
+    # Category:Portraits
+    def _cat_face_Portraits(self):
+        result = self._info_filter['Faces']
+
+        #return (u'Portraits', ((len(result) == 1) and (result[0]['Coverage'] >= .25)))
+        return (u'Portraits', ((len(result) == 1) and (result[0]['Coverage'] >= .20)))
+
+    # Category:Unidentified people
+    def _guess__People(self):
+        #result  = copy.deepcopy(self._info_filter['Faces'])
+        #result += self._detectObjectPeople_CV()
+
+        cls = 'person'
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        else:
+            result = []                             # nothing found
+
+        return (u'Unidentified people', result, 0.1)
+
+    ## Category:Unidentified maps
+    #def _guess__Maps(self):
+    #    return (u'Unidentified maps', self._classifyObjectAll_CV('maps'), 0.1)
+
+    ## Category:Unidentified flags
+    #def _guess__Flags(self):
+    #    return (u'Unidentified flags', self._classifyObjectAll_CV('flags'), 0.1)
+
+    # Category:Unidentified plants
+    def _guess__Plants(self):
+        cls = 'pottedplant'
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        else:
+            result = []                             # nothing found
+
+        return (u'Unidentified plants', result, 0.1)
+
+    ## Category:Unidentified coats of arms
+    #def _guessCoatsOfArms(self):
+    #    return (u'Unidentified coats of arms', self._classifyObjectAll_CV('coats of arms'), 0.1)
+
+    ## Category:Unidentified buildings
+    #def _guessBuildings(self):
+    #    return (u'Unidentified buildings', self._classifyObjectAll_CV('buildings'), 0.1)
+
+    # Category:Unidentified trains
+    def _guess__Trains(self):
+        cls = 'train'
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        else:
+            result = []                             # nothing found
+
+        return (u'Unidentified trains', result, 0.1)
+
+    # Category:Unidentified automobiles
+    def _guess__Automobiles(self):
+        cls = 'bus'
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        else:
+            result = []                             # nothing found
+        cls = 'car'
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result += [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        cls = 'motorbike'
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result += [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        return (u'Unidentified automobiles', result, 0.1)
+
+    # Category:Unidentified buses
+    def _guess__Buses(self):
+        cls = 'bus'
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        else:
+            result = []                             # nothing found
+
+        return (u'Unidentified buses', result, 0.1)
+
+    # Category:Black     (  0,   0,   0)
+    # Category:Blue‎      (  0,   0, 255)
+    # Category:Brown     (165,  42,  42)
+    # Category:Green     (  0, 255,   0)
+    # Category:Orange    (255, 165,   0)
+    # Category:Pink‎      (255, 192, 203)
+    # Category:Purple    (160,  32, 240)
+    # Category:Red‎       (255,   0,   0)
+    # Category:Turquoise ( 64, 224, 208)
+    # Category:White‎     (255, 255, 255)
+    # Category:Yellow    (255, 255,   0)
+    # http://www.farb-tabelle.de/en/table-of-color.htm
+    #def _collectColor(self):
+    def _cat_color_Black(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Black' == item[u'Color']):
+                return (u'Black', True)
+        return (u'Black', False)
+
+    def _cat_color_Blue(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Blue' == item[u'Color']):
+                return (u'Blue', True)
+        return (u'Blue', False)
+
+    def _cat_color_Brown(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Brown' == item[u'Color']):
+                return (u'Brown', True)
+        return (u'Brown', False)
+
+    def _cat_color_Green(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Green' == item[u'Color']):
+                return (u'Green', True)
+        return (u'Green', False)
+
+    def _cat_color_Orange(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Orange' == item[u'Color']):
+                return (u'Orange', True)
+        return (u'Orange', False)
+
+    def _cat_color_Pink(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Pink' == item[u'Color']):
+                return (u'Pink', True)
+        return (u'Pink', False)
+
+    def _cat_color_Purple(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Purple' == item[u'Color']):
+                return (u'Purple', True)
+        return (u'Purple', False)
+
+    def _cat_color_Red(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Red' == item[u'Color']):
+                return (u'Red', True)
+        return (u'Red', False)
+
+    def _cat_color_Turquoise(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Turquoise' == item[u'Color']):
+                return (u'Turquoise', True)
+        return (u'Turquoise', False)
+
+    def _cat_color_White(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'White' == item[u'Color']):
+                return (u'White', True)
+        return (u'White', False)
+
+    def _cat_color_Yellow(self):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (u'Yellow' == item[u'Color']):
+                return (u'Yellow', True)
+        return (u'Yellow', False)
 
     # .../opencv/samples/c/facedetect.cpp
     # http://opencv.willowgarage.com/documentation/python/genindex.html
@@ -845,18 +995,18 @@ class CatImagesBot(checkimages.main):
         #h = i.histogram()   # average over WHOLE IMAGE
         (pic, scale) = self._JSEGdetectColorSegments(i)          # split image into segments first
         #(pic, scale) = self._SLICdetectColorSegments(i)          # split image into superpixel first
-        hist = self._getColorSegmentsHist(i, pic, scale)         #
+        hist = self._PILgetColorSegmentsHist(i, pic, scale)         #
         #pic  = self._ColorRegionsMerge_ColorSimplify(pic, hist)  # iteratively in order to MERGE similar regions
         #(pic, scale_) = self._JSEGdetectColorSegments(pic)       # (final split)
         ##(pic, scale) = self._JSEGdetectColorSegments(pic)        # (final split)
-        #hist = self._getColorSegmentsHist(i, pic, scale)         #
+        #hist = self._PILgetColorSegmentsHist(i, pic, scale)         #
         i = 0
         # (may be do an additional region merge according to same color names...)
         for (h, coverage, (center, bbox)) in hist:
             if (coverage < 0.05):    # at least 5% coverage needed (help for debugging/log_output)
                 continue
 
-            data = self._DeltaEaverageColor(h)
+            data = self._colormathDeltaEaverageColor(h)
             data['Coverage'] = coverage
             data['ID']       = (i+1)
             data['Center']   = (int(center[0]+l), int(center[1]+t))
@@ -889,7 +1039,32 @@ class CatImagesBot(checkimages.main):
             pywikibot.output(u'WARNING: unknown file type')
             return
         
-        self._info['ColorAverage'] = [self._DeltaEaverageColor(h)]
+        self._info['ColorAverage'] = [self._colormathDeltaEaverageColor(h)]
+        return
+
+    def _detectProperties_PIL(self):
+        import Image
+
+        self._info['Properties'] = []
+        try:
+            i = Image.open(self.image_path)
+        except IOError:
+            pywikibot.output(u'WARNING: unknown file type')
+            return
+
+        self.image_size = i.size
+
+        result = { #'bands':      i.getbands(),
+                   #'bbox':       i.getbbox(),
+                   'Format':     i.format,
+                   'Mode':       i.mode,
+                   'Dimensions': i.size,
+                   #'info':       i.info,
+                   'Filesize':   os.path.getsize(self.image_path),
+                   #'stat':       os.stat(self.image_path),
+                   'Palette':    str(len(i.palette.palette)) if i.palette else u'-', }
+
+        self._info['Properties'] = [result]
         return
 
     # http://stackoverflow.com/questions/2270874/image-color-detection-using-python
@@ -898,7 +1073,7 @@ class CatImagesBot(checkimages.main):
     # http://code.google.com/p/python-colormath/
     # http://en.wikipedia.org/wiki/Color_difference
     # http://www.farb-tabelle.de/en/table-of-color.htm
-    def _DeltaEaverageColor(self, h):
+    def _colormathDeltaEaverageColor(self, h):
         # split into red, green, blue
         r = h[0:256]
         g = h[256:256*2]
@@ -1031,7 +1206,7 @@ class CatImagesBot(checkimages.main):
         
         # http://stackoverflow.com/questions/384759/pil-and-numpy
         pic = Image.open(tmpgif)
-        pix = numpy.array(pic)
+        #pix = numpy.array(pic)
         #Image.fromarray(10*pix).show()
         
         os.remove( tmpgif )
@@ -1061,7 +1236,7 @@ class CatImagesBot(checkimages.main):
         #return (pic, 1.)
         return (region_labels, 1.)
 
-    def _getColorSegmentsHist(self, im, pic, scale):
+    def _PILgetColorSegmentsHist(self, im, pic, scale):
         import Image, numpy
         
         if not (type(numpy.ndarray(None)) == type(pic)):
@@ -1160,275 +1335,6 @@ class CatImagesBot(checkimages.main):
         #im = im.filter(ImageFilter.BLUR)   # or 'SMOOTH'
 
         return im
-
-    def _detectProperties_PIL(self):
-        import Image
-
-        self._info['Properties'] = []
-        try:
-            i = Image.open(self.image_path)
-        except IOError:
-            pywikibot.output(u'WARNING: unknown file type')
-            return
-
-        self.image_size = i.size
-
-        result = { #'bands':      i.getbands(),
-                   #'bbox':       i.getbbox(),
-                   'Format':     i.format,
-                   'Mode':       i.mode,
-                   'Dimensions': i.size,
-                   #'info':       i.info,
-                   'Filesize':   os.path.getsize(self.image_path),
-                   #'stat':       os.stat(self.image_path),
-                   'Palette':    str(len(i.palette.palette)) if i.palette else u'-', }
-
-        self._info['Properties'] = [result]
-        return
-
-    def _filter_Properties(self):
-        # >>> never drop <<<
-        result = self._info['Properties']
-        return {'Properties': result}
-
-    def _filter_Faces(self):
-        result = self._info['Faces']
-        if (len(result) < self._thrhld_group_size):
-            buf = []
-            for item in self._info['Faces']:
-                # >>> drop if below thrshld <<<
-                if (item['Confidence'] >= self.thrshld):
-                    buf.append( item )
-            result = buf
-        return {'Faces': result}
-
-    def _filter_ColorRegions(self):
-        #result = {}
-        result = []
-        for item in self._info['ColorRegions']:
-            ## >>> drop wrost ones... (ignore all below 0.2) <<<
-            #if (result.get(item['Color'], {'Confidence': 0.2})['Confidence'] < item['Confidence']):
-            #    result[item['Color']] = item
-            # >>> drop if below thrshld <<<
-            if (item['Confidence'] >= self.thrshld):
-                result.append( item )
-        #return {'ColorRegions': [result[item] for item in result]}
-        return {'ColorRegions': result}
-
-    def _filter_ColorAverage(self):
-        # >>> never drop <<<
-        result = self._info['ColorAverage']
-        return {'ColorAverage': result}
-
-    # Category:Unidentified people
-    def _cat_face_People(self):
-        relevance = bool(self._info_filter['Faces'])
-
-        return (u'Unidentified people', relevance)
-
-    # Category:Groups
-    def _cat_face_Groups(self):
-        result = self._info_filter['Faces']
-
-        #if not (len(result) > 1): # 5 should give 0.75 and get reported
-        #    relevance = 0.
-        #else:
-        #    relevance = 1 - 1./(len(result)-1)
-        relevance = (len(result) >= self._thrhld_group_size)
-
-        return (u'Groups', relevance)
-
-    # Category:Unidentified people
-    def _guess__People(self):
-        #result  = copy.deepcopy(self._info_filter['Faces'])
-        #result += self._detectObjectPeople_CV()
-
-        cls = 'person'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        else:
-            result = []                             # nothing found
-
-        return (u'Unidentified people', result, 0.1)
-
-    ## Category:Unidentified maps
-    #def _guess__Maps(self):
-    #    return (u'Unidentified maps', self._classifyObjectAll_CV('maps'), 0.1)
-
-    ## Category:Unidentified flags
-    #def _guess__Flags(self):
-    #    return (u'Unidentified flags', self._classifyObjectAll_CV('flags'), 0.1)
-
-    # Category:Unidentified plants
-    def _guess__Plants(self):
-        cls = 'pottedplant'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        else:
-            result = []                             # nothing found
-
-        return (u'Unidentified plants', result, 0.1)
-
-    ## Category:Unidentified coats of arms
-    #def _guessCoatsOfArms(self):
-    #    return (u'Unidentified coats of arms', self._classifyObjectAll_CV('coats of arms'), 0.1)
-
-    ## Category:Unidentified buildings
-    #def _guessBuildings(self):
-    #    return (u'Unidentified buildings', self._classifyObjectAll_CV('buildings'), 0.1)
-
-    # Category:Unidentified trains
-    def _guess__Trains(self):
-        cls = 'train'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        else:
-            result = []                             # nothing found
-
-        return (u'Unidentified trains', result, 0.1)
-
-    # Category:Unidentified automobiles
-    def _guess__Automobiles(self):
-        cls = 'bus'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        else:
-            result = []                             # nothing found
-        cls = 'car'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result += [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        cls = 'motorbike'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result += [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        return (u'Unidentified automobiles', result, 0.1)
-
-    # Category:Unidentified buses
-    def _guess__Buses(self):
-        cls = 'bus'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        else:
-            result = []                             # nothing found
-
-        return (u'Unidentified buses', result, 0.1)
-
-    # Category:Black     (  0,   0,   0)
-    # Category:Blue‎      (  0,   0, 255)
-    # Category:Brown     (165,  42,  42)
-    # Category:Green     (  0, 255,   0)
-    # Category:Orange    (255, 165,   0)
-    # Category:Pink‎      (255, 192, 203)
-    # Category:Purple    (160,  32, 240)
-    # Category:Red‎       (255,   0,   0)
-    # Category:Turquoise ( 64, 224, 208)
-    # Category:White‎     (255, 255, 255)
-    # Category:Yellow    (255, 255,   0)
-    # http://www.farb-tabelle.de/en/table-of-color.htm
-    #def _collectColor(self):
-    def _cat_color_Black(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Black' == item[u'Color']):
-                return (u'Black', True)
-        return (u'Black', False)
-
-    def _cat_color_Blue(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Blue' == item[u'Color']):
-                return (u'Blue', True)
-        return (u'Blue', False)
-
-    def _cat_color_Brown(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Brown' == item[u'Color']):
-                return (u'Brown', True)
-        return (u'Brown', False)
-
-    def _cat_color_Green(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Green' == item[u'Color']):
-                return (u'Green', True)
-        return (u'Green', False)
-
-    def _cat_color_Orange(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Orange' == item[u'Color']):
-                return (u'Orange', True)
-        return (u'Orange', False)
-
-    def _cat_color_Pink(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Pink' == item[u'Color']):
-                return (u'Pink', True)
-        return (u'Pink', False)
-
-    def _cat_color_Purple(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Purple' == item[u'Color']):
-                return (u'Purple', True)
-        return (u'Purple', False)
-
-    def _cat_color_Red(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Red' == item[u'Color']):
-                return (u'Red', True)
-        return (u'Red', False)
-
-    def _cat_color_Turquoise(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Turquoise' == item[u'Color']):
-                return (u'Turquoise', True)
-        return (u'Turquoise', False)
-
-    def _cat_color_White(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'White' == item[u'Color']):
-                return (u'White', True)
-        return (u'White', False)
-
-    def _cat_color_Yellow(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Yellow' == item[u'Color']):
-                return (u'Yellow', True)
-        return (u'Yellow', False)
-
-    ## Category:Unidentified people
-    #def _catPeople(self):
-    #    result = copy.deepcopy(self._info_filter['Faces'])
-    #
-    #    result = [{} for item in result]
-    #
-    #    return (u'Unidentified people', result, 1.0)
-
-    # Category:Faces
-    def _cat_face_Faces(self):
-        result = self._info_filter['Faces']
-
-        return (u'Faces', ((len(result) == 1) and (result[0]['Coverage'] >= .50)))
-
-    # Category:Portraits
-    def _cat_face_Portraits(self):
-        result = self._info_filter['Faces']
-
-        #return (u'Portraits', ((len(result) == 1) and (result[0]['Coverage'] >= .25)))
-        return (u'Portraits', ((len(result) == 1) and (result[0]['Coverage'] >= .20)))
 
 gbv = Global()
 
