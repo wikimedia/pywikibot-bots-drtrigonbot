@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikipedia_family.py 10340 2012-06-09 17:37:49Z xqt $'
+__version__ = '$Id: wikipedia_family.py 10355 2012-06-13 11:11:10Z xqt $'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 
@@ -838,6 +838,7 @@ class Family(family.Family):
             'eo': u'Projekto',
             'es': u'Wikiproyecto',
             'eu': u'Wikiproiektu',
+            'fa': u'کتاب',
             'fi': u'Metasivu',
             'fr': u'Projet',
             'gl': u'Libro',
@@ -866,6 +867,7 @@ class Family(family.Family):
             'eo': u'Projekta diskuto',
             'es': u'Wikiproyecto Discusión',
             'eu': u'Wikiproiektu eztabaida',
+            'fa': u'بحث کتاب',
             'fi': u'Keskustelu metasivusta',
             'fr': u'Discussion Projet',
             'gl': u'Conversa libro',

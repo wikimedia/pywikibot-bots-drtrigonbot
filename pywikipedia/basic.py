@@ -9,8 +9,9 @@ The following parameters are supported:
 
 &params;
 
--dry              If given, doesn't do any real changes, but only shows
-                  what would have been changed.
+-summary:XYZ      Set the summary message text for the edit to XYZ, bypassing
+                  the predefined message texts with original and replacements
+                  inserted.
 
 All other parameters will be regarded as part of the title of a single page,
 and the bot will only work on that single page.
@@ -20,7 +21,7 @@ and the bot will only work on that single page.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: basic.py 10332 2012-06-08 14:58:03Z drtrigon $'
+__version__ = '$Id: basic.py 10358 2012-06-13 12:29:02Z drtrigon $'
 #
 
 import re
@@ -40,22 +41,23 @@ class BasicBot:
     # The file containing these messages should have the same name as the caller
     # script (i.e. basic.py in this case)
 
-    def __init__(self, generator, dry):
+    def __init__(self, generator, summary):
         """
         Constructor. Parameters:
             @param generator: The page generator that determines on which pages
                               to work.
             @type generator: generator.
-            @param dry: If True, doesn't do any real changes, but only shows
-                        what would have been changed.
-            @type dry: boolean.
+            @param summary: Set the summary message text for the edit.
+            @type summary: (unicode) string.
         """
         self.generator = generator
-        self.dry = dry
         # init constants
         self.site = pywikibot.getSite(code=pywikibot.default_code)
         # Set the edit summary message
-        self.summary = i18n.twtranslate(self.site, 'basic-changing')
+        if summary:
+            self.summary = summary
+        else:
+            self.summary = i18n.twtranslate(self.site, 'basic-changing')
 
     def run(self):
         for page in self.generator:
@@ -108,28 +110,27 @@ class BasicBot:
             # show what was changed
             pywikibot.showDiff(page.get(), text)
             pywikibot.output(u'Comment: %s' %comment)
-            if not self.dry:
-                choice = pywikibot.inputChoice(
-                    u'Do you want to accept these changes?',
-                    ['Yes', 'No'], ['y', 'N'], 'N')
-                if choice == 'y':
-                    try:
-                        # Save the page
-                        page.put(text, comment=comment or self.comment,
-                                 minorEdit=minorEdit, botflag=botflag)
-                    except pywikibot.LockedPage:
-                        pywikibot.output(u"Page %s is locked; skipping."
-                                         % page.title(asLink=True))
-                    except pywikibot.EditConflict:
-                        pywikibot.output(
-                            u'Skipping %s because of edit conflict'
-                            % (page.title()))
-                    except pywikibot.SpamfilterError, error:
-                        pywikibot.output(
+            choice = pywikibot.inputChoice(
+                u'Do you want to accept these changes?',
+                ['Yes', 'No'], ['y', 'N'], 'N')
+            if choice == 'y':
+                try:
+                    # Save the page
+                    page.put(text, comment=comment or self.comment,
+                             minorEdit=minorEdit, botflag=botflag)
+                except pywikibot.LockedPage:
+                    pywikibot.output(u"Page %s is locked; skipping."
+                                     % page.title(asLink=True))
+                except pywikibot.EditConflict:
+                    pywikibot.output(
+                        u'Skipping %s because of edit conflict'
+                        % (page.title()))
+                except pywikibot.SpamfilterError, error:
+                    pywikibot.output(
 u'Cannot change %s because of spam blacklist entry %s'
-                            % (page.title(), error.url))
-                    else:
-                        return True
+                        % (page.title(), error.url))
+                else:
+                    return True
         return False
 
 class AutoBasicBot(BasicBot):
@@ -260,14 +261,13 @@ def main():
     # This temporary array is used to read the page title if one single
     # page to work on is specified by the arguments.
     pageTitleParts = []
-    # If dry is True, doesn't do any real changes, but only show
-    # what would have been changed.
-    dry = False
+    # summary message
+    editSummary = ''
 
     # Parse command line arguments
     for arg in pywikibot.handleArgs():
-        if arg.startswith("-dry"):
-            dry = True
+        if arg.startswith('-summary:'):
+            editSummary = arg[9:]
         else:
             # check if a standard argument like
             # -start:XYZ or -ref:Asdf was given.
@@ -286,7 +286,7 @@ def main():
         # The preloading generator is responsible for downloading multiple
         # pages from the wiki simultaneously.
         gen = pagegenerators.PreloadingGenerator(gen)
-        bot = BasicBot(gen, dry)
+        bot = BasicBot(gen, editSummary)
         bot.run()
     else:
         pywikibot.showHelp()

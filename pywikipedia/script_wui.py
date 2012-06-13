@@ -96,8 +96,7 @@ bot_config = {    # unicode values
 
 # debug tools
 # (look at 'bot_control.py' for more info)
-debug = []                      # no write
-#debug.append( 'write2wiki' )    # write to wiki (operational mode)
+debug = []
 
 docuReplacements = {
 #    '&params;': pagegenerators.parameterHelp
@@ -135,7 +134,7 @@ class ScriptWUIBot(basic.AutoBasicBot):
         pywikibot.output(u'\03{lightred}** Receiving Job Queue\03{default}')
         page = pywikibot.Page(self.site, bot_config['commandlist'])
         self._commandlist = self.loadJobQueue(page, bot_config['queue_security'],
-                                              reset=('write2wiki' in self._debug))
+                                              reset=(not pywikibot.simulate))
         logging.getLogger('script_wui').debug( self._commandlist )
 
         # code debugging
@@ -193,7 +192,7 @@ class ScriptWUIBot(basic.AutoBasicBot):
         if not out:
             return
 
-        if 'write2wiki' in debug:
+        if not pywikibot.simulate:
             head, msg = pywikibot.translate(self.site.lang, bot_config['msg'])
             comment = head + msg % pywikibot.Timestamp.now().isoformat(' ')
             page = pywikibot.Page(self.site, bot_config['sim_output'])

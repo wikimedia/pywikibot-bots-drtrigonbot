@@ -145,17 +145,15 @@ error_SGE_stop    = 1    # error, but not for SGE
 
 
 # debug tools
-# 'write2wiki', 'write2hist'   # operational mode (default)
-# 'user'                       # no write, skip users
-# 'write2hist'                 # write only history (for code changes and smooth update)
-# 'write2wiki', 'user'         # write wiki, skip users
-# 'write2hist', 'toolserver'   # write only history (for code changes and smooth update), toolserver down
-debug = []                    # no write, all users
-debug.append( 'write2wiki' )  # write to wiki (operational mode)
+# 'write2hist'                 # operational mode (default)
+# 'user'                       # skip users
+# 'write2hist', 'toolserver'   # write history (for code changes and smooth update), toolserver down
+debug = []                    # all users
 #debug.append( 'user' )        # skip users
 debug.append( 'write2hist' )  # write history (operational mode)
 #debug.append( 'toolserver' )  # toolserver down
-# code debugging look below; debug.append( 'code' )
+# write to wiki;  use -simulate instead of debug.append( 'write2wiki' )
+# code debugging; use -debug    instead of debug.append( 'code' )
 
 
 ## Bot Error Handling; to prevent bot errors to stop execution of other bots
@@ -271,8 +269,6 @@ class BotController:
         pywikibot.output(u'\nRUN BOT: ' + self.desc)
 
         try:
-            if ('write2wiki' not in debug):
-                pywikibot.config.actions_to_block = ['edit']
             sys.argv[1:]   = self.argv
             self.bot.debug = debug
             self.bot.main()

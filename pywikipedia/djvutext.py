@@ -6,8 +6,6 @@ namespace.  It is intended to be used for Wikisource.
 
 The following parameters are supported:
 
-    -dry           If given, doesn't do any real changes, but only shows
-                   what would have been changed.
     -ask           Ask for confirmation before uploading each page.
                    (Default: ask when overwriting pages)
     -overwrite:no  When asking for confirmation, the answer is no.
@@ -26,7 +24,7 @@ and the bot will only work on that single page.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: djvutext.py 10037 2012-03-21 22:55:26Z valhallasw $'
+__version__ = '$Id: djvutext.py 10354 2012-06-13 10:26:56Z drtrigon $'
 import wikipedia as pywikibot
 from pywikibot import i18n
 import os, sys
@@ -40,7 +38,7 @@ docuReplacements = {
 
 class DjVuTextBot:
 
-    def __init__(self, djvu, index, pages, ask=False, overwrite='ask', debug=False):
+    def __init__(self, djvu, index, pages, ask=False, overwrite='ask', dry=False):
         """
         Constructor. Parameters:
         djvu : filename
@@ -50,7 +48,7 @@ class DjVuTextBot:
         self.djvu = djvu
         self.index = index
         self.pages = pages
-        self.dry = debug
+        self.dry = dry
         self.ask = ask
         self.overwrite = overwrite
 
@@ -188,15 +186,12 @@ def main():
     djvu = None
     pages = None
     # what would have been changed.
-    dry = False
     ask = False
     overwrite = 'ask'
 
     # Parse command line arguments
     for arg in pywikibot.handleArgs():
-        if arg.startswith("-dry"):
-            dry = True
-        elif arg.startswith("-ask"):
+        if arg.startswith("-ask"):
             ask = True
         elif arg.startswith("-overwrite:"):
             overwrite = arg[11:12]
@@ -236,7 +231,7 @@ def main():
             raise pywikibot.NoPage(u"Page '%s' does not exist" % index)
         pywikibot.output(u"uploading text from %s to %s"
                          % (djvu, index_page.title(asLink=True)) )
-        bot = DjVuTextBot(djvu, index, pages, ask, overwrite, dry)
+        bot = DjVuTextBot(djvu, index, pages, ask, overwrite, pywikibot.simulate)
         if not bot.has_text():
             raise ValueError("No text layer in djvu file")
         bot.run()

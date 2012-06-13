@@ -109,9 +109,8 @@ magic_words = {} # no magic word substitution (for empty dict)
 
 # debug tools
 # (look at 'bot_control.py' for more info)
-debug = []                       # no write, all users
-#debug.append( 'write2wiki' )    # write to wiki (operational mode)
-#debug.append( 'code' )          # code debugging
+debug = []
+#debug.append( 'code' )  # code debugging
 
 
 class SubsterBot(basic.AutoBasicBot):
@@ -200,7 +199,7 @@ class SubsterBot(basic.AutoBasicBot):
                 #if substed_tags:
                     self.outputContentDiff(content, substed_content)
 
-                    if 'write2wiki' not in debug:
+                    if pywikibot.simulate:
                         pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
                         continue
 

@@ -55,9 +55,7 @@ locale.setlocale(locale.LC_ALL, '')
 
 # debug tools
 # (look at 'bot_control.py' for more info)
-debug = []                       # no write, all users
-#debug.append( 'write2wiki' )    # write to wiki (operational mode)
-#debug.append( 'code' )          # code debugging
+debug = []
 
 
 ###############################################################################
@@ -1561,7 +1559,7 @@ def checkbot():
             continue
         resultCheck = mainClass.checkStep()
         try:
-            mainClass.tag_image(put=('write2wiki' in debug))
+            mainClass.tag_image(put=(not pywikibot.simulate))
             ret = mainClass.log_output()
             if ret:
                 outresult.append( ret )
@@ -1581,7 +1579,7 @@ def checkbot():
     if outresult:
         outpage = pywikibot.Page(site, u"User:DrTrigon/User:DrTrigonBot/logging")
         #outresult = [ outpage.get() ] + outresult   # append to page
-        if ('write2wiki' in debug):
+        if (not pywikibot.simulate):
             outpage.put( u"\n".join(outresult), comment="bot writing log for last run" )
         else:
             print u"--- " * 20

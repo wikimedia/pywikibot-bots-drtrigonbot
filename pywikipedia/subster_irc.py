@@ -48,8 +48,7 @@ magic_words = {} # no magic word substitution (for empty dict)
 
 # debug tools
 # (look at 'bot_control.py' and 'subster.py' for more info)
-debug = []				# no write, all users
-#debug.append( 'write2wiki' )		# write to wiki (operational mode)
+debug = []
 
 
 class SubsterTagModifiedBot(articlenos.ArtNoDisp):
