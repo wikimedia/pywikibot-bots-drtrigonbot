@@ -53,11 +53,6 @@ import checkimages
 locale.setlocale(locale.LC_ALL, '')
 
 
-# debug tools
-# (look at 'bot_control.py' for more info)
-debug = []
-
-
 ###############################################################################
 # <--------------------------- Change only below! --------------------------->#
 ###############################################################################
@@ -246,7 +241,7 @@ class CatImagesBot(checkimages.main):
 
         return self._result_check
 
-    def tag_image(self, put = False):
+    def tag_image(self):
         self.clean_cache()
 
         #if not self._reportInformation(self._info_filter):  # information available?
@@ -277,9 +272,8 @@ class CatImagesBot(checkimages.main):
         print u"--- " * 20
         print content
         print u"--- " * 20
-        if put:
-            pywikibot.put_throttle()
-            self.image.put( content, comment="bot automatic categorization; adding %s" % u", ".join(tags) )
+        pywikibot.put_throttle()
+        self.image.put( content, comment="bot automatic categorization; adding %s" % u", ".join(tags) )
 
         return
 
@@ -1102,7 +1096,7 @@ class CatImagesBot(checkimages.main):
                 print "gray scale image, try to fix..."
                 h = h*3
             if (len(h) == 256*4):
-                print "4-ch. image, try to fix (can include transperancy)..."
+                print "4-ch. image, try to fix (exclude transparency)..."
                 h = h[0:(256*3)]
             hist.append( (h, coverage, (center, bbox)) )
         
@@ -1559,12 +1553,13 @@ def checkbot():
             continue
         resultCheck = mainClass.checkStep()
         try:
-            mainClass.tag_image(put=(not pywikibot.simulate))
+            mainClass.tag_image()
             ret = mainClass.log_output()
             if ret:
                 outresult.append( ret )
         except AttributeError:
-            pywikibot.output(u"ERROR: was not able to process image page!!!\n")
+            pywikibot.output(u"ERROR: was not able to process page %s!!!\n" %\
+                             image.title(asLink=True))
         limit += -1
         posfile = open(os.path.join('cache', 'catimages_start'), "w")
         posfile.write( image.title().encode('utf-8') )
@@ -1579,9 +1574,8 @@ def checkbot():
     if outresult:
         outpage = pywikibot.Page(site, u"User:DrTrigon/User:DrTrigonBot/logging")
         #outresult = [ outpage.get() ] + outresult   # append to page
-        if (not pywikibot.simulate):
-            outpage.put( u"\n".join(outresult), comment="bot writing log for last run" )
-        else:
+        outpage.put( u"\n".join(outresult), comment="bot writing log for last run" )
+        if pywikibot.simulate:
             print u"--- " * 20
             print u"--- " * 20
             print u"\n".join(outresult[1:])

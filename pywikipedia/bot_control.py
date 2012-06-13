@@ -83,7 +83,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '10351'
+__framework_rev__ = '10359'
 __release_ver__   = '1.3'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -134,8 +134,10 @@ bot_list = { 'clean_user_sandbox': ( clean_sandbox, ['-user'],
              'catimages':          ( catimages, ['-cat'],#, '-limit:1'], 
                                      u'Categorize Images (by content)'),
              'subster_irc':        ( subster_irc, [], 
-                                     u'"SubsterBot" IRC surveillance (beta)'), }
-bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history', 'script_wui', 'catimages', 'subster', 'subster_irc' ]
+                                     u'"SubsterBot" IRC surveillance (beta)'),
+           }
+bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history',
+              'script_wui', 'catimages', 'subster', 'subster_irc' ]
 
 # SGE: exit errorlevel
 error_SGE_ok      = 0    # successful termination, nothing more to do
@@ -154,6 +156,7 @@ debug.append( 'write2hist' )  # write history (operational mode)
 #debug.append( 'toolserver' )  # toolserver down
 # write to wiki;  use -simulate instead of debug.append( 'write2wiki' )
 # code debugging; use -debug    instead of debug.append( 'code' )
+#                 (consider using -verbose also)
 
 
 ## Bot Error Handling; to prevent bot errors to stop execution of other bots

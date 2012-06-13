@@ -199,10 +199,6 @@ class SubsterBot(basic.AutoBasicBot):
                 #if substed_tags:
                     self.outputContentDiff(content, substed_content)
 
-                    if pywikibot.simulate:
-                        pywikibot.output(u'\03{lightyellow}=== ! DEBUG MODE NOTHING WRITTEN TO WIKI ! ===\03{default}')
-                        continue
-
                     head = i18n.twtranslate(self.site.lang,
                                             'thirdparty-drtrigonbot-sum_disc-summary-head')
                     if msg is None:
