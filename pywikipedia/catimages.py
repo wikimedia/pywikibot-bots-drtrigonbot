@@ -917,13 +917,25 @@ class CatImagesBot(checkimages.main):
             (30, 30) ))
         #faces = cv.HaarDetectObjects(grayscale, cascade, storage, 1.2, 2,
         #                           cv.CV_HAAR_DO_CANNY_PRUNING, (50,50))
-        if not faces:
-            faces += list(cascadeprofil.detectMultiScale( smallImg,
-                1.1, 2, 0
-                #|cv.CV_HAAR_FIND_BIGGEST_OBJECT
-                #|cv.CV_HAAR_DO_ROUGH_SEARCH
-                |cv.CV_HAAR_SCALE_IMAGE,
-                (30, 30) ))
+        facesprofil = list(cascadeprofil.detectMultiScale( smallImg,
+            1.1, 2, 0
+            #|cv.CV_HAAR_FIND_BIGGEST_OBJECT
+            #|cv.CV_HAAR_DO_ROUGH_SEARCH
+            |cv.CV_HAAR_SCALE_IMAGE,
+            (30, 30) ))
+        for r in facesprofil:   # append the new ones
+            (rx, ry, rwidth, rheight) = r
+            cx = cv.Round((rx + rwidth*0.5))
+            cy = cv.Round((ry + rheight*0.5))
+            new = True
+            for rr in faces:
+                (rrx, rry, rrwidth, rrheight) = rr
+                if (rrx <= cx) and (cx <= (rrx + rrwidth)) and \
+                   (rry <= cy) and (cy <= (rry + rrheight)):
+                    new = False
+                    break
+            if new:
+                faces.append( rr )
         faces = numpy.array(faces)
         #if faces:
         #    self._drawRect(faces) #call to a python pil
@@ -1626,7 +1638,7 @@ def checkbot():
             gbv.useGuesses = False
         elif arg.startswith('-single'):
             if len(arg) > 7:
-                pageName = str(arg[8:])
+                pageName = unicode(arg[8:])
             generator = [ pywikibot.Page(pywikibot.getSite(), pageName) ]
             firstPageTitle = None
 
