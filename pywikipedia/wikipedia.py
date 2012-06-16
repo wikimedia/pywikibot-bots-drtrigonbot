@@ -119,7 +119,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 10359 2012-06-13 12:58:26Z drtrigon $'
+__version__ = '$Id: wikipedia.py 10361 2012-06-16 19:21:45Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -5728,7 +5728,8 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
 
         """
         if ('action' in predata) and pywikibot.simulate and \
-           (predata['action'] in pywikibot.config.actions_to_block):
+           (predata['action'] in pywikibot.config.actions_to_block) and \
+           (address not in [self.export_address()]):
             pywikibot.output(u'\03{lightyellow}SIMULATION: %s action blocked.\03{default}'%\
                              predata['action'])
             import StringIO

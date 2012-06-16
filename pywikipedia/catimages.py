@@ -929,25 +929,25 @@ class CatImagesBot(checkimages.main):
         #    self._drawRect(faces) #call to a python pil
         t = cv.GetTickCount() - t
         #print( "detection time = %g ms\n" % (t/(cv.GetTickFrequency()*1000.)) )
-        colors = [ (0,0,255),
-            (0,128,255),
-            (0,255,255),
-            (0,255,0),
-            (255,128,0),
-            (255,255,0),
-            (255,0,0),
-            (255,0,255) ]
+        #colors = [ (0,0,255),
+        #    (0,128,255),
+        #    (0,255,255),
+        #    (0,255,0),
+        #    (255,128,0),
+        #    (255,255,0),
+        #    (255,0,0),
+        #    (255,0,255) ]
         result = []
         for i, r in enumerate(faces):
-            color = colors[i%8]
+            #color = colors[i%8]
             (rx, ry, rwidth, rheight) = r
-            cx = cv.Round((rx + rwidth*0.5)*scale)
-            cy = cv.Round((ry + rheight*0.5)*scale)
-            radius = cv.Round((rwidth + rheight)*0.25*scale)
-            cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
-            if nestedCascade.empty():
-                continue
-            dx, dy = cv.Round(img.shape[1]/5.), cv.Round(img.shape[0]/5.)
+            #cx = cv.Round((rx + rwidth*0.5)*scale)
+            #cy = cv.Round((ry + rheight*0.5)*scale)
+            #radius = cv.Round((rwidth + rheight)*0.25*scale)
+            #cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
+            #if nestedCascade.empty():
+            #    continue
+            dx, dy = cv.Round(rwidth*0.5), cv.Round(rheight*0.5)
             (rx, ry, rwidth, rheight) = (max([rx-dx,0]), max([ry-dy,0]), min([rwidth+2*dx,img.shape[1]]), min([rheight+2*dy,img.shape[0]]))
             #smallImgROI = smallImg
             #print r, (rx, ry, rwidth, rheight)
@@ -974,7 +974,7 @@ class CatImagesBot(checkimages.main):
                 cx = cv.Round((rx + nrx + nrwidth*0.5)*scale)
                 cy = cv.Round((ry + nry + nrheight*0.5)*scale)
                 radius = cv.Round((nrwidth + nrheight)*0.25*scale)
-                cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
+                #cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
                 data['Eyes'].append( (cx-radius, cy-radius, 2*radius, 2*radius) )
             result.append( data )
 
@@ -1151,7 +1151,7 @@ class CatImagesBot(checkimages.main):
 
         self._info['ColorRegions'] = []
         try:
-            im = Image.open(self.image_path)
+            im = Image.open(self.image_path).convert(mode = 'RGB')
 
             # crop 25% of the image in order to give the bot a more human eye
             scale  = 0.75    # crop 25% percent (area) bounding box

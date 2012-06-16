@@ -7,7 +7,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: config.py 10353 2012-06-13 09:10:13Z drtrigon $'
+__version__ = '$Id: config.py 10361 2012-06-16 19:21:45Z drtrigon $'
 
 import os, re
 import sys as __sys
