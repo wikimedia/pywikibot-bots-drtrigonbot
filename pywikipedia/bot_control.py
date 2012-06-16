@@ -466,6 +466,7 @@ if __name__ == "__main__":
                     'subster':            False,
                     'script_wui':         False,
                     'subster_irc':        False,
+                    'catimages':          False,
         }
         error_ec    = error_SGE_stop
         #error_ec    = error_SGE_restart
