@@ -157,6 +157,7 @@ class CatImagesBot(checkimages.main):
 
     def downloadImage(self):
         self.image_filename  = os.path.split(self.image.fileUrl())[-1]
+        self.image_fileext   = os.path.splitext(self.image_filename)[1]
         if pywikibot.debug:
             self.image_filename = "Ali_1_-_IMG_1378.jpg"
             #self.image_filename = "Gyorche_Petrov_Todor_Alexandrov_Andrey_Lyapchev_Simeon_Radev_Stamatov_and_others.jpg"
@@ -192,13 +193,34 @@ class CatImagesBot(checkimages.main):
         f.write( data )
         f.close()
 
-        try:
-            import Image
-            im = Image.open(self.image_path) # might be png, gif etc, for instance
-            #im.thumbnail(size, Image.ANTIALIAS) # size is 640x480
-            im.convert('RGB').save(self.image_path_JPEG, "JPEG")
-        except:
-            self.image_path_JPEG = self.image_path
+        # SVG: rasterize the SVG to bitmap (MAY BE GET FROM WIKI BY DOWNLOAD?...)
+        # http://stackoverflow.com/questions/6589358/convert-svg-to-png-in-python
+        # http://cairographics.org/pythoncairopil/
+        # http://cairographics.org/pyrsvg/
+        if self.image_fileext == u'.svg':
+            import cairo, rsvg, Image       # gnome-python2-rsvg
+
+            svg = rsvg.Handle(self.image_path)
+            img = cairo.ImageSurface(cairo.FORMAT_ARGB32, svg.props.width, svg.props.height)
+            ctx = cairo.Context(img)
+            svg.render_cairo(ctx)
+            #img.write_to_png("svg.png")
+            Image.frombuffer("RGBA",( img.get_width(),img.get_height() ),
+                             img.get_data(),"raw","RGBA",0,1).save(self.image_path_JPEG, "JPEG")
+        else:
+            try:
+                import Image
+                im = Image.open(self.image_path) # might be png, gif etc, for instance
+                #im.thumbnail(size, Image.ANTIALIAS) # size is 640x480
+                im.convert('RGB').save(self.image_path_JPEG, "JPEG")
+            except IOError, e:
+                if 'image file is truncated' in str(e):
+                    # im object has changed due to exception raised
+                    im.convert('RGB').save(self.image_path_JPEG, "JPEG")
+                else:
+                    self.image_path_JPEG = self.image_path
+            except:
+                self.image_path_JPEG = self.image_path
 
     # LOOK ALSO AT: checkimages.CatImagesBot.checkStep
     # (and category scripts/bots too...)
@@ -229,6 +251,7 @@ class CatImagesBot(checkimages.main):
             #print cat, result, len(result)
             if rel:
                 self._result_check.append( cat )
+        self._result_check = list(set(self._result_check))
 
         # categorization: use guesses for unreliable classification (rel = 0.1)
         if not gbv.useGuesses:
@@ -291,8 +314,10 @@ class CatImagesBot(checkimages.main):
         ret.append( u'<div style="position:relative;">' )
         ret.append( u"[[%s|200px]]" % self.image.title() )
         ret.append( self._make_markerblock(self._info[u'Faces'], 200.) )
-        ret.append( self._make_markerblock(self._info[u'ColorRegions'], 200.,
-                                          structure=['Position']) )
+        #ret.append( self._make_markerblock(self._info[u'ColorRegions'], 200.,
+        #                                   structure=['Position'], line='dashed') )
+        ret.append( self._make_markerblock(self._info[u'People'], 200.,
+                                           structure=['Position'], line='dashed') )
         ret.append( u"</div>" )
 
         color = {True: "rgb(0,255,0)", False: "rgb(255,0,0)"}[bool(self._result_check)]
@@ -387,7 +412,6 @@ class CatImagesBot(checkimages.main):
         for i, r in enumerate(res):
             if ('RGB' in r):
                 color = list(numpy.array((255,255,255))-numpy.array(r['RGBref']))
-                line  = 'dashed'
             else:
                 color = list(colors[i%8])
             color.reverse()
@@ -474,7 +498,7 @@ class CatImagesBot(checkimages.main):
         # Image size
         self._detectProperties_PIL()
         
-        # Faces and eyes
+        # Faces and eyes (opencv pre-trained)
         self._detectObjectFaces_CV()
         
         for i in range(len(self._info['Faces'])):
@@ -514,8 +538,34 @@ class CatImagesBot(checkimages.main):
             #c  = ( cc + 6*ca + 2*cb ) / 9
             self._info['ColorRegions'][i]['Confidence'] = c
 
-        # People
-        #self._detectObjectPeople_CV()
+        # People (opencv pre-trained)
+        self._detectObjectPeople_CV()
+        
+        for i in range(len(self._info['People'])):
+            data = self._info['People'][i]
+
+            if (data['Coverage'] >= 0.20):
+                c = 0.75
+            if (data['Coverage'] >= 0.10):    # at least 10% coverage needed
+                c = 0.5
+            else:
+                c = 0.1
+            self._info['People'][i]['Confidence'] = c
+
+        # general (self trained) classification
+        # !!! train a own cascade classifier like for face detection used
+        # !!! with 'opencv_haartraing' -> xml (file to use like in face/eye detection)
+        # !!! do NOT train 'people', there is already 'haarcascade_fullbody.xml', a.o. ...
+        #
+        # http://www.computer-vision-software.com/blog/2009/11/faq-opencv-haartraining/
+        #self._detectObjectTrained_CV()
+
+        # optical text recognition (tesseract?)
+        #self._recognizeOpticalText_x()
+        # (no full recognition but just classify as 'contains text')
+
+        # barcode and Data Matrix recognition (gocr? libdmtx/pydmtx?)
+        #self._recognizeOpticalCodes_x()
 
         # general (trained) classification
         #self._classifyObjectAll_CV()
@@ -545,6 +595,17 @@ class CatImagesBot(checkimages.main):
             result = buf
         return {'Faces': result}
 
+    def _filter_People(self):
+        result = self._info['People']
+        if (len(result) < self._thrhld_group_size):
+            buf = []
+            for item in self._info['People']:
+                # >>> drop if below thrshld <<<
+                if (item['Confidence'] >= self.thrshld):
+                    buf.append( item )
+            result = buf
+        return {'People': result}
+
     def _filter_ColorRegions(self):
         #result = {}
         result = []
@@ -564,10 +625,27 @@ class CatImagesBot(checkimages.main):
         return {'ColorAverage': result}
 
     # Category:Unidentified people
-    def _cat_face_People(self):
-        relevance = bool(self._info_filter['Faces'])
+    def _cat_people_People(self):
+        #relevance = bool(self._info_filter['People'])
+        relevance = self._cat_people_Groups()[1]
 
         return (u'Unidentified people', relevance)
+
+    # Category:Unidentified people
+    #def _cat_multi_People(self):
+    def _cat_face_People(self):
+        relevance = bool(self._info_filter['Faces'])
+        #relevance = bool(self._info_filter['People']) or relevance
+
+        return (u'Unidentified people', relevance)
+
+    # Category:Groups
+    def _cat_people_Groups(self):
+        result = self._info_filter['People']
+
+        relevance = (len(result) >= self._thrhld_group_size)
+
+        return (u'Groups', relevance)
 
     # Category:Groups
     def _cat_face_Groups(self):
@@ -597,7 +675,6 @@ class CatImagesBot(checkimages.main):
     # Category:Unidentified people
     def _guess__People(self):
         #result  = copy.deepcopy(self._info_filter['Faces'])
-        #result += self._detectObjectPeople_CV()
 
         cls = 'person'
         if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
@@ -789,15 +866,24 @@ class CatImagesBot(checkimages.main):
         #cascade       = cv.Load(
         cascade       = cv2.CascadeClassifier(
           'opencv/haarcascades/haarcascade_frontalface_alt.xml',
+          # MAY BE USE 'haarcascade_frontalface_alt_tree.xml' ALSO / INSTEAD...?!!
+          )
+        cascadeprofil = cv2.CascadeClassifier(
+          'opencv/haarcascades/haarcascade_profileface.xml',
           )
 
         self._info['Faces'] = []
         scale = 1.
+        # So, to find an object of an unknown size in the image the scan
+        # procedure should be done several times at different scales.
+        # http://opencv.itseez.com/modules/objdetect/doc/cascade_classification.html
         try:
             #image = cv.LoadImage(self.image_path)
             #img    = cv2.imread( self.image_path, 1 )
             img    = cv2.imread( self.image_path_JPEG, 1 )
             #image  = cv.fromarray(img)
+            if img == None:
+                raise IOError
             
             # !!! the 'scale' here IS RELEVANT FOR THE DETECTION RATE;
             # how small and how many features are detected as faces (or eyes)
@@ -823,7 +909,7 @@ class CatImagesBot(checkimages.main):
         smallImg = cv2.equalizeHist( smallImg )
 
         t = cv.GetTickCount()
-        faces = numpy.array(cascade.detectMultiScale( smallImg,
+        faces = list(cascade.detectMultiScale( smallImg,
             1.1, 2, 0
             #|cv.CV_HAAR_FIND_BIGGEST_OBJECT
             #|cv.CV_HAAR_DO_ROUGH_SEARCH
@@ -831,6 +917,14 @@ class CatImagesBot(checkimages.main):
             (30, 30) ))
         #faces = cv.HaarDetectObjects(grayscale, cascade, storage, 1.2, 2,
         #                           cv.CV_HAAR_DO_CANNY_PRUNING, (50,50))
+        if not faces:
+            faces += list(cascadeprofil.detectMultiScale( smallImg,
+                1.1, 2, 0
+                #|cv.CV_HAAR_FIND_BIGGEST_OBJECT
+                #|cv.CV_HAAR_DO_ROUGH_SEARCH
+                |cv.CV_HAAR_SCALE_IMAGE,
+                (30, 30) ))
+        faces = numpy.array(faces)
         #if faces:
         #    self._drawRect(faces) #call to a python pil
         t = cv.GetTickCount() - t
@@ -896,9 +990,86 @@ class CatImagesBot(checkimages.main):
 
     # .../opencv/samples/cpp/peopledetect.cpp
     def _detectObjectPeople_CV(self):
-        # needs an .so (C++) module since python bindings are missing, but
-        # results do not look very probising, so forget about it...
-        pass
+        # http://stackoverflow.com/questions/10231380/graphic-recognition-of-people
+        # https://code.ros.org/trac/opencv/ticket/1298
+        # http://opencv.itseez.com/modules/gpu/doc/object_detection.html
+        # http://opencv.willowgarage.com/documentation/cpp/basic_structures.html
+        # http://www.pygtk.org/docs/pygtk/class-gdkrectangle.html
+        
+        # MAY BE USE 'haarcascade_fullbody.xml' ALSO...?!! (like face detection)
+
+        import cv2, gtk, cv, numpy#, time
+
+        self._info['People'] = []
+        scale = 1.
+        try:
+            img = cv2.imread(self.image_path_JPEG, 1)
+
+            if (img == None) or (min(img.shape[:2]) < 50) or (not img.data):
+                raise IOError
+
+            #scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/500.)])
+            #scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/350.)])
+            scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/300.)])
+        except IOError:
+            pywikibot.output(u'WARNING: unknown file type')
+            return
+        except AttributeError:
+            pywikibot.output(u'WARNING: unknown file type')
+            return
+
+        # similar to face detection
+        smallImg = numpy.empty( (cv.Round(img.shape[1]/scale), cv.Round(img.shape[0]/scale)), dtype=numpy.uint8 )
+        gray = cv2.cvtColor( img, cv.CV_BGR2GRAY )
+        smallImg = cv2.resize( gray, smallImg.shape, interpolation=cv2.INTER_LINEAR )
+        smallImg = cv2.equalizeHist( smallImg )
+        img = smallImg
+        
+        hog = cv2.HOGDescriptor()
+        hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+        #cv2.namedWindow("people detector", 1)
+        
+        found = found_filtered = []
+        #t = time.time()
+        # run the detector with default parameters. to get a higher hit-rate
+        # (and more false alarms, respectively), decrease the hitThreshold and
+        # groupThreshold (set groupThreshold to 0 to turn off the grouping completely).
+        found = hog.detectMultiScale(img, 0, (8,8), (32,32), 1.05, 2)
+        #t = time.time() - t
+        #print("tdetection time = %gms\n", t*1000.)
+        bbox = gtk.gdk.Rectangle(*(0,0,img.shape[1],img.shape[0]))
+        for i in range(len(found)):
+            r = gtk.gdk.Rectangle(*found[i])
+            j = 0
+            while (j < len(found)):
+                if (j != i and r.intersect(gtk.gdk.Rectangle(*found[j])) == r):
+                    break
+                j += 1
+            if (j == len(found)):
+                found_filtered.append(r)
+                #found_filtered.append(bbox.intersect(r))   # crop to image size
+        result = []
+        for i in range(len(found_filtered)):
+            r = found_filtered[i]
+            # the HOG detector returns slightly larger rectangles than the real objects.
+            # so we slightly shrink the rectangles to get a nicer output.
+            r.x += cv.Round(r.width*0.1)
+            r.width = cv.Round(r.width*0.8)
+            r.y += cv.Round(r.height*0.07)
+            r.height = cv.Round(r.height*0.8)
+            data = { 'ID':       (i+1),
+                     'Center':   (int(r.x + r.width*0.5), int(r.y + r.height*0.5)), }
+            # crop to image size (because of the slightly bigger boxes)
+            r = bbox.intersect(r)
+            #cv2.rectangle(img, (r.x, r.y), (r.x+r.width, r.y+r.height), cv.Scalar(0,255,0), 3)
+            data['Position'] = tuple(numpy.int_(numpy.array(r)*scale))
+            data['Coverage'] = float(data['Position'][2]*data['Position'][3])/(self.image_size[0]*self.image_size[1])
+            result.append( data )
+        #cv2.imshow("people detector", img)
+        #c = cv2.waitKey(0) & 255
+
+        self._info['People'] = result
+        return
 
     # .../opencv/samples/cpp/bagofwords_classification.cpp
     def _classifyObjectAll_CV(self, cls):
@@ -1046,23 +1217,44 @@ class CatImagesBot(checkimages.main):
         import Image
 
         self._info['Properties'] = []
-        try:
-            i = Image.open(self.image_path)
-        except IOError:
-            pywikibot.output(u'WARNING: unknown file type')
-            return
+        self.image_size = (None, None)
+        if self.image_fileext == u'.svg':
+            import rsvg     # gnome-python2-rsvg
+            svg = rsvg.Handle(self.image_path)
 
-        self.image_size = i.size
+            # http://validator.w3.org/docs/api.html#libs
+            # http://pypi.python.org/pypi/py_w3c/
+            from py_w3c.validators.html.validator import HTMLValidator
+            vld = HTMLValidator()
+            vld.validate(self.image.fileUrl())
+            valid = (True if vld.result.validity == 'true' else False)
+            #print vld.errors, vld.warnings
 
-        result = { #'bands':      i.getbands(),
-                   #'bbox':       i.getbbox(),
-                   'Format':     i.format,
-                   'Mode':       i.mode,
-                   'Dimensions': i.size,
-                   #'info':       i.info,
-                   'Filesize':   os.path.getsize(self.image_path),
-                   #'stat':       os.stat(self.image_path),
-                   'Palette':    str(len(i.palette.palette)) if i.palette else u'-', }
+            result = { 'Format':     u'SVG%s' % (u' (valid)' if valid else u''),
+                       'Mode':       u'-',
+                       'Dimensions': (svg.props.width, svg.props.height),
+                       'Filesize':   os.path.getsize(self.image_path),
+                       'Palette':    u'-', }
+            # may be set {{validSVG}} also or do something in bot template to
+            # recognize 'Format=SVG (valid)' ...
+        else:
+            try:
+                i = Image.open(self.image_path)
+            except IOError:
+                pywikibot.output(u'WARNING: unknown file type')
+                return
+
+            result = { #'bands':      i.getbands(),
+                       #'bbox':       i.getbbox(),
+                       'Format':     i.format,
+                       'Mode':       i.mode,
+                       'Dimensions': i.size,
+                       #'info':       i.info,
+                       'Filesize':   os.path.getsize(self.image_path),
+                       #'stat':       os.stat(self.image_path),
+                       'Palette':    str(len(i.palette.palette)) if i.palette else u'-', }
+
+        self.image_size = result['Dimensions']
 
         self._info['Properties'] = [result]
         return
@@ -1336,6 +1528,43 @@ class CatImagesBot(checkimages.main):
 
         return im
 
+    def _detectObjectTrained_CV(self):
+        # general (self trained) classification
+        # http://www.computer-vision-software.com/blog/2009/11/faq-opencv-haartraining/
+
+        # !!! train a own cascade classifier like for face detection used
+        # !!! with 'opencv_haartraing' -> xml (file to use like in face/eye detection)
+        # !!! do NOT train 'people', there is already 'haarcascade_fullbody.xml', a.o. ...
+        pass
+
+    def _recognizeOpticalText_x(self):
+        # optical text recognition (tesseract?)
+        # (no full recognition but just classify as 'contains text')
+        pass
+
+    def _recognizeOpticalCodes_x(self):
+        # barcode and Data Matrix recognition (gocr? libdmtx/pydmtx?)
+        # http://libdmtx.wikidot.com/libdmtx-python-wrapper
+
+        from pydmtx import DataMatrix   # linux distro package
+        from PIL import Image
+        
+        ## Write a Data Matrix barcode
+        #dm_write = DataMatrix()
+        #dm_write.encode("Hello, world!")
+        #dm_write.save("hello.png", "png")
+        
+        # Read a Data Matrix barcode
+        dm_read = DataMatrix()
+        img = Image.open("hello.png")
+        
+        print dm_read.decode(img.size[0], img.size[1], buffer(img.tostring()))
+        print dm_read.count()
+        print dm_read.message(1)
+        print dm_read.stats(1)
+        
+        return
+
 gbv = Global()
 
 def checkbot():
@@ -1484,7 +1713,7 @@ def checkbot():
         if pywikibot.simulate:
             print u"--- " * 20
             print u"--- " * 20
-            print u"\n".join(outresult[1:])
+            print u"\n".join(outresult)
 
 main = checkbot
 
