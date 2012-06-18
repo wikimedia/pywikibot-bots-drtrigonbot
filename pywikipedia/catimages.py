@@ -118,6 +118,7 @@ class CatImagesBot(checkimages.main):
 
     #ignore = []
     ignore = ['color']
+    #ignore = ['color', 'people']
     
     _thrhld_group_size = 4
     _thrshld_guesses = 0.1
@@ -498,7 +499,7 @@ class CatImagesBot(checkimages.main):
         # Image size
         self._detectProperties_PIL()
         
-        # Faces and eyes (opencv pre-trained)
+        # Faces and eyes (opencv pre-trained haar)
         self._detectObjectFaces_CV()
         
         for i in range(len(self._info['Faces'])):
@@ -538,7 +539,7 @@ class CatImagesBot(checkimages.main):
             #c  = ( cc + 6*ca + 2*cb ) / 9
             self._info['ColorRegions'][i]['Confidence'] = c
 
-        # People (opencv pre-trained)
+        # People/Pedestrian (opencv pre-trained hog)
         self._detectObjectPeople_CV()
         
         for i in range(len(self._info['People'])):
@@ -552,20 +553,17 @@ class CatImagesBot(checkimages.main):
                 c = 0.1
             self._info['People'][i]['Confidence'] = c
 
-        # general (self trained) classification
-        # !!! train a own cascade classifier like for face detection used
-        # !!! with 'opencv_haartraing' -> xml (file to use like in face/eye detection)
-        # !!! do NOT train 'people', there is already 'haarcascade_fullbody.xml', a.o. ...
-        #
+        # general (self trained haar and cascade) classification
+        # (people is opencv pre-trained, all other are own results)
         # http://www.computer-vision-software.com/blog/2009/11/faq-opencv-haartraining/
-        #self._detectObjectTrained_CV()
+        self._detectObjectTrained_CV()
 
         # optical text recognition (tesseract?)
         #self._recognizeOpticalText_x()
         # (no full recognition but just classify as 'contains text')
 
-        # barcode and Data Matrix recognition (gocr? libdmtx/pydmtx?)
-        #self._recognizeOpticalCodes_x()
+        # barcode and Data Matrix recognition (libdmtx/pydmtx, zbar, gocr?)
+        self._recognizeOpticalCodes_x()
 
         # general (trained) classification
         #self._classifyObjectAll_CV()
@@ -935,7 +933,7 @@ class CatImagesBot(checkimages.main):
                     new = False
                     break
             if new:
-                faces.append( rr )
+                faces.append( r )
         faces = numpy.array(faces)
         #if faces:
         #    self._drawRect(faces) #call to a python pil
@@ -1017,11 +1015,11 @@ class CatImagesBot(checkimages.main):
         try:
             img = cv2.imread(self.image_path_JPEG, 1)
 
-            if (img == None) or (min(img.shape[:2]) < 50) or (not img.data):
+            if (img == None) or (min(img.shape[:2]) < 100) or (not img.data):
                 raise IOError
 
             #scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/500.)])
-            #scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/350.)])
+            #scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/400.)])
             scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/300.)])
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
@@ -1540,14 +1538,64 @@ class CatImagesBot(checkimages.main):
 
         return im
 
-    def _detectObjectTrained_CV(self):
-        # general (self trained) classification
+    def _detectObjectTrained_CV(self, cascade_file='haarcascade_fullbody.xml'):
+        # general (self trained) classification (e.g. people, ...)
         # http://www.computer-vision-software.com/blog/2009/11/faq-opencv-haartraining/
+
+        # Can be used with haar classifier (use: opencv_haartraining) and
+        # cascaded classifier (use: opencv_traincascade), both should work.
 
         # !!! train a own cascade classifier like for face detection used
         # !!! with 'opencv_haartraing' -> xml (file to use like in face/eye detection)
-        # !!! do NOT train 'people', there is already 'haarcascade_fullbody.xml', a.o. ...
-        pass
+
+        # analogue to face detection:
+
+        import cv, cv2, numpy
+
+        # http://tutorial-haartraining.googlecode.com/svn/trunk/data/haarcascades/
+        # or own xml files trained onto specific file database/set
+        cascade       = cv2.CascadeClassifier(
+          'opencv/haarcascades/' + cascade_file,
+          )
+
+        #self._info['_ObjectTrained'] = []
+        scale = 1.
+        try:
+            img    = cv2.imread( self.image_path_JPEG, 1 )
+            if img == None:
+                raise IOError
+            
+            # !!! the 'scale' here IS RELEVANT FOR THE DETECTION RATE;
+            # how small and how many features are detected
+            scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/500.)])
+            #scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/300.)])
+        except IOError:
+            pywikibot.output(u'WARNING: unknown file type')
+            return
+        except AttributeError:
+            pywikibot.output(u'WARNING: unknown file type')
+            return
+
+        # similar to face detection
+        smallImg = numpy.empty( (cv.Round(img.shape[1]/scale), cv.Round(img.shape[0]/scale)), dtype=numpy.uint8 )
+        gray = cv2.cvtColor( img, cv.CV_BGR2GRAY )
+        smallImg = cv2.resize( gray, smallImg.shape, interpolation=cv2.INTER_LINEAR )
+        smallImg = cv2.equalizeHist( smallImg )
+
+        objects = list(cascade.detectMultiScale( smallImg,
+            1.1, 2, 0
+            #|cv.CV_HAAR_FIND_BIGGEST_OBJECT
+            #|cv.CV_HAAR_DO_ROUGH_SEARCH
+            |cv.CV_HAAR_SCALE_IMAGE,
+            (30, 30) ))
+
+        pywikibot.output(u'ALPHA STAGE: _detectObjectTrained_CV')
+        pywikibot.output(unicode(objects))
+
+        # generic detection ...
+
+        #self._info['_ObjectTrained'] = ...
+        return
 
     def _recognizeOpticalText_x(self):
         # optical text recognition (tesseract?)
@@ -1555,26 +1603,65 @@ class CatImagesBot(checkimages.main):
         pass
 
     def _recognizeOpticalCodes_x(self):
-        # barcode and Data Matrix recognition (gocr? libdmtx/pydmtx?)
+        # barcode and Data Matrix recognition (libdmtx/pydmtx, zbar, gocr?)
         # http://libdmtx.wikidot.com/libdmtx-python-wrapper
+        # http://blog.globalstomp.com/2011/09/decoding-qr-code-code-128-code-39.html
+        # http://zbar.sourceforge.net/
+        # http://pypi.python.org/pypi/zbar
 
-        from pydmtx import DataMatrix   # linux distro package
-        from PIL import Image
+        #self._info['_OpticalCodes'] = []
+
+        # ...pydmtx seems to have a bug an crashes...
+        ## DataMatrix
+        #from pydmtx import DataMatrix   # linux distro package
+        #from PIL import Image
+        #
+        ### Write a Data Matrix barcode
+        ##dm_write = DataMatrix()
+        ##dm_write.encode("Hello, world!")
+        ##dm_write.save("hello.png", "png")
+        #
+        ## Read a Data Matrix barcode
+        #dm_read = DataMatrix()
+        #img = Image.open("hello.png")
+        #
+        #print dm_read.decode(img.size[0], img.size[1], buffer(img.tostring()))
+        #print dm_read.count()
+        #print dm_read.message(1)
+        #print dm_read.stats(1)
         
-        ## Write a Data Matrix barcode
-        #dm_write = DataMatrix()
-        #dm_write.encode("Hello, world!")
-        #dm_write.save("hello.png", "png")
+        # supports many popular symbologies
+        #import zbar, Image
+        import pyzbar as zbar
+        import Image
         
-        # Read a Data Matrix barcode
-        dm_read = DataMatrix()
-        img = Image.open("hello.png")
+        try:
+            img = Image.open(self.image_path_JPEG).convert('L')
+            width, height = img.size
+        except IOError:
+            pywikibot.output(u'WARNING: unknown file type')
+            return
         
-        print dm_read.decode(img.size[0], img.size[1], buffer(img.tostring()))
-        print dm_read.count()
-        print dm_read.message(1)
-        print dm_read.stats(1)
+        scanner = zbar.ImageScanner()
+        scanner.parse_config('enable')
+        zbar_img = zbar.Image(width, height, 'Y800', img.tostring())
         
+        # scan the image for barcodes
+        scanner.scan(zbar_img)
+        
+        pywikibot.output(u'ALPHA STAGE: _recognizeOpticalCodes_x')
+
+        for symbol in zbar_img:
+            #pywikibot.output(unicode(symbol.components))
+            pywikibot.output(unicode(symbol.count))
+            pywikibot.output(unicode(symbol.data))
+            pywikibot.output(unicode(symbol.location))
+            pywikibot.output(unicode(symbol.quality))
+            pywikibot.output(unicode(symbol.type))
+
+        # further detection ...
+
+        #self._info['_OpticalCodes'] = ...
         return
 
 gbv = Global()
