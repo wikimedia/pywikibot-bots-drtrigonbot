@@ -119,7 +119,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 10361 2012-06-16 19:21:45Z drtrigon $'
+__version__ = '$Id: wikipedia.py 10388 2012-06-20 14:56:03Z xqt $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -4526,8 +4526,13 @@ class _GetAll(object):
         m = p.match(version)
         if m:
             version = m.group(1)
-            if version != self.site.version():
-                output(u'WARNING: Family file %s contains version number %s, but it should be %s' % (self.site.family.name, self.site.version(), version))
+            # only warn operator when versionnumber has been changed
+            versionnumber = self.site.family.versionnumber
+            if version != self.site.version() and \
+               versionnumber(self.site.lang,
+                             version=version) != versionnumber(self.site.lang):
+                output(u'WARNING: Family file %s contains version number %s, but it should be %s'
+                       % (self.site.family.name, self.site.version(), version))
 
         # Verify case
         if self.site.nocapitalize:
@@ -4687,8 +4692,13 @@ class _GetAll(object):
         m = p.match(header['general']['generator'])
         if m:
             version = m.group(1)
-            if version != self.site.version():
-                output(u'WARNING: Family file %s contains version number %s, but it should be %s' % (self.site.family.name, self.site.version(), version))
+            # only warn operator when versionnumber has been changed
+            versionnumber = self.site.family.versionnumber
+            if version != self.site.version() and \
+               versionnumber(self.site.lang,
+                             version=version) != versionnumber(self.site.lang):
+                output(u'WARNING: Family file %s contains version number %s, but it should be %s'
+                       % (self.site.family.name, self.site.version(), version))
 
         # Verify case
         if self.site.nocapitalize:

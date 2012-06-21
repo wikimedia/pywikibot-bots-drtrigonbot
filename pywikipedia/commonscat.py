@@ -50,7 +50,7 @@ TODO:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: commonscat.py 10272 2012-06-02 23:35:18Z xqt $'
+__version__ = '$Id: commonscat.py 10364 2012-06-17 15:42:55Z amir $'
 #
 
 import wikipedia as pywikibot
@@ -88,7 +88,7 @@ commonscatTemplates = {
                             u'Commonscat-inline']),
     'eu' : (u'Commonskat', [u'Commonscat']),
     'fa' : (u'ویکی‌انبار-رده', [u'Commonscat', u'Commons cat',
-                           u'انبار رده', u'Commons category',u'انبار-رده']),
+                           u'انبار رده', u'Commons category',u'انبار-رده',u'جعبه پیوند به پروژه‌های خواهر',u'در پروژه‌های خواهر',u'پروژه‌های خواهر']),
     'fr' : (u'Commonscat', [u'CommonsCat', u'Commons cat',
                             u'Commons category']),
     'frp' : (u'Commonscat', [u'CommonsCat']),
@@ -156,7 +156,9 @@ ignoreTemplates = {
             (u'Projektoj', 'commonscat=')],
     'es' : [u'Commons', u'IprCommonscat'],
     'eu' : [u'Commons'],
-    'fa' : [u'Commons', u'ویکی‌انبار'],
+    'fa' : [u'Commons', u'ویکی‌انبار',
+	    u'Category redirect',u'رده بهتر',
+            u'جعبه پیوند به پروژه‌های خواهر',u'در پروژه‌های خواهر',u'پروژه‌های خواهر'],
     'fi' : [u'Commonscat-rivi', u'Commons-rivi', u'Commons'],
     'fr' : [u'Commons', u'Commons-inline', (u'Autres projets', 'commons=')],
     'fy' : [u'Commons', u'CommonsLyts'],
@@ -185,6 +187,7 @@ msg_change = {
     'da': u'Robot: Ændrer commonscat link fra [[:Commons:Category:%(oldcat)s|%(oldcat)s]] til [[:Commons:Category:%(newcat)s|%(newcat)s]]',
     'de': u'Bot: Ändere commonscat link von [[:Commons:Category:%(oldcat)s|%(oldcat)s]] zu [[:Commons:Category:%(newcat)s|%(newcat)s]]',
     'en': u'Bot: Changing commonscat link from [[:Commons:Category:%(oldcat)s|%(oldcat)s]] to [[:Commons:Category:%(newcat)s|%(newcat)s]]',
+    'fa': u'ربات: تغییر پیوند به انبار از [[:Commons:Category:%(oldcat)s|%(oldcat)s]] به [[:Commons:Category:%(newcat)s|%(newcat)s]]',
     'fr': u'Robot: Changé commonscat link de [[:Commons:Category:%(oldcat)s|%(oldcat)s]] à [[:Commons:Category:%(newcat)s|%(newcat)s]]',
     'frr':u'Bot: Feranere commonscat link faan [[:Commons:Category:%(oldcat)s|%(oldcat)s]] tu [[:Commons:Category:%(newcat)s|%(newcat)s]]',
     'is': u'Vélmenni: Breyti Commonscat tengli frá [[:Commons:Category:%(oldcat)s|%(oldcat)s]] í [[:Commons:Category:%(newcat)s|%(newcat)s]]',

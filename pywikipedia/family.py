@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: family.py 10322 2012-06-08 07:29:39Z xqt $'
+__version__='$Id: family.py 10391 2012-06-20 15:11:03Z xqt $'
 
 import config
 import re
@@ -754,7 +754,7 @@ class Family:
                 'fiu-vro': u'Pruukja',
                 'fo': u'Brúkari',
                 'fr': [u'Utilisateur', u'Utilisatrice'],
-                'frp': [u'Usanciér', u'Utilisator'],
+                'frp': [u'Utilisator', u'Usanciér'],
                 'frr': [u'Benutzer', u'Benutzerin'],
                 'fur': u'Utent',
                 'fy': [u'Meidogger', u'Brûker'],
@@ -4028,17 +4028,19 @@ class Family:
         """Return MediaWiki version number as a string."""
         # Don't use this, use versionnumber() instead. This only exists
         # to not break family files.
-        return '1.20wmf4'
+        return '1.20wmf5'
 
-    def versionnumber(self, code):
+    def versionnumber(self, code, version=None):
         """Return an int identifying MediaWiki version.
 
         Currently this is implemented as returning the minor version
         number; i.e., 'X' in version '1.X.Y'
 
+        if version is given (e.g. from a mw page), extract that number
+
         """
         R = re.compile(r"(\d+).(\d+)")
-        M = R.search(self.version(code))
+        M = R.search(version or self.version(code))
         if not M:
             # Version string malformatted; assume it should have been 1.10
             return 10

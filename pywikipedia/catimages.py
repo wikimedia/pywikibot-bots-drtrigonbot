@@ -556,7 +556,9 @@ class CatImagesBot(checkimages.main):
         # general (self trained haar and cascade) classification
         # (people is opencv pre-trained, all other are own results)
         # http://www.computer-vision-software.com/blog/2009/11/faq-opencv-haartraining/
-        self._detectObjectTrained_CV()
+        cascade_files = [(u'People', 'haarcascade_fullbody.xml')]
+        for cf in cascade_files:
+            self._detectObjectTrained_CV(*cf)
 
         # optical text recognition (tesseract?)
         #self._recognizeOpticalText_x()
@@ -565,8 +567,19 @@ class CatImagesBot(checkimages.main):
         # barcode and Data Matrix recognition (libdmtx/pydmtx, zbar, gocr?)
         self._recognizeOpticalCodes_x()
 
-        # general (trained) classification
+        # Chessboard (opencv reference detector)
+        self._detectObjectChessboard_CV
+
+        # ??? classification of detected features (RTrees, KNearest, Boost, SVM, MLP, NBayes, ...)
+        # ??? (may be do this in '_cat_...()' or '_filter_...()' ?!?...)
+        # http://opencv.itseez.com/doc/tutorials/ml/introduction_to_svm/introduction_to_svm.html
+        # http://stackoverflow.com/questions/8687885/python-opencv-svm-implementation
+        # https://code.ros.org/trac/opencv/browser/trunk/opencv/samples/python2/letter_recog.py?rev=6480
         #self._classifyObjectAll_CV()
+
+        # general (trained) detection AND classification (BoW)
+        # uses feature detection (SIFT, SURF, ...) AND classification (SVM, ...)
+        #self._detectclassifyObjectAll_CV()
 
     def _existInformation(self, info, ignore = ['Properties', 'ColorAverage']):
         result = []
@@ -685,11 +698,11 @@ class CatImagesBot(checkimages.main):
 
     ## Category:Unidentified maps
     #def _guess__Maps(self):
-    #    return (u'Unidentified maps', self._classifyObjectAll_CV('maps'), 0.1)
+    #    return (u'Unidentified maps', self._detectclassifyObjectAll_CV('maps'), 0.1)
 
     ## Category:Unidentified flags
     #def _guess__Flags(self):
-    #    return (u'Unidentified flags', self._classifyObjectAll_CV('flags'), 0.1)
+    #    return (u'Unidentified flags', self._detectclassifyObjectAll_CV('flags'), 0.1)
 
     # Category:Unidentified plants
     def _guess__Plants(self):
@@ -704,11 +717,11 @@ class CatImagesBot(checkimages.main):
 
     ## Category:Unidentified coats of arms
     #def _guessCoatsOfArms(self):
-    #    return (u'Unidentified coats of arms', self._classifyObjectAll_CV('coats of arms'), 0.1)
+    #    return (u'Unidentified coats of arms', self._detectclassifyObjectAll_CV('coats of arms'), 0.1)
 
     ## Category:Unidentified buildings
     #def _guessBuildings(self):
-    #    return (u'Unidentified buildings', self._classifyObjectAll_CV('buildings'), 0.1)
+    #    return (u'Unidentified buildings', self._detectclassifyObjectAll_CV('buildings'), 0.1)
 
     # Category:Unidentified trains
     def _guess__Trains(self):
@@ -1019,8 +1032,8 @@ class CatImagesBot(checkimages.main):
                 raise IOError
 
             #scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/500.)])
-            #scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/400.)])
-            scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/300.)])
+            scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/400.)])
+            #scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/300.)])
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
             return
@@ -1082,8 +1095,8 @@ class CatImagesBot(checkimages.main):
         return
 
     # .../opencv/samples/cpp/bagofwords_classification.cpp
-    def _classifyObjectAll_CV(self, cls):
-        """Uses the 'The Bag of Words model' for classification"""
+    def _detectclassifyObjectAll_CV(self, cls):
+        """Uses the 'The Bag of Words model' for detection and classification"""
 
         # http://app-solut.com/blog/2011/07/the-bag-of-words-model-in-opencv-2-2/
         # http://app-solut.com/blog/2011/07/using-the-normal-bayes-classifier-for-image-categorization-in-opencv/
@@ -1236,8 +1249,11 @@ class CatImagesBot(checkimages.main):
             # http://pypi.python.org/pypi/py_w3c/
             from py_w3c.validators.html.validator import HTMLValidator
             vld = HTMLValidator()
-            vld.validate(self.image.fileUrl())
-            valid = (True if vld.result.validity == 'true' else False)
+            try:
+                vld.validate(self.image.fileUrl())
+                valid = (True if vld.result.validity == 'true' else False)
+            except urllib2.URLError:
+                valid = False
             #print vld.errors, vld.warnings
 
             result = { 'Format':     u'SVG%s' % (u' (valid)' if valid else u''),
@@ -1538,7 +1554,7 @@ class CatImagesBot(checkimages.main):
 
         return im
 
-    def _detectObjectTrained_CV(self, cascade_file='haarcascade_fullbody.xml'):
+    def _detectObjectTrained_CV(self, info_desc, cascade_file):
         # general (self trained) classification (e.g. people, ...)
         # http://www.computer-vision-software.com/blog/2009/11/faq-opencv-haartraining/
 
@@ -1558,7 +1574,7 @@ class CatImagesBot(checkimages.main):
           'opencv/haarcascades/' + cascade_file,
           )
 
-        #self._info['_ObjectTrained'] = []
+        #self._info[info_desc] = []
         scale = 1.
         try:
             img    = cv2.imread( self.image_path_JPEG, 1 )
@@ -1591,10 +1607,11 @@ class CatImagesBot(checkimages.main):
 
         pywikibot.output(u'ALPHA STAGE: _detectObjectTrained_CV')
         pywikibot.output(unicode(objects))
+        pywikibot.output(unicode(self._info[info_desc]))
 
         # generic detection ...
 
-        #self._info['_ObjectTrained'] = ...
+        #self._info[info_desc] = ...
         return
 
     def _recognizeOpticalText_x(self):
@@ -1662,6 +1679,38 @@ class CatImagesBot(checkimages.main):
         # further detection ...
 
         #self._info['_OpticalCodes'] = ...
+        return
+
+    def _detectObjectChessboard_CV(self):
+        # Chessboard (opencv reference detector)
+        # http://nullege.com/codes/show/src%40o%40p%40opencvpython-HEAD%40samples%40chessboard.py/12/cv.FindChessboardCorners/python
+        
+        import cv
+
+        #self._info['_ObjectChessboard'] = []
+        try:
+            #cv.NamedWindow("win")
+            im = cv.LoadImage(self.image_path_JPEG, cv.CV_LOAD_IMAGE_GRAYSCALE)
+            #im3 = cv.LoadImage(self.image_path_JPEG, cv.CV_LOAD_IMAGE_COLOR)
+            chessboard_dim = ( 7, 7 )
+        except IOError:
+            pywikibot.output(u'WARNING: unknown file type')
+            return
+        except AttributeError:
+            pywikibot.output(u'WARNING: unknown file type')
+            return
+
+        found_all, corners = cv.FindChessboardCorners( im, chessboard_dim )
+        pywikibot.output(u'ALPHA STAGE: _detectObjectChessboard_CV')
+        pywikibot.output(unicode((found_all, corners)))
+     
+        ##cv.DrawChessboardCorners( im3, chessboard_dim, corners, found_all )
+        #cv.ShowImage("win", im3);
+        #cv.WaitKey()
+
+        # further detection ...
+
+        #self._info['_ObjectChessboard'] = ...
         return
 
 gbv = Global()
