@@ -1605,7 +1605,7 @@ class CatImagesBot(checkimages.main):
             |cv.CV_HAAR_SCALE_IMAGE,
             (30, 30) ))
 
-        pywikibot.output(u'ALPHA STAGE: _detectObjectTrained_CV')
+        pywikibot.output(u'ALPHA STAGE: _detectObjectTrained_CV (%s)' % bool(objects))
         pywikibot.output(unicode(objects))
         pywikibot.output(unicode(self._info[info_desc]))
 
@@ -1666,7 +1666,7 @@ class CatImagesBot(checkimages.main):
         # scan the image for barcodes
         scanner.scan(zbar_img)
         
-        pywikibot.output(u'ALPHA STAGE: _recognizeOpticalCodes_x')
+        pywikibot.output(u'ALPHA STAGE: _recognizeOpticalCodes_x (%s)' % bool(zbar_img))
 
         for symbol in zbar_img:
             #pywikibot.output(unicode(symbol.components))
@@ -1701,7 +1701,7 @@ class CatImagesBot(checkimages.main):
             return
 
         found_all, corners = cv.FindChessboardCorners( im, chessboard_dim )
-        pywikibot.output(u'ALPHA STAGE: _detectObjectChessboard_CV')
+        pywikibot.output(u'ALPHA STAGE: _detectObjectChessboard_CV (%s)' % found_all)
         pywikibot.output(unicode((found_all, corners)))
      
         ##cv.DrawChessboardCorners( im3, chessboard_dim, corners, found_all )
