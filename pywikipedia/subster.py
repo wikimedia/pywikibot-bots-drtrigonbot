@@ -419,7 +419,7 @@ class SubsterBot(basic.AutoBasicBot):
                 content = content.replace(item[0], external_data, 1)
 
             if (content != prev_content):
-                substed_tags.append(u'BeautifulSoup')
+                substed_tags.append(value+'BS')
 
         return (content, substed_tags)
 

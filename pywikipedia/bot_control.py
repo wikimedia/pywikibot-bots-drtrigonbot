@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8  -*-
 #$ -m as
+#$ -j y
+#$ -b y
+# SGE integration/interaction: https://wiki.toolserver.org/view/Job_scheduling
 # Tip from Merlissimo: use (a=reschedule or abort, s= suspended) to send mail
 # by SGE and exitcode 99 to restart the job and 100 to stop it in error state.
-# https://wiki.toolserver.org/view/Job_scheduling#Receiving_mail_when_the_job_starts_or_finishes
 """
 This bot is the general DrTrigonBot caller. It runs all the different sub tasks,
 that DrTrigonBot does. That are:
