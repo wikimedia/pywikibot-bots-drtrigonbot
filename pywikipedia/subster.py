@@ -122,11 +122,7 @@ class SubsterBot(basic.AutoBasicBot):
     _param_default = bot_config['param_default']
 
     _var_regex_str = bot_config['var_regex_str']%{'var1':'%(var)s','var2':'%(var)s','cont':'%(cont)s'}
-
-    _BS_regex      = re.compile(u'(' + _var_regex_str%{'var':'BS:(.*?)','cont':'(.*?)'} + u')')
-    # !!! access to full data (all attachements) should be possible too !!!
-    #_BS_regex      = bot_config['var_regex_str']%{'var1':'%(var)s-BS:(.*?)','var2':'BS:(.*?)','cont':'(.*?)'}
-    _BS_regex_str  = bot_config['var_regex_str']%{'var1':'BS:%(var)s','var2':'BS:/','cont':'%(cont)s'}
+    _BS_regex_str  = bot_config['var_regex_str']%{'var1':'%(var1)s','var2':'%(var2)sBS:/','cont':'%(cont)s'}
 
     # -template and subst-tag handling taken from MerlBot
     # -this bot could also be runned on my local wiki with an anacron-job
@@ -164,6 +160,11 @@ class SubsterBot(basic.AutoBasicBot):
         if self._ConfCSSconfigPage.exists():
             exec(self._ConfCSSconfigPage.get())    # with variable: bot_config_wiki
             self._flagenable = bot_config_wiki['flagenable']
+
+        pywikibot.output(u'Imported postproc %s rev %s from %s' % \
+          ((self._ConfCSSpostprocPage.title(asLink=True),) + self._ConfCSSpostprocPage.getVersionHistory(revCount=1)[0][:2]) )
+        pywikibot.output(u'Imported config %s rev %s from %s' % \
+          ((self._ConfCSSconfigPage.title(asLink=True),) + self._ConfCSSconfigPage.getVersionHistory(revCount=1)[0][:2]) )
 
     def run(self, sim=False, msg=None, EditFlags=bot_config['EditFlags']):
         '''Run SubsterBot().'''
@@ -358,7 +359,6 @@ class SubsterBot(basic.AutoBasicBot):
             #for subitem in param['regex']:
             subitem = param['regex']
             regex = re.compile(subitem, re.S | re.I)
-            var_regex = self.get_var_regex(param['value'])
 
             # 3.) subst in content
             external_data = regex.search(external_buffer)
@@ -368,41 +368,55 @@ class SubsterBot(basic.AutoBasicBot):
 
                 pywikibot.output(u'Groups found by regex: %i' % len(external_data))
 
-                if (len(external_data) == 1):
-                    external_data = external_data[0]
+                # DRTRIGON-114: Support for named groups in regexs
+                if regex.groupindex:
+                    external_data_dict = {}
+                    for item in regex.groupindex:
+                        external_data_dict[u'%s-%s' % (param['value'], item)] = external_data[regex.groupindex[item]-1]
+                elif (len(external_data) == 1):
+                    external_data_dict = {param['value']: external_data[0]}
                 else:
-                    external_data = str(external_data)
-            logging.getLogger('subster').debug( external_data )
+                    external_data_dict = {param['value']: str(external_data)}
+            logging.getLogger('subster').debug( str(external_data_dict) )
 
-            # 4.) postprocessing
             param['postproc'] = eval(param['postproc'])
             # should be secured as given below, but needs code changes in wiki too
             #param['postproc'] = ast.literal_eval(param['postproc'])
-            func  = param['postproc'][0]    # needed by exec call of self._code
-            DATA  = [ external_data ]       #
-            args  = param['postproc'][1:]   #
-            scope = {}                      # (scope to run in)
-            scope.update( locals() )        # (add DATA, *args, ...)
-            scope.update( globals() )       # (add imports and else)
-            if func:
-                exec(self._code + (bot_config['CodeTemplate'] % func), scope, scope)
-                external_data = DATA[0]
-            logging.getLogger('subster').debug( external_data )
+            for value in external_data_dict:
+                external_data = external_data_dict[value]
 
-            # 5.) subst content
-            content = var_regex.sub((self._var_regex_str%{'var':param['value'],'cont':external_data}), content, int(param['count']))
-            if (content != prev_content):
-                substed_tags.append(param['value'])
+                # 4.) postprocessing
+                func  = param['postproc'][0]    # needed by exec call of self._code
+                DATA  = [ external_data ]       #
+                args  = param['postproc'][1:]   #
+                scope = {}                      # (scope to run in)
+                scope.update( locals() )        # (add DATA, *args, ...)
+                scope.update( globals() )       # (add imports and else)
+                if func:
+                    exec(self._code + (bot_config['CodeTemplate'] % func), scope, scope)
+                    external_data = DATA[0]
+                logging.getLogger('subster').debug( external_data )
+    
+                # 5.) subst content
+                var_regex = self.get_var_regex(value)
+                content = var_regex.sub((self._var_regex_str%{'var':value,'cont':external_data}), content, int(param['count']))
+                if (content != prev_content):
+                    substed_tags.append(value)
         else:
+            # DRTRIGON-105: Support for multiple BS template configurations
+            value = param['value']
+            if value:
+                value += u'-'
+
             # DRTRIGON-88: Enable Beautiful Soup power for Subster
-            BS_tags = self._BS_regex.findall(content)
+            BS_tags = self.get_BS_regex(value).findall(content)
 
             pywikibot.output(u'BeautifulSoup tags found by regex: %i' % len(BS_tags))
 
             for item in BS_tags:
-                if not (item[3] == '/'): continue
                 external_data = eval('BeautifulSoup.BeautifulSoup(external_buffer).%s' % item[1])
-                content = content.replace(item[0], self._BS_regex_str%{'var':item[1],'cont':external_data}, 1)
+                external_data = self._BS_regex_str%{'var1':value+'BS:'+item[1],'var2':value,'cont':external_data}
+                content = content.replace(item[0], external_data, 1)
 
             if (content != prev_content):
                 substed_tags.append(u'BeautifulSoup')
@@ -437,6 +451,18 @@ class SubsterBot(basic.AutoBasicBot):
            Return the according (and compiled) regex object.
         """
         return re.compile((self._var_regex_str%{'var':var,'cont':cont}), re.S | re.I)
+
+    def get_BS_regex(self, var, cont='(.*?)'):
+        """Get regex used/needed to find the BS tags to replace.
+
+           @param var: The tag/variable name.
+           @type  var: string
+           @param cont: The content/value of the variable.
+           @type  cont: string
+
+           Return the according (and compiled) regex object.
+        """
+        return re.compile(u'(' + self._BS_regex_str%{'var1':var+'BS:(.*?)','var2':var,'cont':cont} + u')')
 
     def unzip(self, external_buffer, i):
         """Convert zip data to plain format.
