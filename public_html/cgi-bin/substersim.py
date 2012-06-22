@@ -93,7 +93,7 @@ function switch_mode () {
     document.SubsterBotForm.simple.disabled = true;
   } else if (document.ModusForm.mode[1].checked == true) {
     document.SubsterBotForm.regex.disabled = true;
-    document.SubsterBotForm.value.disabled = true;
+    document.SubsterBotForm.value.disabled = false;
     document.SubsterBotForm.count.disabled = true;
     document.SubsterBotForm.postproc.disabled = true;
     document.SubsterBotForm.wiki.disabled = true;
