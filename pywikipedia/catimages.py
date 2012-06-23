@@ -223,6 +223,13 @@ class CatImagesBot(checkimages.main):
             except:
                 self.image_path_JPEG = self.image_path
 
+        # add PDF support (extract text and images):
+        # http://vermeulen.ca/python-pdf.html
+        # http://code.activestate.com/recipes/511465-pure-python-pdf-to-text-converter/
+        # http://stackoverflow.com/questions/25665/python-module-for-converting-pdf-to-text
+        if self.image_fileext == u'.pdf':
+            pass
+
     # LOOK ALSO AT: checkimages.CatImagesBot.checkStep
     # (and category scripts/bots too...)
     def checkStep(self):
@@ -297,7 +304,8 @@ class CatImagesBot(checkimages.main):
         print content
         print u"--- " * 20
         pywikibot.put_throttle()
-        self.image.put( content, comment="bot automatic categorization; adding %s" % u", ".join(tags) )
+        self.image.put( content, comment="bot automatic categorization; adding %s" % u", ".join(tags),
+                                 botflag=False )
 
         return
 
@@ -565,10 +573,16 @@ class CatImagesBot(checkimages.main):
         # (no full recognition but just classify as 'contains text')
 
         # barcode and Data Matrix recognition (libdmtx/pydmtx, zbar, gocr?)
-        self._recognizeOpticalCodes_x()
+        self._recognizeOpticalCodes_dmtxNzbar()
+
+        for i in range(len(self._info['OpticalCodes'])):
+            self._info['OpticalCodes'][i]['Confidence'] = self._info['OpticalCodes'][i]['Quality']
 
         # Chessboard (opencv reference detector)
-        self._detectObjectChessboard_CV
+        self._detectObjectChessboard_CV()
+
+        for i in range(len(self._info['Chessboard'])):
+            self._info['Chessboard'][i]['Confidence'] = len(self._info['Chessboard'][i]['Corners'])/49.
 
         # ??? classification of detected features (RTrees, KNearest, Boost, SVM, MLP, NBayes, ...)
         # ??? (may be do this in '_cat_...()' or '_filter_...()' ?!?...)
@@ -635,6 +649,16 @@ class CatImagesBot(checkimages.main):
         result = self._info['ColorAverage']
         return {'ColorAverage': result}
 
+    def _filter_OpticalCodes(self):
+        # use all, since detection should be very reliable
+        result = self._info['OpticalCodes']
+        return {'OpticalCodes': result}
+
+    def _filter_Chessboard(self):
+        # use all, since detection should be very reliable
+        result = self._info['Chessboard']
+        return {'Chessboard': result}
+
     # Category:Unidentified people
     def _cat_people_People(self):
         #relevance = bool(self._info_filter['People'])
@@ -674,7 +698,8 @@ class CatImagesBot(checkimages.main):
     def _cat_face_Faces(self):
         result = self._info_filter['Faces']
 
-        return (u'Faces', ((len(result) == 1) and (result[0]['Coverage'] >= .50)))
+        #return (u'Faces', ((len(result) == 1) and (result[0]['Coverage'] >= .50)))
+        return (u'Faces', ((len(result) == 1) and (result[0]['Coverage'] >= .40)))
 
     # Category:Portraits
     def _cat_face_Portraits(self):
@@ -682,6 +707,18 @@ class CatImagesBot(checkimages.main):
 
         #return (u'Portraits', ((len(result) == 1) and (result[0]['Coverage'] >= .25)))
         return (u'Portraits', ((len(result) == 1) and (result[0]['Coverage'] >= .20)))
+
+    # Category:Barcode
+    def _cat_code_Barcode(self):
+        relevance = bool(self._info_filter['OpticalCodes'])
+
+        return (u'Barcode', relevance)
+
+    # Category:Chessboards
+    def _cat_chess_Chessboards(self):
+        relevance = bool(self._info_filter['Chessboard'])
+
+        return (u'Chessboards', relevance)
 
     # Category:Unidentified people
     def _guess__People(self):
@@ -1608,6 +1645,7 @@ class CatImagesBot(checkimages.main):
         pywikibot.output(u'ALPHA STAGE: _detectObjectTrained_CV (%s)' % bool(objects))
         pywikibot.output(unicode(objects))
         pywikibot.output(unicode(self._info[info_desc]))
+        pywikibot.output(u'')
 
         # generic detection ...
 
@@ -1619,38 +1657,66 @@ class CatImagesBot(checkimages.main):
         # (no full recognition but just classify as 'contains text')
         pass
 
-    def _recognizeOpticalCodes_x(self):
+    def _recognizeOpticalCodes_dmtxNzbar(self):
         # barcode and Data Matrix recognition (libdmtx/pydmtx, zbar, gocr?)
         # http://libdmtx.wikidot.com/libdmtx-python-wrapper
         # http://blog.globalstomp.com/2011/09/decoding-qr-code-code-128-code-39.html
         # http://zbar.sourceforge.net/
         # http://pypi.python.org/pypi/zbar
 
-        #self._info['_OpticalCodes'] = []
-
-        # ...pydmtx seems to have a bug an crashes...
-        ## DataMatrix
-        #from pydmtx import DataMatrix   # linux distro package
+        # DataMatrix
+        from pydmtx import DataMatrix   # linux distro package
         #from PIL import Image
-        #
-        ### Write a Data Matrix barcode
-        ##dm_write = DataMatrix()
-        ##dm_write.encode("Hello, world!")
-        ##dm_write.save("hello.png", "png")
-        #
-        ## Read a Data Matrix barcode
-        #dm_read = DataMatrix()
-        #img = Image.open("hello.png")
-        #
-        #print dm_read.decode(img.size[0], img.size[1], buffer(img.tostring()))
-        #print dm_read.count()
-        #print dm_read.message(1)
-        #print dm_read.stats(1)
+        import Image, numpy
         
+        ## Write a Data Matrix barcode
+        #dm_write = DataMatrix()
+        #dm_write.encode("Hello, world!")
+        #dm_write.save("hello.png", "png")
+        
+        self._info['OpticalCodes'] = []
+        scale = 1.
+        try:
+            # Read a Data Matrix barcode
+            dm_read = DataMatrix()
+            img = Image.open(self.image_path_JPEG)
+            
+            # http://libdmtx.wikidot.com/libdmtx-python-wrapper
+            if img.mode != 'RGB':
+               img = img.convert('RGB')
+
+            scale  = max([1., numpy.average(numpy.array(img.size)/200.)])
+        except IOError:
+            pywikibot.output(u'WARNING: unknown file type')
+            return
+        
+        smallImg = img.resize( (int(img.size[0]/scale), int(img.size[1]/scale)) )
+        img = smallImg
+
+        res = dm_read.decode(img.size[0], img.size[1], buffer(img.tostring()))
+        #print res
+
+        result = []
+        i      = -1
+        for i in range(dm_read.count()):
+            data, bbox = dm_read.stats(i+1)
+            bbox = numpy.array(bbox)
+            x, y = bbox[:,0], bbox[:,1]
+            pos  = (numpy.min(x), numpy.min(y), numpy.max(x)-numpy.min(x), numpy.max(y)-numpy.min(y))
+            result.append({ 'ID':       (i+1),
+                            #'Data':     dm_read.message(i+1),
+                            'Data':     data,
+                            'Position': pos,
+                            'Type':     u'DataMatrix',
+                            'Count':    0,                      # ???
+                            'Quality':  0.75, })
+        
+        self._info['OpticalCodes'] = result
+
         # supports many popular symbologies
         #import zbar, Image
         import pyzbar as zbar
-        import Image
+        #import Image
         
         try:
             img = Image.open(self.image_path_JPEG).convert('L')
@@ -1665,34 +1731,40 @@ class CatImagesBot(checkimages.main):
         
         # scan the image for barcodes
         scanner.scan(zbar_img)
-        
-        pywikibot.output(u'ALPHA STAGE: _recognizeOpticalCodes_x (%s)' % bool(zbar_img))
 
         for symbol in zbar_img:
-            #pywikibot.output(unicode(symbol.components))
-            pywikibot.output(unicode(symbol.count))
-            pywikibot.output(unicode(symbol.data))
-            pywikibot.output(unicode(symbol.location))
-            pywikibot.output(unicode(symbol.quality))
-            pywikibot.output(unicode(symbol.type))
+            i += 1
+            result.append({ #'components': symbol.components,
+                            'ID':         (i+1),
+                            'Count':      symbol.count,         # 'ID'?
+                            'Data':       symbol.data,
+                            'Position':   symbol.location,      # (left, top, width, height)?
+                            'Quality':    symbol.quality,       # usable for 'Confidence'?
+                            'Type':       symbol.type, })
+        
+        # further detection ?
 
-        # further detection ...
-
-        #self._info['_OpticalCodes'] = ...
+        self._info['OpticalCodes'] = result
         return
 
     def _detectObjectChessboard_CV(self):
         # Chessboard (opencv reference detector)
         # http://nullege.com/codes/show/src%40o%40p%40opencvpython-HEAD%40samples%40chessboard.py/12/cv.FindChessboardCorners/python
         
-        import cv
+        import cv, cv2, numpy
 
-        #self._info['_ObjectChessboard'] = []
+        self._info['Chessboard'] = []
+        scale = 1.
         try:
             #cv.NamedWindow("win")
-            im = cv.LoadImage(self.image_path_JPEG, cv.CV_LOAD_IMAGE_GRAYSCALE)
-            #im3 = cv.LoadImage(self.image_path_JPEG, cv.CV_LOAD_IMAGE_COLOR)
+            #im = cv.LoadImage(self.image_path_JPEG, cv.CV_LOAD_IMAGE_GRAYSCALE)
+            ##im3 = cv.LoadImage(self.image_path_JPEG, cv.CV_LOAD_IMAGE_COLOR)
+            im = cv2.imread( self.image_path_JPEG, cv2.CV_LOAD_IMAGE_GRAYSCALE )
             chessboard_dim = ( 7, 7 )
+            if im == None:
+                raise IOError
+
+            scale  = max([1., numpy.average(numpy.array(im.shape)[0:2]/500.)])
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
             return
@@ -1700,17 +1772,24 @@ class CatImagesBot(checkimages.main):
             pywikibot.output(u'WARNING: unknown file type')
             return
 
-        found_all, corners = cv.FindChessboardCorners( im, chessboard_dim )
-        pywikibot.output(u'ALPHA STAGE: _detectObjectChessboard_CV (%s)' % found_all)
-        pywikibot.output(unicode((found_all, corners)))
+        smallImg = numpy.empty( (cv.Round(im.shape[1]/scale), cv.Round(im.shape[0]/scale)), dtype=numpy.uint8 )
+        #gray = cv2.cvtColor( im, cv.CV_BGR2GRAY )
+        smallImg = cv2.resize( im, smallImg.shape, interpolation=cv2.INTER_LINEAR )
+        #smallImg = cv2.equalizeHist( smallImg )
+        im = smallImg
+
+        #found_all, corners = cv.FindChessboardCorners( im, chessboard_dim )
+        found_all, corners = cv2.findChessboardCorners( im, chessboard_dim )
      
         ##cv.DrawChessboardCorners( im3, chessboard_dim, corners, found_all )
         #cv.ShowImage("win", im3);
         #cv.WaitKey()
 
-        # further detection ...
+        # further detection ?
 
-        #self._info['_ObjectChessboard'] = ...
+        if found_all:
+            self._info['Chessboard'] = [{'Corners': corners}]
+
         return
 
 gbv = Global()

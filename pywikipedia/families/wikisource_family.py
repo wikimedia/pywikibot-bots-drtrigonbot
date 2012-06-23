@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikisource_family.py 10367 2012-06-17 17:46:51Z xqt $'
+__version__ = '$Id: wikisource_family.py 10414 2012-06-22 11:49:13Z xqt $'
 
 # The Wikimedia family that is known as Wikisource
 
@@ -13,8 +13,8 @@ class Family(family.Family):
         self.languages_by_size = [
             'fr', 'en', 'de', 'ru', 'it', 'zh', 'pt', 'he', 'pl', 'es', 'sv',
             'fa', 'hu', 'ar', 'ca', 'cs', 'ko', 'sl', 'ro', 'fi', 'vi', 'te',
-            'sa', 'el', 'bn', 'th', 'hr', 'hy', 'no', 'sr', 'nl', 'la', 'vec',
-            'ml', 'tr', 'ja', 'yi', 'br', 'uk', 'mk', 'id', 'ta', 'is', 'eo',
+            'sa', 'el', 'bn', 'th', 'hr', 'hy', 'sr', 'no', 'nl', 'la', 'vec',
+            'ml', 'tr', 'ja', 'yi', 'br', 'uk', 'mk', 'ta', 'id', 'is', 'eo',
             'da', 'be', 'li', 'bs', 'bg', 'sah', 'gu', 'et', 'az', 'gl', 'mr',
             'lt', 'kn', 'cy', 'zh-min-nan', 'sk', 'fo',
         ]
@@ -47,6 +47,7 @@ class Family(family.Family):
         self.namespaces[12]['de'] = [u'Hilfe']
         self.namespaces[9]['da'] = [u'MediaWiki diskussion', u'MediaWiki-diskussion']
         self.namespaces[13]['da'] = [u'Hjælp diskussion', u'Hjælp-diskussion']
+        self.namespaces[12]['ml'] = [u'സഹായം', u'H', u'സ']
 
         # Most namespaces are inherited from family.Family.
         # Translation used on all wikis for the different namespaces.
@@ -221,6 +222,7 @@ class Family(family.Family):
             'hu': u'Szerző',
             'hy': u'Հեղինակ',
             'id': u'Pengarang',
+            'kn': u'ಸಂಪುಟ',
             'ko': u'저자',
             'ml': u'രചയിതാവ്',
             'mr': u'दालन',
@@ -251,6 +253,7 @@ class Family(family.Family):
             'hu': u'Szerző vita',
             'hy': u'Հեղինակի քննարկում',
             'id': u'Pembicaraan Pengarang',
+            'kn': u'ಸಂಪುಟ ಚರ್ಚೆ',
             'ko': u'저자토론',
             'ml': u'രചയിതാവിന്റെ സംവാദം',
             'mr': u'दालन चर्चा',
@@ -285,6 +288,7 @@ class Family(family.Family):
             'hy': u'Պորտալ',
             'id': u'Indeks',
             'it': u'Autore',
+            'kn': u'ಕರ್ತೃ',
             'la': u'Scriptor',
             'mk': u'Автор',
             'ml': u'കവാടം',
@@ -321,6 +325,7 @@ class Family(family.Family):
             'hy': u'Պորտալի քննարկում',
             'id': u'Pembicaraan Indeks',
             'it': u'Discussioni autore',
+            'kn': u'ಕರ್ತೃ ಚರ್ಚೆ',
             'la': u'Disputatio Scriptoris',
             'mk': u'Разговор за автор',
             'ml': u'കവാടത്തിന്റെ സംവാദം',
@@ -359,6 +364,7 @@ class Family(family.Family):
             'hy': u'Էջ',
             'id': u'Halaman',
             'it': u'Progetto',
+            'kn': u'ಪುಟ',
             'la': u'Pagina',
             'ml': [u'സൂചിക', u'Index'],
             'mr': u'पान',
@@ -399,6 +405,7 @@ class Family(family.Family):
             'hy': u'Էջի քննարկում',
             'id': u'Pembicaraan Halaman',
             'it': u'Discussioni progetto',
+            'kn': u'ಪುಟ ಚರ್ಚೆ',
             'la': u'Disputatio Paginae',
             'ml': [u'സൂചികയുടെ സംവാദം', u'Index talk'],
             'mr': u'पान चर्चा',
@@ -435,6 +442,7 @@ class Family(family.Family):
             'hy': u'Ինդեքս',
             'id': u'Portal',
             'it': u'Portale',
+            'kn': u'ಪರಿವಿಡಿ',
             'la': u'Liber',
             'ml': u'താൾ',
             'mr': [u'अनुक्रमणिका', u'Index'],
@@ -468,6 +476,7 @@ class Family(family.Family):
             'hy': u'Ինդեքսի քննարկում',
             'id': u'Pembicaraan Portal',
             'it': u'Discussioni portale',
+            'kn': u'ಪರಿವಿಡಿ ಚರ್ಚೆ',
             'la': u'Disputatio Libri',
             'ml': u'താളിന്റെ സംവാദം',
             'mr': [u'अनुक्रमणिका चर्चा', u'Index talk'],

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikibooks_family.py 10368 2012-06-17 17:54:50Z xqt $'
+__version__ = '$Id: wikibooks_family.py 10414 2012-06-22 11:49:13Z xqt $'
 
 # The Wikimedia family that is known as Wikibooks
 
@@ -14,8 +14,8 @@ class Family(family.Family):
             'en', 'de', 'fr', 'hu', 'ja', 'pt', 'nl', 'pl', 'it', 'es', 'vi',
             'he', 'sq', 'fi', 'ca', 'id', 'ru', 'cs', 'zh', 'hr', 'sv', 'tr',
             'da', 'th', 'gl', 'no', 'ko', 'ta', 'fa', 'sr', 'ar', 'tl', 'mk',
-            'is', 'tt', 'lt', 'ka', 'az', 'eo', 'ro', 'bg', 'uk', 'hy', 'sl',
-            'el', 'sk', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'et', 'ur', 'mr',
+            'is', 'tt', 'lt', 'ka', 'az', 'eo', 'ro', 'bg', 'el', 'uk', 'hy',
+            'sl', 'sk', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'et', 'ur', 'mr',
             'bn', 'ms', 'hi', 'oc', 'kk', 'ml', 'eu', 'fy', 'ie', 'ne', 'te',
             'af', 'tg', 'sa', 'pa', 'bs', 'ky', 'mg', 'cy', 'be', 'zh-min-nan',
             'ku', 'uz', 'su',
@@ -201,7 +201,7 @@ class Family(family.Family):
             'km': u'ការពិភាក្សាអំពីWikibooks',
             'kn': u'Wikibooks ಚರ್ಚೆ',
             'ko': u'위키책토론',
-            'ku': u'Wikibooks nîqaş',
+            'ku': u'Gotûbêja Wîkîpirtûkê',
             'ky': u'Wikibooks баарлашуу',
             'la': u'Disputatio Vicilibrorum',
             'lb': u'Wikibooks Diskussioun',

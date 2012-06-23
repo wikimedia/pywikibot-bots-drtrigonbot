@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiquote_family.py 10367 2012-06-17 17:46:51Z xqt $'
+__version__ = '$Id: wikiquote_family.py 10414 2012-06-22 11:49:13Z xqt $'
 
 # The Wikimedia family that is known as Wikiquote
 
@@ -11,11 +11,11 @@ class Family(family.Family):
         self.name = 'wikiquote'
 
         self.languages_by_size = [
-            'en', 'pl', 'it', 'ru', 'fr', 'de', 'pt', 'es', 'sk', 'bg', 'cs',
+            'en', 'pl', 'it', 'ru', 'fr', 'de', 'pt', 'es', 'sk', 'cs', 'bg',
             'bs', 'tr', 'sl', 'he', 'eo', 'lt', 'el', 'uk', 'id', 'zh', 'fa',
             'hu', 'fi', 'nl', 'sv', 'li', 'no', 'nn', 'ja', 'az', 'hy', 'ca',
             'et', 'ar', 'hr', 'cy', 'ka', 'ko', 'gl', 'ml', 'sr', 'ro', 'ku',
-            'te', 'th', 'is', 'eu', 'da', 'af', 'sq', 'vi', 'ta', 'hi', 'la',
+            'th', 'te', 'is', 'eu', 'da', 'af', 'sq', 'vi', 'ta', 'hi', 'la',
             'br', 'be', 'mr', 'uz', 'ur', 'zh-min-nan', 'gu', 'su', 'kn', 'wo',
             'ky', 'am',
         ]
@@ -176,7 +176,7 @@ class Family(family.Family):
             'kk': u'Уикидәйек талқылауы',
             'kn': u'Wikiquote ಚರ್ಚೆ',
             'ko': u'위키인용집토론',
-            'ku': u'Wikiquote nîqaş',
+            'ku': u'Gotûbêja Wîkîgotinê',
             'ky': u'Wikiquote баарлашуу',
             'la': u'Disputatio Vicicitationis',
             'lb': u'Wikiquote Diskussioun',
