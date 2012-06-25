@@ -230,8 +230,8 @@ def logging_statistics(logfile):
 	mqueue    = { 'debug': [], 'warning': [], 'info': [], 'error': [], 'critical': [], 'unknown': [], }
 	events    = { 'start':     'SCRIPT CALL:',
 	              'end':       botdonemsg,
-	              'histcomp':  'RUN BOT: compressing discussion summary',
-	              'sum_disc':  'RUN BOT: discussion summary',
+	              'histcomp':  'RUN BOT: Compressing Discussion Summary',
+	              'sum_disc':  'RUN BOT: Discussion Summary',
 	              'subster':   'RUN BOT: "SubsterBot"', }
 	ecount    = { 'start': 0, 'end': 0, 'histcomp': 0, 'sum_disc': 0, 'subster': 0, }
 	etiming   = { 'start': [], 'end': [], 'histcomp': [], 'sum_disc': [], 'subster': [],
@@ -548,6 +548,7 @@ def logstat(form):
 		p5 = ax.step(d[:,0], d[:,5], marker='x', where='mid')
 		plt.legend([p1, p2, p3, p4, p5], stat[last]['ecount'].keys(), loc='upper left')
 		plt.grid(True, which='both')
+		plt.ylim(ymax=10)
 		# format the ticks
 		ax.xaxis.set_major_locator(MonthLocator())
 		ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
