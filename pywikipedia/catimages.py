@@ -46,6 +46,12 @@ __version__ = '$Id$'
 #
 
 import re, time, urllib2, os, locale, sys, datetime
+
+import Image
+import numpy as np
+import cv, cv2
+# more imports are done later on request (e.g. opencv, jseg, slic, pydmtx, (py)zbar, ...)
+
 import wikipedia as pywikibot
 import pagegenerators, catlib
 import checkimages
@@ -68,13 +74,6 @@ project_inserted = [u'commons',]
 # <--------------------------- Change only above! ---------------------------> #
 ################################################################################
 
-#tmpl_FileContentsByBot = u"""{{FileContentsByBot
-#| botName = %(botName)s
-#<!--| dimX    = ?-->   <!-- is this REALLY needed...?? -->
-#<!--| dimY    = ?-->   <!-- is this REALLY needed...?? -->
-#|
-#%(items)s
-#}}"""
 tmpl_FileContentsByBot = u"""}}
 {{FileContentsByBot
 | botName = ~~~
@@ -159,9 +158,6 @@ class CatImagesBot(checkimages.main):
     def downloadImage(self):
         self.image_filename  = os.path.split(self.image.fileUrl())[-1]
         self.image_fileext   = os.path.splitext(self.image_filename)[1]
-        if pywikibot.debug:
-            self.image_filename = "Ali_1_-_IMG_1378.jpg"
-            #self.image_filename = "Gyorche_Petrov_Todor_Alexandrov_Andrey_Lyapchev_Simeon_Radev_Stamatov_and_others.jpg"
         self.image_path      = urllib2.quote(os.path.join('cache', self.image_filename[-128:]))
         
         image_path_JPEG      = self.image_path.split(u'.')
@@ -195,11 +191,12 @@ class CatImagesBot(checkimages.main):
         f.close()
 
         # SVG: rasterize the SVG to bitmap (MAY BE GET FROM WIKI BY DOWNLOAD?...)
+        # (Mediawiki uses librsvg too: http://commons.wikimedia.org/wiki/SVG#SVGs_in_MediaWiki)
         # http://stackoverflow.com/questions/6589358/convert-svg-to-png-in-python
         # http://cairographics.org/pythoncairopil/
         # http://cairographics.org/pyrsvg/
         if self.image_fileext == u'.svg':
-            import cairo, rsvg, Image       # gnome-python2-rsvg
+            import cairo, rsvg              # gnome-python2-rsvg (binding to librsvg)
 
             svg = rsvg.Handle(self.image_path)
             img = cairo.ImageSurface(cairo.FORMAT_ARGB32, svg.props.width, svg.props.height)
@@ -210,7 +207,6 @@ class CatImagesBot(checkimages.main):
                              img.get_data(),"raw","RGBA",0,1).save(self.image_path_JPEG, "JPEG")
         else:
             try:
-                import Image
                 im = Image.open(self.image_path) # might be png, gif etc, for instance
                 #im.thumbnail(size, Image.ANTIALIAS) # size is 640x480
                 im.convert('RGB').save(self.image_path_JPEG, "JPEG")
@@ -223,7 +219,8 @@ class CatImagesBot(checkimages.main):
             except:
                 self.image_path_JPEG = self.image_path
 
-        # add PDF support (extract text and images):
+        # PDF: support extract text and images
+        # (Mediawiki uses ghostscript: https://www.mediawiki.org/wiki/Extension:PdfHandler#Pre-requisites)
         # http://vermeulen.ca/python-pdf.html
         # http://code.activestate.com/recipes/511465-pure-python-pdf-to-text-converter/
         # http://stackoverflow.com/questions/25665/python-module-for-converting-pdf-to-text
@@ -406,8 +403,6 @@ class CatImagesBot(checkimages.main):
             return u"  | %s = %s" % (key, self._output_format(value))
 
     def _make_markerblock(self, res, size, structure=['Position', 'Eyes'], line='solid'):
-        import numpy
-
         # same as in '_detectObjectFaces_CV'
         colors = [ (0,0,255),
             (0,128,255),
@@ -420,7 +415,7 @@ class CatImagesBot(checkimages.main):
         result = []
         for i, r in enumerate(res):
             if ('RGB' in r):
-                color = list(numpy.array((255,255,255))-numpy.array(r['RGBref']))
+                color = list(np.array((255,255,255))-np.array(r['RGBref']))
             else:
                 color = list(colors[i%8])
             color.reverse()
@@ -428,13 +423,13 @@ class CatImagesBot(checkimages.main):
             
             #scale = r['size'][0]/size
             scale = self.image_size[0]/size
-            f     = list(numpy.array(r[structure[0]])/scale)
+            f     = list(np.array(r[structure[0]])/scale)
             
             result.append( u'<div class="%s-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px %s #%s;"></div>' % tuple([structure[0].lower()] + f + [line, color]) )
 
             if (len(structure) > 1):
                 for e in r[structure[1]]:
-                    e = list(numpy.array(e)/scale)
+                    e = list(np.array(e)/scale)
     
                     result.append( u'<div class="%s-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px solid #%s;"></div>' % tuple([structure[1].lower()] + e + [color]) )
 
@@ -463,7 +458,6 @@ class CatImagesBot(checkimages.main):
         else:
             buf = [text, (u"[[%s]]" % name)]
         return u"\n".join( buf )
-    #    import catlib
     #    catlib.add_category(self.image, category, comment=None, createEmptyPages=False)
 
     # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
@@ -488,7 +482,7 @@ class CatImagesBot(checkimages.main):
         return text
 
     #def _drawRect(self, faces): #function to modify the img
-    #    import Image, ImageDraw
+    #    import ImageDraw
     #    image_path_new = os.path.join('cache', '0_DETECTED_' + self.image_filename)
     #    im = Image.open(self.image_path)
     #    draw = ImageDraw.Draw(im)
@@ -510,6 +504,9 @@ class CatImagesBot(checkimages.main):
         # Faces and eyes (opencv pre-trained haar)
         self._detectObjectFaces_CV()
         
+        # Faces (extract EXIF data)
+        self._detectObjectFaces_EXIF()
+
         for i in range(len(self._info['Faces'])):
             data = self._info['Faces'][i]
 
@@ -568,7 +565,7 @@ class CatImagesBot(checkimages.main):
         for cf in cascade_files:
             self._detectObjectTrained_CV(*cf)
 
-        # optical text recognition (tesseract?)
+        # optical text recognition (tesseract & ocropus, ...)
         #self._recognizeOpticalText_x()
         # (no full recognition but just classify as 'contains text')
 
@@ -902,8 +899,6 @@ class CatImagesBot(checkimages.main):
         # http://blog.jozilla.net/2008/06/27/fun-with-python-opencv-and-face-detection/
         # http://www.cognotics.com/opencv/servo_2007_series/part_4/index.html
 
-        import cv, cv2, numpy
-
         # https://code.ros.org/trac/opencv/browser/trunk/opencv_extra/testdata/gpu/haarcascade?rev=HEAD
         #nestedCascade = cv.Load(
         nestedCascade = cv2.CascadeClassifier(
@@ -935,7 +930,7 @@ class CatImagesBot(checkimages.main):
             
             # !!! the 'scale' here IS RELEVANT FOR THE DETECTION RATE;
             # how small and how many features are detected as faces (or eyes)
-            scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/500.)])
+            scale  = max([1., np.average(np.array(img.shape)[0:2]/500.)])
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
             return
@@ -946,8 +941,8 @@ class CatImagesBot(checkimages.main):
         #detectAndDraw( image, cascade, nestedCascade, scale );
         # http://nullege.com/codes/search/cv.CvtColor
         #smallImg = cv.CreateImage( (cv.Round(img.shape[0]/scale), cv.Round(img.shape[1]/scale)), cv.CV_8UC1 )
-        #smallImg = cv.fromarray(numpy.empty( (cv.Round(img.shape[0]/scale), cv.Round(img.shape[1]/scale)), dtype=numpy.uint8 ))
-        smallImg = numpy.empty( (cv.Round(img.shape[1]/scale), cv.Round(img.shape[0]/scale)), dtype=numpy.uint8 )
+        #smallImg = cv.fromarray(np.empty( (cv.Round(img.shape[0]/scale), cv.Round(img.shape[1]/scale)), dtype=np.uint8 ))
+        smallImg = np.empty( (cv.Round(img.shape[1]/scale), cv.Round(img.shape[0]/scale)), dtype=np.uint8 )
 
         #cv.CvtColor( image, gray, cv.CV_BGR2GRAY )
         gray = cv2.cvtColor( img, cv.CV_BGR2GRAY )
@@ -984,7 +979,7 @@ class CatImagesBot(checkimages.main):
                     break
             if new:
                 faces.append( r )
-        faces = numpy.array(faces)
+        faces = np.array(faces)
         #if faces:
         #    self._drawRect(faces) #call to a python pil
         t = cv.GetTickCount() - t
@@ -1020,7 +1015,7 @@ class CatImagesBot(checkimages.main):
                 |cv.CV_HAAR_SCALE_IMAGE,
                 (30, 30) )
             data = { 'ID':       (i+1),
-                     'Position': tuple(numpy.int_(r*scale)), 
+                     'Position': tuple(np.int_(r*scale)), 
                      'Eyes':     [], }
             data['Coverage'] = float(data['Position'][2]*data['Position'][3])/(self.image_size[0]*self.image_size[1])
             #if (c >= confidence):
@@ -1058,7 +1053,7 @@ class CatImagesBot(checkimages.main):
         
         # MAY BE USE 'haarcascade_fullbody.xml' ALSO...?!! (like face detection)
 
-        import cv2, gtk, cv, numpy#, time
+        import gtk
 
         self._info['People'] = []
         scale = 1.
@@ -1068,9 +1063,9 @@ class CatImagesBot(checkimages.main):
             if (img == None) or (min(img.shape[:2]) < 100) or (not img.data):
                 raise IOError
 
-            #scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/500.)])
-            scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/400.)])
-            #scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/300.)])
+            #scale  = max([1., np.average(np.array(img.shape)[0:2]/500.)])
+            scale  = max([1., np.average(np.array(img.shape)[0:2]/400.)])
+            #scale  = max([1., np.average(np.array(img.shape)[0:2]/300.)])
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
             return
@@ -1079,7 +1074,7 @@ class CatImagesBot(checkimages.main):
             return
 
         # similar to face detection
-        smallImg = numpy.empty( (cv.Round(img.shape[1]/scale), cv.Round(img.shape[0]/scale)), dtype=numpy.uint8 )
+        smallImg = np.empty( (cv.Round(img.shape[1]/scale), cv.Round(img.shape[0]/scale)), dtype=np.uint8 )
         gray = cv2.cvtColor( img, cv.CV_BGR2GRAY )
         smallImg = cv2.resize( gray, smallImg.shape, interpolation=cv2.INTER_LINEAR )
         smallImg = cv2.equalizeHist( smallImg )
@@ -1122,7 +1117,7 @@ class CatImagesBot(checkimages.main):
             # crop to image size (because of the slightly bigger boxes)
             r = bbox.intersect(r)
             #cv2.rectangle(img, (r.x, r.y), (r.x+r.width, r.y+r.height), cv.Scalar(0,255,0), 3)
-            data['Position'] = tuple(numpy.int_(numpy.array(r)*scale))
+            data['Position'] = tuple(np.int_(np.array(r)*scale))
             data['Coverage'] = float(data['Position'][2]*data['Position'][3])/(self.image_size[0]*self.image_size[1])
             result.append( data )
         #cv2.imshow("people detector", img)
@@ -1161,7 +1156,7 @@ class CatImagesBot(checkimages.main):
         #   BoWclassify /data/toolserver/pywikipedia/opencv/VOC2007 /data/toolserver/pywikipedia/opencv/data HARRIS SIFT BruteForce | tee run.log
         # http://experienceopencv.blogspot.com/2011/02/object-recognition-bag-of-keypoints.html
         import opencv
-        import StringIO#, numpy
+        import StringIO
 
         if os.path.exists(bowDescPath):
             os.remove(bowDescPath)
@@ -1188,7 +1183,7 @@ class CatImagesBot(checkimages.main):
             #raise
             self._info['Classify'] = {}
             return []
-        #result = list(numpy.abs(numpy.array(result)))
+        #result = list(np.abs(np.array(result)))
         (mi, ma) = (min(result), max(result))
         #for i in range(len(result)):
         #    print "%12s %.3f" % (trained[i], result[i]), ((result[i] == mi) or (result[i] == ma))
@@ -1207,7 +1202,7 @@ class CatImagesBot(checkimages.main):
     # (http://pythonvision.org/basic-tutorial, http://luispedro.org/software/mahotas, http://packages.python.org/pymorph/)
     def _detectSegmentColors_JSEGnPIL(self):    # may be SLIC other other too...
         #from PIL import Image
-        import Image, math
+        import math
 
         self._info['ColorRegions'] = []
         try:
@@ -1259,7 +1254,6 @@ class CatImagesBot(checkimages.main):
     # http://www.farb-tabelle.de/en/table-of-color.htm
     def _detectAverageColor_PIL(self):
         #from PIL import Image
-        import Image
         
         self._info['ColorAverage'] = []
         try:
@@ -1274,8 +1268,6 @@ class CatImagesBot(checkimages.main):
         return
 
     def _detectProperties_PIL(self):
-        import Image
-
         self._info['Properties'] = []
         self.image_size = (None, None)
         if self.image_fileext == u'.svg':
@@ -1418,16 +1410,14 @@ class CatImagesBot(checkimages.main):
         return data
 
     def _JSEGdetectColorSegments(self, im):
-        import Image, numpy, os
-        
         tmpjpg = os.path.join(os.path.abspath(os.curdir), "cache/jseg_buf.jpg")
         tmpgif = os.path.join(os.path.abspath(os.curdir), "cache/jseg_buf.gif")
 
         # same scale func as in '_detectObjectFaces_CV'
-        scale  = max([1., numpy.average(numpy.array(im.size)[0:2]/200.)])
-        #print numpy.array(im.size)/scale, scale
+        scale  = max([1., np.average(np.array(im.size)[0:2]/200.)])
+        #print np.array(im.size)/scale, scale
         try:
-            smallImg = im.resize( tuple(numpy.int_(numpy.array(im.size)/scale)), Image.ANTIALIAS )
+            smallImg = im.resize( tuple(np.int_(np.array(im.size)/scale)), Image.ANTIALIAS )
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
             return
@@ -1461,7 +1451,7 @@ class CatImagesBot(checkimages.main):
         
         # http://stackoverflow.com/questions/384759/pil-and-numpy
         pic = Image.open(tmpgif)
-        #pix = numpy.array(pic)
+        #pix = np.array(pic)
         #Image.fromarray(10*pix).show()
         
         os.remove( tmpgif )
@@ -1472,8 +1462,6 @@ class CatImagesBot(checkimages.main):
     # http://peekaboo-vision.blogspot.ch/2012/05/superpixels-for-python-pretty-slic.html
     # http://ivrg.epfl.ch/supplementary_material/RK_SLICSuperpixels/index.html
     def _SLICdetectColorSegments(self, img):
-        import numpy as np
-        #import Image
         import slic
 
         im = np.array(img)
@@ -1492,30 +1480,28 @@ class CatImagesBot(checkimages.main):
         return (region_labels, 1.)
 
     def _PILgetColorSegmentsHist(self, im, pic, scale):
-        import Image, numpy
-        
-        if not (type(numpy.ndarray(None)) == type(pic)):
-            pix = numpy.array(pic)
+        if not (type(np.ndarray(None)) == type(pic)):
+            pix = np.array(pic)
             #Image.fromarray(10*pix).show()
         else:
             pix = pic
-            #Image.fromarray(255*pix/numpy.max(pix)).show()
+            #Image.fromarray(255*pix/np.max(pix)).show()
 
         try:
-            smallImg = im.resize( tuple(numpy.int_(numpy.array(im.size)/scale)), Image.ANTIALIAS )
+            smallImg = im.resize( tuple(np.int_(np.array(im.size)/scale)), Image.ANTIALIAS )
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
             return
 
         imgsize = float(smallImg.size[0]*smallImg.size[1])
         hist = []
-        for i in range(numpy.max(pix)+1):
-            mask   = numpy.uint8(pix == i)*255
-            (y, x) = numpy.where(mask != 0)
-            center = (numpy.average(x)*scale, numpy.average(y)*scale)
-            bbox   = (numpy.min(x)*scale, numpy.min(y)*scale, 
-                      (numpy.max(x)-numpy.min(x))*scale, (numpy.max(y)-numpy.min(y))*scale)
-            coverage = numpy.count_nonzero(mask)/imgsize
+        for i in range(np.max(pix)+1):
+            mask   = np.uint8(pix == i)*255
+            (y, x) = np.where(mask != 0)
+            center = (np.average(x)*scale, np.average(y)*scale)
+            bbox   = (np.min(x)*scale, np.min(y)*scale, 
+                      (np.max(x)-np.min(x))*scale, (np.max(y)-np.min(y))*scale)
+            coverage = np.count_nonzero(mask)/imgsize
             mask = Image.fromarray( mask )
             h    = smallImg.histogram(mask)
             #smallImg.show()
@@ -1538,14 +1524,13 @@ class CatImagesBot(checkimages.main):
         # merge regions by simplifying through average color and re-running
         # JSEG again...
 
-        import Image, numpy 
         from scipy import ndimage
         
-        if not (type(numpy.ndarray(None)) == type(im)):
-            pix = numpy.array(im)
+        if not (type(np.ndarray(None)) == type(im)):
+            pix = np.array(im)
         else:
             pix = im
-            im  = Image.fromarray(255*pix/numpy.max(pix))
+            im  = Image.fromarray(255*pix/np.max(pix))
 
         im = im.convert('RGB')
 
@@ -1568,20 +1553,20 @@ class CatImagesBot(checkimages.main):
             #        sum( i*i*w for i, w in enumerate(g) ) / max(1, sum(g)),
             #        sum( i*i*w for i, w in enumerate(b) ) / max(1, sum(b))
             #)
-            #if ( 500. < numpy.average( (
+            #if ( 500. < np.average( (
             #       rgb2[0] - rgb[0]**2,
             #       rgb2[1] - rgb[1]**2,
             #       rgb2[2] - rgb[2]**2, ) ) ):
             #           continue
 
-            mask = numpy.uint8(pix == j)*255
+            mask = np.uint8(pix == j)*255
             mask = Image.fromarray( mask )
             #dispImg = Image.new('RGB', im.size)
             #dispImg.paste(rgb, mask=mask)
             #dispImg.show()
             im.paste(rgb, mask=mask)
 
-        pix = numpy.array(im)
+        pix = np.array(im)
         pix[:,:,0] = ndimage.gaussian_filter(pix[:,:,0], .5)
         pix[:,:,1] = ndimage.gaussian_filter(pix[:,:,1], .5)
         pix[:,:,2] = ndimage.gaussian_filter(pix[:,:,2], .5)
@@ -1603,8 +1588,6 @@ class CatImagesBot(checkimages.main):
 
         # analogue to face detection:
 
-        import cv, cv2, numpy
-
         # http://tutorial-haartraining.googlecode.com/svn/trunk/data/haarcascades/
         # or own xml files trained onto specific file database/set
         cascade       = cv2.CascadeClassifier(
@@ -1620,8 +1603,8 @@ class CatImagesBot(checkimages.main):
             
             # !!! the 'scale' here IS RELEVANT FOR THE DETECTION RATE;
             # how small and how many features are detected
-            scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/500.)])
-            #scale  = max([1., numpy.average(numpy.array(img.shape)[0:2]/300.)])
+            scale  = max([1., np.average(np.array(img.shape)[0:2]/500.)])
+            #scale  = max([1., np.average(np.array(img.shape)[0:2]/300.)])
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
             return
@@ -1630,7 +1613,7 @@ class CatImagesBot(checkimages.main):
             return
 
         # similar to face detection
-        smallImg = numpy.empty( (cv.Round(img.shape[1]/scale), cv.Round(img.shape[0]/scale)), dtype=numpy.uint8 )
+        smallImg = np.empty( (cv.Round(img.shape[1]/scale), cv.Round(img.shape[0]/scale)), dtype=np.uint8 )
         gray = cv2.cvtColor( img, cv.CV_BGR2GRAY )
         smallImg = cv2.resize( gray, smallImg.shape, interpolation=cv2.INTER_LINEAR )
         smallImg = cv2.equalizeHist( smallImg )
@@ -1653,8 +1636,11 @@ class CatImagesBot(checkimages.main):
         return
 
     def _recognizeOpticalText_x(self):
-        # optical text recognition (tesseract?)
-        # (no full recognition but just classify as 'contains text')
+        # optical text recognition (tesseract & ocropus, ...)
+        # (no full recognition but - at least - just classify as 'contains text')
+        # http://www.claraocr.org/de/ocr/ocr-software/open-source-ocr.html
+        # https://github.com/edsu/ocropy
+        # http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/Doku#Categorization
         pass
 
     def _recognizeOpticalCodes_dmtxNzbar(self):
@@ -1667,7 +1653,6 @@ class CatImagesBot(checkimages.main):
         # DataMatrix
         from pydmtx import DataMatrix   # linux distro package
         #from PIL import Image
-        import Image, numpy
         
         ## Write a Data Matrix barcode
         #dm_write = DataMatrix()
@@ -1685,7 +1670,7 @@ class CatImagesBot(checkimages.main):
             if img.mode != 'RGB':
                img = img.convert('RGB')
 
-            scale  = max([1., numpy.average(numpy.array(img.size)/200.)])
+            scale  = max([1., np.average(np.array(img.size)/200.)])
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
             return
@@ -1700,9 +1685,9 @@ class CatImagesBot(checkimages.main):
         i      = -1
         for i in range(dm_read.count()):
             data, bbox = dm_read.stats(i+1)
-            bbox = numpy.array(bbox)
+            bbox = np.array(bbox)
             x, y = bbox[:,0], bbox[:,1]
-            pos  = (numpy.min(x), numpy.min(y), numpy.max(x)-numpy.min(x), numpy.max(y)-numpy.min(y))
+            pos  = (np.min(x), np.min(y), np.max(x)-np.min(x), np.max(y)-np.min(y))
             result.append({ 'ID':       (i+1),
                             #'Data':     dm_read.message(i+1),
                             'Data':     data,
@@ -1714,9 +1699,8 @@ class CatImagesBot(checkimages.main):
         self._info['OpticalCodes'] = result
 
         # supports many popular symbologies
-        #import zbar, Image
+        #import zbar
         import pyzbar as zbar
-        #import Image
         
         try:
             img = Image.open(self.image_path_JPEG).convert('L')
@@ -1750,8 +1734,6 @@ class CatImagesBot(checkimages.main):
     def _detectObjectChessboard_CV(self):
         # Chessboard (opencv reference detector)
         # http://nullege.com/codes/show/src%40o%40p%40opencvpython-HEAD%40samples%40chessboard.py/12/cv.FindChessboardCorners/python
-        
-        import cv, cv2, numpy
 
         self._info['Chessboard'] = []
         scale = 1.
@@ -1764,7 +1746,7 @@ class CatImagesBot(checkimages.main):
             if im == None:
                 raise IOError
 
-            scale  = max([1., numpy.average(numpy.array(im.shape)[0:2]/500.)])
+            scale  = max([1., np.average(np.array(im.shape)[0:2]/500.)])
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
             return
@@ -1772,7 +1754,7 @@ class CatImagesBot(checkimages.main):
             pywikibot.output(u'WARNING: unknown file type')
             return
 
-        smallImg = numpy.empty( (cv.Round(im.shape[1]/scale), cv.Round(im.shape[0]/scale)), dtype=numpy.uint8 )
+        smallImg = np.empty( (cv.Round(im.shape[1]/scale), cv.Round(im.shape[0]/scale)), dtype=np.uint8 )
         #gray = cv2.cvtColor( im, cv.CV_BGR2GRAY )
         smallImg = cv2.resize( im, smallImg.shape, interpolation=cv2.INTER_LINEAR )
         #smallImg = cv2.equalizeHist( smallImg )
@@ -1791,6 +1773,125 @@ class CatImagesBot(checkimages.main):
             self._info['Chessboard'] = [{'Corners': corners}]
 
         return
+
+    def _EXIFgetData(self):
+        # http://tilloy.net/dev/pyexiv2/tutorial.html
+        # (is UNFORTUNATELY NOT ABLE to handle all tags, e.g. 'FacesDetected', ...)
+        import pyexiv2
+        
+        res = {}
+        try:
+            metadata = pyexiv2.ImageMetadata(self.image_path)
+            metadata.read()
+        
+            for key in metadata.exif_keys:
+                res[key] = metadata[key]
+                
+            for key in metadata.iptc_keys:
+                res[key] = metadata[key]
+                
+            for key in metadata.xmp_keys:
+                res[key] = metadata[key]
+        except IOError:
+            pass
+        
+        
+        from subprocess import Popen, PIPE
+        import string
+        
+        # http://www.sno.phy.queensu.ca/~phil/exiftool/
+        # MIGHT BE BETTER TO USE AS PYTHON MODULE; either by wrapper or perlmodule:
+        # http://search.cpan.org/~gaas/pyperl-1.0/perlmodule.pod
+        data = Popen("exiftool %s" % self.image_path, 
+                     shell=True, stdout=PIPE).stdout.readlines()
+        #res  = {}
+        for item in data:
+            #print item.strip()
+            #res.update( dict([ map(string.strip, string.split(item, sep=':', maxsplit=1)) ]) )
+            item    = map(string.strip, string.split(item, sep=':', maxsplit=1))
+            item[0] = item[0].replace(' ', '')
+            res.update( dict([ item ]) )
+        #print res
+        
+        return res
+    
+    def _detectObjectFaces_EXIF(self):
+        res = self._EXIFgetData()
+        
+        # http://u88.n24.queensu.ca/exiftool/forum/index.php?topic=3156.0
+        # u88.n24.queensu.ca/pub/facetest.pl
+        # ( all scaling stuff ignored (!) and some strongly simplified (!) )
+        if 'Make' in res:
+            make = res['Make'].lower()
+        else:
+            make = None
+        found = set(res.keys())
+        data  = []
+        
+        #if   (make == 'sony'):
+        if   (make in ['sony', 'nikon', 'panasonic']):
+            if set(['FacesDetected', 'Face1Position']).issubset(found):
+                i = 1
+                #for i in range(res['FacesDetected']):
+                while ('Face%iPosition'%i) in res:
+                    data.append({ 'Position': res['Face%iPosition'%i].split(' ') })
+                    i += 1
+        elif (make == 'fujifilm'):
+            if set(['FacesDetected', 'FacePositions']).issubset(found):
+                buf = res['FacePositions'].split(' ')
+                for i in range(int(res['FacesDetected'])):
+                    data.append({ 'Position': [buf[i*4], buf[i*4+1], buf[i*4+2], buf[i*4+3]] })
+        elif (make == 'olympus'):
+            if set(['FacesDetected', 'FaceDetectArea']).issubset(found):
+                buf = res['FaceDetectArea'].split(' ')
+                for i in range(int(res['MaxFaces'])):
+                    data.append({ 'Position': [buf[i*4], buf[i*4+1], buf[i*4+2], buf[i*4+3]] })
+        elif (make == 'pentax'):
+            if set(['FacesDetected']).issubset(found):
+                if 'FacePosition' in res:
+                    data.append({ 'Position': res['FacePosition'].split(' ') + \
+                                              ['100', '100'] }) # how big is the face?
+                i = 1
+                while ('Face%iPosition'%i) in res:
+                    data.append({ 'Position': res['Face%iPosition'%i].split(' ') + \
+                                              res['Face%iSize'%i].split(' ') })
+                    i += 1
+        elif (make == 'canon'):
+            if   set(['FacesDetected', 'FaceDetectFrameWidth']).issubset(found):
+                # older models store face detect information
+                buf = res['FaceWidth'].split(' ')
+                i = 1
+                while ('Face%iPosition'%i) in res:
+                    data.append({ 'Position': res['Face%iPosition'%i].split(' ') + \
+                                              buf })
+                    i += 1
+            elif set(['ValidAFPoints', 'AFImageWidth', 'AFImageHeight',
+                      'AFAreaXPositions', 'AFAreaYPositions', 'PrimaryAFPoint']).issubset(found):
+                # newer models use AF points
+                if ('AFAreaMode' in res) and ('Face' in res['AFAreaMode']):
+                    buf_x = res['AFAreaXPositions'].split(' ')
+                    buf_y = res['AFAreaYPositions'].split(' ')
+                    buf_w = buf_h = [100] * len(buf_x) # how big is the face? (else)
+                    if   'AFAreaWidths' in res:
+                        buf_w = res['AFAreaWidths'].split(' ')
+                        buf_h = res['AFAreaHeights'].split(' ')
+                    elif 'AFAreaWidth' in res:
+                        buf_w = [res['AFAreaWidth']]  * len(buf_x)
+                        buf_h = [res['AFAreaHeight']] * len(buf_x)
+                    # conversion to positive coordinates might be needed...
+                    for i in range(int(res['ValidAFPoints'])):
+                        data.append({ 'Position': [buf_x[i], buf_y[i], 
+                                                   buf_w[i], buf_h[i]] })
+        else:
+            pass    # not supported (yet...)
+        
+        for i, d in enumerate(data):
+            data[i] = {'Position': map(int, data[i]['Position'])}
+        
+        pywikibot.output(u'')
+        pywikibot.output(u'ALPHA STAGE: _detectObjectFaces_EXIF (%s)' % bool(data))
+        pywikibot.output(unicode(data))
+        pywikibot.output(unicode(self._info['Faces']))
 
 gbv = Global()
 
@@ -1927,8 +2028,6 @@ def checkbot():
         posfile.write( image.title().encode('utf-8') )
         posfile.close()
         if limit <= 0:
-            break
-        if pywikibot.debug:
             break
         if resultCheck:
             continue
