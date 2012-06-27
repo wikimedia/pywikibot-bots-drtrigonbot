@@ -362,13 +362,13 @@ class SubsterBot(basic.AutoBasicBot):
             # 3.) subst in content
             external_data = regex.search(external_buffer)
 
+            external_data_dict = {}
             if external_data:    # not None
                 external_data = external_data.groups()
 
                 pywikibot.output(u'Groups found by regex: %i' % len(external_data))
 
                 # DRTRIGON-114: Support for named groups in regexs
-                external_data_dict = {}
                 if regex.groupindex:
                     for item in regex.groupindex:
                         external_data_dict[u'%s-%s' % (param['value'], item)] = external_data[regex.groupindex[item]-1]
