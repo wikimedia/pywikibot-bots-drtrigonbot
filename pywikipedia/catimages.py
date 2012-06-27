@@ -49,7 +49,10 @@ import re, time, urllib2, os, locale, sys, datetime
 
 import Image
 import numpy as np
-import cv, cv2
+try:
+    import cv, cv2
+except:
+    pass
 # more imports are done later on request (e.g. opencv, jseg, slic, pydmtx, (py)zbar, ...)
 
 import wikipedia as pywikibot
