@@ -368,8 +368,8 @@ class SubsterBot(basic.AutoBasicBot):
                 pywikibot.output(u'Groups found by regex: %i' % len(external_data))
 
                 # DRTRIGON-114: Support for named groups in regexs
+                external_data_dict = {}
                 if regex.groupindex:
-                    external_data_dict = {}
                     for item in regex.groupindex:
                         external_data_dict[u'%s-%s' % (param['value'], item)] = external_data[regex.groupindex[item]-1]
                 elif (len(external_data) == 1):
