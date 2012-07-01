@@ -324,14 +324,14 @@ msg = {
 	'diq': {
 		'category-adding': u'Bot: [[Kategoriye:%(newcat)s]] dekerd de',
 		'category-also-in': u'(kategori da %(alsocat)s esto)',
-		'category-changing': u'Boti: %(oldcat)s deye %(newcat)s vurna',
-		'category-listifying': u'Boti: pela da %(fromcat)s ra nata (%(num)d deqewteni) liste kerd',
-		'category-removing': u'Boti:kategoriya da %(oldcat)s\'ira wederna',
-		'category-replacing': u'Boti: %(oldcat)s, kategoriya da %(newcat)s\'iya vurna',
+		'category-changing': u'Boti %(oldcat)s, %(newcat)s deye vurna',
+		'category-listifying': u'Boti pela da %(fromcat)s ra nata (%(num)d deqewteni) liste kerd',
+		'category-removing': u'Boti kategori da %(oldcat)s\' ra wederna',
+		'category-replacing': u'Boti %(oldcat)s, kategori da %(newcat)s\'iya vurna',
 		'category-section-title': u'Werênayışê pela da %(oldcat)s',
-		'category-version-history': u'Boti: Qeydê verênayış de versiyoni ke %(oldcat)s',
-		'category-was-disbanded': u'Boti: Karkerdışe kategoriye wederna',
-		'category-was-moved': u'Boti: Kategori [[:Category:%(newcat)s|%(title)s]] name de ciya geriya',
+		'category-version-history': u'Boti Qeydê verênayış de versiyoni ke %(oldcat)s',
+		'category-was-disbanded': u'Boti karkerdışe kategori ke hewna',
+		'category-was-moved': u'Boti namey kategori name dê [[:Category:%(newcat)s|%(title)s]] deye ahûlyê',
 	},
 	# Author: Evropi
 	# Author: Xqt
@@ -487,10 +487,10 @@ msg = {
 	'frr': {
 		'category-adding': u'Bot: Du kategoriie [[:Category:%(newcat)s|%(newcat)s]] diartu',
 		'category-also-in': u'(uk uun %(alsocat)s)',
-		'category-changing': u'Feranere %(oldcat)s tu %(newcat)s',
+		'category-changing': u'Feranre %(oldcat)s tu %(newcat)s',
 		'category-listifying': u'Bot: List faan %(fromcat)s (%(num)d iindracher)',
 		'category-removing': u'Bot: Strik ütj %(oldcat)s',
-		'category-replacing': u'Bot: Waksle kategorii %(oldcat)s ütj mä %(newcat)s',
+		'category-replacing': u'Bot: Bütje kategorii %(oldcat)s ütj mä %(newcat)s',
 		'category-section-title': u'Wersjuunshistoore faan det ual %(oldcat)s',
 		'category-version-history': u'Bot: Seekere wersjuunshistoore faan det ual %(oldcat)s',
 		'category-was-disbanded': u'Bot: Kategorii as apliaset wurden',
@@ -1487,8 +1487,18 @@ msg = {
 		'category-adding': u'robot: manopandminõ [[Category:%(newcat)s]]',
 	},
 	# Author: Xqt
+	# Author: Srtxg
 	'wa': {
-		'category-adding': u'robot: radjouter category [[:Category:%(newcat)s|%(newcat)s]]',
+		'category-adding': u'Robot: radjouter l\' categorye [[:Category:%(newcat)s|%(newcat)s]]',
+		'category-also-in': u'(ossu dins %(alsocat)s)',
+		'category-changing': u'Robot: displaeçaedje di %(oldcat)s eviè %(newcat)s',
+		'category-listifying': u'Robot: djivêye del categoreye «%(fromcat)s» ({{PLURAL:%(num)d|1 cayet|%(num)d cayets}})',
+		'category-removing': u'Robot: disfaçaedje del categoreye «%(oldcat)s»',
+		'category-replacing': u'Robot: replaecî l\' categoreye «%(oldcat)s» avou «%(newcat)s»',
+		'category-section-title': u'Istwere del viye categoreye «%(oldcat)s»',
+		'category-version-history': u'Robot: wårdaedje di l\' istwere del viye modêye di «%(oldcat)s»',
+		'category-was-disbanded': u'Robot: li categoreye a stî disfwaite',
+		'category-was-moved': u'Robot: categoreye displaeceye viè [[:Category:%(newcat)s|%(title)s]]',
 	},
 	# Author: JinJian
 	'war': {

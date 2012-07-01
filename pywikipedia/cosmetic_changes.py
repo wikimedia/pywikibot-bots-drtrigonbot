@@ -57,7 +57,7 @@ your user-config.py:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: cosmetic_changes.py 10346 2012-06-11 05:35:41Z xqt $'
+__version__ = '$Id: cosmetic_changes.py 10428 2012-06-29 16:13:07Z xqt $'
 #
 import sys, re
 import wikipedia as pywikibot
@@ -208,9 +208,10 @@ class CosmeticChangesToolkit:
         old instances standardizeInterwiki and standardizeCategories
         The page footer has the following section in that sequence:
         1. categories
-        2. additional information depending on local site policy
-        3. stars templates for featured and good articles
-        4. interwiki links
+        2. ## TODO: template beyond categories ##
+        3. additional information depending on local site policy
+        4. stars templates for featured and good articles
+        5. interwiki links
         """
         starsList = [
             u'bueno',
@@ -278,8 +279,6 @@ class CosmeticChangesToolkit:
                                    % star, re.I)
                 found = regex.findall(starstext)
                 if found != []:
-                    if pywikibot.verbose:
-                        print found
                     text = regex.sub('', text)
                     allstars += found
 
@@ -295,8 +294,6 @@ class CosmeticChangesToolkit:
             regex = re.compile(iw_reg)
             found = regex.findall(text)
             if found:
-                if pywikibot.verbose:
-                    print found
                 hasCommentLine = True
                 text = regex.sub('', text)
 
@@ -318,7 +315,7 @@ class CosmeticChangesToolkit:
             self.site.language() == 'nn' or
             (interwikiLinks and hasCommentLine) and
             self.site.language() == 'fr'):
-            text = text + '\r\n\r\n' + iw_msg
+            text += '\r\n\r\n' + iw_msg
         # Adding stars templates
         if allstars:
             text = text.strip()+self.site.family.interwiki_text_separator
@@ -729,8 +726,8 @@ class CosmeticChangesToolkit:
         # This only works if there are only two items in digits dict
         old = digits[digits.keys()[0]]
         # do not change inside file links
-        namespaces = list(self.site.namespace(6, all = True))
-        pattern = re.compile(u'\[\[(' + '|'.join(namespaces) + '):.+?\..+?\]\]',
+        namespaces = list(self.site.namespace(6, all=True))
+        pattern = re.compile(u'\[\[(' + '|'.join(namespaces) + '):.+?\.\w+? *(\|((\[\[.*?\]\])|.)*)?\]\]',
                              re.UNICODE)
         exceptions.append(pattern)
         text = pywikibot.replaceExcept(text, u',', u'،', exceptions)
@@ -742,8 +739,8 @@ class CosmeticChangesToolkit:
             text = pywikibot.replaceExcept(text, u'ه', u'ھ', exceptions)
         text = pywikibot.replaceExcept(text, u'ك', u'ک', exceptions)
         text = pywikibot.replaceExcept(text, ur'[ىي]', u'ی', exceptions)
-        # replace persian digits
-        for i in range(0,10):
+        # replace persian/arabic digits
+        for i in xrange(0, 10):
             text = pywikibot.replaceExcept(text, old[i], new[i], exceptions)
         # do not change digits in class, style and table params
         pattern = re.compile(u'\w+=(".+?"|\d+)', re.UNICODE)
@@ -752,13 +749,14 @@ class CosmeticChangesToolkit:
         pattern = re.compile(u'<[/]*?[^</]+?[/]*?>', re.UNICODE)
         exceptions.append(pattern)
         exceptions.append('table') #exclude tables for now
+        # replace digits
+        for i in xrange(0, 10):
+            text = pywikibot.replaceExcept(text, str(i), new[i], exceptions)
         ##fixing pipe and trailing for fa. Thanks ZxxZxxZ
         if self.site.lang=='fa':
             faChrs = u'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك' + u'ًٌٍَُِّْٓٔ'
             text = re.sub(u'\[\[([^\]\|]*)]]([‌%s]+)' % faChrs, ur'[[\1|\1\2]]', text)
             text = re.sub(u'\[\[([^\]\|]*)\|(.+?)]]([‌%s]+)' % faChrs, ur'[[\1|\2\3]]', text)
-        for i in range(0,10):
-            text = pywikibot.replaceExcept(text, str(i), new[i], exceptions)
         return text
 
     # Retrieved from "http://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup"

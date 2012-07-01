@@ -18,7 +18,7 @@ These parameters are supported to specify which pages titles to print:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: pagegenerators.py 10218 2012-05-16 15:10:55Z xqt $'
+__version__='$Id: pagegenerators.py 10417 2012-06-23 16:12:26Z multichill $'
 
 import wikipedia as pywikibot
 from pywikibot import deprecate_arg, i18n
@@ -28,6 +28,7 @@ import traceback
 import re
 import sys
 import codecs
+import datetime
 
 import urllib, urllib2, time
 import date, catlib, userlib, query
@@ -1130,6 +1131,22 @@ def RegexFilterPageGenerator(generator, regex, inverse=False, ignore_namespace=T
                 if r.match(title):
                     yield page
                     break
+
+def EdittimeFilterPageGenerator(generator, begintime=datetime.datetime.min, endtime=datetime.datetime.max):
+    """
+    Wraps around another generator. Yields only those pages which were changed
+    between begintime and endtime.
+
+    @param generator: A generator object
+    @param begintime: A datetime object. Only pages after this time will be returned.
+    @param endtime: A datetime object Only pages before this time will be returned.
+    """
+    for page in generator:
+        if page.editTime(datetime=True)==None:
+            # FIXME: The page object should probably handle this
+            page.get()
+        if page.editTime(datetime=True) and begintime < page.editTime(datetime=True) and page.editTime(datetime=True) < endtime:
+            yield page
 
 def CombinedPageGenerator(generators):
     """

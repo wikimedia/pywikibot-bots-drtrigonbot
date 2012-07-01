@@ -7,7 +7,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: i18n.py 10132 2012-04-18 14:04:17Z xqt $'
+__version__ = '$Id: i18n.py 10432 2012-06-30 15:47:55Z xqt $'
 
 import re, sys
 from pywikibot import Error
@@ -396,10 +396,13 @@ def twntranslate(code, twtitle, parameters=None):
             # maybe we should implement this to i18n.translate()
             # TODO: check against plural_rules[lang]['nplurals']
             try:
-                plural_func = plural_rules[lang]['plural']
+                index = plural_rules[lang]['plural'](num)
             except KeyError:
-                plural_func = plural_rules['_default']['plural']
-        repl = variants.split('|')[plural_func(num)]
+                index = plural_rules['_default']['plural'](num)
+            except TypeError:
+                # we got an int
+                index = plural_rules[lang]['plural']
+        repl = variants.split('|')[index]
         trans = re.sub(PATTERN, repl, trans)
     if param:
         try:

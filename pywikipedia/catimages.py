@@ -293,13 +293,15 @@ class CatImagesBot(checkimages.main):
         tags = set([])
         for i, cat in enumerate(self._result_check):
             tags.add( u"[[:Category:%s]]" % cat )
-            content = self._add_category(content, u"Category:%s" % cat)
+            content = pywikibot.replaceCategoryLinks(content, [cat], site=self.site, addOnly=True)
 
         tags.add( u"[[:Category:Categorized by DrTrigonBot]]" )
-        content = self._add_category(content, u"Category:Categorized by DrTrigonBot")
+        content = pywikibot.replaceCategoryLinks(content, [u"Categorized by DrTrigonBot"], site=self.site, addOnly=True)
         content = self._add_template(content, u"Check categories|year={{subst:#time:Y}}|month={{subst:#time:F}}|day={{subst:#time:j}}|category=[[Category:Categorized by DrTrigonBot]]", top=True)
-        content = self._remove_category_or_template(content, u"Uncategorized")
-        content = self._gather_category(content)
+        content = self._remove_category_or_template(content, u"Uncategorized")  # template
+        content = pywikibot.replaceCategoryLinks( content, 
+                list(set(pywikibot.getCategoryLinks(content, site=self.site))),
+                site=self.site )
         print u"--- " * 20
         print content
         print u"--- " * 20
@@ -443,27 +445,7 @@ class CatImagesBot(checkimages.main):
         text = re.sub(u"[\{\[]{2}%s.*?[\}\]]{2}\n?" % name, u"", text)
         return text
 
-    # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
-    def _gather_category(self, text):
-        cat  = []
-        page = []
-        for line in text.split(u"\n"):
-            if re.match(u"^\[\[Category:.*?\]\]$", line):
-                cat.append( line )
-            else:
-                page.append( line )
-        return u"\n".join( page + cat )
-
-    # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
-    def _add_category(self, text, name, top=False):
-        if top:
-            buf = [(u"[[%s]]" % name), text]
-        else:
-            buf = [text, (u"[[%s]]" % name)]
-        return u"\n".join( buf )
-    #    catlib.add_category(self.image, category, comment=None, createEmptyPages=False)
-
-    # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
+    # place into 'textlib'
     def _add_template(self, text, name, params={}, top=False, raw=False):
         if top:
             buf = [(u"{{%s}}" % name), text]
@@ -483,21 +465,6 @@ class CatImagesBot(checkimages.main):
         
         text = pattern.sub(template, text)
         return text
-
-    #def _drawRect(self, faces): #function to modify the img
-    #    import ImageDraw
-    #    image_path_new = os.path.join('cache', '0_DETECTED_' + self.image_filename)
-    #    im = Image.open(self.image_path)
-    #    draw = ImageDraw.Draw(im)
-    #    for f in faces:
-    #        (x, y, width, height) = f[0]
-    ##        (x, y, width, height) = f
-    #        #print("[(%d,%d) -> (%d,%d)]" % (f.x, f.y, f.x+f.width, f.y+f.height))
-    #        (x1, y1, x2, y2) = (x, y, x+width, y+height)
-    #        #print("[(%d,%d) -> (%d,%d)]" % (x1, y1, x2, y2))
-    ##        draw.rectangle([x1,y1,x2,y2], outline=(255,0,0))
-    #        draw.rectangle([x1,y1,x2,y2], outline="#ff0000")
-    #    im.save(image_path_new)
 
     # gather data from all information interfaces and assign confidences
     def gatherInformation(self):
@@ -545,6 +512,7 @@ class CatImagesBot(checkimages.main):
             cc = (1. - (data['Delta_R']/max_dim))**(1.)     # 0.25 -> ~0.75
             c  = ( 3*ca + cb ) / 4
             #c  = ( cc + 6*ca + 2*cb ) / 9
+            #c  = ca    # with RAL colors Delta_E <= 20.0 should be always given...?!!?
             self._info['ColorRegions'][i]['Confidence'] = c
 
         # People/Pedestrian (opencv pre-trained hog)
@@ -1323,6 +1291,7 @@ class CatImagesBot(checkimages.main):
     # http://code.google.com/p/python-colormath/
     # http://en.wikipedia.org/wiki/Color_difference
     # http://www.farb-tabelle.de/en/table-of-color.htm
+    # http://www5.konicaminolta.eu/de/messinstrumente/color-light-language.html
     def _colormathDeltaEaverageColor(self, h):
         # split into red, green, blue
         r = h[0:256]
@@ -1341,6 +1310,9 @@ class CatImagesBot(checkimages.main):
                  'RGB':       rgb, }
 
         from colormath.color_objects import RGBColor
+        import pycolorname
+        #colors = pycolorname.RAL.colors
+        colors = pycolorname.pantone.colors
         
         #print "=== RGB Example: RGB->LAB ==="
         # Instantiate an Lab color object with the given values.
@@ -1357,35 +1329,6 @@ class CatImagesBot(checkimages.main):
         # Color to be compared to the reference.
         #color2 = LabColor(lab_l=0.7, lab_a=14.2, lab_b=-1.80)
         color2 = lab
-
-        # according to Categories available in Commons and more
-        colors = { u'Black':       (  0,   0,   0),
-                   u'DarkBlue':    (  0,   0, 139),
-                   u'DarkCyan':    (  0, 139, 139),
-                   u'LightBlue':   (173, 216, 230),
-                   u'LightCyan':   (224, 255, 255),
-                   u'Blue':        (  0,   0, 255),
-                   u'Cyan':        (  0, 255, 255),
-                   u'Turquoise':   ( 64, 224, 208),
-                   u'Brown':       (165,  42,  42),
-                   u'DimGray':     (105, 105, 105),
-                   u'LightGray':   (211, 211, 211),
-                   u'Gray':        (190, 190, 190),
-                   u'DarkGreen':   (  0, 100,   0),
-                   u'LightGreen':  (144, 238, 144),
-                   u'Green':       (  0, 255,   0),
-                   u'DarkOrange':  (	255,140,0),
-                   u'Orange':      (255, 165,   0),
-                   u'DarkRed':     (139,   0,   0),
-                   u'DeepPink':    (255,  20, 147),
-                   u'Pink':        (255, 192, 203),
-                   u'DarkMagenta': (139,   0, 139),
-                   u'Magenta':     (255,   0, 255),
-                   u'Purple':      (160,  32, 240),
-                   u'Red':         (255,   0,   0),
-                   u'Violet':      (238, 130, 238),
-                   u'White':       (255, 255, 255),
-                   u'Yellow':      (255, 255,   0), }
 
         res = (1.E100, '')
         for c in colors:
@@ -1644,6 +1587,8 @@ class CatImagesBot(checkimages.main):
         # http://www.claraocr.org/de/ocr/ocr-software/open-source-ocr.html
         # https://github.com/edsu/ocropy
         # http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/Doku#Categorization
+        # Usage:tesseract imagename outputbase [-l lang] [configfile [[+|-]varfile]...]
+        # tesseract imagename.tif output
         pass
 
     def _recognizeOpticalCodes_dmtxNzbar(self):
@@ -1889,7 +1834,12 @@ class CatImagesBot(checkimages.main):
             pass    # not supported (yet...)
         
         for i, d in enumerate(data):
-            data[i] = {'Position': map(int, data[i]['Position'])}
+            data[i] = { 'Position':   map(int, data[i]['Position']),
+                        'Confidence': self._thrshld_default,
+                        'ID':         (i+1),
+                        'Eyes':       [], }
+
+        # exclude duplicates...
         
         pywikibot.output(u'')
         pywikibot.output(u'ALPHA STAGE: _detectObjectFaces_EXIF (%s)' % bool(data))
@@ -2018,14 +1968,14 @@ def checkbot():
         except pywikibot.exceptions.NoPage:
             continue
         resultCheck = mainClass.checkStep()
-        try:
-            mainClass.tag_image()
-            ret = mainClass.log_output()
-            if ret:
-                outresult.append( ret )
-        except AttributeError:
-            pywikibot.output(u"ERROR: was not able to process page %s!!!\n" %\
-                             image.title(asLink=True))
+#        try:
+        mainClass.tag_image()
+        ret = mainClass.log_output()
+        if ret:
+            outresult.append( ret )
+#        except AttributeError:
+#            pywikibot.output(u"ERROR: was not able to process page %s!!!\n" %\
+#                             image.title(asLink=True))
         limit += -1
         posfile = open(os.path.join('cache', 'catimages_start'), "w")
         posfile.write( image.title().encode('utf-8') )

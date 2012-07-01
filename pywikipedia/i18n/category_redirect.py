@@ -162,12 +162,12 @@ msg = {
 	},
 	# Author: Erdemaslancan
 	'diq': {
-		'category_redirect-add-template': u'Boti: Qande wereni şablone hetenayışe kategoriya dekerd de',
-		'category_redirect-change-category': u'Boti: Kategoriya da [[:%(oldCatLink)s|%(oldCatTitle)s]]ra  frotu berd[[:%(newCatLink)s|%(newCatTitle)s]]',
-		'category_redirect-comment': u'Boti werene kategoriya hetanayışi',
+		'category_redirect-add-template': u'Boti Qande wereni şablone hetenayışe kategoriya dekerd de',
+		'category_redirect-change-category': u'Boti Kategoriya [[:%(oldCatLink)s|%(oldCatTitle)s]] berd [[:%(newCatLink)s|%(newCatTitle)s]]',
+		'category_redirect-comment': u'Boti werên hetanayışi kategoriya',
 		'category_redirect-edit-request': u'Peleye ke stare deyê greye kategoriya re newe kerdış icab keno: %(itemlist)s',
 		'category_redirect-edit-request-item': u'* %(title)s, %(newcat)s re hetanayışkar ita do %(oldcat)s\'',
-		'category_redirect-fix-double': u'Boti: Dılet hetenayış timar ke',
+		'category_redirect-fix-double': u'Boti Dılet hetenayış timar ke',
 	},
 	# Author: Glavkos
 	# Author: Geraki
@@ -261,7 +261,7 @@ msg = {
 	# Author: Murma174
 	'frr': {
 		'category_redirect-add-template': u'Bot: Du kategoriiwidjerfeerangsföörlag diartu',
-		'category_redirect-change-category': u'Bot: Feranere widjerfeerd kategorii [[:%(oldCatLink)s|%(oldCatTitle)s]] in [[:%(newCatLink)s|%(newCatTitle)s]]',
+		'category_redirect-change-category': u'Bot: Feranre widjerfeerd kategorii [[:%(oldCatLink)s|%(oldCatTitle)s]] in [[:%(newCatLink)s|%(newCatTitle)s]]',
 		'category_redirect-comment': u'Bot för\'t üübpaasin faan kategoriiwidjerfeerangen',
 		'category_redirect-edit-request': u'Joheer seekert sidjen brük noch an en aktuelen kategoriilink: %(itemlist)s',
 		'category_redirect-edit-request-item': u'* %(title)s leit uun %(oldcat)s, wat tu %(newcat)s widjerfeert',

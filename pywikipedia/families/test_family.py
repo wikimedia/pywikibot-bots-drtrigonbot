@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: test_family.py 10338 2012-06-09 14:48:11Z multichill $'
+__version__ = '$Id: test_family.py 10434 2012-07-01 11:47:26Z xqt $'
 
 import family
 
@@ -144,6 +144,12 @@ class Family(family.Family):
         }
         self.namespaces[1199] = {
             '_default': u'Translations talk',
+        }
+        self.namespaces[2500] = {
+            '_default': u'VisualEditor',
+        }
+        self.namespaces[2501] = {
+            '_default': u'VisualEditor talk',
         }
         self.interwiki_forward = 'wikipedia'
         self.cross_projects = [
