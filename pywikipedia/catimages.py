@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-EXPERIMENTAL BOT SCRIPT DERIVED FROM 'checkimages.py' and should use 'catlib.py'
+Image by content categorization derived from 'checkimages.py'.
 ...
 
 Script to check recently uploaded files. This script checks if a file
@@ -110,17 +110,14 @@ class Global(object):
     useGuesses = True        # Use guesses which are less reliable than true searches
 
 
-# EXPERIMENTAL BOT SCRIPT DERIVED FROM 'checkimages.py' and should use 'catlib.py'
+# Image by content categorization derived from 'checkimages.py'.
 class CatImagesBot(checkimages.main):
 #    def __init__(self, site, logFulNumber = 25000, sendemailActive = False,
 #                 duplicatesReport = False, logFullError = True): pass
 #    def setParameters(self, imageName, timestamp, uploader): pass
-#    def report(self, newtext, image_to_report, notification=None, head=None,
-#               notification2 = None, unver=True, commTalk=None, commImage=None): pass
 
     #ignore = []
     ignore = ['color']
-    #ignore = ['color', 'people']
     
     _thrhld_group_size = 4
     _thrshld_guesses = 0.1
@@ -354,6 +351,11 @@ class CatImagesBot(checkimages.main):
         if os.path.exists(image_path_new):
             os.remove( image_path_new )
 
+    # LOOK ALSO AT: checkimages.CatImagesBot.report
+    def report(self):
+        self.tag_image()
+        return self.log_output()
+
     def _make_infoblock(self, cat, res, tmpl_available=None):
         if not res:
             return u''
@@ -506,13 +508,13 @@ class CatImagesBot(checkimages.main):
             ca = (data['Coverage'])**(1./6)                 # 0.20 -> ~0.75
             #ca = (data['Coverage'])**(1./5)                 # 0.25 -> ~0.75
             #ca = (data['Coverage'])**(1./4)                 # 0.35 -> ~0.75
-            #cb = (0.02 * (50. - data['Delta_E']))**(1.2)    # 10.0 -> ~0.75
-            cb = (0.02 * (50. - data['Delta_E']))**(1./2)   # 20.0 -> ~0.75
-            #cb = (0.02 * (50. - data['Delta_E']))**(1./3)   # 25.0 -> ~0.75
-            cc = (1. - (data['Delta_R']/max_dim))**(1.)     # 0.25 -> ~0.75
-            c  = ( 3*ca + cb ) / 4
+            ##cb = (0.02 * (50. - data['Delta_E']))**(1.2)    # 10.0 -> ~0.75
+            #cb = (0.02 * (50. - data['Delta_E']))**(1./2)   # 20.0 -> ~0.75
+            ##cb = (0.02 * (50. - data['Delta_E']))**(1./3)   # 25.0 -> ~0.75
+            #cc = (1. - (data['Delta_R']/max_dim))**(1.)     # 0.25 -> ~0.75
+            #c  = ( 3*ca + cb ) / 4
             #c  = ( cc + 6*ca + 2*cb ) / 9
-            #c  = ca    # with RAL colors Delta_E <= 20.0 should be always given...?!!?
+            c  = ca
             self._info['ColorRegions'][i]['Confidence'] = c
 
         # People/Pedestrian (opencv pre-trained hog)
@@ -1767,7 +1769,7 @@ class CatImagesBot(checkimages.main):
         res = self._EXIFgetData()
         
         # http://u88.n24.queensu.ca/exiftool/forum/index.php?topic=3156.0
-        # u88.n24.queensu.ca/pub/facetest.pl
+        # http://u88.n24.queensu.ca/pub/facetest.pl
         # ( all scaling stuff ignored (!) and some strongly simplified (!) )
         if 'Make' in res:
             make = res['Make'].lower()
@@ -1968,14 +1970,13 @@ def checkbot():
         except pywikibot.exceptions.NoPage:
             continue
         resultCheck = mainClass.checkStep()
-#        try:
-        mainClass.tag_image()
-        ret = mainClass.log_output()
-        if ret:
-            outresult.append( ret )
-#        except AttributeError:
-#            pywikibot.output(u"ERROR: was not able to process page %s!!!\n" %\
-#                             image.title(asLink=True))
+        try:
+            ret = mainClass.report()
+            if ret:
+                outresult.append( ret )
+        except AttributeError:
+            pywikibot.output(u"ERROR: was not able to process page %s!!!\n" %\
+                             image.title(asLink=True))
         limit += -1
         posfile = open(os.path.join('cache', 'catimages_start'), "w")
         posfile.write( image.title().encode('utf-8') )
