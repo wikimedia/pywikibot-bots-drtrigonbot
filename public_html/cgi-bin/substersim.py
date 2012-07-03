@@ -62,6 +62,7 @@ bot_path = os.path.realpath("../../pywikipedia/")
 sys.path.append( bot_path )				# bot import form other path (!)
 import subster						#
 import config						#
+import wikipedia as pywikibot
 
 
 # === panel HTML stylesheets === === ===
@@ -247,6 +248,8 @@ def maindisplay():
 		stdlog = StringIO.StringIO()
 		(out_stream, err_stream) = (sys.stdout, sys.stderr)
 		(sys.stdout, sys.stderr) = (stdlog, stdlog)
+		pywikibot.ui.stdout = sys.stdout    # patch needed for pywikibot.output
+		pywikibot.ui.stderr = sys.stderr    # (look at terminal_iterface_base.py and bot_control.py)
 
 		# Set the signal handler and a ?-second alarm (request max. timeout)
 		signal.signal(signal.SIGALRM, timeout_handler)
@@ -266,7 +269,7 @@ def maindisplay():
 		bot_output[0] = re.sub('\x03', '', stdlog.getvalue())
 		stdlog.close()
 
-	bot_output = re.sub("\n", "<br>\n", "\n".join(bot_output))
+	bot_output = re.sub("\n{1,2}", "<br>\n", "\n".join(bot_output))
 
 	data = {'panel_ver':		__version__,
 		'subster_bot_ver':	subster.__version__,
