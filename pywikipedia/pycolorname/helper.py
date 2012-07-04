@@ -8,8 +8,15 @@ Created on Sat Jun 30 22:57:26 2012
 import pickle, os
 
 
+path = list(os.path.split(os.path.abspath(os.curdir)))
+if 'pycolorname' not in path:
+    path.append( 'pycolorname' )
+path.append( '%s' )
+path = os.path.join(*path)
+
+
 def storeData(filename, data):
-    output = open(os.path.join(os.path.abspath(os.curdir), 'pycolorname', filename), 'wb')
+    output = open(path % filename, 'wb')
     # Pickle dictionary using protocol 0.
     pickle.dump(data, output)
 #    # Pickle the list using the highest protocol available.
@@ -17,7 +24,7 @@ def storeData(filename, data):
     output.close()   
     
 def loadData(filename):
-    pkl_file = open(os.path.join(os.path.abspath(os.curdir), 'pycolorname', filename), 'rb')
+    pkl_file = open(path % filename, 'rb')
     data1 = pickle.load(pkl_file)
 #    pprint.pprint(data1)
 #    data2 = pickle.load(pkl_file)

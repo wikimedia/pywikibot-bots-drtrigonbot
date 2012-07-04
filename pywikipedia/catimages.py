@@ -319,14 +319,29 @@ class CatImagesBot(checkimages.main):
         ret  = []
         ret.append( u"" )
         ret.append( u"== [[:%s]] ==" % self.image.title() )
-        ret.append( u'<div style="position:relative;">' )
+        ret.append( u'{|' )
+        ret.append( u'|<div style="position:relative;">' )
         ret.append( u"[[%s|200px]]" % self.image.title() )
         ret.append( self._make_markerblock(self._info[u'Faces'], 200.) )
-        #ret.append( self._make_markerblock(self._info[u'ColorRegions'], 200.,
-        #                                   structure=['Position'], line='dashed') )
         ret.append( self._make_markerblock(self._info[u'People'], 200.,
                                            structure=['Position'], line='dashed') )
         ret.append( u"</div>" )
+        ret.append( u'|<div style="position:relative;">' )
+        ret.append( u"[[%s|200px]]" % self.image.title() )
+        ret.append( self._make_markerblock(self._info[u'ColorRegions'], 200.,
+                                           structure=['Position']) )
+        ret.append( u"</div>" )
+        ret.append( u'|<div style="position:relative;">' )
+        ret.append( u"[[%s|200px]]" % self.image.title() )
+        ret.append( self._make_markerblock(self._info[u'_EXIFFaces'], 200.,
+                                           structure=['Position']) )
+        ret.append( u"</div>" )
+        ret.append( u'|<div style="position:relative;">' )
+        ret.append( u"[[%s|200px]]" % self.image.title() )
+        ret.append( self._make_markerblock(self._info[u'_TrainedTEST'], 200.,
+                                           structure=['Position']) )
+        ret.append( u"</div>" )
+        ret.append( u'|}' )
 
         color = {True: "rgb(0,255,0)", False: "rgb(255,0,0)"}[bool(self._result_check)]
         ret.append( u"<div style='background:%s'>'''automatic categorization''': %s</div>" % (color, u", ".join(self._result_check)) )
@@ -347,9 +362,9 @@ class CatImagesBot(checkimages.main):
             os.remove( self.image_path )
         if os.path.exists(self.image_path_JPEG):
             os.remove( self.image_path_JPEG )
-        image_path_new = self.image_path_JPEG.replace(u"cache/", u"cache/0_DETECTED_")
-        if os.path.exists(image_path_new):
-            os.remove( image_path_new )
+        #image_path_new = self.image_path_JPEG.replace(u"cache/", u"cache/0_DETECTED_")
+        #if os.path.exists(image_path_new):
+        #    os.remove( image_path_new )
 
     # LOOK ALSO AT: checkimages.CatImagesBot.report
     def report(self):
@@ -505,6 +520,7 @@ class CatImagesBot(checkimages.main):
             #    c = 0.5
             #else:
             #    c = 0.1
+            #ca = (data['Coverage'])**(1./7)                 # 0.15 -> ~0.75
             ca = (data['Coverage'])**(1./6)                 # 0.20 -> ~0.75
             #ca = (data['Coverage'])**(1./5)                 # 0.25 -> ~0.75
             #ca = (data['Coverage'])**(1./4)                 # 0.35 -> ~0.75
@@ -532,9 +548,9 @@ class CatImagesBot(checkimages.main):
             self._info['People'][i]['Confidence'] = c
 
         # general (self trained haar and cascade) classification
-        # (people is opencv pre-trained, all other are own results)
         # http://www.computer-vision-software.com/blog/2009/11/faq-opencv-haartraining/
-        cascade_files = [(u'People', 'haarcascade_fullbody.xml')]
+        cascade_files = [(u'TEST', 'haarcascade_fullbody.xml')]   # ...just as an example!
+        #cascade_files = [(u'Aeroplane', 'haarcascade_aeroplane.xml')]   # e.g. for 'Category:Unidentified aircraft'
         for cf in cascade_files:
             self._detectObjectTrained_CV(*cf)
 
@@ -546,7 +562,7 @@ class CatImagesBot(checkimages.main):
         self._recognizeOpticalCodes_dmtxNzbar()
 
         for i in range(len(self._info['OpticalCodes'])):
-            self._info['OpticalCodes'][i]['Confidence'] = self._info['OpticalCodes'][i]['Quality']
+            self._info['OpticalCodes'][i]['Confidence'] = self._info['OpticalCodes'][i]['Quality']/2.
 
         # Chessboard (opencv reference detector)
         self._detectObjectChessboard_CV()
@@ -621,7 +637,12 @@ class CatImagesBot(checkimages.main):
 
     def _filter_OpticalCodes(self):
         # use all, since detection should be very reliable
-        result = self._info['OpticalCodes']
+        #result = self._info['OpticalCodes']
+        result = []
+        for item in self._info['OpticalCodes']:
+            # >>> drop if below thrshld <<<
+            if (item['Confidence'] >= self.thrshld):
+                result.append( item )
         return {'OpticalCodes': result}
 
     def _filter_Chessboard(self):
@@ -1006,17 +1027,18 @@ class CatImagesBot(checkimages.main):
                 data['Eyes'].append( (cx-radius, cy-radius, 2*radius, 2*radius) )
             result.append( data )
 
-        # see '_drawRect'
-        if result:
-            #image_path_new = os.path.join('cache', '0_DETECTED_' + self.image_filename)
-            image_path_new = self.image_path_JPEG.replace(u"cache/", u"cache/0_DETECTED_")
-            cv2.imwrite( image_path_new, img )
+        ## see '_drawRect'
+        #if result:
+        #    #image_path_new = os.path.join('cache', '0_DETECTED_' + self.image_filename)
+        #    image_path_new = self.image_path_JPEG.replace(u"cache/", u"cache/0_DETECTED_")
+        #    cv2.imwrite( image_path_new, img )
 
         #return faces.tolist()
         self._info['Faces'] = result
         return
 
     # .../opencv/samples/cpp/peopledetect.cpp
+    # + Haar/Cascade detection
     def _detectObjectPeople_CV(self):
         # http://stackoverflow.com/questions/10231380/graphic-recognition-of-people
         # https://code.ros.org/trac/opencv/ticket/1298
@@ -1024,8 +1046,6 @@ class CatImagesBot(checkimages.main):
         # http://opencv.willowgarage.com/documentation/cpp/basic_structures.html
         # http://www.pygtk.org/docs/pygtk/class-gdkrectangle.html
         
-        # MAY BE USE 'haarcascade_fullbody.xml' ALSO...?!! (like face detection)
-
         import gtk
 
         self._info['People'] = []
@@ -1036,6 +1056,8 @@ class CatImagesBot(checkimages.main):
             if (img == None) or (min(img.shape[:2]) < 100) or (not img.data):
                 raise IOError
 
+            # !!! the 'scale' here IS RELEVANT FOR THE DETECTION RATE;
+            # how small and how many features are detected
             #scale  = max([1., np.average(np.array(img.shape)[0:2]/500.)])
             scale  = max([1., np.average(np.array(img.shape)[0:2]/400.)])
             #scale  = max([1., np.average(np.array(img.shape)[0:2]/300.)])
@@ -1062,7 +1084,23 @@ class CatImagesBot(checkimages.main):
         # run the detector with default parameters. to get a higher hit-rate
         # (and more false alarms, respectively), decrease the hitThreshold and
         # groupThreshold (set groupThreshold to 0 to turn off the grouping completely).
-        found = hog.detectMultiScale(img, 0, (8,8), (32,32), 1.05, 2)
+        found = list(hog.detectMultiScale(img, 0, (8,8), (32,32), 1.05, 2))
+
+        # people haar/cascaded classifier
+        # use 'haarcascade_fullbody.xml', ... also (like face detection)
+        cascade       = cv2.CascadeClassifier(
+          'opencv/haarcascades/haarcascade_fullbody.xml',
+          #'opencv/haarcascades/haarcascade_lowerbody.xml',
+          #'opencv/haarcascades/haarcascade_upperbody.xml',
+          )
+        objects = list(cascade.detectMultiScale( smallImg,
+            1.1, 2, 0
+            #|cv.CV_HAAR_FIND_BIGGEST_OBJECT
+            #|cv.CV_HAAR_DO_ROUGH_SEARCH
+            |cv.CV_HAAR_SCALE_IMAGE,
+            (30, 30) ))
+        found += objects
+
         #t = time.time() - t
         #print("tdetection time = %gms\n", t*1000.)
         bbox = gtk.gdk.Rectangle(*(0,0,img.shape[1],img.shape[0]))
@@ -1314,7 +1352,8 @@ class CatImagesBot(checkimages.main):
         from colormath.color_objects import RGBColor
         import pycolorname
         #colors = pycolorname.RAL.colors
-        colors = pycolorname.pantone.colors
+        #colors = pycolorname.pantone.Formula_Guide_Solid
+        colors = pycolorname.pantone.Fashion_Home_paper
         
         #print "=== RGB Example: RGB->LAB ==="
         # Instantiate an Lab color object with the given values.
@@ -1542,7 +1581,7 @@ class CatImagesBot(checkimages.main):
           'opencv/haarcascades/' + cascade_file,
           )
 
-        #self._info[info_desc] = []
+        self._info[u'_Trained%s' % info_desc] = []
         scale = 1.
         try:
             img    = cv2.imread( self.image_path_JPEG, 1 )
@@ -1573,14 +1612,13 @@ class CatImagesBot(checkimages.main):
             |cv.CV_HAAR_SCALE_IMAGE,
             (30, 30) ))
 
-        pywikibot.output(u'ALPHA STAGE: _detectObjectTrained_CV (%s)' % bool(objects))
-        pywikibot.output(unicode(objects))
-        pywikibot.output(unicode(self._info[info_desc]))
-        pywikibot.output(u'')
+        result = []
+        for i, r in enumerate(objects):
+            result.append({ 'Position': tuple(np.int_(np.array(r)*scale)) })
 
         # generic detection ...
 
-        #self._info[info_desc] = ...
+        self._info[u'_Trained%s' % info_desc] = result
         return
 
     def _recognizeOpticalText_x(self):
@@ -1643,8 +1681,7 @@ class CatImagesBot(checkimages.main):
                             'Data':     data,
                             'Position': pos,
                             'Type':     u'DataMatrix',
-                            'Count':    0,                      # ???
-                            'Quality':  0.75, })
+                            'Quality':  2*0.75, })
         
         self._info['OpticalCodes'] = result
 
@@ -1664,14 +1701,15 @@ class CatImagesBot(checkimages.main):
         zbar_img = zbar.Image(width, height, 'Y800', img.tostring())
         
         # scan the image for barcodes
+        # http://zbar.sourceforge.net/api/zbar_8h.html
         scanner.scan(zbar_img)
 
         for symbol in zbar_img:
             i += 1
             result.append({ #'components': symbol.components,
                             'ID':         (i+1),
-                            'Count':      symbol.count,         # 'ID'?
-                            'Data':       symbol.data,
+                            #'Count':      symbol.count,         # 'ID'?
+                            'Data':       symbol.data or u'-',
                             'Position':   symbol.location,      # (left, top, width, height)?
                             'Quality':    symbol.quality,       # usable for 'Confidence'?
                             'Type':       symbol.type, })
@@ -1766,87 +1804,154 @@ class CatImagesBot(checkimages.main):
         return res
     
     def _detectObjectFaces_EXIF(self):
+        self._info['_EXIFFaces'] = []
+        
         res = self._EXIFgetData()
         
         # http://u88.n24.queensu.ca/exiftool/forum/index.php?topic=3156.0
         # http://u88.n24.queensu.ca/pub/facetest.pl
         # ( all scaling stuff ignored (!) and some strongly simplified (!) )
+        # Example: 'File:Annagrah-2 041.JPG' (canon)
         if 'Make' in res:
             make = res['Make'].lower()
         else:
             make = None
         found = set(res.keys())
         data  = []
+
+        if 'ImageWidth' in res:
+            (width, height) = (res['ImageWidth'], res['ImageHeight'])
+            (width, height) = (width.replace(u'pt', u''), height.replace(u'pt', u''))
+            (width, height) = (int(float(width)+0.5), int(float(height)+0.5))
+        else:
+            (width, height) = self.image_size
+        wasRotated = (height > width)
         
-        #if   (make == 'sony'):
-        if   (make in ['sony', 'nikon', 'panasonic']):
+        if   (make in ['sony', 'nikon', 'panasonic', 'casio', 'ricoh']):
+            # UNTESTED: ['sony', 'nikon', 'panasonic', 'casio', 'ricoh']
             if set(['FacesDetected', 'Face1Position']).issubset(found):
                 i = 1
-                #for i in range(res['FacesDetected']):
+                if 'FaceOrientation' in res:
+                    print res['FaceOrientation']    # for rotation 'rot'
+                # 'crop' for 'casio' omitted here...
+                (sx, sy) = (1./width, 1./height)
+                if 'FaceDetectFrameSize' in res:
+                    (width, height) = res['FaceDetectFrameSize'].split(' ')
+                    (sx, sy) = (1./width, 1./height)
                 while ('Face%iPosition'%i) in res:
-                    data.append({ 'Position': res['Face%iPosition'%i].split(' ') })
+                    buf = res['Face%iPosition'%i].split(' ')
+                    (x1, y1) = (buf[1]*sx, buf[0]*sy)
+                    (x2, y2) = (x1+buf[3]*sx, y1+buf[2]*sy)
+                    data.append({ 'Position': (x1, y1, x2, y2) })
                     i += 1
         elif (make == 'fujifilm'):
+            # UNTESTED: 'fujifilm'
             if set(['FacesDetected', 'FacePositions']).issubset(found):
                 buf = res['FacePositions'].split(' ')
+                (sx, sy) = (1./width, 1./height)
                 for i in range(int(res['FacesDetected'])):
-                    data.append({ 'Position': [buf[i*4], buf[i*4+1], buf[i*4+2], buf[i*4+3]] })
+                    data.append({ 'Position': [buf[i*4]*sx,   buf[i*4+1]*sy, 
+                                               buf[i*4+2]*sx, buf[i*4+3]*sy] })
+                    if ('Face%iName'%i) in res:
+                        print res['Face%iName'%i], res['Face%iCategory'%i], res['Face%iBirthday'%i]
         elif (make == 'olympus'):
+            # UNTESTED: 'olympus'
             if set(['FacesDetected', 'FaceDetectArea']).issubset(found):
                 buf = res['FaceDetectArea'].split(' ')
                 for i in range(int(res['MaxFaces'])):
                     data.append({ 'Position': [buf[i*4], buf[i*4+1], buf[i*4+2], buf[i*4+3]] })
-        elif (make == 'pentax'):
+        elif make in ['pentax', 'sanyo']:
+            # UNTESTED: ['pentax', 'sanyo']
             if set(['FacesDetected']).issubset(found):
-                if 'FacePosition' in res:
-                    data.append({ 'Position': res['FacePosition'].split(' ') + \
-                                              ['100', '100'] }) # how big is the face?
                 i = 1
+                (sx, sy) = (1./width, 1./height)
                 while ('Face%iPosition'%i) in res:
-                    data.append({ 'Position': res['Face%iPosition'%i].split(' ') + \
-                                              res['Face%iSize'%i].split(' ') })
+                    buf = res['Face%iPosition'%i].split(' ') + \
+                          res['Face%iSize'%i].split(' ')
+                    (x1, y1) = ((buf[0] - buf[2]/2.)*sx, (buf[1] - buf[3]/2.)*sy)
+                    (x2, y2) = (x1+buf[2]*sx, y1+buf[3]*sy)
+                    data.append({ 'Position': (x1, y1, x2, y2) })
                     i += 1
+                if 'FacePosition' in res:
+                    buf = res['FacePosition'].split(' ') + ['100', '100'] # how big is the face?
+                    (x1, y1) = (buf[0]*sx, buf[1]*sy)
+                    (x2, y2) = (buf[2]*sx, buf[3]*sy)
+                    data.append({ 'Position': (x1, y1, x2, y2) })
         elif (make == 'canon'):
-            if   set(['FacesDetected', 'FaceDetectFrameWidth']).issubset(found):
-                # older models store face detect information
-                buf = res['FaceWidth'].split(' ')
+            if   set(['FacesDetected', 'FaceDetectFrameSize']).issubset(found):
+                # UNTESTED: older models store face detect information
+                (width, height) = map(int, res['FaceDetectFrameSize'].split(' '))
+                fw = res['FaceWidth'].split(' ')
                 i = 1
+                (sx, sy) = (1./width, 1./height)
                 while ('Face%iPosition'%i) in res:
-                    data.append({ 'Position': res['Face%iPosition'%i].split(' ') + \
-                                              buf })
+                    buf = res['Face%iPosition'%i].split(' ')
+                    (x1, y1) = ((buf[0] + width/2. - fw)*sx, (buf[1] + height/2. - fw)*sy)
+                    (x2, y2) = (x1 + fw*2*sx, y1 + fw*2*sy)
+                    data.append({ 'Position': (x1, y1, x2, y2) })
                     i += 1
             elif set(['ValidAFPoints', 'AFImageWidth', 'AFImageHeight',
                       'AFAreaXPositions', 'AFAreaYPositions', 'PrimaryAFPoint']).issubset(found):
-                # newer models use AF points
+                # TESTED: newer models use AF points
+                (width, height) = (int(res['AFImageWidth']), int(res['AFImageHeight']))
                 if ('AFAreaMode' in res) and ('Face' in res['AFAreaMode']):
                     buf_x = res['AFAreaXPositions'].split(' ')
                     buf_y = res['AFAreaYPositions'].split(' ')
                     buf_w = buf_h = [100] * len(buf_x) # how big is the face? (else)
                     if   'AFAreaWidths' in res:
-                        buf_w = res['AFAreaWidths'].split(' ')
-                        buf_h = res['AFAreaHeights'].split(' ')
+                        buf_w = map(int, res['AFAreaWidths'].split(' '))
+                        buf_h = map(int, res['AFAreaHeights'].split(' '))
                     elif 'AFAreaWidth' in res:
-                        buf_w = [res['AFAreaWidth']]  * len(buf_x)
-                        buf_h = [res['AFAreaHeight']] * len(buf_x)
-                    # conversion to positive coordinates might be needed...
+                        buf_w = [int(res['AFAreaWidth'])]  * len(buf_x)
+                        buf_h = [int(res['AFAreaHeight'])] * len(buf_x)
+                    else:
+                        pywikibot.output(u'No AF area size')
+                    # conversion to positive coordinates
+                    buf_x = [ int(x) + width/2. for x in buf_x ]
+                    buf_y = [ int(y) + height/2. for y in buf_y ]
+                    # EOS models have Y flipped
+                    if ('Model' in res) and ('EOS' in res['Model']):
+                        buf_y = [ height - y for y in buf_y ]
+                    (sx, sy) = (1./width, 1./height)
                     for i in range(int(res['ValidAFPoints'])):
-                        data.append({ 'Position': [buf_x[i], buf_y[i], 
-                                                   buf_w[i], buf_h[i]] })
+                        (x1, y1) = ((buf_x[i]-buf_w[i]/2)*sx, (buf_y[i]-buf_h[i]/2)*sy)
+                        (x2, y2) = (x1+buf_w[i]*sx, y1+buf_h[i]*sy)
+                        data.append({ 'Position': (x1, y1, x2, y2) })
         else:
             pass    # not supported (yet...)
         
+        # finally, rotate face coordinates if image was rotated
+        if wasRotated:
+            rot = 270
+            # variable rotation omitted here... ($$faceInfo{Rotation})
+
         for i, d in enumerate(data):
-            data[i] = { 'Position':   map(int, data[i]['Position']),
+            # rotate face coordinates
+            if wasRotated:
+                p = data[i]['Position']
+                if (rot == 90):
+                    p = (p[1], 1-p[0], p[3], 1-p[2])
+                else:
+                    p = (1-p[1], p[0], 1-p[3], p[2])
+                if 'Rotation' in data[i]:
+                    data[i]['Rotation'] -= rot
+                    data[i]['Rotation'] += 360 if data[i]['Rotation'] < 0 else 0
+
+            # rescale relative sizes to real pixel values
+            p = (p[0]*self.image_size[0] + 0.5, p[1]*self.image_size[1] + 0.5, 
+                 p[2]*self.image_size[0] + 0.5, p[3]*self.image_size[1] + 0.5)
+            # change from (x1, y1, x2, y2) to (x, y, w, h)
+            data[i]['Position'] = (p[0], p[1], p[0]-p[2], p[3]-p[1])
+
+            data[i] = { 'Position':   tuple(map(int, data[i]['Position'])),
                         'Confidence': self._thrshld_default,
                         'ID':         (i+1),
                         'Eyes':       [], }
 
         # exclude duplicates...
-        
-        pywikibot.output(u'')
-        pywikibot.output(u'ALPHA STAGE: _detectObjectFaces_EXIF (%s)' % bool(data))
-        pywikibot.output(unicode(data))
-        pywikibot.output(unicode(self._info['Faces']))
+
+        self._info['_EXIFFaces'] = data
+        return
 
 gbv = Global()
 

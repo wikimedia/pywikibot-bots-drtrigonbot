@@ -10,10 +10,16 @@ import pickle
 from helper import *
 
 
+# === Pantone Formula Guide Solid ===
 colors_01 = loadData('PMS_cal-print.pkl') # looks most reliable when compared to others...
 #colors_02 = loadData('PMS_logodesignteam.pkl')
 #colors_03 = loadData('PMS_ackerdesign.pkl')
-colors    = colors_01  
+Formula_Guide_Solid = colors_01
+
+# === Pantone Fashion + Home paper ===
+# === Pantone Fashion + Home New Colors paper ===
+colors_04 = loadData('PMS_pantonepaint_raw.pkl')
+Fashion_Home_paper = colors_04
 
 
 def getPMSdata_calprint():
@@ -28,7 +34,7 @@ def getPMSdata_calprint():
         val  = (int(val[1:3], 16), int(val[3:5], 16), int(val[5:7], 16))
         if ('PMS' not in key) and ('Pantone' not in key):
             key = u'Pantone ' + key
-        result[key] = {'RGB': val}
+        result[key] = val
     return result
     
 def getPMSdata_logodesignteam():
@@ -56,7 +62,7 @@ def getPMSdata_logodesignteam():
                 if 'Pantone' not in key:
                     key = u'Pantone ' + key
                 key = re.sub('Pantone (?P<ID>\d+)', 'PMS \g<ID>', key)
-                result[key] = {'RGB': val}
+                result[key] = val
     return result
 
 def getPMSdata_ackerdesign():
@@ -73,9 +79,27 @@ def getPMSdata_ackerdesign():
                 continue
             key = u'PMS ' + item[0]
             val = tuple(map(int, item[1:4]))
-            result[key] = {'RGB': val}
+            result[key] = val
     return result
-    
+
+def getPMSdata_materialsworld():
+    # http://www.materials-world.com/pantone/pantone.htm
+    pass
+
+def getPMSdata_pantonepaint():
+    site = pywikibot.getSite()
+    data = http.request(site, u'http://www.pantonepaint.co.kr/color/colorchipsearch.asp?cmp=TPX', no_hostname = True)
+    data = BeautifulSoup.BeautifulSoup(data).findAll('div', {'onmouseover': "s(this);"})
+    result = {}
+    for item in data:
+        val = re.split('[:;]', item['style'])[1]
+        val = eval(unicode(val[3:]))
+        key = u'PMS %s %s (%s)' % (re.split('&', item.contents[1])[0], item.contents[2], item.contents[0])
+        key = re.sub('<.*?>', '', key)
+        key = re.sub('PANTONE', ' Pantone', key)
+        result[key] = val
+    return result
+
 
 def findNames(data):
     result = []
@@ -89,7 +113,7 @@ def assignColorNames(data, names):
     
     result = {}
     for key in data:
-        rgb = data[key]['RGB']
+        rgb = data[key]
 
         #print "=== RGB Example: RGB->LAB ==="
         # Instantiate an Lab color object with the given values.
@@ -109,7 +133,7 @@ def assignColorNames(data, names):
 
         res = (1.E100, '')
         for c in names:
-            rgb = data[c]['RGB']
+            rgb = data[c]
             rgb = RGBColor(rgb[0], rgb[1], rgb[2], rgb_type='sRGB')
             color1 = rgb.convert_to('lab', target_illuminant='D65')
 
@@ -125,11 +149,11 @@ def assignColorNames(data, names):
 
             r = color1.delta_e(color2, mode='cmc', pl=2, pc=1)
             if (r < res[0]):
-                res = (r, c, data[c]['RGB'])
+                res = (r, c, data[c])
 #        data[key]['Color']   = res[1]
 #        data[key]['Delta_E'] = res[0]
 #        data[key]['RGBref']  = res[2]
-        result['%s (%s)' % (key, res[1])] = data[key]['RGB']
+        result['%s (%s)' % (key, res[1])] = data[key]
 
     return result
     
@@ -141,6 +165,8 @@ def refresh():
     storeData('PMS_logodesignteam_raw.pkl', data_02)
     data_03 = getPMSdata_ackerdesign()
     storeData('PMS_ackerdesign_raw.pkl', data_03)
+    data_04 = getPMSdata_pantonepaint()
+    storeData('PMS_pantonepaint_raw.pkl', data_04)
 #    data_01 = loadData('PMS_cal-print_raw.pkl')
 #    data_02 = loadData('PMS_logodesignteam_raw.pkl')
 #    data_03 = loadData('PMS_ackerdesign_raw.pkl')
@@ -154,6 +180,9 @@ def refresh():
     data = data_01
 
     print "Retrieved number of colors:", len(data)
+
+    data['White'] = (255, 255, 255)
+    print "Added color 'White' to Pantone set."
 
     names = findNames(data)
     print "Number of human readable names:", len(names)
