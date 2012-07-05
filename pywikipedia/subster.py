@@ -41,7 +41,7 @@ __version__ = '$Id$'
 import re, sys, os, string, time
 import difflib
 import BeautifulSoup
-import urllib, StringIO, zipfile, csv
+import StringIO, zipfile, csv#, urllib
 import mailbox, mimetypes, datetime, locale
 import openpyxl.reader.excel
 import crontab
@@ -339,8 +339,10 @@ class SubsterBot(basic.AutoBasicBot):
             external_buffer = mbox.find_data(param['url'])
             mbox.close()
         elif param['zip']:
-            # !!! does zip deflate work with 'http.request' ??!! (has to be made working! see opencv stuff also!)
-            external_buffer = urllib.urlopen(param['url']).read()
+            #external_buffer = urllib.urlopen(param['url']).read()
+            f_url, external_buffer = http.request(self.site, param['url'], no_hostname=True, back_response=True)
+            external_buffer = f_url.read()
+            del f_url   # free some memory (no need to keep a copy...)
         else:
             external_buffer = http.request(self.site, param['url'], no_hostname = True)
 

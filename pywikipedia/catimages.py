@@ -166,25 +166,13 @@ class CatImagesBot(checkimages.main):
         if os.path.exists(self.image_path):
             return
 
-        maxtries = 5
-        while maxtries:
-            maxtries -= 1
-            
-            pywikibot.get_throttle()
-#            f, data = self.site.getUrl(self.image.fileUrl(), no_hostname=True, back_response=True)
-            # !!! CHEAP HACK TO GET IT WORKING -> NEEDS PATCH IN 'getUrl' upstream !!!
-            # (prevent unicode encoding at end or allow to re-read in back_response)
-            # (this will be useful for 'subster' also; merge several get modes there)
-            try:
-                req = urllib2.Request(self.image.fileUrl(), None, {})
-                f = pywikibot.MyURLopener.open(req)
-                data = f.read()
-                break
-            except urllib2.URLError:
-                pywikibot.output( u"Error downloading data: retrying in 60 secs." )
-                time.sleep(60.)
-        if not maxtries:
-            raise pywikibot.exceptions.NoPage(u'MaxTries reached; skipping page!')
+        pywikibot.get_throttle()
+        f_url, data = self.site.getUrl(self.image.fileUrl(), no_hostname=True, 
+                                       back_response=True)
+        # needed patch for 'getUrl' applied upstream in r10441
+        # (allows to re-read from back_response)
+        data = f_url.read()
+        del f_url   # free some memory (no need to keep a copy...)
 
         f = open(self.image_path, 'wb')
         f.write( data )
@@ -329,11 +317,6 @@ class CatImagesBot(checkimages.main):
         ret.append( u'|<div style="position:relative;">' )
         ret.append( u"[[%s|200px]]" % self.image.title() )
         ret.append( self._make_markerblock(self._info[u'ColorRegions'], 200.,
-                                           structure=['Position']) )
-        ret.append( u"</div>" )
-        ret.append( u'|<div style="position:relative;">' )
-        ret.append( u"[[%s|200px]]" % self.image.title() )
-        ret.append( self._make_markerblock(self._info[u'_EXIFFaces'], 200.,
                                            structure=['Position']) )
         ret.append( u"</div>" )
         ret.append( u'|<div style="position:relative;">' )
@@ -490,15 +473,21 @@ class CatImagesBot(checkimages.main):
         
         # Faces and eyes (opencv pre-trained haar)
         self._detectObjectFaces_CV()
-        
-        # Faces (extract EXIF data)
-        self._detectObjectFaces_EXIF()
 
         for i in range(len(self._info['Faces'])):
             data = self._info['Faces'][i]
 
             c = (len(data['Eyes']) + 2.) / 4.
             self._info['Faces'][i]['Confidence'] = c
+        
+        # Faces (extract EXIF data)
+        self._detectObjectFaces_EXIF()
+        # exclude duplicates... (CV and EXIF)
+
+        for i in range(len(self._info['Faces'])):
+            if 'Confidence' not in self._info['Faces'][i]:
+                self._info['Faces'][i]['ID'] = i+1
+                self._info['Faces'][i]['Confidence'] = self._thrshld_default
 
         # Segments and colors
         self._detectSegmentColors_JSEGnPIL()
@@ -520,8 +509,8 @@ class CatImagesBot(checkimages.main):
             #    c = 0.5
             #else:
             #    c = 0.1
-            #ca = (data['Coverage'])**(1./7)                 # 0.15 -> ~0.75
-            ca = (data['Coverage'])**(1./6)                 # 0.20 -> ~0.75
+            ca = (data['Coverage'])**(1./7)                 # 0.15 -> ~0.75
+            #ca = (data['Coverage'])**(1./6)                 # 0.20 -> ~0.75
             #ca = (data['Coverage'])**(1./5)                 # 0.25 -> ~0.75
             #ca = (data['Coverage'])**(1./4)                 # 0.35 -> ~0.75
             ##cb = (0.02 * (50. - data['Delta_E']))**(1.2)    # 10.0 -> ~0.75
@@ -1804,8 +1793,6 @@ class CatImagesBot(checkimages.main):
         return res
     
     def _detectObjectFaces_EXIF(self):
-        self._info['_EXIFFaces'] = []
-        
         res = self._EXIFgetData()
         
         # http://u88.n24.queensu.ca/exiftool/forum/index.php?topic=3156.0
@@ -1836,18 +1823,22 @@ class CatImagesBot(checkimages.main):
                 # 'crop' for 'casio' omitted here...
                 (sx, sy) = (1./width, 1./height)
                 if 'FaceDetectFrameSize' in res:
-                    (width, height) = res['FaceDetectFrameSize'].split(' ')
+                    (width, height) = map(int, res['FaceDetectFrameSize'].split(' '))
                     (sx, sy) = (1./width, 1./height)
-                while ('Face%iPosition'%i) in res:
-                    buf = res['Face%iPosition'%i].split(' ')
-                    (x1, y1) = (buf[1]*sx, buf[0]*sy)
-                    (x2, y2) = (x1+buf[3]*sx, y1+buf[2]*sy)
+                while (('Face%iPosition'%i) in res) and (i <= int(res['FacesDetected'])):
+                    buf = map(int, res['Face%iPosition'%i].split(' '))
+                    (x1, y1) = (buf[0]*sx, buf[1]*sy)       # 'panasonic'
+                    (x2, y2) = (buf[2]*sx, buf[3]*sy)       #
+                    #(x1, y1) = (buf[1]*sx, buf[0]*sy)
+                    #(x2, y2) = (x1+buf[3]*sx, y1+buf[2]*sy)
                     data.append({ 'Position': (x1, y1, x2, y2) })
+                    if ('RecognizedFace%iName'%i) in res:
+                        print res['RecognizedFace%iName'%i], res['RecognizedFace%iAge'%i]
                     i += 1
         elif (make == 'fujifilm'):
             # UNTESTED: 'fujifilm'
             if set(['FacesDetected', 'FacePositions']).issubset(found):
-                buf = res['FacePositions'].split(' ')
+                buf = map(int, res['FacePositions'].split(' '))
                 (sx, sy) = (1./width, 1./height)
                 for i in range(int(res['FacesDetected'])):
                     data.append({ 'Position': [buf[i*4]*sx,   buf[i*4+1]*sy, 
@@ -1857,7 +1848,7 @@ class CatImagesBot(checkimages.main):
         elif (make == 'olympus'):
             # UNTESTED: 'olympus'
             if set(['FacesDetected', 'FaceDetectArea']).issubset(found):
-                buf = res['FaceDetectArea'].split(' ')
+                buf = map(int, res['FaceDetectArea'].split(' '))
                 for i in range(int(res['MaxFaces'])):
                     data.append({ 'Position': [buf[i*4], buf[i*4+1], buf[i*4+2], buf[i*4+3]] })
         elif make in ['pentax', 'sanyo']:
@@ -1866,14 +1857,14 @@ class CatImagesBot(checkimages.main):
                 i = 1
                 (sx, sy) = (1./width, 1./height)
                 while ('Face%iPosition'%i) in res:
-                    buf = res['Face%iPosition'%i].split(' ') + \
-                          res['Face%iSize'%i].split(' ')
+                    buf = map(int, res['Face%iPosition'%i].split(' ') + \
+                                   res['Face%iSize'%i].split(' '))
                     (x1, y1) = ((buf[0] - buf[2]/2.)*sx, (buf[1] - buf[3]/2.)*sy)
                     (x2, y2) = (x1+buf[2]*sx, y1+buf[3]*sy)
                     data.append({ 'Position': (x1, y1, x2, y2) })
                     i += 1
                 if 'FacePosition' in res:
-                    buf = res['FacePosition'].split(' ') + ['100', '100'] # how big is the face?
+                    buf = map(int, res['FacePosition'].split(' ') + ['100', '100']) # how big is the face?
                     (x1, y1) = (buf[0]*sx, buf[1]*sy)
                     (x2, y2) = (buf[2]*sx, buf[3]*sy)
                     data.append({ 'Position': (x1, y1, x2, y2) })
@@ -1881,11 +1872,11 @@ class CatImagesBot(checkimages.main):
             if   set(['FacesDetected', 'FaceDetectFrameSize']).issubset(found):
                 # UNTESTED: older models store face detect information
                 (width, height) = map(int, res['FaceDetectFrameSize'].split(' '))
-                fw = res['FaceWidth'].split(' ')
+                fw = map(int, res['FaceWidth'].split(' '))
                 i = 1
                 (sx, sy) = (1./width, 1./height)
                 while ('Face%iPosition'%i) in res:
-                    buf = res['Face%iPosition'%i].split(' ')
+                    buf = map(int, res['Face%iPosition'%i].split(' '))
                     (x1, y1) = ((buf[0] + width/2. - fw)*sx, (buf[1] + height/2. - fw)*sy)
                     (x2, y2) = (x1 + fw*2*sx, y1 + fw*2*sy)
                     data.append({ 'Position': (x1, y1, x2, y2) })
@@ -1927,8 +1918,8 @@ class CatImagesBot(checkimages.main):
 
         for i, d in enumerate(data):
             # rotate face coordinates
+            p = data[i]['Position']
             if wasRotated:
-                p = data[i]['Position']
                 if (rot == 90):
                     p = (p[1], 1-p[0], p[3], 1-p[2])
                 else:
@@ -1944,13 +1935,13 @@ class CatImagesBot(checkimages.main):
             data[i]['Position'] = (p[0], p[1], p[0]-p[2], p[3]-p[1])
 
             data[i] = { 'Position':   tuple(map(int, data[i]['Position'])),
-                        'Confidence': self._thrshld_default,
                         'ID':         (i+1),
                         'Eyes':       [], }
+            data[i]['Coverage'] = float(data[i]['Position'][2]*data[i]['Position'][3])/(self.image_size[0]*self.image_size[1])
 
         # exclude duplicates...
 
-        self._info['_EXIFFaces'] = data
+        self._info['Faces'] += data
         return
 
 gbv = Global()

@@ -57,7 +57,7 @@ your user-config.py:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: cosmetic_changes.py 10428 2012-06-29 16:13:07Z xqt $'
+__version__ = '$Id: cosmetic_changes.py 10438 2012-07-04 10:27:20Z xqt $'
 #
 import sys, re
 import wikipedia as pywikibot
@@ -169,7 +169,7 @@ class CosmeticChangesToolkit:
         text = self.translateAndCapitalizeNamespaces(text)
 ##        text = self.translateMagicWords(text)
         text = self.replaceDeprecatedTemplates(text)
-        text = self.resolveHtmlEntities(text)
+##        text = self.resolveHtmlEntities(text)
         text = self.validXhtml(text)
         text = self.removeUselessSpaces(text)
         text = self.removeNonBreakingSpaceBeforePercent(text)

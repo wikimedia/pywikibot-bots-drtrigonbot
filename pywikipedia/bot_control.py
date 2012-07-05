@@ -85,7 +85,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '10436'
+__framework_rev__ = '10441'
 __release_ver__   = '1.2'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
