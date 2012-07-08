@@ -104,9 +104,9 @@ def printWithTimeZone(message):
 class Global(object):
     # default environment settings
     # Command line configurable parameters
-    limit = 80               # How many images check?
-    untagged = False         # Use the untagged generator
-    sendemailActive = False  # Use the send-email
+#    limit = 80               # How many images to check?
+#    untagged = False         # Use the untagged generator
+#    sendemailActive = False  # Use the send-email
     useGuesses = True        # Use guesses which are less reliable than true searches
 
 
@@ -282,11 +282,11 @@ class CatImagesBot(checkimages.main):
 
         tags.add( u"[[:Category:Categorized by DrTrigonBot]]" )
         content = pywikibot.replaceCategoryLinks(content, [u"Categorized by DrTrigonBot"], site=self.site, addOnly=True)
-        content = self._add_template(content, u"Check categories|year={{subst:#time:Y}}|month={{subst:#time:F}}|day={{subst:#time:j}}|category=[[Category:Categorized by DrTrigonBot]]", top=True)
-        content = self._remove_category_or_template(content, u"Uncategorized")  # template
         content = pywikibot.replaceCategoryLinks( content, 
                 list(set(pywikibot.getCategoryLinks(content, site=self.site))),
                 site=self.site )
+        content = self._remove_category_or_template(content, u"Uncategorized")  # template
+        content = self._add_template(content, u"Check categories|year={{subst:#time:Y}}|month={{subst:#time:F}}|day={{subst:#time:j}}|category=[[Category:Categorized by DrTrigonBot]]", top=True)
         print u"--- " * 20
         print content
         print u"--- " * 20
@@ -321,8 +321,10 @@ class CatImagesBot(checkimages.main):
         ret.append( u"</div>" )
         ret.append( u'|<div style="position:relative;">' )
         ret.append( u"[[%s|200px]]" % self.image.title() )
-        ret.append( self._make_markerblock(self._info[u'_TrainedTEST'], 200.,
+        ret.append( self._make_markerblock(self._info[u'_TrainedTESTlower'], 200.,
                                            structure=['Position']) )
+        ret.append( self._make_markerblock(self._info[u'_TrainedTESTupper'], 200.,
+                                           structure=['Position'], line='dashed') )
         ret.append( u"</div>" )
         ret.append( u'|}' )
 
@@ -538,7 +540,8 @@ class CatImagesBot(checkimages.main):
 
         # general (self trained haar and cascade) classification
         # http://www.computer-vision-software.com/blog/2009/11/faq-opencv-haartraining/
-        cascade_files = [(u'TEST', 'haarcascade_fullbody.xml')]   # ...just as an example!
+        cascade_files = [(u'TESTlower', 'haarcascade_lowerbody.xml'),   # ...just as an example!
+                         (u'TESTupper', 'haarcascade_upperbody.xml')]   # ...and for testing ;)
         #cascade_files = [(u'Aeroplane', 'haarcascade_aeroplane.xml')]   # e.g. for 'Category:Unidentified aircraft'
         for cf in cascade_files:
             self._detectObjectTrained_CV(*cf)
@@ -1112,8 +1115,8 @@ class CatImagesBot(checkimages.main):
             r.width = cv.Round(r.width*0.8)
             r.y += cv.Round(r.height*0.07)
             r.height = cv.Round(r.height*0.8)
-            data = { 'ID':       (i+1),
-                     'Center':   (int(r.x + r.width*0.5), int(r.y + r.height*0.5)), }
+            data = { 'ID':       (i+1), }
+                     #'Center':   (int(r.x + r.width*0.5), int(r.y + r.height*0.5)), }
             # crop to image size (because of the slightly bigger boxes)
             r = bbox.intersect(r)
             #cv2.rectangle(img, (r.x, r.y), (r.x+r.width, r.y+r.height), cv.Scalar(0,255,0), 3)
@@ -1208,11 +1211,14 @@ class CatImagesBot(checkimages.main):
         try:
             im = Image.open(self.image_path).convert(mode = 'RGB')
 
-            # crop 25% of the image in order to give the bot a more human eye
-            scale  = 0.75    # crop 25% percent (area) bounding box
-            (w, h) = ( self.image_size[0]*math.sqrt(scale), self.image_size[1]*math.sqrt(scale) )
-            (l, t) = ( (self.image_size[0]-w)/2, (self.image_size[1]-h)/2 )
-            i = im.crop( (int(l), int(t), int(l+w), int(t+h)) )
+            ## crop 25% of the image in order to give the bot a more human eye
+            ## (needed for categorization only and thus should be done there/later)
+            #scale  = 0.75    # crop 25% percent (area) bounding box
+            #(w, h) = ( self.image_size[0]*math.sqrt(scale), self.image_size[1]*math.sqrt(scale) )
+            #(l, t) = ( (self.image_size[0]-w)/2, (self.image_size[1]-h)/2 )
+            #i = im.crop( (int(l), int(t), int(l+w), int(t+h)) )
+            (l, t) = (0, 0)
+            i = im
         except IOError:
             pywikibot.output(u'WARNING: unknown file type')
             return
@@ -1737,8 +1743,12 @@ class CatImagesBot(checkimages.main):
         #smallImg = cv2.equalizeHist( smallImg )
         im = smallImg
 
-        #found_all, corners = cv.FindChessboardCorners( im, chessboard_dim )
-        found_all, corners = cv2.findChessboardCorners( im, chessboard_dim )
+        found_all = None
+        try:
+            #found_all, corners = cv.FindChessboardCorners( im, chessboard_dim )
+            found_all, corners = cv2.findChessboardCorners( im, chessboard_dim )
+        except cv2.error, e:
+            pywikibot.output(u'%s' % e)
      
         ##cv.DrawChessboardCorners( im3, chessboard_dim, corners, found_all )
         #cv.ShowImage("win", im3);
@@ -1869,7 +1879,8 @@ class CatImagesBot(checkimages.main):
                     (x2, y2) = (buf[2]*sx, buf[3]*sy)
                     data.append({ 'Position': (x1, y1, x2, y2) })
         elif (make == 'canon'):
-            if   set(['FacesDetected', 'FaceDetectFrameSize']).issubset(found):
+            if   set(['FacesDetected', 'FaceDetectFrameSize']).issubset(found) \
+                 and (int(res['FacesDetected'])):
                 # UNTESTED: older models store face detect information
                 (width, height) = map(int, res['FaceDetectFrameSize'].split(' '))
                 fw = map(int, res['FaceWidth'].split(' '))
@@ -1949,7 +1960,7 @@ gbv = Global()
 def checkbot():
     """ Main function """
     # Command line configurable parameters
-    limit = 100 # How many images check?
+    limit = 200 # How many images to check?
     untagged = False # Use the untagged generator
     sendemailActive = False # Use the send-email
 

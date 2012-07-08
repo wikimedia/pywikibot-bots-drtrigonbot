@@ -59,7 +59,7 @@ from pywikibot.comms import http
 
 bot_config = {    # unicode values
         'TemplateName':     u'User:DrTrigonBot/Subster',    # or 'template' for 'Flagged Revisions'
-        'ErrorTemplate':    u'----\n<b>SubsterBot Exception (%s)</b>\n%s',
+        'ErrorTemplate':    u'----\n<b>SubsterBot Exception in "%s" (%s)</b>\n%s',
 
         # important to use a '.css' page here, since it HAS TO BE protected to
         # prevent malicious code injection !
@@ -255,9 +255,10 @@ class SubsterBot(basic.AutoBasicBot):
                 (exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)
                 substed_content += ast.literal_eval(item['error']) %\
                                    {'error': bot_config['ErrorTemplate'] %\
-                                     ( pywikibot.Timestamp.now().isoformat(' '), 
+                                     ( item['value'],
+                                       pywikibot.Timestamp.now().isoformat(' '), 
                                        u' ' + result.replace(u'\n', u'\n ').rstrip() ) }
-                substed_tags.append( u'>error:Template<' )
+                substed_tags.append( u'>error:%s<' % item['value'] )
 
         return (substed_content, substed_tags)
 

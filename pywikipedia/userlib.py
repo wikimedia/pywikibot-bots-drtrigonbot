@@ -7,7 +7,7 @@ Library to work with users, their pages and talk pages.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: userlib.py 10306 2012-06-07 09:22:57Z xqt $'
+__version__ = '$Id: userlib.py 10445 2012-07-08 10:08:16Z xqt $'
 
 import re
 import wikipedia as pywikibot
@@ -90,6 +90,18 @@ class User(object):
     def username(self):
         return self._name
 
+    def isRegistered(self, force=False):
+        """ Return True if a user with this name is registered on this site,
+        False otherwise.
+
+        @param force: if True, forces reloading the data from API
+        @type force: bool
+        """
+        if self.isAnonymous():
+            return False
+        else:
+            return self.registrationTime(force) != -1
+
     def isAnonymous(self):
         return ip_regexp.match(self.username) is not None
 
@@ -106,7 +118,7 @@ class User(object):
         return
 
     def registrationTime(self, force=False):
-        if not hasattr(self, '_registrationTime') or force:
+        if self._registrationTime < 0 or force:
             self._load()
         return self._registrationTime
 
@@ -578,6 +590,8 @@ class _GetAllUI(object):
                 try:
                     x = data[uj.name()]
                 except KeyError:
+                    break
+                if 'missing' in x:
                     break
                 uj._editcount = x['editcount']
                 if 'groups' in x:

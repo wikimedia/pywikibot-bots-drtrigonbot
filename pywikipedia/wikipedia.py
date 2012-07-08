@@ -119,7 +119,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 10416 2012-06-23 16:10:55Z multichill $'
+__version__ = '$Id: wikipedia.py 10443 2012-07-08 07:21:39Z xqt $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -6842,7 +6842,8 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
             'list'      : 'recentchanges',
             'rcdir'     : rcdir,
             'rctype'    : rctype,
-            'rcprop'    : ['user','comment','timestamp','title','ids','loginfo','sizes'],    #','flags','redirect','patrolled']
+            'rcprop'    : ['user', 'comment', 'timestamp', 'title', 'ids',
+                           'loginfo', 'sizes'], #', 'flags', 'redirect', 'patrolled'],
             'rcnamespace' : namespace,
             'rclimit'   : int(number),
             }
@@ -8133,7 +8134,7 @@ def handleArgs(*args):
             nonGlobalArgs.append(arg)
 
     if username:
-        config.usernames[config.family][config.mylang] = username
+        config.usernames[default_family][default_code] = username
 
     # TEST for bug #3081100
     if unicode_error:
