@@ -53,7 +53,7 @@ subdirectory.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: login.py 9692 2011-10-30 15:03:29Z xqt $'
+__version__='$Id: login.py 10446 2012-07-09 08:17:26Z xqt $'
 
 import re, os, query
 import urllib2
@@ -66,7 +66,7 @@ import config
 # second parameter, otherwise it must be None
 botList = {
     'wikipedia': {
-        'en': [u'Wikipedia:Bots/Status', 'BotS'],
+        'en': [u'Wikipedia:Bots/Status/active bots', 'BotS'],
         'simple': [u'Wikipedia:Bots', '/links']
     },
     'gentoo': {

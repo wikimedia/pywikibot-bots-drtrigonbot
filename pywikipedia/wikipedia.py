@@ -119,7 +119,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 10443 2012-07-08 07:21:39Z xqt $'
+__version__ = '$Id: wikipedia.py 10448 2012-07-09 09:43:08Z xqt $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -6790,7 +6790,10 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
             yield o, t, u, c
         return
 
-    def recentchanges(self, number = 100, rcstart = None, rcend = None, rcshow = None, rcdir='older', rctype ='edit|new', namespace=None, includeredirects=True, repeat = False, user = None, returndict = False):
+    def recentchanges(self, number=100, rcstart=None, rcend=None, rcshow=None,
+                      rcdir='older', rctype='edit|new', namespace=None,
+                      includeredirects=True, repeat=False, user=None,
+                      returndict=False):
         """
         Yield recent changes as Page objects
         uses API call: action=query&list=recentchanges&rctype=edit|new&rclimit=500
@@ -8186,8 +8189,9 @@ Global arguments available for all bots:
 
 -help             Show this help text.
 
--log              Enable the logfile. Logs will be stored in the logs
-                  subdirectory.
+-log              Enable the logfile, using the default filename
+                  "%s.log"
+                  Logs will be stored in the logs subdirectory.
 
 -log:xyz          Enable the logfile, using 'xyz' as the filename.
 
@@ -8211,7 +8215,7 @@ Global arguments available for all bots:
 (-dry)            debugging of new code (if given, doesn't do any real
                   changes, but only shows what would have been changed).
                   DEPRECATED: please use -simulate instead of -dry
-'''# % moduleName
+''' % moduleName
     output(globalHelp, toStdout=True)
     try:
         exec('import %s as module' % moduleName)
