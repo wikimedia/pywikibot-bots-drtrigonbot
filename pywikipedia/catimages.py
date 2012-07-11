@@ -1305,6 +1305,12 @@ class CatImagesBot(checkimages.main):
                 pywikibot.output(u'WARNING: unknown file type')
                 return
 
+            # http://grokbase.com/t/python/image-sig/082psaxt6k/embedded-icc-profiles
+            #icc = i.app['APP2']     # jpeg
+            #icc = i.tag[34675]      # tiff
+            #icc = re.sub('[^%s]'%string.printable, ' ', icc)
+            ## more image formats and more post-processing needed...
+
             result = { #'bands':      i.getbands(),
                        #'bbox':       i.getbbox(),
                        'Format':     i.format,

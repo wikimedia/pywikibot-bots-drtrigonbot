@@ -415,8 +415,9 @@ class SubsterBot(basic.AutoBasicBot):
 
             pywikibot.output(u'BeautifulSoup tags found by regex: %i' % len(BS_tags))
 
+            BS = BeautifulSoup.BeautifulSoup(external_buffer)
             for item in BS_tags:
-                external_data = eval('BeautifulSoup.BeautifulSoup(external_buffer).%s' % item[1])
+                external_data = eval('BS.%s' % item[1])
                 external_data = self._BS_regex_str%{'var1':value+'BS:'+item[1],'var2':value,'cont':external_data}
                 content = content.replace(item[0], external_data, 1)
 

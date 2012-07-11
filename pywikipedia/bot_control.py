@@ -286,6 +286,9 @@ class BotController:
 #  @todo try to merge/combine with 'log' from 'user-config.py' and use this
 #        mechnism alread implemented upstream
 #        \n[ JIRA: ticket? ]
+#  @todo consider using 'rrdtool' to improve logging (and logging_statistics as
+#        well as creating graphs in panel.py - may be with 'bottle' as webserver)
+#  @see  http://segfault.in/2010/03/python-rrdtool-tutorial/
 class BotLogger:
     def __init__(self, filename, console=True):
         # http://docs.python.org/howto/logging-cookbook.html#logging-to-multiple-destinations
@@ -317,6 +320,10 @@ class BotLogger:
         
         logging.shutdown()
 
+# regarding the "patch" with "still strange behaviour" below, consider:
+# http://lists.wikimedia.org/pipermail/toolserver-l/2012-June/005029.html
+# "That looks like line buffering in stdio. You can try prepending the
+# python command with: stderr -e0"
 class BotLoggerObject:
     _REGEX_boc = re.compile('\x1B\[.*?m')   # BeginOfColor
     _REGEX_eoc = re.compile('\x03\{.*?\}')  # EndOfColor
