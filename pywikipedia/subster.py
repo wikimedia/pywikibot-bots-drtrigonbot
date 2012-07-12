@@ -41,7 +41,7 @@ __version__ = '$Id$'
 import re, sys, os, string, time
 import difflib
 import BeautifulSoup
-import StringIO, zipfile, csv#, urllib
+import StringIO, zipfile, csv, urllib
 import mailbox, mimetypes, datetime, locale
 import openpyxl.reader.excel
 import crontab
@@ -340,10 +340,11 @@ class SubsterBot(basic.AutoBasicBot):
             external_buffer = mbox.find_data(param['url'])
             mbox.close()
         elif param['zip']:
-            #external_buffer = urllib.urlopen(param['url']).read()
-            f_url, external_buffer = http.request(self.site, param['url'], no_hostname=True, back_response=True)
-            external_buffer = f_url.read()
-            del f_url   # free some memory (no need to keep a copy...)
+            external_buffer = urllib.urlopen(param['url']).read()
+            # issue with r355: http://de.wikipedia.org/w/index.php?title=Vorlage:Infobox_Kreditinstitut/DatenDE&oldid=105472739
+            #f_url, external_buffer = http.request(self.site, param['url'], no_hostname=True, back_response=True)
+            #external_buffer = f_url.read()
+            #del f_url   # free some memory (no need to keep a copy...)
         else:
             external_buffer = http.request(self.site, param['url'], no_hostname = True)
 
