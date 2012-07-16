@@ -1774,17 +1774,30 @@ class CatImagesBot(checkimages.main):
         
         res = {}
         try:
-            metadata = pyexiv2.ImageMetadata(self.image_path)
-            metadata.read()
-        
-            for key in metadata.exif_keys:
-                res[key] = metadata[key]
-                
-            for key in metadata.iptc_keys:
-                res[key] = metadata[key]
-                
-            for key in metadata.xmp_keys:
-                res[key] = metadata[key]
+            if hasattr(pyexiv2, 'ImageMetadata'):
+                metadata = pyexiv2.ImageMetadata(self.image_path)
+                metadata.read()
+            
+                for key in metadata.exif_keys:
+                    res[key] = metadata[key]
+                    
+                for key in metadata.iptc_keys:
+                    res[key] = metadata[key]
+                    
+                for key in metadata.xmp_keys:
+                    res[key] = metadata[key]
+            else:
+                image = pyexiv2.Image(self.image_path)
+                image.readMetadata()
+            
+                for key in image.exifKeys():
+                    res[key] = image[key]
+                    
+                for key in image.iptcKeys():
+                    res[key] = image[key]
+                    
+                for key in image.xmpKeys():
+                    res[key] = image[key]
         except IOError:
             pass
         
@@ -1824,7 +1837,7 @@ class CatImagesBot(checkimages.main):
 
         if 'ImageWidth' in res:
             (width, height) = (res['ImageWidth'], res['ImageHeight'])
-            (width, height) = (width.replace(u'pt', u''), height.replace(u'pt', u''))
+            (width, height) = (re.sub(u'p[tx]', u'', width), re.sub(u'p[tx]', u'', height))
             (width, height) = (int(float(width)+0.5), int(float(height)+0.5))
         else:
             (width, height) = self.image_size
