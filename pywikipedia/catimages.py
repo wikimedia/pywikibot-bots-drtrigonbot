@@ -1282,12 +1282,14 @@ class CatImagesBot(checkimages.main):
 
             # http://validator.w3.org/docs/api.html#libs
             # http://pypi.python.org/pypi/py_w3c/
-            from py_w3c.validators.html.validator import HTMLValidator
+            from py_w3c.validators.html.validator import HTMLValidator, ValidationFault
             vld = HTMLValidator()
             try:
                 vld.validate(self.image.fileUrl())
                 valid = (True if vld.result.validity == 'true' else False)
             except urllib2.URLError:
+                valid = False
+            except ValidationFault:
                 valid = False
             #print vld.errors, vld.warnings
 
@@ -1432,7 +1434,9 @@ class CatImagesBot(checkimages.main):
         import jseg
         # e.g. "segdist -i test3.jpg -t 6 -r9 test3.map.gif"
         pywikibot.output(u'')
+        enable_recovery()   # enable recovery from hard crash
         jseg.segdist_cpp.main( ("segdist -i %s -t 6 -r9 %s"%(tmpjpg, tmpgif)).split(" ") )
+        disable_recovery()  # disable since everything worked out fine
         pywikibot.output(u'')
         
         os.remove( tmpjpg )
@@ -1796,8 +1800,8 @@ class CatImagesBot(checkimages.main):
                 for key in image.iptcKeys():
                     res[key] = image[key]
                     
-                for key in image.xmpKeys():
-                    res[key] = image[key]
+                #for key in image.xmpKeys():
+                #    res[key] = image[key]
         except IOError:
             pass
         
@@ -1810,6 +1814,8 @@ class CatImagesBot(checkimages.main):
         # http://search.cpan.org/~gaas/pyperl-1.0/perlmodule.pod
         data = Popen("exiftool %s" % self.image_path, 
                      shell=True, stdout=PIPE).stdout.readlines()
+        if not data:
+            raise ImportError("exiftool not found!")
         #res  = {}
         for item in data:
             #print item.strip()
@@ -2073,11 +2079,18 @@ def checkbot():
     for image in generator:
         if firstPageTitle:
             if (image.title() == firstPageTitle):
-                pywikibot.output( u"found starting page '%s' ..." % image.title() )
+                pywikibot.output( u"found last page '%s' ..." % image.title() )
                 firstPageTitle = None
+                continue
             else:
                 #pywikibot.output( u"skipping page '%s' ..." % image.title() )
                 continue
+
+        # recover from hard crash in the run before, thus skip one more page
+        if os.path.exists( os.path.join('cache', 'catimages_recovery') ):
+            pywikibot.output( u"trying to recover from hard crash, skipping page '%s' ..." % image.title() )
+            disable_recovery()
+            continue
 
         timestamp = None
         uploader = None
@@ -2122,6 +2135,17 @@ def checkbot():
             print u"\n".join(outresult)
 
 main = checkbot
+
+# for functions in C/C++ that might crash hard without any exception throwed
+# e.g. an abort due to an assert or something else
+def enable_recovery():
+    recoveryfile = open(os.path.join('cache', 'catimages_recovery'), "w")
+    recoveryfile.write('')
+    recoveryfile.close()
+
+def disable_recovery():
+    if os.path.exists( os.path.join('cache', 'catimages_recovery') ):
+        os.remove( os.path.join('cache', 'catimages_recovery') )
 
 
 # Main loop will take all the (name of the) images and then i'll check them.
