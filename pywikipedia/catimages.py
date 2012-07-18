@@ -76,10 +76,13 @@ import checkimages
 
 # DrTrigonBot framework packages
 import dtbext.pycolorname as pycolorname
-sys.path.append('dtbext')
+target = 'dtbext'
+if 'pywikipedia' in os.listdir(os.curdir):
+    target = 'pywikipedia/' + target
+sys.path.append(target)
 from colormath.color_objects import RGBColor
 from py_w3c.validators.html.validator import HTMLValidator, ValidationFault
-sys.path.remove('dtbext')
+sys.path.remove(target)
 
 locale.setlocale(locale.LC_ALL, '')
 

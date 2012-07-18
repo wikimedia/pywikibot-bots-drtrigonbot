@@ -8,9 +8,12 @@ Created on Sat Jun 30 22:57:26 2012
 import pickle, os
 
 
+target = 'dtbext/pycolorname'
+if 'pywikipedia' in os.listdir(os.curdir):
+    target = 'pywikipedia/' + target
 path = list(os.path.split(os.path.abspath(os.curdir)))
-if 'dtbext/pycolorname' not in path:
-    path.append( 'dtbext/pycolorname' )
+if target not in path:
+    path.append( target )
 path.append( '%s' )
 path = os.path.join(*path)
 
