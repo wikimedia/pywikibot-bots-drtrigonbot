@@ -9,8 +9,8 @@ import pickle, os
 
 
 path = list(os.path.split(os.path.abspath(os.curdir)))
-if 'pycolorname' not in path:
-    path.append( 'pycolorname' )
+if 'dtbext/pycolorname' not in path:
+    path.append( 'dtbext/pycolorname' )
 path.append( '%s' )
 path = os.path.join(*path)
 

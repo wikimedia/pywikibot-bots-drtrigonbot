@@ -58,7 +58,6 @@ try:
     from scipy import ndimage
     import cv
     import cv2
-    from pydmtx import DataMatrix   # linux distro package        
     import pyexiv2
     import gtk
     import rsvg                     # gnome-python2-rsvg (binding to librsvg)
@@ -67,7 +66,8 @@ except:
     # either raise the ImportError later or skip it
     pass
 # modules needing compilation are imported later on request:
-# e.g. opencv, jseg, slic, (py)zbar
+# (see https://jira.toolserver.org/browse/TS-1452)
+# e.g. opencv, jseg, slic, pydmtx, zbar
 
 # pywikipedia framework python packages
 import wikipedia as pywikibot
@@ -75,9 +75,11 @@ import pagegenerators, catlib
 import checkimages
 
 # DrTrigonBot framework packages
+import dtbext.pycolorname as pycolorname
+sys.path.append('dtbext')
 from colormath.color_objects import RGBColor
-import pycolorname
 from py_w3c.validators.html.validator import HTMLValidator, ValidationFault
+sys.path.remove('dtbext')
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -906,17 +908,17 @@ class CatImagesBot(checkimages.main):
         # https://code.ros.org/trac/opencv/browser/trunk/opencv_extra/testdata/gpu/haarcascade?rev=HEAD
         #nestedCascade = cv.Load(
         nestedCascade = cv2.CascadeClassifier(
-          'opencv/haarcascades/haarcascade_eye_tree_eyeglasses.xml',
-          #'opencv/haarcascades/haarcascade_eye.xml',
+          'dtbext/opencv/haarcascades/haarcascade_eye_tree_eyeglasses.xml',
+          #'dtbext/opencv/haarcascades/haarcascade_eye.xml',
           )
         # http://tutorial-haartraining.googlecode.com/svn/trunk/data/haarcascades/
         #cascade       = cv.Load(
         cascade       = cv2.CascadeClassifier(
-          'opencv/haarcascades/haarcascade_frontalface_alt.xml',
+          'dtbext/opencv/haarcascades/haarcascade_frontalface_alt.xml',
           # MAY BE USE 'haarcascade_frontalface_alt_tree.xml' ALSO / INSTEAD...?!!
           )
         cascadeprofil = cv2.CascadeClassifier(
-          'opencv/haarcascades/haarcascade_profileface.xml',
+          'dtbext/opencv/haarcascades/haarcascade_profileface.xml',
           )
 
         self._info['Faces'] = []
@@ -1097,9 +1099,9 @@ class CatImagesBot(checkimages.main):
         # people haar/cascaded classifier
         # use 'haarcascade_fullbody.xml', ... also (like face detection)
         cascade       = cv2.CascadeClassifier(
-          'opencv/haarcascades/haarcascade_fullbody.xml',
-          #'opencv/haarcascades/haarcascade_lowerbody.xml',
-          #'opencv/haarcascades/haarcascade_upperbody.xml',
+          'dtbext/opencv/haarcascades/haarcascade_fullbody.xml',
+          #'dtbext/opencv/haarcascades/haarcascade_lowerbody.xml',
+          #'dtbext/opencv/haarcascades/haarcascade_upperbody.xml',
           )
         objects = list(cascade.detectMultiScale( smallImg,
             1.1, 2, 0
@@ -1161,20 +1163,20 @@ class CatImagesBot(checkimages.main):
         #   source: http://code.google.com/p/open-cv-bow-demo/downloads/detail?name=bowdemo.tar.gz&can=2&q=
 
         # parts of code here should/have to be placed into e.g. a own
-        # class in 'opencv/__init__.py' script/module
+        # class in 'dtbext/opencv/__init__.py' script/module
         
         trained = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus',
                    'car', 'cat', 'chair', 'cow', 'diningtable', 'dog',
                    'horse', 'motorbike', 'person', 'pottedplant', 'sheep',
                    'sofa', 'train', 'tvmonitor',]
-        bowDescPath = '/home/ursin/data/toolserver/pywikipedia/opencv/data/bowImageDescriptors/000000.xml.gz'
+        bowDescPath = '/home/ursin/data/toolserver/pywikipedia/dtbext/opencv/data/bowImageDescriptors/000000.xml.gz'
 
         # https://code.ros.org/trac/opencv/browser/trunk/opencv/samples/cpp/bagofwords_classification.cpp?rev=3714
         # stand-alone (in shell) for training e.g. with:
-        #   BoWclassify /data/toolserver/pywikipedia/opencv/VOC2007 /data/toolserver/pywikipedia/opencv/data FAST SURF BruteForce | tee run.log
-        #   BoWclassify /data/toolserver/pywikipedia/opencv/VOC2007 /data/toolserver/pywikipedia/opencv/data HARRIS SIFT BruteForce | tee run.log
+        #   BoWclassify /data/toolserver/pywikipedia/dtbext/opencv/VOC2007 /data/toolserver/pywikipedia/dtbext/opencv/data FAST SURF BruteForce | tee run.log
+        #   BoWclassify /data/toolserver/pywikipedia/dtbext/opencv/VOC2007 /data/toolserver/pywikipedia/dtbext/opencv/data HARRIS SIFT BruteForce | tee run.log
         # http://experienceopencv.blogspot.com/2011/02/object-recognition-bag-of-keypoints.html
-        import opencv
+        import dtbext.opencv as opencv
 
         if os.path.exists(bowDescPath):
             os.remove(bowDescPath)
@@ -1183,8 +1185,8 @@ class CatImagesBot(checkimages.main):
         sys.stdout = StringIO.StringIO()
         #result = opencv.BoWclassify.main(0, '', '', '', '', '')
         result = opencv.BoWclassify.main(6, 
-                                         '/data/toolserver/pywikipedia/opencv/VOC2007', 
-                                         '/data/toolserver/pywikipedia/opencv/data', 
+                                         '/data/toolserver/pywikipedia/dtbext/opencv/VOC2007', 
+                                         '/data/toolserver/pywikipedia/dtbext/opencv/data', 
                                          'HARRIS',      # not important; given by training
                                          'SIFT',        # not important; given by training
                                          'BruteForce',  # not important; given by training
@@ -1436,7 +1438,7 @@ class CatImagesBot(checkimages.main):
 #        sys.stderr = StringIO.StringIO()
         
         # stdout, stderr not properly handeled yet
-        import jseg
+        import dtbext.jseg as jseg
         # e.g. "segdist -i test3.jpg -t 6 -r9 test3.map.gif"
         pywikibot.output(u'')
         enable_recovery()   # enable recovery from hard crash
@@ -1459,7 +1461,7 @@ class CatImagesBot(checkimages.main):
     # http://peekaboo-vision.blogspot.ch/2012/05/superpixels-for-python-pretty-slic.html
     # http://ivrg.epfl.ch/supplementary_material/RK_SLICSuperpixels/index.html
     def _SLICdetectColorSegments(self, img):
-        import slic
+        import dtbext.slic as slic
 
         im = np.array(img)
         image_argb = np.dstack([im[:, :, :1], im]).copy("C")
@@ -1586,7 +1588,7 @@ class CatImagesBot(checkimages.main):
         # http://tutorial-haartraining.googlecode.com/svn/trunk/data/haarcascades/
         # or own xml files trained onto specific file database/set
         cascade       = cv2.CascadeClassifier(
-          'opencv/haarcascades/' + cascade_file,
+          'dtbext/opencv/haarcascades/' + cascade_file,
           )
 
         self._info[u'_Trained%s' % info_desc] = []
@@ -1646,6 +1648,12 @@ class CatImagesBot(checkimages.main):
         # http://zbar.sourceforge.net/
         # http://pypi.python.org/pypi/zbar
 
+        # DataMatrix
+        try:
+            from pydmtx import DataMatrix           # linux distro package (fedora)
+        except:
+            from dtbext._pydmtx import DataMatrix   # TS (debian)
+
         ## Write a Data Matrix barcode
         #dm_write = DataMatrix()
         #dm_write.encode("Hello, world!")
@@ -1691,9 +1699,9 @@ class CatImagesBot(checkimages.main):
 
         # supports many popular symbologies
         try:
-            import zbar
+            import zbar                     # TS (debian)
         except:
-            import pyzbar as zbar
+            import dtbext._zbar as zbar     # other distros (fedora)
         
         try:
             img = Image.open(self.image_path_JPEG).convert('L')

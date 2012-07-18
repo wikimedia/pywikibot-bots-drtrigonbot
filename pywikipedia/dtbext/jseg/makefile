@@ -4,7 +4,8 @@ CP=g++
 CFLAGS = -O3 -I./jpeg-6b -L./jpeg-6b -fPIC
 # CFLAGS = -O2 -I/usr1.bizet/users/deng/Software/jpeg-6b
 LIBS = -ljpeg -lm
-PYTHON = `pyversions -d`
+#PYTHON = `pyversions -d`
+PYTHON = python`python -V 2>&1 | grep -o '[0-9]*\.[0-9]*' | head -n 1`
 #CONF = `pkg-config --libs --cflags python`
 CONF = -I/usr/include/$(PYTHON)  -l$(PYTHON)
 
