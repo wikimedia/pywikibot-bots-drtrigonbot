@@ -45,19 +45,39 @@ X                    http://toolserver.org/~daniel/WikiSense/UntaggedImages.php
 __version__ = '$Id$'
 #
 
-import re, time, urllib2, os, locale, sys, datetime
-
+# python default packages
+import re, time, urllib2, os, locale, sys, datetime, math, shutil
+import StringIO, string
+from subprocess import Popen, PIPE
 import Image
-import numpy as np
-try:
-    import cv, cv2
-except:
-    pass
-# more imports are done later on request (e.g. opencv, jseg, slic, pydmtx, (py)zbar, ...)
+#import ImageFilter
 
+# additional python packages (more exotic and problematic ones)
+try:
+    import numpy as np
+    from scipy import ndimage
+    import cv
+    import cv2
+    from pydmtx import DataMatrix   # linux distro package        
+    import pyexiv2
+    import gtk
+    import rsvg                     # gnome-python2-rsvg (binding to librsvg)
+    import cairo
+except:
+    # either raise the ImportError later or skip it
+    pass
+# modules needing compilation are imported later on request:
+# e.g. opencv, jseg, slic, (py)zbar
+
+# pywikipedia framework python packages
 import wikipedia as pywikibot
 import pagegenerators, catlib
 import checkimages
+
+# DrTrigonBot framework packages
+from colormath.color_objects import RGBColor
+import pycolorname
+from py_w3c.validators.html.validator import HTMLValidator, ValidationFault
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -184,8 +204,6 @@ class CatImagesBot(checkimages.main):
         # http://cairographics.org/pythoncairopil/
         # http://cairographics.org/pyrsvg/
         if self.image_fileext == u'.svg':
-            import cairo, rsvg              # gnome-python2-rsvg (binding to librsvg)
-
             svg = rsvg.Handle(self.image_path)
             img = cairo.ImageSurface(cairo.FORMAT_ARGB32, svg.props.width, svg.props.height)
             ctx = cairo.Context(img)
@@ -1038,8 +1056,6 @@ class CatImagesBot(checkimages.main):
         # http://opencv.willowgarage.com/documentation/cpp/basic_structures.html
         # http://www.pygtk.org/docs/pygtk/class-gdkrectangle.html
         
-        import gtk
-
         self._info['People'] = []
         scale = 1.
         try:
@@ -1159,7 +1175,6 @@ class CatImagesBot(checkimages.main):
         #   BoWclassify /data/toolserver/pywikipedia/opencv/VOC2007 /data/toolserver/pywikipedia/opencv/data HARRIS SIFT BruteForce | tee run.log
         # http://experienceopencv.blogspot.com/2011/02/object-recognition-bag-of-keypoints.html
         import opencv
-        import StringIO
 
         if os.path.exists(bowDescPath):
             os.remove(bowDescPath)
@@ -1204,9 +1219,6 @@ class CatImagesBot(checkimages.main):
     # http://code.google.com/p/pymeanshift/wiki/Examples
     # (http://pythonvision.org/basic-tutorial, http://luispedro.org/software/mahotas, http://packages.python.org/pymorph/)
     def _detectSegmentColors_JSEGnPIL(self):    # may be SLIC other other too...
-        #from PIL import Image
-        import math
-
         self._info['ColorRegions'] = []
         try:
             im = Image.open(self.image_path).convert(mode = 'RGB')
@@ -1259,8 +1271,6 @@ class CatImagesBot(checkimages.main):
     # http://en.wikipedia.org/wiki/Color_difference
     # http://www.farb-tabelle.de/en/table-of-color.htm
     def _detectAverageColor_PIL(self):
-        #from PIL import Image
-        
         self._info['ColorAverage'] = []
         try:
             # we need to have 3 channels (but e.g. grayscale 'P' has only 1)
@@ -1277,12 +1287,10 @@ class CatImagesBot(checkimages.main):
         self._info['Properties'] = []
         self.image_size = (None, None)
         if self.image_fileext == u'.svg':
-            import rsvg     # gnome-python2-rsvg
             svg = rsvg.Handle(self.image_path)
 
             # http://validator.w3.org/docs/api.html#libs
             # http://pypi.python.org/pypi/py_w3c/
-            from py_w3c.validators.html.validator import HTMLValidator, ValidationFault
             vld = HTMLValidator()
             try:
                 vld.validate(self.image.fileUrl())
@@ -1352,8 +1360,6 @@ class CatImagesBot(checkimages.main):
         data = { #'histogram': h,
                  'RGB':       rgb, }
 
-        from colormath.color_objects import RGBColor
-        import pycolorname
         #colors = pycolorname.RAL.colors
         #colors = pycolorname.pantone.Formula_Guide_Solid
         colors = pycolorname.pantone.Fashion_Home_paper
@@ -1425,7 +1431,6 @@ class CatImagesBot(checkimages.main):
         
         # ^^^  THUS RESCALING TO ABOUT 200px ABOVE  ^^^
 
-#        import StringIO
 #        stdout, stderr = sys.stdout, sys.stderr
 #        sys.stdout = StringIO.StringIO()
 #        sys.stderr = StringIO.StringIO()
@@ -1493,7 +1498,8 @@ class CatImagesBot(checkimages.main):
             center = (np.average(x)*scale, np.average(y)*scale)
             bbox   = (np.min(x)*scale, np.min(y)*scale, 
                       (np.max(x)-np.min(x))*scale, (np.max(y)-np.min(y))*scale)
-            coverage = np.count_nonzero(mask)/imgsize
+            #coverage = np.count_nonzero(mask)/imgsize
+            coverage = (mask != 0).sum()/imgsize    # count_nonzero is missing in older numpy
             mask = Image.fromarray( mask )
             h    = smallImg.histogram(mask)
             #smallImg.show()
@@ -1516,8 +1522,6 @@ class CatImagesBot(checkimages.main):
         # merge regions by simplifying through average color and re-running
         # JSEG again...
 
-        from scipy import ndimage
-        
         if not (type(np.ndarray(None)) == type(im)):
             pix = np.array(im)
         else:
@@ -1563,7 +1567,6 @@ class CatImagesBot(checkimages.main):
         pix[:,:,1] = ndimage.gaussian_filter(pix[:,:,1], .5)
         pix[:,:,2] = ndimage.gaussian_filter(pix[:,:,2], .5)
         im = Image.fromarray( pix, mode='RGB' )
-        #import ImageFilter
         #im = im.filter(ImageFilter.BLUR)   # or 'SMOOTH'
 
         return im
@@ -1643,10 +1646,6 @@ class CatImagesBot(checkimages.main):
         # http://zbar.sourceforge.net/
         # http://pypi.python.org/pypi/zbar
 
-        # DataMatrix
-        from pydmtx import DataMatrix   # linux distro package
-        #from PIL import Image
-        
         ## Write a Data Matrix barcode
         #dm_write = DataMatrix()
         #dm_write.encode("Hello, world!")
@@ -1691,8 +1690,10 @@ class CatImagesBot(checkimages.main):
         self._info['OpticalCodes'] = result
 
         # supports many popular symbologies
-        #import zbar
-        import pyzbar as zbar
+        try:
+            import zbar
+        except:
+            import pyzbar as zbar
         
         try:
             img = Image.open(self.image_path_JPEG).convert('L')
@@ -1774,7 +1775,6 @@ class CatImagesBot(checkimages.main):
     def _EXIFgetData(self):
         # http://tilloy.net/dev/pyexiv2/tutorial.html
         # (is UNFORTUNATELY NOT ABLE to handle all tags, e.g. 'FacesDetected', ...)
-        import pyexiv2
         
         res = {}
         try:
@@ -1805,9 +1805,6 @@ class CatImagesBot(checkimages.main):
         except IOError:
             pass
         
-        
-        from subprocess import Popen, PIPE
-        import string
         
         # http://www.sno.phy.queensu.ca/~phil/exiftool/
         # MIGHT BE BETTER TO USE AS PYTHON MODULE; either by wrapper or perlmodule:
@@ -2000,7 +1997,6 @@ def checkbot():
 
     # try to resume last run and continue
     if os.path.exists( os.path.join('cache', 'catimages_start') ):
-        import shutil
         shutil.copy2(os.path.join('cache', 'catimages_start'), os.path.join('cache', 'catimages_start.bak'))
         posfile = open(os.path.join('cache', 'catimages_start'), "r")
         firstPageTitle = posfile.read().decode('utf-8')
@@ -2151,6 +2147,8 @@ def disable_recovery():
 # Main loop will take all the (name of the) images and then i'll check them.
 if __name__ == "__main__":
     old = datetime.datetime.strptime(str(datetime.datetime.utcnow()).split('.')[0], "%Y-%m-%d %H:%M:%S") #timezones are UTC
+    if sys.exc_info()[0]:   # re-raise ImportError
+        raise               #
     try:
         checkbot()
         #main()
