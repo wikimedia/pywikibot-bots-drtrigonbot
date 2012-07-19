@@ -52,6 +52,10 @@ from subprocess import Popen, PIPE
 import Image
 #import ImageFilter
 
+scriptdir = os.path.dirname(sys.argv[0])
+if not os.path.isabs(scriptdir):
+    scriptdir = os.path.abspath(os.path.join(os.curdir, scriptdir))
+
 # additional python packages (more exotic and problematic ones)
 try:
     import numpy as np
@@ -76,9 +80,7 @@ import checkimages
 
 # DrTrigonBot framework packages
 import dtbext.pycolorname as pycolorname
-target = 'dtbext'
-if 'pywikipedia' in os.listdir(os.curdir):
-    target = 'pywikipedia/' + target
+target = os.path.join(scriptdir, 'dtbext')
 sys.path.append(target)
 from colormath.color_objects import RGBColor
 from py_w3c.validators.html.validator import HTMLValidator, ValidationFault
@@ -183,7 +185,7 @@ class CatImagesBot(checkimages.main):
     def downloadImage(self):
         self.image_filename  = os.path.split(self.image.fileUrl())[-1]
         self.image_fileext   = os.path.splitext(self.image_filename)[1]
-        self.image_path      = urllib2.quote(os.path.join('cache', self.image_filename[-128:]))
+        self.image_path      = urllib2.quote(os.path.join(scriptdir, ('cache/' + self.image_filename[-128:])))
         
         image_path_JPEG      = self.image_path.split(u'.')
         self.image_path_JPEG = u'.'.join(image_path_JPEG[:-1]+[u'jpg'])
@@ -1050,7 +1052,7 @@ class CatImagesBot(checkimages.main):
 
         ## see '_drawRect'
         #if result:
-        #    #image_path_new = os.path.join('cache', '0_DETECTED_' + self.image_filename)
+        #    #image_path_new = os.path.join(scriptdir, 'cache/0_DETECTED_' + self.image_filename)
         #    image_path_new = self.image_path_JPEG.replace(u"cache/", u"cache/0_DETECTED_")
         #    cv2.imwrite( image_path_new, img )
 
@@ -1419,8 +1421,8 @@ class CatImagesBot(checkimages.main):
         return data
 
     def _JSEGdetectColorSegments(self, im):
-        tmpjpg = os.path.join(os.path.abspath(os.curdir), "cache/jseg_buf.jpg")
-        tmpgif = os.path.join(os.path.abspath(os.curdir), "cache/jseg_buf.gif")
+        tmpjpg = os.path.join(scriptdir, "cache/jseg_buf.jpg")
+        tmpgif = os.path.join(scriptdir, "cache/jseg_buf.gif")
 
         # same scale func as in '_detectObjectFaces_CV'
         scale  = max([1., np.average(np.array(im.size)[0:2]/200.)])
@@ -2017,9 +2019,9 @@ def checkbot():
     sys.argv += ['-noguesses']
 
     # try to resume last run and continue
-    if os.path.exists( os.path.join('cache', 'catimages_start') ):
-        shutil.copy2(os.path.join('cache', 'catimages_start'), os.path.join('cache', 'catimages_start.bak'))
-        posfile = open(os.path.join('cache', 'catimages_start'), "r")
+    if os.path.exists( os.path.join(scriptdir, 'cache/catimages_start') ):
+        shutil.copy2(os.path.join(scriptdir, 'cache/catimages_start'), os.path.join(scriptdir, 'cache/catimages_start.bak'))
+        posfile = open(os.path.join(scriptdir, 'cache/catimages_start'), "r")
         firstPageTitle = posfile.read().decode('utf-8')
         posfile.close()
     else:
@@ -2104,7 +2106,7 @@ def checkbot():
                 continue
 
         # recover from hard crash in the run before, thus skip one more page
-        if os.path.exists( os.path.join('cache', 'catimages_recovery') ):
+        if os.path.exists( os.path.join(scriptdir, 'cache/catimages_recovery') ):
             pywikibot.output( u"trying to recover from hard crash, skipping page '%s' ..." % image.title() )
             disable_recovery()
             continue
@@ -2134,7 +2136,7 @@ def checkbot():
             pywikibot.output(u"ERROR: was not able to process page %s!!!\n" %\
                              image.title(asLink=True))
         limit += -1
-        posfile = open(os.path.join('cache', 'catimages_start'), "w")
+        posfile = open(os.path.join(scriptdir, 'cache/catimages_start'), "w")
         posfile.write( image.title().encode('utf-8') )
         posfile.close()
         if limit <= 0:
@@ -2156,13 +2158,13 @@ main = checkbot
 # for functions in C/C++ that might crash hard without any exception throwed
 # e.g. an abort due to an assert or something else
 def enable_recovery():
-    recoveryfile = open(os.path.join('cache', 'catimages_recovery'), "w")
+    recoveryfile = open(os.path.join(scriptdir, 'cache/catimages_recovery'), "w")
     recoveryfile.write('')
     recoveryfile.close()
 
 def disable_recovery():
-    if os.path.exists( os.path.join('cache', 'catimages_recovery') ):
-        os.remove( os.path.join('cache', 'catimages_recovery') )
+    if os.path.exists( os.path.join(scriptdir, 'cache/catimages_recovery') ):
+        os.remove( os.path.join(scriptdir, 'cache/catimages_recovery') )
 
 
 # Main loop will take all the (name of the) images and then i'll check them.
