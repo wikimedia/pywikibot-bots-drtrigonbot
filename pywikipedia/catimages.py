@@ -61,7 +61,11 @@ try:
     import numpy as np
     from scipy import ndimage
     import cv
+    # TS: nonofficial cv2.so backport of the testing-version of
+    # python-opencv because of missing build-host, done by DaB
+    sys.path.append('/usr/local/lib/python2.6/')
     import cv2
+    sys.path.remove('/usr/local/lib/python2.6/')
     import pyexiv2
     import gtk
     import rsvg                     # gnome-python2-rsvg (binding to librsvg)
@@ -911,26 +915,23 @@ class CatImagesBot(checkimages.main):
         # http://www.cognotics.com/opencv/servo_2007_series/part_4/index.html
 
         # https://code.ros.org/trac/opencv/browser/trunk/opencv_extra/testdata/gpu/haarcascade?rev=HEAD
-        if not os.path.exists('dtbext/opencv/haarcascades/haarcascade_eye_tree_eyeglasses.xml'):
-            raise IOError(u"No such file: '%s'" % 'dtbext/opencv/haarcascades/haarcascade_eye_tree_eyeglasses.xml')
+        xml = os.path.join(scriptdir, 'dtbext/opencv/haarcascades/haarcascade_eye_tree_eyeglasses.xml')
+        #xml = os.path.join(scriptdir, 'dtbext/opencv/haarcascades/haarcascade_eye.xml')
+        if not os.path.exists(xml):
+            raise IOError(u"No such file: '%s'" % xml)
         #nestedCascade = cv.Load(
-        nestedCascade = cv2.CascadeClassifier(
-          'dtbext/opencv/haarcascades/haarcascade_eye_tree_eyeglasses.xml',
-          #'dtbext/opencv/haarcascades/haarcascade_eye.xml',
-          )
+        nestedCascade = cv2.CascadeClassifier(xml)
         # http://tutorial-haartraining.googlecode.com/svn/trunk/data/haarcascades/
-        if not os.path.exists('dtbext/opencv/haarcascades/haarcascade_frontalface_alt.xml'):
-            raise IOError(u"No such file: '%s'" % 'dtbext/opencv/haarcascades/haarcascade_frontalface_alt.xml')
+        xml = os.path.join(scriptdir, 'dtbext/opencv/haarcascades/haarcascade_frontalface_alt.xml')
+        # MAY BE USE 'haarcascade_frontalface_alt_tree.xml' ALSO / INSTEAD...?!!
+        if not os.path.exists(xml):
+            raise IOError(u"No such file: '%s'" % xml)
         #cascade       = cv.Load(
-        cascade       = cv2.CascadeClassifier(
-          'dtbext/opencv/haarcascades/haarcascade_frontalface_alt.xml',
-          # MAY BE USE 'haarcascade_frontalface_alt_tree.xml' ALSO / INSTEAD...?!!
-          )
-        if not os.path.exists('dtbext/opencv/haarcascades/haarcascade_profileface.xml'):
-            raise IOError(u"No such file: '%s'" % 'dtbext/opencv/haarcascades/haarcascade_profileface.xml')
-        cascadeprofil = cv2.CascadeClassifier(
-          'dtbext/opencv/haarcascades/haarcascade_profileface.xml',
-          )
+        cascade       = cv2.CascadeClassifier(xml)
+        xml = os.path.join(scriptdir, 'dtbext/opencv/haarcascades/haarcascade_profileface.xml')
+        if not os.path.exists(xml):
+            raise IOError(u"No such file: '%s'" % xml)
+        cascadeprofil = cv2.CascadeClassifier(xml)
 
         self._info['Faces'] = []
         scale = 1.
@@ -1109,13 +1110,12 @@ class CatImagesBot(checkimages.main):
 
         # people haar/cascaded classifier
         # use 'haarcascade_fullbody.xml', ... also (like face detection)
-        if not os.path.exists('dtbext/opencv/haarcascades/haarcascade_fullbody.xml'):
-            raise IOError(u"No such file: '%s'" % 'dtbext/opencv/haarcascades/haarcascade_fullbody.xml')
-        cascade       = cv2.CascadeClassifier(
-          'dtbext/opencv/haarcascades/haarcascade_fullbody.xml',
-          #'dtbext/opencv/haarcascades/haarcascade_lowerbody.xml',
-          #'dtbext/opencv/haarcascades/haarcascade_upperbody.xml',
-          )
+        xml = os.path.join(scriptdir, 'dtbext/opencv/haarcascades/haarcascade_fullbody.xml')
+        #xml = os.path.join(scriptdir, 'dtbext/opencv/haarcascades/haarcascade_lowerbody.xml')
+        #xml = os.path.join(scriptdir, 'dtbext/opencv/haarcascades/haarcascade_upperbody.xml')
+        if not os.path.exists(xml):
+            raise IOError(u"No such file: '%s'" % xml)
+        cascade       = cv2.CascadeClassifier(xml)
         objects = list(cascade.detectMultiScale( smallImg,
             1.1, 2, 0
             #|cv.CV_HAAR_FIND_BIGGEST_OBJECT
@@ -1182,7 +1182,7 @@ class CatImagesBot(checkimages.main):
                    'car', 'cat', 'chair', 'cow', 'diningtable', 'dog',
                    'horse', 'motorbike', 'person', 'pottedplant', 'sheep',
                    'sofa', 'train', 'tvmonitor',]
-        bowDescPath = '/home/ursin/data/toolserver/pywikipedia/dtbext/opencv/data/bowImageDescriptors/000000.xml.gz'
+        bowDescPath = os.path.join(scriptdir, 'dtbext/opencv/data/bowImageDescriptors/000000.xml.gz')
 
         # https://code.ros.org/trac/opencv/browser/trunk/opencv/samples/cpp/bagofwords_classification.cpp?rev=3714
         # stand-alone (in shell) for training e.g. with:
@@ -1198,8 +1198,8 @@ class CatImagesBot(checkimages.main):
         sys.stdout = StringIO.StringIO()
         #result = opencv.BoWclassify.main(0, '', '', '', '', '')
         result = opencv.BoWclassify.main(6, 
-                                         '/data/toolserver/pywikipedia/dtbext/opencv/VOC2007', 
-                                         '/data/toolserver/pywikipedia/dtbext/opencv/data', 
+                                         os.path.join(scriptdir, 'dtbext/opencv/VOC2007'), 
+                                         os.path.join(scriptdir, 'dtbext/opencv/data'), 
                                          'HARRIS',      # not important; given by training
                                          'SIFT',        # not important; given by training
                                          'BruteForce',  # not important; given by training
@@ -1266,7 +1266,7 @@ class CatImagesBot(checkimages.main):
                 continue
 
             data = self._colormathDeltaEaverageColor(h)
-            data['Coverage'] = coverage
+            data['Coverage'] = float(coverage)
             data['ID']       = (i+1)
             data['Center']   = (int(center[0]+l), int(center[1]+t))
             data['Position'] = (int(bbox[0]+l), int(bbox[1]+t), int(bbox[2]), int(bbox[3]))
@@ -1600,11 +1600,10 @@ class CatImagesBot(checkimages.main):
 
         # http://tutorial-haartraining.googlecode.com/svn/trunk/data/haarcascades/
         # or own xml files trained onto specific file database/set
-        if not os.path.exists('dtbext/opencv/haarcascades/' + cascade_file):
-            raise IOError(u"No such file: '%s'" % ('dtbext/opencv/haarcascades/' + cascade_file))
-        cascade       = cv2.CascadeClassifier(
-          'dtbext/opencv/haarcascades/' + cascade_file,
-          )
+        xml = os.path.join(scriptdir, ('dtbext/opencv/haarcascades/' + cascade_file))
+        if not os.path.exists(xml):
+            raise IOError(u"No such file: '%s'" % xml)
+        cascade       = cv2.CascadeClassifier(xml)
 
         self._info[u'_Trained%s' % info_desc] = []
         scale = 1.

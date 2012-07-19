@@ -1,11 +1,16 @@
+import sys, os
+scriptdir = os.path.dirname(sys.argv[0])
+if not os.path.isabs(scriptdir):
+    scriptdir = os.path.abspath(os.path.join(os.curdir, scriptdir))
+
 try:
     # try to import
     import segdist_cpp
 except ImportError:
-    import os
+    #import os
 
     cur = os.path.abspath(os.curdir)
-    os.chdir( os.path.join(os.path.abspath(os.curdir), 'dtbext/jseg') )
+    os.chdir( os.path.join(scriptdir, 'dtbext/jseg') )
 
     # compile python module (may be use 'distutil' instead of 'make' here)
     if os.system("make segdist_cpp.so"):
