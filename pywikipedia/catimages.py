@@ -950,10 +950,10 @@ class CatImagesBot(checkimages.main):
             # how small and how many features are detected as faces (or eyes)
             scale  = max([1., np.average(np.array(img.shape)[0:2]/500.)])
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type')
+            pywikibot.output(u'WARNING: unknown file type [_detectObjectFaces_CV]')
             return
         except AttributeError:
-            pywikibot.output(u'WARNING: unknown file type')
+            pywikibot.output(u'WARNING: unknown file type [_detectObjectFaces_CV]')
             return
 
         #detectAndDraw( image, cascade, nestedCascade, scale );
@@ -1084,10 +1084,10 @@ class CatImagesBot(checkimages.main):
             scale  = max([1., np.average(np.array(img.shape)[0:2]/400.)])
             #scale  = max([1., np.average(np.array(img.shape)[0:2]/300.)])
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type')
+            pywikibot.output(u'WARNING: unknown file type [_detectObjectPeople_CV]')
             return
         except AttributeError:
-            pywikibot.output(u'WARNING: unknown file type')
+            pywikibot.output(u'WARNING: unknown file type [_detectObjectPeople_CV]')
             return
 
         # similar to face detection
@@ -1236,7 +1236,8 @@ class CatImagesBot(checkimages.main):
     def _detectSegmentColors_JSEGnPIL(self):    # may be SLIC other other too...
         self._info['ColorRegions'] = []
         try:
-            im = Image.open(self.image_path).convert(mode = 'RGB')
+            #im = Image.open(self.image_path).convert(mode = 'RGB')
+            im = Image.open(self.image_path_JPEG)
 
             ## crop 25% of the image in order to give the bot a more human eye
             ## (needed for categorization only and thus should be done there/later)
@@ -1247,7 +1248,7 @@ class CatImagesBot(checkimages.main):
             (l, t) = (0, 0)
             i = im
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type')
+            pywikibot.output(u'WARNING: unknown file type [_detectSegmentColors_JSEGnPIL]')
             return
 
         result = []
@@ -1289,10 +1290,11 @@ class CatImagesBot(checkimages.main):
         self._info['ColorAverage'] = []
         try:
             # we need to have 3 channels (but e.g. grayscale 'P' has only 1)
-            i = Image.open(self.image_path).convert(mode = 'RGB')
+            #i = Image.open(self.image_path).convert(mode = 'RGB')
+            i = Image.open(self.image_path_JPEG)
             h = i.histogram()
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type')
+            pywikibot.output(u'WARNING: unknown file type [_detectAverageColor_PIL]')
             return
         
         self._info['ColorAverage'] = [self._colormathDeltaEaverageColor(h)]
@@ -1327,7 +1329,7 @@ class CatImagesBot(checkimages.main):
             try:
                 i = Image.open(self.image_path)
             except IOError:
-                pywikibot.output(u'WARNING: unknown file type')
+                pywikibot.output(u'WARNING: unknown file type [_detectProperties_PIL]')
                 return
 
             # http://grokbase.com/t/python/image-sig/082psaxt6k/embedded-icc-profiles
@@ -1430,7 +1432,7 @@ class CatImagesBot(checkimages.main):
         try:
             smallImg = im.resize( tuple(np.int_(np.array(im.size)/scale)), Image.ANTIALIAS )
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type')
+            pywikibot.output(u'WARNING: unknown file type [_JSEGdetectColorSegments]')
             return
         
         #im.thumbnail(size, Image.ANTIALIAS) # size is 640x480
@@ -1499,7 +1501,7 @@ class CatImagesBot(checkimages.main):
         try:
             smallImg = im.resize( tuple(np.int_(np.array(im.size)/scale)), Image.ANTIALIAS )
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type')
+            pywikibot.output(u'WARNING: unknown file type [_PILgetColorSegmentsHist]')
             return
 
         imgsize = float(smallImg.size[0]*smallImg.size[1])
@@ -1614,10 +1616,10 @@ class CatImagesBot(checkimages.main):
             scale  = max([1., np.average(np.array(img.shape)[0:2]/500.)])
             #scale  = max([1., np.average(np.array(img.shape)[0:2]/300.)])
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type')
+            pywikibot.output(u'WARNING: unknown file type [_detectObjectTrained_CV]')
             return
         except AttributeError:
-            pywikibot.output(u'WARNING: unknown file type')
+            pywikibot.output(u'WARNING: unknown file type [_detectObjectTrained_CV]')
             return
 
         # similar to face detection
@@ -1683,7 +1685,7 @@ class CatImagesBot(checkimages.main):
 
             scale  = max([1., np.average(np.array(img.size)/200.)])
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type')
+            pywikibot.output(u'WARNING: unknown file type [_recognizeOpticalCodes_dmtxNzbar]')
             return
         
         smallImg = img.resize( (int(img.size[0]/scale), int(img.size[1]/scale)) )
@@ -1718,7 +1720,7 @@ class CatImagesBot(checkimages.main):
             img = Image.open(self.image_path_JPEG).convert('L')
             width, height = img.size
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type')
+            pywikibot.output(u'WARNING: unknown file type [_recognizeOpticalCodes_dmtxNzbar]')
             return
         
         scanner = zbar.ImageScanner()
@@ -1761,10 +1763,10 @@ class CatImagesBot(checkimages.main):
 
             scale  = max([1., np.average(np.array(im.shape)[0:2]/500.)])
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type')
+            pywikibot.output(u'WARNING: unknown file type [_detectObjectChessboard_CV]')
             return
         except AttributeError:
-            pywikibot.output(u'WARNING: unknown file type')
+            pywikibot.output(u'WARNING: unknown file type [_detectObjectChessboard_CV]')
             return
 
         smallImg = np.empty( (cv.Round(im.shape[1]/scale), cv.Round(im.shape[0]/scale)), dtype=np.uint8 )
@@ -1859,6 +1861,9 @@ class CatImagesBot(checkimages.main):
 
         if 'ImageWidth' in res:
             (width, height) = (res['ImageWidth'], res['ImageHeight'])
+            if (u'mm' in width) or (u'mm' in height):
+                pywikibot.output(u'WARNING: %s contains incompatible unit(s), skipped' % ((width, height),))
+                return
             (width, height) = (re.sub(u'p[tx]', u'', width), re.sub(u'p[tx]', u'', height))
             (width, height) = (int(float(width)+0.5), int(float(height)+0.5))
         else:
