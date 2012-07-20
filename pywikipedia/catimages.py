@@ -46,7 +46,7 @@ __version__ = '$Id$'
 #
 
 # python default packages
-import re, time, urllib2, os, locale, sys, datetime, math, shutil
+import re, time, urllib2, os, locale, sys, datetime, math, shutil, warnings
 import StringIO, string
 from subprocess import Popen, PIPE
 import Image
@@ -67,7 +67,10 @@ try:
     import cv2
     sys.path.remove('/usr/local/lib/python2.6/')
     import pyexiv2
+    warnings.simplefilter('ignore', Warning)   # if no display present
     import gtk
+    #warnings.resetwarnings()
+    warnings.simplefilter('default', Warning)
     import rsvg                     # gnome-python2-rsvg (binding to librsvg)
     import cairo
 except:
@@ -1825,6 +1828,8 @@ class CatImagesBot(checkimages.main):
                 #    res[key] = image[key]
         except IOError:
             pass
+        except RuntimeError:
+            pass
         
         
         # http://www.sno.phy.queensu.ca/~phil/exiftool/
@@ -1861,11 +1866,12 @@ class CatImagesBot(checkimages.main):
 
         if 'ImageWidth' in res:
             (width, height) = (res['ImageWidth'], res['ImageHeight'])
-            if (u'mm' in width) or (u'mm' in height):
+            (width, height) = (re.sub(u'p[tx]', u'', width), re.sub(u'p[tx]', u'', height))
+            try:
+                (width, height) = (int(float(width)+0.5), int(float(height)+0.5))
+            except ValueError:
                 pywikibot.output(u'WARNING: %s contains incompatible unit(s), skipped' % ((width, height),))
                 return
-            (width, height) = (re.sub(u'p[tx]', u'', width), re.sub(u'p[tx]', u'', height))
-            (width, height) = (int(float(width)+0.5), int(float(height)+0.5))
         else:
             (width, height) = self.image_size
         wasRotated = (height > width)
