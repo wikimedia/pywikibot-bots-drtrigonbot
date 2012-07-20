@@ -248,7 +248,7 @@ class CatImagesBot(checkimages.main):
     # (and category scripts/bots too...)
     def checkStep(self):
         #print self.image_path
-        pywikibot.output(self.image.title())
+        pywikibot.output(u'Processing media %s ...' % self.image.title(asLink=True))
 
         if gbv.useGuesses:
             self.thrshld = self._thrshld_guesses
@@ -1446,18 +1446,15 @@ class CatImagesBot(checkimages.main):
         
         # ^^^  THUS RESCALING TO ABOUT 200px ABOVE  ^^^
 
-#        stdout, stderr = sys.stdout, sys.stderr
-#        sys.stdout = StringIO.StringIO()
-#        sys.stderr = StringIO.StringIO()
-        
-        # stdout, stderr not properly handeled yet
+        # sys.stdout handeled, but with freopen which could give issues
         import dtbext.jseg as jseg
         # e.g. "segdist -i test3.jpg -t 6 -r9 test3.map.gif"
-        pywikibot.output(u'')
         enable_recovery()   # enable recovery from hard crash
         jseg.segdist_cpp.main( ("segdist -i %s -t 6 -r9 %s"%(tmpjpg, tmpgif)).split(" ") )
         disable_recovery()  # disable since everything worked out fine
-        pywikibot.output(u'')
+        out = open((tmpgif + ".stdout"), "r").read()    # reading stdout
+        #print out
+        os.remove(tmpgif + ".stdout")
         
         os.remove( tmpjpg )
         

@@ -9,6 +9,7 @@
 #include <boost/python/stl_iterator.hpp>
 #include <vector>
 //#include <iostream>
+//#include <cstdio>
 
 using namespace std;
 
@@ -47,8 +48,24 @@ void worker_python(const boost::python::list& str_list = boost::python::list())
     cout << endl;
 */
 
+    /* redirecting stdout for python (NOT the C++ std:cout stream!) */
+    /* http://www.cplusplus.com/reference/clibrary/cstdio/freopen/ */
+    /* http://c-faq.com/stdio/rd.kirby.c (dup, dup2 not available on all OS) */
+    fpos_t pos;
+    fflush(stdout);
+    fgetpos(stdout, &pos);
+    int fd = dup(fileno(stdout));
+    freopen((strvec[6] + ".stdout").c_str(), "w", stdout);
+
     // call the actual worker function
     worker(strvec.size(), cstr);
+
+    // reset stdout change (to initial state)
+    fflush(stdout);
+    dup2(fd, fileno(stdout));
+    close(fd);
+    clearerr(stdout);
+    fsetpos(stdout, &pos);        /* for C9X */
 
     // free dynamic memory
     for (unsigned long i=0; i<strvec.size(); i++) delete[] cstr[i];
