@@ -46,7 +46,7 @@ __version__ = '$Id$'
 #
 
 # python default packages
-import re, time, urllib2, os, locale, sys, datetime, math, shutil, warnings
+import re, time, urllib2, os, locale, sys, datetime, math, shutil
 import StringIO, string
 from subprocess import Popen, PIPE
 import Image
@@ -67,10 +67,7 @@ try:
     import cv2
     sys.path.remove('/usr/local/lib/python2.6/')
     import pyexiv2
-    warnings.simplefilter('ignore', Warning)   # if no display present
     import gtk
-    #warnings.resetwarnings()
-    warnings.simplefilter('default', Warning)
     import rsvg                     # gnome-python2-rsvg (binding to librsvg)
     import cairo
 except:
@@ -2012,7 +2009,7 @@ gbv = Global()
 def checkbot():
     """ Main function """
     # Command line configurable parameters
-    limit = 200 # How many images to check?
+    limit = 250 # How many images to check?
     untagged = False # Use the untagged generator
     sendemailActive = False # Use the send-email
 
