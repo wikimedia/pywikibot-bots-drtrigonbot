@@ -1,16 +1,24 @@
 import sys, os
+
 scriptdir = os.path.dirname(sys.argv[0])
 if not os.path.isabs(scriptdir):
     scriptdir = os.path.abspath(os.path.join(os.curdir, scriptdir))
-sys.path.append(os.path.join(scriptdir, 'dtbext/_pydmtx/build/lib.linux-x86_64-%s.%s' % sys.version_info[:2]))
+
+libdir = os.path.join(scriptdir, 'dtbext/_pydmtx/build/lib.linux-x86_64-%s.%s' % sys.version_info[:2])
+sys.path.append(os.path.join(libdir)
+
 try:
     # try to import
     from pydmtx import DataMatrix
-except ImportError:
-    #import os
+except ImportError, e:
+    print "(re-)compilation triggered because of: '%s'" % e
 
     cur = os.path.abspath(os.curdir)
     os.chdir( os.path.join(scriptdir, 'dtbext/_pydmtx') )
+
+    # remove/reset if existing already
+    if os.path.exists(os.path.join(scriptdir, '_pydmtx.so')):
+        os.remove( os.path.join(scriptdir, '_pydmtx.so') )
 
     # compile python module (may be use 'distutil' instead of 'make' here)
     if os.system("python setup.py build"):
