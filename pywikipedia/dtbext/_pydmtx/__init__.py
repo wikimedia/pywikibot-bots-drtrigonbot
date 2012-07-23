@@ -5,7 +5,7 @@ if not os.path.isabs(scriptdir):
     scriptdir = os.path.abspath(os.path.join(os.curdir, scriptdir))
 
 libdir = os.path.join(scriptdir, 'dtbext/_pydmtx/build/lib.linux-x86_64-%s.%s' % sys.version_info[:2])
-sys.path.append(os.path.join(libdir)
+sys.path.append(os.path.join(libdir))
 
 try:
     # try to import
