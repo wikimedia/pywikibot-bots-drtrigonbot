@@ -586,7 +586,7 @@ class CatImagesBot(checkimages.main):
             self._detectObjectTrained_CV(*cf)
 
         # optical and other text recognition (tesseract & ocropus, ...)
-        self._detectEmbeddedText_poppler()
+        self._detectEmbeddedText_popplerNpdfminer()
         #self._recognizeOpticalText_x()
         # (no full recognition but just classify as 'contains text')
 
@@ -1672,7 +1672,7 @@ class CatImagesBot(checkimages.main):
         # tesseract imagename.tif output
         pass
 
-    def _detectEmbeddedText_poppler(self):
+    def _detectEmbeddedText_popplerNpdfminer(self):
         # may be also: http://www.reportlab.com/software/opensource/rl-toolkit/
 
         self._info['Text'] = []
@@ -1715,7 +1715,7 @@ class CatImagesBot(checkimages.main):
             #device = pdfdevice.TagExtractor(rsrcmgr, outfp, codec='utf-8')
             fp = file(self.image_path, 'rb')
             pdfinterp.process_pdf(rsrcmgr, device, fp, set(), maxpages=0, password='',
-                        caching=True, check_extractable=True)
+                        caching=True, check_extractable=False)
             fp.close()
             device.close()
             data = outfp.getvalue().splitlines(True)
