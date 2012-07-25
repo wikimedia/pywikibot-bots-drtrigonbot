@@ -753,7 +753,7 @@ class CatImagesBot(checkimages.main):
         pdf    = u'PDF' in self._info_filter['Properties'][0]['Format']
         result = self._info_filter['Text']
         relevance = pdf and len(result) and \
-                    (result[0]['Size'] >= 1E4) and (result[0]['Lines'] >= 100)
+                    (result[0]['Size'] >= 5E4) and (result[0]['Lines'] >= 1000)
         # number of pages >= 10
 
         return (u'Books (literature) in PDF', relevance)
