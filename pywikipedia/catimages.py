@@ -76,6 +76,7 @@ except:
 # modules needing compilation are imported later on request:
 # (see https://jira.toolserver.org/browse/TS-1452)
 # e.g. opencv, jseg, slic, pydmtx, zbar
+# binaries: exiftool, pdftotext
 
 # pywikipedia framework python packages
 import wikipedia as pywikibot
@@ -89,6 +90,7 @@ sys.path.append(target)
 from colormath.color_objects import RGBColor
 from py_w3c.validators.html.validator import HTMLValidator, ValidationFault
 sys.path.remove(target)
+from dtbext.pdfminer import pdfparser, pdfinterp, pdfdevice, converter, cmapdb, layout
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -159,7 +161,7 @@ class CatImagesBot(checkimages.main):
         #pywikibot.output(u'\n\t...Listing the procedures available...\n')
         pywikibot.output(u'\n\t...Listing the procedures used...\n')
         
-        self._funcs = {'filter': [], 'cat': [], 'guess': []}
+        self._funcs = {'filter': [], 'cat': [], 'addcat': [], 'guess': []}
 
         for item in dir(self):
             s = item.split('_')
@@ -258,6 +260,7 @@ class CatImagesBot(checkimages.main):
         self._info         = {}     # used for LOG/DEBUG OUTPUT ONLY
         self._info_filter  = {}     # used for CATEGORIZATION
         self._result_check = []
+        self._result_add   = []
 
         # gather all information related to current image
         self.gatherInformation()
@@ -274,6 +277,15 @@ class CatImagesBot(checkimages.main):
             if rel:
                 self._result_check.append( cat )
         self._result_check = list(set(self._result_check))
+
+        # categorization: conditional (only if the ones before are present)
+        # (does not trigger report to page)
+        for item in self._funcs['addcat']:
+            (cat, rel) = self.__class__.__dict__[item](self)
+            #print cat, result, len(result)
+            if rel:
+                self._result_add.append( cat )
+        self._result_add = list(set(self._result_add))
 
         # categorization: use guesses for unreliable classification (rel = 0.1)
         if not gbv.useGuesses:
@@ -305,12 +317,10 @@ class CatImagesBot(checkimages.main):
                 content = self._append_to_template(content, u"FileContentsByBot", info)
 
         tags = set([])
-        for i, cat in enumerate(self._result_check):
+        for i, cat in enumerate(list(set(self._result_check + self._result_add))):
             tags.add( u"[[:Category:%s]]" % cat )
             content = pywikibot.replaceCategoryLinks(content, [cat], site=self.site, addOnly=True)
 
-        tags.add( u"[[:Category:Categorized by DrTrigonBot]]" )
-        content = pywikibot.replaceCategoryLinks(content, [u"Categorized by DrTrigonBot"], site=self.site, addOnly=True)
         content = pywikibot.replaceCategoryLinks( content, 
                 list(set(pywikibot.getCategoryLinks(content, site=self.site))),
                 site=self.site )
@@ -358,7 +368,7 @@ class CatImagesBot(checkimages.main):
         ret.append( u'|}' )
 
         color = {True: "rgb(0,255,0)", False: "rgb(255,0,0)"}[bool(self._result_check)]
-        ret.append( u"<div style='background:%s'>'''automatic categorization''': %s</div>" % (color, u", ".join(self._result_check)) )
+        ret.append( u"<div style='background:%s'>'''automatic categorization''': %s</div>" % (color, u", ".join(list(set(self._result_check + self._result_add)))) )
 
         buf = []
         for i, key in enumerate(self._info):
@@ -575,7 +585,8 @@ class CatImagesBot(checkimages.main):
         for cf in cascade_files:
             self._detectObjectTrained_CV(*cf)
 
-        # optical text recognition (tesseract & ocropus, ...)
+        # optical and other text recognition (tesseract & ocropus, ...)
+        self._detectEmbeddedText_poppler()
         #self._recognizeOpticalText_x()
         # (no full recognition but just classify as 'contains text')
 
@@ -671,6 +682,11 @@ class CatImagesBot(checkimages.main):
         result = self._info['Chessboard']
         return {'Chessboard': result}
 
+    def _filter_Text(self):
+        # use all, since detection should be very reliable
+        result = self._info['Text']
+        return {'Text': result}
+
     # Category:Unidentified people
     def _cat_people_People(self):
         #relevance = bool(self._info_filter['People'])
@@ -731,6 +747,51 @@ class CatImagesBot(checkimages.main):
         relevance = bool(self._info_filter['Chessboard'])
 
         return (u'Chessboards', relevance)
+
+    # Category:Books (literature) in PDF
+    def _cat_text_BooksPDF(self):
+        pdf    = u'PDF' in self._info_filter['Properties'][0]['Format']
+        result = self._info_filter['Text']
+        relevance = pdf and len(result) and \
+                    (result[0]['Size'] >= 1E4) and (result[0]['Lines'] >= 100)
+        # number of pages >= 10
+
+        return (u'Books (literature) in PDF', relevance)
+
+    # Category:Categorized by DrTrigonBot
+    def _addcat_BOT(self):
+        # - ALWAYS -
+        return (u"Categorized by DrTrigonBot", True)
+
+    # Category:BMP
+    # Category:TIFF
+    # Category:PNG
+    # Category:JPEG
+    # (more image formats/extensions according to PIL)
+    # Category:PDF files
+    def _addcat_prop_general(self):
+        fmt = self._info_filter['Properties'][0]['Format']
+        if   u'SVG' in fmt:
+            # additional to PIL (rsvg, ...)
+            # should be added as template instead of category (!)
+            fmt = u''
+        elif u'PDF' in fmt:
+            # additional to PIL (...)
+            fmt = u'PDF files'
+        # PIL: http://www.pythonware.com/library/pil/handbook/index.htm
+
+        return (fmt, bool(fmt))
+
+#    # TODO: add templates (conditional/additional like 'addcat')
+#    # Category:SVG - Category:Valid SVG‎ - Category:Invalid SVG
+#    # {{ValidSVG}} - {{InvalidSVG}}
+#    def _addtempl_prop_SVN(self):
+#        fmt = self._info_filter['Properties'][0]['Format']
+#        d   = { u'Valid SVG':   u'{{ValidSVG}}',
+#                u'Invalid SVG': u'{{InvalidSVG}}', }
+#        fmt = d.get(fmt, u'')
+#
+#        return (fmt, bool(fmt))
 
     # Category:Unidentified people
     def _guess__People(self):
@@ -825,82 +886,31 @@ class CatImagesBot(checkimages.main):
     # Category:Yellow    (255, 255,   0)
     # http://www.farb-tabelle.de/en/table-of-color.htm
     #def _collectColor(self):
-    def _cat_color_Black(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Black' == item[u'Color']):
-                return (u'Black', True)
-        return (u'Black', False)
+    #def _cat_color_Black(self):
+    #    info = self._info_filter['ColorRegions']
+    #    for item in info:
+    #        if (u'Black' == item[u'Color']):
+    #            return (u'Black', True)
+    #    return (u'Black', False)
 
-    def _cat_color_Blue(self):
+    def __cat_color_general(self, col):
         info = self._info_filter['ColorRegions']
         for item in info:
-            if (u'Blue' == item[u'Color']):
-                return (u'Blue', True)
-        return (u'Blue', False)
+            if (col == item[u'Color']):
+                return (col, True)
+        return (col, False)
 
-    def _cat_color_Brown(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Brown' == item[u'Color']):
-                return (u'Brown', True)
-        return (u'Brown', False)
-
-    def _cat_color_Green(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Green' == item[u'Color']):
-                return (u'Green', True)
-        return (u'Green', False)
-
-    def _cat_color_Orange(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Orange' == item[u'Color']):
-                return (u'Orange', True)
-        return (u'Orange', False)
-
-    def _cat_color_Pink(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Pink' == item[u'Color']):
-                return (u'Pink', True)
-        return (u'Pink', False)
-
-    def _cat_color_Purple(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Purple' == item[u'Color']):
-                return (u'Purple', True)
-        return (u'Purple', False)
-
-    def _cat_color_Red(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Red' == item[u'Color']):
-                return (u'Red', True)
-        return (u'Red', False)
-
-    def _cat_color_Turquoise(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Turquoise' == item[u'Color']):
-                return (u'Turquoise', True)
-        return (u'Turquoise', False)
-
-    def _cat_color_White(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'White' == item[u'Color']):
-                return (u'White', True)
-        return (u'White', False)
-
-    def _cat_color_Yellow(self):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (u'Yellow' == item[u'Color']):
-                return (u'Yellow', True)
-        return (u'Yellow', False)
+    _cat_color_Black     = lambda self: self.__cat_color_general(u'Black')
+    _cat_color_Blue      = lambda self: self.__cat_color_general(u'Blue')
+    _cat_color_Brown     = lambda self: self.__cat_color_general(u'Brown')
+    _cat_color_Green     = lambda self: self.__cat_color_general(u'Green')
+    _cat_color_Orange    = lambda self: self.__cat_color_general(u'Orange')
+    _cat_color_Pink      = lambda self: self.__cat_color_general(u'Pink')
+    _cat_color_Purple    = lambda self: self.__cat_color_general(u'Purple')
+    _cat_color_Red       = lambda self: self.__cat_color_general(u'Red')
+    _cat_color_Turquoise = lambda self: self.__cat_color_general(u'Turquoise')
+    _cat_color_White     = lambda self: self.__cat_color_general(u'White')
+    _cat_color_Yellow    = lambda self: self.__cat_color_general(u'Yellow')
 
     # .../opencv/samples/c/facedetect.cpp
     # http://opencv.willowgarage.com/documentation/python/genindex.html
@@ -1309,22 +1319,29 @@ class CatImagesBot(checkimages.main):
             # http://validator.w3.org/docs/api.html#libs
             # http://pypi.python.org/pypi/py_w3c/
             vld = HTMLValidator()
+            valid = u'SVG'
             try:
                 vld.validate(self.image.fileUrl())
-                valid = (True if vld.result.validity == 'true' else False)
+                valid = (u'Valid SVG' if vld.result.validity == 'true' else u'Invalid SVG')
             except urllib2.URLError:
-                valid = False
+                pass
             except ValidationFault:
-                valid = False
+                pass
             #print vld.errors, vld.warnings
 
-            result = { 'Format':     u'SVG%s' % (u' (valid)' if valid else u''),
+            self.image_size = (svg.props.width, svg.props.height)
+
+            result = { 'Format':     valid,
                        'Mode':       u'-',
-                       'Dimensions': (svg.props.width, svg.props.height),
-                       'Filesize':   os.path.getsize(self.image_path),
                        'Palette':    u'-', }
             # may be set {{validSVG}} also or do something in bot template to
             # recognize 'Format=SVG (valid)' ...
+        elif self.image_fileext == u'.pdf':
+            self.image_size = (0, 0)    # unknown?!? (page size)
+
+            result = { 'Format':     u'PDF',
+                       'Mode':       u'-',
+                       'Palette':    u'-', }
         else:
             try:
                 i = Image.open(self.image_path)
@@ -1338,17 +1355,18 @@ class CatImagesBot(checkimages.main):
             #icc = re.sub('[^%s]'%string.printable, ' ', icc)
             ## more image formats and more post-processing needed...
 
+            self.image_size = i.size
+
             result = { #'bands':      i.getbands(),
                        #'bbox':       i.getbbox(),
                        'Format':     i.format,
                        'Mode':       i.mode,
-                       'Dimensions': i.size,
                        #'info':       i.info,
-                       'Filesize':   os.path.getsize(self.image_path),
                        #'stat':       os.stat(self.image_path),
                        'Palette':    str(len(i.palette.palette)) if i.palette else u'-', }
 
-        self.image_size = result['Dimensions']
+        result['Dimensions'] = self.image_size
+        result['Filesize']   = os.path.getsize(self.image_path)
 
         self._info['Properties'] = [result]
         return
@@ -1654,6 +1672,67 @@ class CatImagesBot(checkimages.main):
         # tesseract imagename.tif output
         pass
 
+    def _detectEmbeddedText_poppler(self):
+        # may be also: http://www.reportlab.com/software/opensource/rl-toolkit/
+
+        self._info['Text'] = []
+
+        if self.image_fileext == u'.pdf':
+#            # poppler pdftotext
+#            # (similar as in '_EXIFgetData' but with stderr)
+#            # http://poppler.freedesktop.org/
+#            # http://www.izzycode.com/bash/how-to-install-pdf2text-on-centos-fedora-redhat.html
+#            # MIGHT BE BETTER TO USE AS PYTHON MODULE:
+#            # https://launchpad.net/poppler-python/
+#            # http://stackoverflow.com/questions/2732178/extracting-text-from-pdf-with-poppler-c
+#            # http://stackoverflow.com/questions/25665/python-module-for-converting-pdf-to-text
+#            data = Popen("pdftotext %s %s" % (self.image_path, self.image_path+'.txt'), 
+#                         shell=True, stderr=PIPE).stderr.readlines()
+#            if data:
+#                raise ImportError("pdftotext not found!")
+#            data = open(self.image_path+'.txt', 'r').readlines()
+#            os.remove( self.image_path+'.txt' )
+#            
+#            (s1, l1) = (len(u''.join(data)), len(data))
+
+            # pdfminer (tools/pdf2txt.py)
+            debug = 0
+            laparams = layout.LAParams()
+            #
+            pdfparser.PDFDocument.debug        = debug
+            pdfparser.PDFParser.debug          = debug
+            cmapdb.CMapDB.debug                = debug
+            pdfinterp.PDFResourceManager.debug = debug
+            pdfinterp.PDFPageInterpreter.debug = debug
+            pdfdevice.PDFDevice.debug          = debug
+            #
+            rsrcmgr = pdfinterp.PDFResourceManager(caching=True)
+            outfp = StringIO.StringIO()
+            device = converter.TextConverter(rsrcmgr, outfp, codec='utf-8', laparams=laparams)
+            #device = converter.XMLConverter(rsrcmgr, outfp, codec='utf-8', laparams=laparams, outdir=None)
+            #device = converter.HTMLConverter(rsrcmgr, outfp, codec='utf-8', scale=1,
+            #                       layoutmode='normal', laparams=laparams, outdir=None)
+            #device = pdfdevice.TagExtractor(rsrcmgr, outfp, codec='utf-8')
+            fp = file(self.image_path, 'rb')
+            pdfinterp.process_pdf(rsrcmgr, device, fp, set(), maxpages=0, password='',
+                        caching=True, check_extractable=True)
+            fp.close()
+            device.close()
+            data = outfp.getvalue().splitlines(True)
+
+            (s2, l2) = (len(u''.join(data)), len(data))
+            (s1, l1) = (s2, l2) # (no/skip average)
+
+            result = { 'Size':     (s1+s2)/2,   # average
+                       'Lines':    (l1+l2)/2,   #
+                       #'Data':     data,
+                       #'Position': pos,
+                       'Type':     u'-', }  # 'Type' could be u'OCR' above...
+
+            self._info['Text'] = [result]
+
+        return
+
     def _recognizeOpticalCodes_dmtxNzbar(self):
         # barcode and Data Matrix recognition (libdmtx/pydmtx, zbar, gocr?)
         # http://libdmtx.wikidot.com/libdmtx-python-wrapper
@@ -1832,6 +1911,7 @@ class CatImagesBot(checkimages.main):
         # http://www.sno.phy.queensu.ca/~phil/exiftool/
         # MIGHT BE BETTER TO USE AS PYTHON MODULE; either by wrapper or perlmodule:
         # http://search.cpan.org/~gaas/pyperl-1.0/perlmodule.pod
+        # (or use C++ with embbedded perl to write a python module)
         data = Popen("exiftool %s" % self.image_path, 
                      shell=True, stdout=PIPE).stdout.readlines()
         if not data:
