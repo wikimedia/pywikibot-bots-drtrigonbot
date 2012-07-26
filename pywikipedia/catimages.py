@@ -217,13 +217,16 @@ class CatImagesBot(checkimages.main):
         # http://cairographics.org/pythoncairopil/
         # http://cairographics.org/pyrsvg/
         if self.image_fileext == u'.svg':
-            svg = rsvg.Handle(self.image_path)
-            img = cairo.ImageSurface(cairo.FORMAT_ARGB32, svg.props.width, svg.props.height)
-            ctx = cairo.Context(img)
-            svg.render_cairo(ctx)
-            #img.write_to_png("svg.png")
-            Image.frombuffer("RGBA",( img.get_width(),img.get_height() ),
+            try:
+                svg = rsvg.Handle(self.image_path)
+                img = cairo.ImageSurface(cairo.FORMAT_ARGB32, svg.props.width, svg.props.height)
+                ctx = cairo.Context(img)
+                svg.render_cairo(ctx)
+                #img.write_to_png("svg.png")
+                Image.frombuffer("RGBA",( img.get_width(),img.get_height() ),
                              img.get_data(),"raw","RGBA",0,1).save(self.image_path_JPEG, "JPEG")
+            except MemoryError:
+                self.image_path_JPEG = self.image_path
         else:
             try:
                 im = Image.open(self.image_path) # might be png, gif etc, for instance
