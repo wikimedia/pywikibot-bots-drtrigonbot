@@ -1311,7 +1311,7 @@ class CatImagesBot(checkimages.main):
         return
 
     def _detectProperties_PIL(self):
-        self._info['Properties'] = []
+        self._info['Properties'] = [{'Format': u'-'}]
         self.image_size = (None, None)
         if self.image_fileext == u'.svg':
             svg = rsvg.Handle(self.image_path)
