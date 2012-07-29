@@ -363,9 +363,9 @@ class CatImagesBot(checkimages.main):
         ret.append( u"</div>" )
         ret.append( u'|<div style="position:relative;">' )
         ret.append( u"[[%s|200px]]" % self.image.title() )
-        ret.append( self._make_markerblock(self._info[u'_TrainedTESTlower'], 200.,
+        ret.append( self._make_markerblock(self._info[u'_TrainedHuman ears'], 200.,
                                            structure=['Position']) )
-        ret.append( self._make_markerblock(self._info[u'_TrainedTESTupper'], 200.,
+        ret.append( self._make_markerblock(self._info[u'_TrainedHuman eyes'], 200.,
                                            structure=['Position'], line='dashed') )
         ret.append( u"</div>" )
         ret.append( u'|}' )
@@ -451,7 +451,7 @@ class CatImagesBot(checkimages.main):
             # end of recursion
             return u"  | %s = %s" % (key, self._output_format(value))
 
-    def _make_markerblock(self, res, size, structure=['Position', 'Eyes'], line='solid'):
+    def _make_markerblock(self, res, size, structure=['Position', 'Eyes', 'Mouth', 'Nose'], line='solid'):
         # same as in '_detectObjectFaces_CV'
         colors = [ (0,0,255),
             (0,128,255),
@@ -476,11 +476,11 @@ class CatImagesBot(checkimages.main):
             
             result.append( u'<div class="%s-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px %s #%s;"></div>' % tuple([structure[0].lower()] + f + [line, color]) )
 
-            if (len(structure) > 1):
-                for e in r[structure[1]]:
+            for ei in range(len(structure)-1):
+                for e in r[structure[ei+1]]:
                     e = list(np.array(e)/scale)
     
-                    result.append( u'<div class="%s-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px solid #%s;"></div>' % tuple([structure[1].lower()] + e + [color]) )
+                    result.append( u'<div class="%s-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px solid #%s;"></div>' % tuple([structure[ei+1].lower()] + e + [color]) )
 
         return u"\n".join( result )
 
@@ -582,9 +582,19 @@ class CatImagesBot(checkimages.main):
 
         # general (self trained haar and cascade) classification
         # http://www.computer-vision-software.com/blog/2009/11/faq-opencv-haartraining/
-        cascade_files = [(u'TESTlower', 'haarcascade_lowerbody.xml'),   # ...just as an example!
-                         (u'TESTupper', 'haarcascade_upperbody.xml')]   # ...and for testing ;)
-        #cascade_files = [(u'Aeroplane', 'haarcascade_aeroplane.xml')]   # e.g. for 'Category:Unidentified aircraft'
+        cascade_files = [#(u'TESTlower', 'haarcascade_lowerbody.xml'),
+                         #(u'TESTupper', 'haarcascade_upperbody.xml'),
+                         (u'Human ears', 'haarcascade_mcs_leftear.xml'),      # e.g. for 'Category:Human ears'
+                         (u'Human ears', 'haarcascade_mcs_rightear.xml'),     # e.g. for 'Category:Human ears'
+                         (u'Human eyes', 'haarcascade_lefteye_2splits.xml'),  # e.g. for 'Category:Human eyes', http://yushiqi.cn/research/eyedetection
+                         (u'Human eyes', 'haarcascade_righteye_2splits.xml'),]# e.g. for 'Category:Human eyes', http://yushiqi.cn/research/eyedetection
+                         #dtbext/opencv/haarcascades/haarcascade_mcs_lefteye.xml
+                         #dtbext/opencv/haarcascades/haarcascade_mcs_righteye.xml
+                         # (others include indifferent (left and/or right) and pair)
+                         #(u'Aeroplane', 'haarcascade_aeroplane.xml'),]        # e.g. for 'Category:Unidentified aircraft'
+                         #(u'Hands', 'PLEASE_TEST_US/1256617233-1-haarcascade_hand.xml'),]
+                         #(u'Hands', 'PLEASE_TEST_US/1256617233-2-haarcascade-hand.xml'),]
+                         #(u'Hands', 'PLEASE_TEST_US/aGest.xml'),]
         for cf in cascade_files:
             self._detectObjectTrained_CV(*cf)
 
@@ -957,6 +967,14 @@ class CatImagesBot(checkimages.main):
         if not os.path.exists(xml):
             raise IOError(u"No such file: '%s'" % xml)
         cascadeprofil = cv2.CascadeClassifier(xml)
+        xml = os.path.join(scriptdir, 'dtbext/opencv/haarcascades/haarcascade_mcs_mouth.xml')
+        if not os.path.exists(xml):
+            raise IOError(u"No such file: '%s'" % xml)
+        cascademouth = cv2.CascadeClassifier(xml)
+        xml = os.path.join(scriptdir, 'dtbext/opencv/haarcascades/haarcascade_mcs_nose.xml')
+        if not os.path.exists(xml):
+            raise IOError(u"No such file: '%s'" % xml)
+        cascadenose = cv2.CascadeClassifier(xml)
 
         self._info['Faces'] = []
         scale = 1.
@@ -1045,11 +1063,15 @@ class CatImagesBot(checkimages.main):
             #cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
             #if nestedCascade.empty():
             #    continue
-            dx, dy = cv.Round(rwidth*0.5), cv.Round(rheight*0.5)
+            # Wilson, Fernandez: FACIAL FEATURE DETECTION USING HAAR CLASSIFIERS
+            # http://nichol.as/papers/Wilson/Facial%20feature%20detection%20using%20Haar.pdf
+            #dx, dy = cv.Round(rwidth*0.5), cv.Round(rheight*0.5)
+            dx, dy = cv.Round(rwidth/8.), cv.Round(rheight/8.)
             (rx, ry, rwidth, rheight) = (max([rx-dx,0]), max([ry-dy,0]), min([rwidth+2*dx,img.shape[1]]), min([rheight+2*dy,img.shape[0]]))
             #smallImgROI = smallImg
             #print r, (rx, ry, rwidth, rheight)
-            smallImgROI = smallImg[ry:(ry+rheight),rx:(rx+rwidth)]
+            #smallImgROI = smallImg[ry:(ry+rheight),rx:(rx+rwidth)]
+            smallImgROI = smallImg[ry:(ry+6*dy),rx:(rx+rwidth)] # speed up by setting instead of extracting ROI
             nestedObjects = nestedCascade.detectMultiScale( smallImgROI,
                 1.1, 2, 0
                 #|CV_HAAR_FIND_BIGGEST_OBJECT
@@ -1057,9 +1079,27 @@ class CatImagesBot(checkimages.main):
                 #|CV_HAAR_DO_CANNY_PRUNING
                 |cv.CV_HAAR_SCALE_IMAGE,
                 (30, 30) )
+            smallImgROI = smallImg[(ry+4*dy):(ry+rheight),rx:(rx+rwidth)]
+            nestedMouth = cascademouth.detectMultiScale( smallImgROI,
+                1.1, 2, 0
+                |cv.CV_HAAR_FIND_BIGGEST_OBJECT
+                |cv.CV_HAAR_DO_ROUGH_SEARCH
+                #|CV_HAAR_DO_CANNY_PRUNING
+                |cv.CV_HAAR_SCALE_IMAGE,
+                (30, 30) )
+            smallImgROI = smallImg[(ry+(5*dy)/2):(ry+5*dy+(5*dy)/2),(rx+(5*dx)/2):(rx+5*dx+(5*dx)/2)]
+            nestedNose = cascadenose.detectMultiScale( smallImgROI,
+                1.1, 2, 0
+                |cv.CV_HAAR_FIND_BIGGEST_OBJECT
+                |cv.CV_HAAR_DO_ROUGH_SEARCH
+                #|CV_HAAR_DO_CANNY_PRUNING
+                |cv.CV_HAAR_SCALE_IMAGE,
+                (30, 30) )
             data = { 'ID':       (i+1),
                      'Position': tuple(np.int_(r*scale)), 
-                     'Eyes':     [], }
+                     'Eyes':     [],
+                     'Mouth':    [],
+                     'Nose':     [], }
             data['Coverage'] = float(data['Position'][2]*data['Position'][3])/(self.image_size[0]*self.image_size[1])
             #if (c >= confidence):
             #    eyes = nestedObjects
@@ -1074,6 +1114,20 @@ class CatImagesBot(checkimages.main):
                 radius = cv.Round((nrwidth + nrheight)*0.25*scale)
                 #cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
                 data['Eyes'].append( (cx-radius, cy-radius, 2*radius, 2*radius) )
+            for nr in nestedMouth:
+                (nrx, nry, nrwidth, nrheight) = nr
+                cx = cv.Round((rx + nrx + nrwidth*0.5)*scale)
+                cy = cv.Round(((ry+4*dy) + nry + nrheight*0.5)*scale)
+                radius = cv.Round((nrwidth + nrheight)*0.25*scale)
+                #cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
+                data['Mouth'].append( (cx-radius, cy-radius, 2*radius, 2*radius) )
+            for nr in nestedNose:
+                (nrx, nry, nrwidth, nrheight) = nr
+                cx = cv.Round(((rx+(5*dx)/2) + nrx + nrwidth*0.5)*scale)
+                cy = cv.Round(((ry+(5*dy)/2) + nry + nrheight*0.5)*scale)
+                radius = cv.Round((nrwidth + nrheight)*0.25*scale)
+                #cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
+                data['Nose'].append( (cx-radius, cy-radius, 2*radius, 2*radius) )
             result.append( data )
 
         ## see '_drawRect'
@@ -1640,6 +1694,7 @@ class CatImagesBot(checkimages.main):
 
         return im
 
+    # Category:...      (several; look at self.gatherInformation for more hints)
     def _detectObjectTrained_CV(self, info_desc, cascade_file):
         # general (self trained) classification (e.g. people, ...)
         # http://www.computer-vision-software.com/blog/2009/11/faq-opencv-haartraining/
