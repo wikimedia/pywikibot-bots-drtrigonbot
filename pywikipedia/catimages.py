@@ -756,10 +756,20 @@ class CatImagesBot(checkimages.main):
         pdf    = u'PDF' in self._info_filter['Properties'][0]['Format']
         result = self._info_filter['Text']
         relevance = pdf and len(result) and \
+                    (self._info_filter['Properties'][0]['Pages'] >= 10) and \
                     (result[0]['Size'] >= 5E4) and (result[0]['Lines'] >= 1000)
-        # number of pages >= 10
 
         return (u'Books (literature) in PDF', relevance)
+
+    # Category:Animated GIF
+    # Category:Animated PNG‎
+    # (Category:Animated SVG‎)
+    def _cat_prop_Animated_general(self):
+        result = self._info_filter['Properties']
+        relevance = result and (result[0]['Pages'] > 1) and \
+                    (result[0]['Format'] in [u'GIF', u'PNG'])
+
+        return (u'Animated %s' % result[0]['Format'], relevance)
 
     # Category:Categorized by DrTrigonBot
     def _addcat_BOT(self):
@@ -767,9 +777,9 @@ class CatImagesBot(checkimages.main):
         return (u"Categorized by DrTrigonBot", True)
 
     # Category:BMP
-    # Category:TIFF
     # Category:PNG
     # Category:JPEG
+    # Category:TIFF files
     # (more image formats/extensions according to PIL)
     # Category:PDF files
     def _addcat_prop_general(self):
