@@ -1098,8 +1098,8 @@ class CatImagesBot(checkimages.main):
             data = { 'ID':       (i+1),
                      'Position': tuple(np.int_(r*scale)), 
                      'Eyes':     [],
-                     'Mouth':    [],
-                     'Nose':     [], }
+                     'Mouth':    (),
+                     'Nose':     (), }
             data['Coverage'] = float(data['Position'][2]*data['Position'][3])/(self.image_size[0]*self.image_size[1])
             #if (c >= confidence):
             #    eyes = nestedObjects
@@ -1114,20 +1114,18 @@ class CatImagesBot(checkimages.main):
                 radius = cv.Round((nrwidth + nrheight)*0.25*scale)
                 #cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
                 data['Eyes'].append( (cx-radius, cy-radius, 2*radius, 2*radius) )
-            for nr in nestedMouth:
-                (nrx, nry, nrwidth, nrheight) = nr
-                cx = cv.Round((rx + nrx + nrwidth*0.5)*scale)
-                cy = cv.Round(((ry+4*dy) + nry + nrheight*0.5)*scale)
-                radius = cv.Round((nrwidth + nrheight)*0.25*scale)
-                #cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
-                data['Mouth'].append( (cx-radius, cy-radius, 2*radius, 2*radius) )
-            for nr in nestedNose:
-                (nrx, nry, nrwidth, nrheight) = nr
-                cx = cv.Round(((rx+(5*dx)/2) + nrx + nrwidth*0.5)*scale)
-                cy = cv.Round(((ry+(5*dy)/2) + nry + nrheight*0.5)*scale)
-                radius = cv.Round((nrwidth + nrheight)*0.25*scale)
-                #cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
-                data['Nose'].append( (cx-radius, cy-radius, 2*radius, 2*radius) )
+            (nrx, nry, nrwidth, nrheight) = nr
+            cx = cv.Round((rx + nrx + nrwidth*0.5)*scale)
+            cy = cv.Round(((ry+4*dy) + nry + nrheight*0.5)*scale)
+            radius = cv.Round((nrwidth + nrheight)*0.25*scale)
+            #cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
+            data['Mouth'] = (cx-radius, cy-radius, 2*radius, 2*radius)
+            (nrx, nry, nrwidth, nrheight) = nr
+            cx = cv.Round(((rx+(5*dx)/2) + nrx + nrwidth*0.5)*scale)
+            cy = cv.Round(((ry+(5*dy)/2) + nry + nrheight*0.5)*scale)
+            radius = cv.Round((nrwidth + nrheight)*0.25*scale)
+            #cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
+            data['Nose'] = (cx-radius, cy-radius, 2*radius, 2*radius)
             result.append( data )
 
         ## see '_drawRect'
