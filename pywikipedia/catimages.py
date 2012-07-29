@@ -478,7 +478,7 @@ class CatImagesBot(checkimages.main):
 
             for ei in range(len(structure)-1):
                 data = r[structure[ei+1]]
-                if not hasattr(data[0], '__iter__'):    # Mouth and Nose are not lists
+                if data and (not hasattr(data[0], '__iter__')):    # Mouth and Nose are not lists
                     data = [ r[structure[ei+1]] ]
                 for e in data:
                     e = list(np.array(e)/scale)
