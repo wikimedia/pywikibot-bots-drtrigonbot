@@ -774,7 +774,9 @@ class CatImagesBot(checkimages.main):
     # Category:PDF files
     def _addcat_prop_general(self):
         fmt = self._info_filter['Properties'][0]['Format']
-        if   u'SVG' in fmt:
+        if   u'TIFF' in fmt:
+            fmt = u'TIFF images'
+        elif u'SVG' in fmt:
             # additional to PIL (rsvg, ...)
             # should be added as template instead of category (!)
             fmt = u''
