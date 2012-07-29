@@ -1387,7 +1387,7 @@ class CatImagesBot(checkimages.main):
         return
 
     def _detectProperties_PIL(self):
-        self._info['Properties'] = [{'Format': u'-'}]
+        self._info['Properties'] = [{'Format': u'-', 'Pages': 0}]
         self.image_size = (None, None)
         if self.image_fileext == u'.svg':
             # similar to PDF page count OR use BeautifulSoup
