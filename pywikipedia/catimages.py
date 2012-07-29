@@ -1319,6 +1319,10 @@ class CatImagesBot(checkimages.main):
         self._info['Properties'] = [{'Format': u'-'}]
         self.image_size = (None, None)
         if self.image_fileext == u'.svg':
+            # similar to PDF page count OR use BeautifulSoup
+            svgcountpages = re.compile("<page>")
+            pc = len(svgcountpages.findall( file(self.image_path,"r").read() ))
+
             svg = rsvg.Handle(self.image_path)
 
             # http://validator.w3.org/docs/api.html#libs
@@ -1338,21 +1342,38 @@ class CatImagesBot(checkimages.main):
 
             result = { 'Format':     valid,
                        'Mode':       u'-',
-                       'Palette':    u'-', }
+                       'Palette':    u'-',
+                       'Pages':      pc, }
             # may be set {{validSVG}} also or do something in bot template to
             # recognize 'Format=SVG (valid)' ...
         elif self.image_fileext == u'.pdf':
+            # http://code.activestate.com/recipes/496837-count-pdf-pages/
+            #rxcountpages = re.compile(r"$\s*/Type\s*/Page[/\s]", re.MULTILINE|re.DOTALL)
+            rxcountpages = re.compile(r"/Type\s*/Page([^s]|$)", re.MULTILINE|re.DOTALL)    # PDF v. 1.3,1.4,1.5,1.6
+            pc = len(rxcountpages.findall( file(self.image_path,"rb").read() ))
+
             self.image_size = (0, 0)    # unknown?!? (page size)
 
             result = { 'Format':     u'PDF',
                        'Mode':       u'-',
-                       'Palette':    u'-', }
+                       'Palette':    u'-',
+                       'Pages':      pc, }
         else:
             try:
                 i = Image.open(self.image_path)
             except IOError:
                 pywikibot.output(u'WARNING: unknown file type [_detectProperties_PIL]')
                 return
+
+            # http://mail.python.org/pipermail/image-sig/1999-May/000740.html
+            pc=0         # count number of pages
+            while True:
+                try:
+                    i.seek(pc)
+                except EOFError:
+                    break
+                pc+=1
+            i.seek(0)    # restore default
 
             # http://grokbase.com/t/python/image-sig/082psaxt6k/embedded-icc-profiles
             #icc = i.app['APP2']     # jpeg
@@ -1368,7 +1389,8 @@ class CatImagesBot(checkimages.main):
                        'Mode':       i.mode,
                        #'info':       i.info,
                        #'stat':       os.stat(self.image_path),
-                       'Palette':    str(len(i.palette.palette)) if i.palette else u'-', }
+                       'Palette':    str(len(i.palette.palette)) if i.palette else u'-',
+                       'Pages':      pc, }
 
         result['Dimensions'] = self.image_size
         result['Filesize']   = os.path.getsize(self.image_path)
