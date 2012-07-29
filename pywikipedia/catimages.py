@@ -477,7 +477,10 @@ class CatImagesBot(checkimages.main):
             result.append( u'<div class="%s-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px %s #%s;"></div>' % tuple([structure[0].lower()] + f + [line, color]) )
 
             for ei in range(len(structure)-1):
-                for e in r[structure[ei+1]]:
+                data = r[structure[ei+1]]
+                if not hasattr(data[0], '__iter__'):    # Mouth and Nose are not lists
+                    data = [ r[structure[ei+1]] ]
+                for e in data:
                     e = list(np.array(e)/scale)
     
                     result.append( u'<div class="%s-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px solid #%s;"></div>' % tuple([structure[ei+1].lower()] + e + [color]) )
@@ -1114,18 +1117,20 @@ class CatImagesBot(checkimages.main):
                 radius = cv.Round((nrwidth + nrheight)*0.25*scale)
                 #cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
                 data['Eyes'].append( (cx-radius, cy-radius, 2*radius, 2*radius) )
-            (nrx, nry, nrwidth, nrheight) = nr
-            cx = cv.Round((rx + nrx + nrwidth*0.5)*scale)
-            cy = cv.Round(((ry+4*dy) + nry + nrheight*0.5)*scale)
-            radius = cv.Round((nrwidth + nrheight)*0.25*scale)
-            #cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
-            data['Mouth'] = (cx-radius, cy-radius, 2*radius, 2*radius)
-            (nrx, nry, nrwidth, nrheight) = nr
-            cx = cv.Round(((rx+(5*dx)/2) + nrx + nrwidth*0.5)*scale)
-            cy = cv.Round(((ry+(5*dy)/2) + nry + nrheight*0.5)*scale)
-            radius = cv.Round((nrwidth + nrheight)*0.25*scale)
-            #cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
-            data['Nose'] = (cx-radius, cy-radius, 2*radius, 2*radius)
+            if len(nestedMouth):
+                (nrx, nry, nrwidth, nrheight) = nestedMouth[0]
+                cx = cv.Round((rx + nrx + nrwidth*0.5)*scale)
+                cy = cv.Round(((ry+4*dy) + nry + nrheight*0.5)*scale)
+                radius = cv.Round((nrwidth + nrheight)*0.25*scale)
+                #cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
+                data['Mouth'] = (cx-radius, cy-radius, 2*radius, 2*radius)
+            if len(nestedNose):
+                (nrx, nry, nrwidth, nrheight) = nestedNose[0]
+                cx = cv.Round(((rx+(5*dx)/2) + nrx + nrwidth*0.5)*scale)
+                cy = cv.Round(((ry+(5*dy)/2) + nry + nrheight*0.5)*scale)
+                radius = cv.Round((nrwidth + nrheight)*0.25*scale)
+                #cv2.circle( img, (cx, cy), radius, color, 3, 8, 0 )
+                data['Nose'] = (cx-radius, cy-radius, 2*radius, 2*radius)
             result.append( data )
 
         ## see '_drawRect'
@@ -1329,14 +1334,18 @@ class CatImagesBot(checkimages.main):
             return
 
         result = []
-        #h = i.histogram()   # average over WHOLE IMAGE
-        (pic, scale) = self._JSEGdetectColorSegments(i)          # split image into segments first
-        #(pic, scale) = self._SLICdetectColorSegments(i)          # split image into superpixel first
-        hist = self._PILgetColorSegmentsHist(i, pic, scale)         #
-        #pic  = self._ColorRegionsMerge_ColorSimplify(pic, hist)  # iteratively in order to MERGE similar regions
-        #(pic, scale_) = self._JSEGdetectColorSegments(pic)       # (final split)
-        ##(pic, scale) = self._JSEGdetectColorSegments(pic)        # (final split)
-        #hist = self._PILgetColorSegmentsHist(i, pic, scale)         #
+        try:
+            #h = i.histogram()   # average over WHOLE IMAGE
+            (pic, scale) = self._JSEGdetectColorSegments(i)          # split image into segments first
+            #(pic, scale) = self._SLICdetectColorSegments(i)          # split image into superpixel first
+            hist = self._PILgetColorSegmentsHist(i, pic, scale)         #
+            #pic  = self._ColorRegionsMerge_ColorSimplify(pic, hist)  # iteratively in order to MERGE similar regions
+            #(pic, scale_) = self._JSEGdetectColorSegments(pic)       # (final split)
+            ##(pic, scale) = self._JSEGdetectColorSegments(pic)        # (final split)
+            #hist = self._PILgetColorSegmentsHist(i, pic, scale)         #
+        except TypeError:
+            pywikibot.output(u'WARNING: unknown file type [_detectSegmentColors_JSEGnPIL]')
+            return
         i = 0
         # (may be do an additional region merge according to same color names...)
         for (h, coverage, (center, bbox)) in hist:
