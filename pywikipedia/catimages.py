@@ -305,7 +305,7 @@ class CatImagesBot(checkimages.main):
 
         #if not self._existInformation(self._info_filter):  # information available?
         if not self._result_check:                          # category available?
-            return u""
+            return False
 
         pywikibot.get_throttle()
         content = self.image.get()
@@ -335,7 +335,7 @@ class CatImagesBot(checkimages.main):
         self.image.put( content, comment="bot automatic categorization; adding %s" % u", ".join(tags),
                                  botflag=False )
 
-        return
+        return True
 
     def log_output(self):
         # ColorRegions always applies here since there is at least 1 (THE average) color...
@@ -394,8 +394,9 @@ class CatImagesBot(checkimages.main):
 
     # LOOK ALSO AT: checkimages.CatImagesBot.report
     def report(self):
-        self.tag_image()
-        return self.log_output()
+        tagged = self.tag_image()
+        logged = self.log_output()
+        return (tagged, logged)
 
     def _make_infoblock(self, cat, res, tmpl_available=None):
         if not res:
@@ -2050,22 +2051,29 @@ class CatImagesBot(checkimages.main):
         else:
             (width, height) = self.image_size
         wasRotated = (height > width)
+        aspect = float(height)/width
         
         if   (make in ['sony', 'nikon', 'panasonic', 'casio', 'ricoh']):
-            # UNTESTED: ['sony', 'nikon', 'panasonic', 'casio', 'ricoh']
+            # UNTESTED: ['sony', 'nikon', 'casio', 'ricoh']
+            #   TESTED: ['panasonic']
             if set(['FacesDetected', 'Face1Position']).issubset(found):
                 i = 1
                 if 'FaceOrientation' in res:
                     print res['FaceOrientation']    # for rotation 'rot'
                 # 'crop' for 'casio' omitted here...
-                (sx, sy) = (1./width, 1./height)
+                if (aspect <= 3./4):
+                    (fw, fh) = (320, 320 * aspect)
+                else:
+                    (fw, fh) = (240 / aspect, 240)
+                #(sx, sy) = (1./width, 1./height)
+                (sx, sy) = (1./fw, 1./fh)
                 if 'FaceDetectFrameSize' in res:
                     (width, height) = map(int, res['FaceDetectFrameSize'].split(' '))
                     (sx, sy) = (1./width, 1./height)
                 while (('Face%iPosition'%i) in res) and (i <= int(res['FacesDetected'])):
                     buf = map(int, res['Face%iPosition'%i].split(' '))
-                    (x1, y1) = (buf[0]*sx, buf[1]*sy)       # 'panasonic'
-                    (x2, y2) = (buf[2]*sx, buf[3]*sy)       #
+                    (x1, y1) = ((buf[0]-buf[2]/2)*sx, (buf[1]-buf[3]/2)*sy)    # 'panasonic'
+                    (x2, y2) = (x1+buf[2]*sx, y1+buf[3]*sy)                    #
                     #(x1, y1) = (buf[1]*sx, buf[0]*sy)
                     #(x2, y2) = (x1+buf[3]*sx, y1+buf[2]*sy)
                     data.append({ 'Position': (x1, y1, x2, y2) })
@@ -2170,11 +2178,15 @@ class CatImagesBot(checkimages.main):
             p = (p[0]*self.image_size[0] + 0.5, p[1]*self.image_size[1] + 0.5, 
                  p[2]*self.image_size[0] + 0.5, p[3]*self.image_size[1] + 0.5)
             # change from (x1, y1, x2, y2) to (x, y, w, h)
-            data[i]['Position'] = (p[0], p[1], p[0]-p[2], p[3]-p[1])
+            #data[i]['Position'] = (p[0], p[1], p[0]-p[2], p[3]-p[1])
+            data[i]['Position'] = (p[0], p[1], (p[0]-p[2])*np.sign(p[0]-p[2]), 
+                                               (p[3]-p[1])*np.sign(p[3]-p[1]))
 
             data[i] = { 'Position':   tuple(map(int, data[i]['Position'])),
                         'ID':         (i+1),
-                        'Eyes':       [], }
+                        'Eyes':       [],
+                        'Mouth':      (),
+                        'Nose':       (), }
             data[i]['Coverage'] = float(data[i]['Position'][2]*data[i]['Position'][3])/(self.image_size[0]*self.image_size[1])
 
         # exclude duplicates...
@@ -2311,16 +2323,17 @@ def checkbot():
             continue
         resultCheck = mainClass.checkStep()
         try:
-            ret = mainClass.report()
+            (tagged, ret) = mainClass.report()
             if ret:
                 outresult.append( ret )
         except AttributeError:
             pywikibot.output(u"ERROR: was not able to process page %s!!!\n" %\
                              image.title(asLink=True))
         limit += -1
-        posfile = open(os.path.join(scriptdir, 'cache/catimages_start'), "w")
-        posfile.write( image.title().encode('utf-8') )
-        posfile.close()
+        if not tagged:
+            posfile = open(os.path.join(scriptdir, 'cache/catimages_start'), "w")
+            posfile.write( image.title().encode('utf-8') )
+            posfile.close()
         if limit <= 0:
             break
         if resultCheck:
