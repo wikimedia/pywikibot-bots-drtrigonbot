@@ -424,7 +424,7 @@ class CatImagesBot(checkimages.main):
             for item in res:
                 result.append( u"  {{FileContentsByBot/%s" % cat )
                 for key in titles:
-                    if not (item[key] == []):   # (work-a-round for empty 'Eyes')
+                    if item[key]:   # (work-a-round for empty 'Eyes')
                         result.append( self._output_format_flatten(key, item[key]) )
                 result.append( u"  }}" )
         result.append( u"}}" )
