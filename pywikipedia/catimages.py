@@ -193,8 +193,7 @@ class CatImagesBot(checkimages.main):
         self.image_fileext   = os.path.splitext(self.image_filename)[1]
         self.image_path      = urllib2.quote(os.path.join(scriptdir, ('cache/' + self.image_filename[-128:])))
         
-        image_path_JPEG      = self.image_path.split(u'.')
-        self.image_path_JPEG = u'.'.join(image_path_JPEG[:-1]+[u'jpg'])
+        self.image_path_JPEG = self.image_path + u'.jpg'
         
         if os.path.exists(self.image_path):
             return
