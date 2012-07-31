@@ -143,803 +143,8 @@ class Global(object):
     useGuesses = True        # Use guesses which are less reliable than true searches
 
 
-# Image by content categorization derived from 'checkimages.py'.
-class CatImagesBot(checkimages.main):
-#    def __init__(self, site, logFulNumber = 25000, sendemailActive = False,
-#                 duplicatesReport = False, logFullError = True): pass
-#    def setParameters(self, imageName, timestamp, uploader): pass
-
-    #ignore = []
-    ignore = ['color']
-    
-    _thrhld_group_size = 4
-    _thrshld_guesses = 0.1
-    _thrshld_default = 0.75
-
-    # or may be '__init__' ... ???
-    def load_licenses(self):
-        #pywikibot.output(u'\n\t...Listing the procedures available...\n')
-        pywikibot.output(u'\n\t...Listing the procedures used...\n')
-        
-        self._funcs = {'filter': [], 'cat': [], 'addcat': [], 'guess': []}
-
-        for item in dir(self):
-            s = item.split('_')
-            if (len(s) < 3) or (s[1] not in self._funcs) or (s[2] in self.ignore):
-                continue
-            pywikibot.output( item )
-            self._funcs[s[1]].append( item )
-
-        self.tmpl_available_spec = tmpl_available_spec
-        gen = pagegenerators.PrefixingPageGenerator(prefix = u'Template:FileContentsByBot/')
-        buf = []
-        for item in gen:
-            item = item.title()
-            if (item[-4:] == "/doc"):           # all docs
-                continue
-            item = os.path.split(item)[1]
-            if (item[0].lower() == item[0]):    # e.g. 'generic'
-                continue
-            buf.append( item )
-        if buf:
-            self.tmpl_available_spec = buf
-            pywikibot.output( u'\n\t...Following specialized templates found, check them since they are used now...\n' )
-            pywikibot.output( u'tmpl_available_spec = [ %s ]\n' % u", ".join(buf) )
-
-        return []
-
-    def downloadImage(self):
-        self.image_filename  = os.path.split(self.image.fileUrl())[-1]
-        self.image_fileext   = os.path.splitext(self.image_filename)[1]
-        self.image_path      = urllib2.quote(os.path.join(scriptdir, ('cache/' + self.image_filename[-128:])))
-        
-        self.image_path_JPEG = self.image_path + u'.jpg'
-        
-        if os.path.exists(self.image_path):
-            return
-
-        pywikibot.get_throttle()
-        f_url, data = self.site.getUrl(self.image.fileUrl(), no_hostname=True, 
-                                       back_response=True)
-        # needed patch for 'getUrl' applied upstream in r10441
-        # (allows to re-read from back_response)
-        data = f_url.read()
-        del f_url   # free some memory (no need to keep a copy...)
-
-        f = open(self.image_path, 'wb')
-        f.write( data )
-        f.close()
-
-        # SVG: rasterize the SVG to bitmap (MAY BE GET FROM WIKI BY DOWNLOAD?...)
-        # (Mediawiki uses librsvg too: http://commons.wikimedia.org/wiki/SVG#SVGs_in_MediaWiki)
-        # http://stackoverflow.com/questions/6589358/convert-svg-to-png-in-python
-        # http://cairographics.org/pythoncairopil/
-        # http://cairographics.org/pyrsvg/
-        if self.image_fileext == u'.svg':
-            try:
-                svg = rsvg.Handle(self.image_path)
-                img = cairo.ImageSurface(cairo.FORMAT_ARGB32, svg.props.width, svg.props.height)
-                ctx = cairo.Context(img)
-                svg.render_cairo(ctx)
-                #img.write_to_png("svg.png")
-                Image.frombuffer("RGBA",( img.get_width(),img.get_height() ),
-                             img.get_data(),"raw","RGBA",0,1).save(self.image_path_JPEG, "JPEG")
-            except MemoryError:
-                self.image_path_JPEG = self.image_path
-        else:
-            try:
-                im = Image.open(self.image_path) # might be png, gif etc, for instance
-                #im.thumbnail(size, Image.ANTIALIAS) # size is 640x480
-                im.convert('RGB').save(self.image_path_JPEG, "JPEG")
-            except IOError, e:
-                if 'image file is truncated' in str(e):
-                    # im object has changed due to exception raised
-                    im.convert('RGB').save(self.image_path_JPEG, "JPEG")
-                else:
-                    self.image_path_JPEG = self.image_path
-            except:
-                self.image_path_JPEG = self.image_path
-
-        # PDF: support extract text and images
-        # (Mediawiki uses ghostscript: https://www.mediawiki.org/wiki/Extension:PdfHandler#Pre-requisites)
-        # http://vermeulen.ca/python-pdf.html
-        # http://code.activestate.com/recipes/511465-pure-python-pdf-to-text-converter/
-        # http://stackoverflow.com/questions/25665/python-module-for-converting-pdf-to-text
-        if self.image_fileext == u'.pdf':
-            pass
-
-    # LOOK ALSO AT: checkimages.CatImagesBot.checkStep
-    # (and category scripts/bots too...)
-    def checkStep(self):
-        #print self.image_path
-        pywikibot.output(u'Processing media %s ...' % self.image.title(asLink=True))
-
-        if gbv.useGuesses:
-            self.thrshld = self._thrshld_guesses
-        else:
-            self.thrshld = self._thrshld_default
-
-        self._info         = {}     # used for LOG/DEBUG OUTPUT ONLY
-        self._info_filter  = {}     # used for CATEGORIZATION
-        self._result_check = []
-        self._result_add   = []
-
-        # gather all information related to current image
-        self.gatherInformation()
-
-        # information template: use filter to select from gathered information
-        self._info_filter = {}
-        for item in self._funcs['filter']:
-            self._info_filter.update( self.__class__.__dict__[item](self) )
-
-        # categorization: use explicit searches for classification (rel = ?)
-        for item in self._funcs['cat']:
-            (cat, rel) = self.__class__.__dict__[item](self)
-            #print cat, result, len(result)
-            if rel:
-                self._result_check.append( cat )
-        self._result_check = list(set(self._result_check))
-
-        # categorization: conditional (only if the ones before are present)
-        # (does not trigger report to page)
-        for item in self._funcs['addcat']:
-            (cat, rel) = self.__class__.__dict__[item](self)
-            #print cat, result, len(result)
-            if rel:
-                self._result_add.append( cat )
-        self._result_add = list(set(self._result_add))
-
-        # categorization: use guesses for unreliable classification (rel = 0.1)
-        if not gbv.useGuesses:
-            return self._result_check
-        for item in self._funcs['guess']:
-            (cat, result, rel) = self.__class__.__dict__[item](self)
-            #print cat, result, len(result)
-            if result:
-                self._result_check.append( (cat, result, rel) )
-
-        return self._result_check
-
-    def tag_image(self):
-        self.clean_cache()
-
-        #if not self._existInformation(self._info_filter):  # information available?
-        if not self._result_check:                          # category available?
-            return False
-
-        pywikibot.get_throttle()
-        content = self.image.get()
-
-        content = self._append_to_template(content, u"Information", tmpl_FileContentsByBot)
-        for i, key in enumerate(self._info_filter):
-            item = self._info_filter[key]
-
-            info = self._make_infoblock(key, item)
-            if info:
-                content = self._append_to_template(content, u"FileContentsByBot", info)
-
-        tags = set([])
-        for i, cat in enumerate(list(set(self._result_check + self._result_add))):
-            tags.add( u"[[:Category:%s]]" % cat )
-            content = pywikibot.replaceCategoryLinks(content, [cat], site=self.site, addOnly=True)
-
-        content = pywikibot.replaceCategoryLinks( content, 
-                list(set(pywikibot.getCategoryLinks(content, site=self.site))),
-                site=self.site )
-        content = self._remove_category_or_template(content, u"Uncategorized")  # template
-        content = self._add_template(content, u"Check categories|year={{subst:#time:Y}}|month={{subst:#time:F}}|day={{subst:#time:j}}|category=[[Category:Categorized by DrTrigonBot]]", top=True)
-        print u"--- " * 20
-        print content
-        print u"--- " * 20
-        pywikibot.put_throttle()
-        self.image.put( content, comment="bot automatic categorization; adding %s" % u", ".join(tags),
-                                 botflag=False )
-
-        return True
-
-    def log_output(self):
-        # ColorRegions always applies here since there is at least 1 (THE average) color...
-        ignore = ['Properties', 'ColorAverage', 'ColorRegions'] # + ColorRegions
-        #if not self._existInformation(self._info):  # information available?
-        # information available? AND/OR category available?
-        if not (self._existInformation(self._info, ignore = ignore) or self._result_check):
-            return u""
-
-        ret  = []
-        ret.append( u"" )
-        ret.append( u"== [[:%s]] ==" % self.image.title() )
-        ret.append( u'{|' )
-        ret.append( u'|<div style="position:relative;">' )
-        ret.append( u"[[%s|200px]]" % self.image.title() )
-        ret.append( self._make_markerblock(self._info[u'Faces'], 200.) )
-        ret.append( self._make_markerblock(self._info[u'People'], 200.,
-                                           structure=['Position'], line='dashed') )
-        ret.append( u"</div>" )
-        ret.append( u'|<div style="position:relative;">' )
-        ret.append( u"[[%s|200px]]" % self.image.title() )
-        ret.append( self._make_markerblock(self._info[u'ColorRegions'], 200.,
-                                           structure=['Position']) )
-        ret.append( u"</div>" )
-        ret.append( u'|<div style="position:relative;">' )
-        ret.append( u"[[%s|200px]]" % self.image.title() )
-        ret.append( self._make_markerblock(self._info[u'_TrainedHuman ears'], 200.,
-                                           structure=['Position']) )
-        ret.append( self._make_markerblock(self._info[u'_TrainedHuman eyes'], 200.,
-                                           structure=['Position'], line='dashed') )
-        ret.append( u"</div>" )
-        ret.append( u'|}' )
-
-        color = {True: "rgb(0,255,0)", False: "rgb(255,0,0)"}[bool(self._result_check)]
-        ret.append( u"<div style='background:%s'>'''automatic categorization''': %s</div>" % (color, u", ".join(list(set(self._result_check + self._result_add)))) )
-
-        buf = []
-        for i, key in enumerate(self._info):
-            item = self._info[key]
-
-            info = self._make_infoblock(key, item, [])
-            if info:
-                buf.append( info )
-        ret.append( tmpl_FileContentsByBot[3:] + u"\n" + u"\n".join( buf ) + u"\n}}" )
-
-        return u"\n".join( ret )
-
-    def clean_cache(self):
-        if os.path.exists(self.image_path):
-            os.remove( self.image_path )
-        if os.path.exists(self.image_path_JPEG):
-            os.remove( self.image_path_JPEG )
-        #image_path_new = self.image_path_JPEG.replace(u"cache/", u"cache/0_DETECTED_")
-        #if os.path.exists(image_path_new):
-        #    os.remove( image_path_new )
-
-    # LOOK ALSO AT: checkimages.CatImagesBot.report
-    def report(self):
-        tagged = self.tag_image()
-        logged = self.log_output()
-        return (tagged, logged)
-
-    def _make_infoblock(self, cat, res, tmpl_available=None):
-        if not res:
-            return u''
-
-        if (tmpl_available == None):
-            tmpl_available = self.tmpl_available_spec
-
-        generic = (cat not in tmpl_available)
-        titles = res[0].keys()
-        if not titles:
-            return u''
-
-        result = []
-        #result.append( u'{{(!}}style="background:%s;"' % {True: 'green', False: 'red'}[report] )
-        if generic:
-            result.append( u"{{FileContentsByBot/generic|name=%s|" % cat )
-            buf = dict([ (key, []) for key in titles ])
-            for item in res:
-                for key in titles:
-                    buf[key].append( self._output_format(item[key]) )
-            for key in titles:
-                result.append( u"  {{FileContentsByBot/generic|name=%s|value=%s}}" % (key, u"; ".join(buf[key])) )
-        else:
-            result.append( u"{{FileContentsByBot/%s|" % cat )
-            for item in res:
-                result.append( u"  {{FileContentsByBot/%s" % cat )
-                for key in titles:
-                    if item[key]:   # (work-a-round for empty 'Eyes')
-                        result.append( self._output_format_flatten(key, item[key]) )
-                result.append( u"  }}" )
-        result.append( u"}}" )
-
-        return u"\n".join( result )
-
-    def _output_format(self, value):
-        if (type(value) == type(float())):
-            # round/strip floats
-            return "%.3f" % value
-        else:
-            # output string representation of variable
-            return str(value)
-
-    def _output_format_flatten(self, key, value):
-        # flatten structured varible recursively
-        if (type(value) == type(tuple())) or (type(value) == type(list())):
-            buf = []
-            for i, t in enumerate(value):
-                buf.append( self._output_format_flatten(key + (u"-%02i" % i), t) )
-            return u"\n".join( buf )
-        else:
-            # end of recursion
-            return u"  | %s = %s" % (key, self._output_format(value))
-
-    def _make_markerblock(self, res, size, structure=['Position', 'Eyes', 'Mouth', 'Nose'], line='solid'):
-        # same as in '_detectObjectFaces_CV'
-        colors = [ (0,0,255),
-            (0,128,255),
-            (0,255,255),
-            (0,255,0),
-            (255,128,0),
-            (255,255,0),
-            (255,0,0),
-            (255,0,255) ]
-        result = []
-        for i, r in enumerate(res):
-            if ('RGB' in r):
-                color = list(np.array((255,255,255))-np.array(r['RGBref']))
-            else:
-                color = list(colors[i%8])
-            color.reverse()
-            color = u"%02x%02x%02x" % tuple(color)
-            
-            #scale = r['size'][0]/size
-            scale = self.image_size[0]/size
-            f     = list(np.array(r[structure[0]])/scale)
-            
-            result.append( u'<div class="%s-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px %s #%s;"></div>' % tuple([structure[0].lower()] + f + [line, color]) )
-
-            for ei in range(len(structure)-1):
-                data = r[structure[ei+1]]
-                if data and (not hasattr(data[0], '__iter__')):    # Mouth and Nose are not lists
-                    data = [ r[structure[ei+1]] ]
-                for e in data:
-                    e = list(np.array(e)/scale)
-    
-                    result.append( u'<div class="%s-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px solid #%s;"></div>' % tuple([structure[ei+1].lower()] + e + [color]) )
-
-        return u"\n".join( result )
-
-    # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
-    def _remove_category_or_template(self, text, name):
-        text = re.sub(u"[\{\[]{2}%s.*?[\}\]]{2}\n?" % name, u"", text)
-        return text
-
-    # place into 'textlib'
-    def _add_template(self, text, name, params={}, top=False, raw=False):
-        if top:
-            buf = [(u"{{%s}}" % name), text]
-        else:
-            if raw:
-                buf = [text, name]
-            else:
-                buf = [text, (u"{{%s}}" % name)]
-        return u"\n".join( buf )
-
-    # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
-    def _append_to_template(self, text, name, append):
-        pattern  = re.compile(u"(\{\{%s.*?\n)(\s*\}\}\n{2})" % name, flags=re.S)
-        template = pattern.search(text).groups()
-        
-        template = u"".join( [template[0], append, u"\n", template[1]] )
-        
-        text = pattern.sub(template, text)
-        return text
-
-    # gather data from all information interfaces and assign confidences
-    def gatherInformation(self):
-        # Image size
-        self._detectProperties_PIL()
-        
-        # Faces and eyes (opencv pre-trained haar)
-        self._detectObjectFaces_CV()
-
-        for i in range(len(self._info['Faces'])):
-            data = self._info['Faces'][i]
-
-            c = (len(data['Eyes']) + 2.) / 4.
-            self._info['Faces'][i]['Confidence'] = c
-        
-        # Faces (extract EXIF data)
-        self._detectObjectFaces_EXIF()
-        # exclude duplicates... (CV and EXIF)
-
-        for i in range(len(self._info['Faces'])):
-            if 'Confidence' not in self._info['Faces'][i]:
-                self._info['Faces'][i]['ID'] = i+1
-                self._info['Faces'][i]['Confidence'] = self._thrshld_default
-
-        # Segments and colors
-        self._detectSegmentColors_JSEGnPIL()
-        # Average color
-        self._detectAverageColor_PIL()
-
-        max_dim = max(self.image_size)
-        for i in range(len(self._info['ColorRegions'])):
-            data = self._info['ColorRegions'][i]
-
-            # has to be in descending order since only 1 resolves (!)
-            #if   (data['Coverage'] >= 0.40) and (data['Delta_E']  <=  5.0):
-            #    c = 1.0
-            ##elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 15.0):
-            ##elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 10.0):
-            #elif (data['Coverage'] >= 0.25) and (data['Delta_E']  <= 10.0):
-            #    c = 0.75
-            #elif (data['Coverage'] >= 0.10) and (data['Delta_E']  <= 20.0):
-            #    c = 0.5
-            #else:
-            #    c = 0.1
-            ca = (data['Coverage'])**(1./7)                 # 0.15 -> ~0.75
-            #ca = (data['Coverage'])**(1./6)                 # 0.20 -> ~0.75
-            #ca = (data['Coverage'])**(1./5)                 # 0.25 -> ~0.75
-            #ca = (data['Coverage'])**(1./4)                 # 0.35 -> ~0.75
-            ##cb = (0.02 * (50. - data['Delta_E']))**(1.2)    # 10.0 -> ~0.75
-            #cb = (0.02 * (50. - data['Delta_E']))**(1./2)   # 20.0 -> ~0.75
-            ##cb = (0.02 * (50. - data['Delta_E']))**(1./3)   # 25.0 -> ~0.75
-            #cc = (1. - (data['Delta_R']/max_dim))**(1.)     # 0.25 -> ~0.75
-            #c  = ( 3*ca + cb ) / 4
-            #c  = ( cc + 6*ca + 2*cb ) / 9
-            c  = ca
-            self._info['ColorRegions'][i]['Confidence'] = c
-
-        # People/Pedestrian (opencv pre-trained hog)
-        self._detectObjectPeople_CV()
-        
-        for i in range(len(self._info['People'])):
-            data = self._info['People'][i]
-
-            if (data['Coverage'] >= 0.20):
-                c = 0.75
-            if (data['Coverage'] >= 0.10):    # at least 10% coverage needed
-                c = 0.5
-            else:
-                c = 0.1
-            self._info['People'][i]['Confidence'] = c
-
-        # general (self trained haar and cascade) classification
-        # http://www.computer-vision-software.com/blog/2009/11/faq-opencv-haartraining/
-        cascade_files = [#(u'TESTlower', 'haarcascade_lowerbody.xml'),
-                         #(u'TESTupper', 'haarcascade_upperbody.xml'),
-                         (u'Human ears', 'haarcascade_mcs_leftear.xml'),      # e.g. for 'Category:Human ears'
-                         (u'Human ears', 'haarcascade_mcs_rightear.xml'),     # e.g. for 'Category:Human ears'
-                         (u'Human eyes', 'haarcascade_lefteye_2splits.xml'),  # e.g. for 'Category:Human eyes', http://yushiqi.cn/research/eyedetection
-                         (u'Human eyes', 'haarcascade_righteye_2splits.xml'),]# e.g. for 'Category:Human eyes', http://yushiqi.cn/research/eyedetection
-                         #dtbext/opencv/haarcascades/haarcascade_mcs_lefteye.xml
-                         #dtbext/opencv/haarcascades/haarcascade_mcs_righteye.xml
-                         # (others include indifferent (left and/or right) and pair)
-                         #(u'Aeroplane', 'haarcascade_aeroplane.xml'),]        # e.g. for 'Category:Unidentified aircraft'
-                         #(u'Hands', 'PLEASE_TEST_US/1256617233-1-haarcascade_hand.xml'),]
-                         #(u'Hands', 'PLEASE_TEST_US/1256617233-2-haarcascade-hand.xml'),]
-                         #(u'Hands', 'PLEASE_TEST_US/aGest.xml'),]
-        for cf in cascade_files:
-            self._detectObjectTrained_CV(*cf)
-
-        # optical and other text recognition (tesseract & ocropus, ...)
-        self._detectEmbeddedText_popplerNpdfminer()
-        #self._recognizeOpticalText_x()
-        # (no full recognition but just classify as 'contains text')
-
-        # barcode and Data Matrix recognition (libdmtx/pydmtx, zbar, gocr?)
-        self._recognizeOpticalCodes_dmtxNzbar()
-
-        for i in range(len(self._info['OpticalCodes'])):
-            self._info['OpticalCodes'][i]['Confidence'] = self._info['OpticalCodes'][i]['Quality']/2.
-
-        # Chessboard (opencv reference detector)
-        self._detectObjectChessboard_CV()
-
-        for i in range(len(self._info['Chessboard'])):
-            self._info['Chessboard'][i]['Confidence'] = len(self._info['Chessboard'][i]['Corners'])/49.
-
-        # ??? classification of detected features (RTrees, KNearest, Boost, SVM, MLP, NBayes, ...)
-        # ??? (may be do this in '_cat_...()' or '_filter_...()' ?!?...)
-        # http://opencv.itseez.com/doc/tutorials/ml/introduction_to_svm/introduction_to_svm.html
-        # http://stackoverflow.com/questions/8687885/python-opencv-svm-implementation
-        # https://code.ros.org/trac/opencv/browser/trunk/opencv/samples/python2/letter_recog.py?rev=6480
-        #self._classifyObjectAll_CV()
-
-        # general (trained) detection AND classification (BoW)
-        # uses feature detection (SIFT, SURF, ...) AND classification (SVM, ...)
-        #self._detectclassifyObjectAll_CV()
-
-    def _existInformation(self, info, ignore = ['Properties', 'ColorAverage']):
-        result = []
-        for item in info:
-            if item in ignore:
-                continue
-            if info[item]:
-                result.append( item )
-        return result
-
-    def _filter_Properties(self):
-        # >>> never drop <<<
-        result = self._info['Properties']
-        return {'Properties': result}
-
-    def _filter_Faces(self):
-        result = self._info['Faces']
-        if (len(result) < self._thrhld_group_size):
-            buf = []
-            for item in self._info['Faces']:
-                # >>> drop if below thrshld <<<
-                if (item['Confidence'] >= self.thrshld):
-                    buf.append( item )
-            result = buf
-        return {'Faces': result}
-
-    def _filter_People(self):
-        result = self._info['People']
-        if (len(result) < self._thrhld_group_size):
-            buf = []
-            for item in self._info['People']:
-                # >>> drop if below thrshld <<<
-                if (item['Confidence'] >= self.thrshld):
-                    buf.append( item )
-            result = buf
-        return {'People': result}
-
-    def _filter_ColorRegions(self):
-        #result = {}
-        result = []
-        for item in self._info['ColorRegions']:
-            ## >>> drop wrost ones... (ignore all below 0.2) <<<
-            #if (result.get(item['Color'], {'Confidence': 0.2})['Confidence'] < item['Confidence']):
-            #    result[item['Color']] = item
-            # >>> drop if below thrshld <<<
-            if (item['Confidence'] >= self.thrshld):
-                result.append( item )
-        #return {'ColorRegions': [result[item] for item in result]}
-        return {'ColorRegions': result}
-
-    def _filter_ColorAverage(self):
-        # >>> never drop <<<
-        result = self._info['ColorAverage']
-        return {'ColorAverage': result}
-
-    def _filter_OpticalCodes(self):
-        # use all, since detection should be very reliable
-        #result = self._info['OpticalCodes']
-        result = []
-        for item in self._info['OpticalCodes']:
-            # >>> drop if below thrshld <<<
-            if (item['Confidence'] >= self.thrshld):
-                result.append( item )
-        return {'OpticalCodes': result}
-
-    def _filter_Chessboard(self):
-        # use all, since detection should be very reliable
-        result = self._info['Chessboard']
-        return {'Chessboard': result}
-
-    def _filter_Text(self):
-        # use all, since detection should be very reliable
-        result = self._info['Text']
-        return {'Text': result}
-
-    # Category:Unidentified people
-    def _cat_people_People(self):
-        #relevance = bool(self._info_filter['People'])
-        relevance = self._cat_people_Groups()[1]
-
-        return (u'Unidentified people', relevance)
-
-    # Category:Unidentified people
-    #def _cat_multi_People(self):
-    def _cat_face_People(self):
-        relevance = bool(self._info_filter['Faces'])
-        #relevance = bool(self._info_filter['People']) or relevance
-
-        return (u'Unidentified people', relevance)
-
-    # Category:Groups
-    def _cat_people_Groups(self):
-        result = self._info_filter['People']
-
-        relevance = (len(result) >= self._thrhld_group_size)
-
-        return (u'Groups', relevance)
-
-    # Category:Groups
-    def _cat_face_Groups(self):
-        result = self._info_filter['Faces']
-
-        #if not (len(result) > 1): # 5 should give 0.75 and get reported
-        #    relevance = 0.
-        #else:
-        #    relevance = 1 - 1./(len(result)-1)
-        relevance = (len(result) >= self._thrhld_group_size)
-
-        return (u'Groups', relevance)
-
-    # Category:Faces
-    def _cat_face_Faces(self):
-        result = self._info_filter['Faces']
-
-        #return (u'Faces', ((len(result) == 1) and (result[0]['Coverage'] >= .50)))
-        return (u'Faces', ((len(result) == 1) and (result[0]['Coverage'] >= .40)))
-
-    # Category:Portraits
-    def _cat_face_Portraits(self):
-        result = self._info_filter['Faces']
-
-        #return (u'Portraits', ((len(result) == 1) and (result[0]['Coverage'] >= .25)))
-        return (u'Portraits', ((len(result) == 1) and (result[0]['Coverage'] >= .20)))
-
-    # Category:Barcode
-    def _cat_code_Barcode(self):
-        relevance = bool(self._info_filter['OpticalCodes'])
-
-        return (u'Barcode', relevance)
-
-    # Category:Chessboards
-    def _cat_chess_Chessboards(self):
-        relevance = bool(self._info_filter['Chessboard'])
-
-        return (u'Chessboards', relevance)
-
-    # Category:Books (literature) in PDF
-    def _cat_text_BooksPDF(self):
-        pdf    = u'PDF' in self._info_filter['Properties'][0]['Format']
-        result = self._info_filter['Text']
-        relevance = pdf and len(result) and \
-                    (self._info_filter['Properties'][0]['Pages'] >= 10) and \
-                    (result[0]['Size'] >= 5E4) and (result[0]['Lines'] >= 1000)
-
-        return (u'Books (literature) in PDF', relevance)
-
-    # Category:Animated GIF
-    # Category:Animated PNG‎
-    # (Category:Animated SVG‎)
-    def _cat_prop_Animated_general(self):
-        result = self._info_filter['Properties']
-        relevance = result and (result[0]['Pages'] > 1) and \
-                    (result[0]['Format'] in [u'GIF', u'PNG'])
-
-        return (u'Animated %s' % result[0]['Format'], relevance)
-
-    # Category:Categorized by DrTrigonBot
-    def _addcat_BOT(self):
-        # - ALWAYS -
-        return (u"Categorized by DrTrigonBot", True)
-
-    # Category:BMP
-    # Category:PNG
-    # Category:JPEG
-    # Category:TIFF files
-    # (more image formats/extensions according to PIL)
-    # Category:PDF files
-    def _addcat_prop_general(self):
-        fmt = self._info_filter['Properties'][0]['Format']
-        if   u'TIFF' in fmt:
-            fmt = u'TIFF images'
-        elif u'SVG' in fmt:
-            # additional to PIL (rsvg, ...)
-            # should be added as template instead of category (!)
-            fmt = u''
-        elif u'PDF' in fmt:
-            # additional to PIL (...)
-            fmt = u'PDF files'
-        # PIL: http://www.pythonware.com/library/pil/handbook/index.htm
-
-        return (fmt, bool(fmt))
-
-#    # TODO: add templates (conditional/additional like 'addcat')
-#    # Category:SVG - Category:Valid SVG‎ - Category:Invalid SVG
-#    # {{ValidSVG}} - {{InvalidSVG}}
-#    def _addtempl_prop_SVN(self):
-#        fmt = self._info_filter['Properties'][0]['Format']
-#        d   = { u'Valid SVG':   u'{{ValidSVG}}',
-#                u'Invalid SVG': u'{{InvalidSVG}}', }
-#        fmt = d.get(fmt, u'')
-#
-#        return (fmt, bool(fmt))
-
-    # Category:Unidentified people
-    def _guess__People(self):
-        #result  = copy.deepcopy(self._info_filter['Faces'])
-
-        cls = 'person'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        else:
-            result = []                             # nothing found
-
-        return (u'Unidentified people', result, 0.1)
-
-    ## Category:Unidentified maps
-    #def _guess__Maps(self):
-    #    return (u'Unidentified maps', self._detectclassifyObjectAll_CV('maps'), 0.1)
-
-    ## Category:Unidentified flags
-    #def _guess__Flags(self):
-    #    return (u'Unidentified flags', self._detectclassifyObjectAll_CV('flags'), 0.1)
-
-    # Category:Unidentified plants
-    def _guess__Plants(self):
-        cls = 'pottedplant'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        else:
-            result = []                             # nothing found
-
-        return (u'Unidentified plants', result, 0.1)
-
-    ## Category:Unidentified coats of arms
-    #def _guessCoatsOfArms(self):
-    #    return (u'Unidentified coats of arms', self._detectclassifyObjectAll_CV('coats of arms'), 0.1)
-
-    ## Category:Unidentified buildings
-    #def _guessBuildings(self):
-    #    return (u'Unidentified buildings', self._detectclassifyObjectAll_CV('buildings'), 0.1)
-
-    # Category:Unidentified trains
-    def _guess__Trains(self):
-        cls = 'train'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        else:
-            result = []                             # nothing found
-
-        return (u'Unidentified trains', result, 0.1)
-
-    # Category:Unidentified automobiles
-    def _guess__Automobiles(self):
-        cls = 'bus'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        else:
-            result = []                             # nothing found
-        cls = 'car'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result += [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        cls = 'motorbike'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result += [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        return (u'Unidentified automobiles', result, 0.1)
-
-    # Category:Unidentified buses
-    def _guess__Buses(self):
-        cls = 'bus'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        else:
-            result = []                             # nothing found
-
-        return (u'Unidentified buses', result, 0.1)
-
-    # Category:Black     (  0,   0,   0)
-    # Category:Blue‎      (  0,   0, 255)
-    # Category:Brown     (165,  42,  42)
-    # Category:Green     (  0, 255,   0)
-    # Category:Orange    (255, 165,   0)
-    # Category:Pink‎      (255, 192, 203)
-    # Category:Purple    (160,  32, 240)
-    # Category:Red‎       (255,   0,   0)
-    # Category:Turquoise ( 64, 224, 208)
-    # Category:White‎     (255, 255, 255)
-    # Category:Yellow    (255, 255,   0)
-    # http://www.farb-tabelle.de/en/table-of-color.htm
-    #def _collectColor(self):
-    #def _cat_color_Black(self):
-    #    info = self._info_filter['ColorRegions']
-    #    for item in info:
-    #        if (u'Black' == item[u'Color']):
-    #            return (u'Black', True)
-    #    return (u'Black', False)
-
-    def __cat_color_general(self, col):
-        info = self._info_filter['ColorRegions']
-        for item in info:
-            if (col == item[u'Color']):
-                return (col, True)
-        return (col, False)
-
-    _cat_color_Black     = lambda self: self.__cat_color_general(u'Black')
-    _cat_color_Blue      = lambda self: self.__cat_color_general(u'Blue')
-    _cat_color_Brown     = lambda self: self.__cat_color_general(u'Brown')
-    _cat_color_Green     = lambda self: self.__cat_color_general(u'Green')
-    _cat_color_Orange    = lambda self: self.__cat_color_general(u'Orange')
-    _cat_color_Pink      = lambda self: self.__cat_color_general(u'Pink')
-    _cat_color_Purple    = lambda self: self.__cat_color_general(u'Purple')
-    _cat_color_Red       = lambda self: self.__cat_color_general(u'Red')
-    _cat_color_Turquoise = lambda self: self.__cat_color_general(u'Turquoise')
-    _cat_color_White     = lambda self: self.__cat_color_general(u'White')
-    _cat_color_Yellow    = lambda self: self.__cat_color_general(u'Yellow')
-
+# all detection and recognition methods - bindings to other classes, modules and libs
+class FileData(object):
     # .../opencv/samples/c/facedetect.cpp
     # http://opencv.willowgarage.com/documentation/python/genindex.html
     def _detectObjectFaces_CV(self):
@@ -2193,6 +1398,808 @@ class CatImagesBot(checkimages.main):
 
         self._info['Faces'] += data
         return
+
+
+# all classification methods and definitions - default variation
+class CatImages_Default(FileData):
+    # Category:Unidentified people
+    def _cat_people_People(self):
+        #relevance = bool(self._info_filter['People'])
+        relevance = self._cat_people_Groups()[1]
+
+        return (u'Unidentified people', relevance)
+
+    # Category:Unidentified people
+    #def _cat_multi_People(self):
+    def _cat_face_People(self):
+        relevance = bool(self._info_filter['Faces'])
+        #relevance = bool(self._info_filter['People']) or relevance
+
+        return (u'Unidentified people', relevance)
+
+    # Category:Groups
+    def _cat_people_Groups(self):
+        result = self._info_filter['People']
+
+        relevance = (len(result) >= self._thrhld_group_size)
+
+        return (u'Groups', relevance)
+
+    # Category:Groups
+    def _cat_face_Groups(self):
+        result = self._info_filter['Faces']
+
+        #if not (len(result) > 1): # 5 should give 0.75 and get reported
+        #    relevance = 0.
+        #else:
+        #    relevance = 1 - 1./(len(result)-1)
+        relevance = (len(result) >= self._thrhld_group_size)
+
+        return (u'Groups', relevance)
+
+    # Category:Faces
+    def _cat_face_Faces(self):
+        result = self._info_filter['Faces']
+
+        #return (u'Faces', ((len(result) == 1) and (result[0]['Coverage'] >= .50)))
+        return (u'Faces', ((len(result) == 1) and (result[0]['Coverage'] >= .40)))
+
+    # Category:Portraits
+    def _cat_face_Portraits(self):
+        result = self._info_filter['Faces']
+
+        #return (u'Portraits', ((len(result) == 1) and (result[0]['Coverage'] >= .25)))
+        return (u'Portraits', ((len(result) == 1) and (result[0]['Coverage'] >= .20)))
+
+    # Category:Barcode
+    def _cat_code_Barcode(self):
+        relevance = bool(self._info_filter['OpticalCodes'])
+
+        return (u'Barcode', relevance)
+
+    # Category:Chessboards
+    def _cat_chess_Chessboards(self):
+        relevance = bool(self._info_filter['Chessboard'])
+
+        return (u'Chessboards', relevance)
+
+    # Category:Books (literature) in PDF
+    def _cat_text_BooksPDF(self):
+        pdf    = u'PDF' in self._info_filter['Properties'][0]['Format']
+        result = self._info_filter['Text']
+        relevance = pdf and len(result) and \
+                    (self._info_filter['Properties'][0]['Pages'] >= 10) and \
+                    (result[0]['Size'] >= 5E4) and (result[0]['Lines'] >= 1000)
+
+        return (u'Books (literature) in PDF', relevance)
+
+    # Category:Animated GIF
+    # Category:Animated PNG‎
+    # (Category:Animated SVG‎)
+    def _cat_prop_Animated_general(self):
+        result = self._info_filter['Properties']
+        relevance = result and (result[0]['Pages'] > 1) and \
+                    (result[0]['Format'] in [u'GIF', u'PNG'])
+
+        return (u'Animated %s' % result[0]['Format'], relevance)
+
+    # Category:Categorized by DrTrigonBot
+    def _addcat_BOT(self):
+        # - ALWAYS -
+        return (u"Categorized by DrTrigonBot", True)
+
+    # Category:BMP
+    # Category:PNG
+    # Category:JPEG
+    # Category:TIFF files
+    # (more image formats/extensions according to PIL)
+    # Category:PDF files
+    def _addcat_prop_general(self):
+        fmt = self._info_filter['Properties'][0]['Format']
+        if   u'TIFF' in fmt:
+            fmt = u'TIFF images'
+        elif u'SVG' in fmt:
+            # additional to PIL (rsvg, ...)
+            # should be added as template instead of category (!)
+            fmt = u''
+        elif u'PDF' in fmt:
+            # additional to PIL (...)
+            fmt = u'PDF files'
+        # PIL: http://www.pythonware.com/library/pil/handbook/index.htm
+
+        return (fmt, bool(fmt))
+
+#    # TODO: add templates (conditional/additional like 'addcat')
+#    # Category:SVG - Category:Valid SVG‎ - Category:Invalid SVG
+#    # {{ValidSVG}} - {{InvalidSVG}}
+#    def _addtempl_prop_SVN(self):
+#        fmt = self._info_filter['Properties'][0]['Format']
+#        d   = { u'Valid SVG':   u'{{ValidSVG}}',
+#                u'Invalid SVG': u'{{InvalidSVG}}', }
+#        fmt = d.get(fmt, u'')
+#
+#        return (fmt, bool(fmt))
+
+    # Category:Unidentified people
+    def _guess__People(self):
+        #result  = copy.deepcopy(self._info_filter['Faces'])
+
+        cls = 'person'
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        else:
+            result = []                             # nothing found
+
+        return (u'Unidentified people', result, 0.1)
+
+    ## Category:Unidentified maps
+    #def _guess__Maps(self):
+    #    return (u'Unidentified maps', self._detectclassifyObjectAll_CV('maps'), 0.1)
+
+    ## Category:Unidentified flags
+    #def _guess__Flags(self):
+    #    return (u'Unidentified flags', self._detectclassifyObjectAll_CV('flags'), 0.1)
+
+    # Category:Unidentified plants
+    def _guess__Plants(self):
+        cls = 'pottedplant'
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        else:
+            result = []                             # nothing found
+
+        return (u'Unidentified plants', result, 0.1)
+
+    ## Category:Unidentified coats of arms
+    #def _guessCoatsOfArms(self):
+    #    return (u'Unidentified coats of arms', self._detectclassifyObjectAll_CV('coats of arms'), 0.1)
+
+    ## Category:Unidentified buildings
+    #def _guessBuildings(self):
+    #    return (u'Unidentified buildings', self._detectclassifyObjectAll_CV('buildings'), 0.1)
+
+    # Category:Unidentified trains
+    def _guess__Trains(self):
+        cls = 'train'
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        else:
+            result = []                             # nothing found
+
+        return (u'Unidentified trains', result, 0.1)
+
+    # Category:Unidentified automobiles
+    def _guess__Automobiles(self):
+        cls = 'bus'
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        else:
+            result = []                             # nothing found
+        cls = 'car'
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result += [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        cls = 'motorbike'
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result += [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        return (u'Unidentified automobiles', result, 0.1)
+
+    # Category:Unidentified buses
+    def _guess__Buses(self):
+        cls = 'bus'
+        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
+            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
+            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
+        else:
+            result = []                             # nothing found
+
+        return (u'Unidentified buses', result, 0.1)
+
+    # Category:Black     (  0,   0,   0)
+    # Category:Blue‎      (  0,   0, 255)
+    # Category:Brown     (165,  42,  42)
+    # Category:Green     (  0, 255,   0)
+    # Category:Orange    (255, 165,   0)
+    # Category:Pink‎      (255, 192, 203)
+    # Category:Purple    (160,  32, 240)
+    # Category:Red‎       (255,   0,   0)
+    # Category:Turquoise ( 64, 224, 208)
+    # Category:White‎     (255, 255, 255)
+    # Category:Yellow    (255, 255,   0)
+    # http://www.farb-tabelle.de/en/table-of-color.htm
+    #def _collectColor(self):
+    #def _cat_color_Black(self):
+    #    info = self._info_filter['ColorRegions']
+    #    for item in info:
+    #        if (u'Black' == item[u'Color']):
+    #            return (u'Black', True)
+    #    return (u'Black', False)
+
+    def __cat_color_general(self, col):
+        info = self._info_filter['ColorRegions']
+        for item in info:
+            if (col == item[u'Color']):
+                return (col, True)
+        return (col, False)
+
+    _cat_color_Black     = lambda self: self.__cat_color_general(u'Black')
+    _cat_color_Blue      = lambda self: self.__cat_color_general(u'Blue')
+    _cat_color_Brown     = lambda self: self.__cat_color_general(u'Brown')
+    _cat_color_Green     = lambda self: self.__cat_color_general(u'Green')
+    _cat_color_Orange    = lambda self: self.__cat_color_general(u'Orange')
+    _cat_color_Pink      = lambda self: self.__cat_color_general(u'Pink')
+    _cat_color_Purple    = lambda self: self.__cat_color_general(u'Purple')
+    _cat_color_Red       = lambda self: self.__cat_color_general(u'Red')
+    _cat_color_Turquoise = lambda self: self.__cat_color_general(u'Turquoise')
+    _cat_color_White     = lambda self: self.__cat_color_general(u'White')
+    _cat_color_Yellow    = lambda self: self.__cat_color_general(u'Yellow')
+
+
+# Image by content categorization derived from 'checkimages.py'.
+class CatImagesBot(CatImages_Default, checkimages.main):
+#    def __init__(self, site, logFulNumber = 25000, sendemailActive = False,
+#                 duplicatesReport = False, logFullError = True): pass
+#    def setParameters(self, imageName, timestamp, uploader): pass
+
+    #ignore = []
+    ignore = ['color']
+    
+    _thrhld_group_size = 4
+    _thrshld_guesses = 0.1
+    _thrshld_default = 0.75
+
+    # or may be '__init__' ... ???
+    def load_licenses(self):
+        #pywikibot.output(u'\n\t...Listing the procedures available...\n')
+        pywikibot.output(u'\n\t...Listing the procedures used...\n')
+        
+        self._funcs = {'filter': [], 'cat': [], 'addcat': [], 'guess': []}
+
+        for item in dir(self):
+            s = item.split('_')
+            if (len(s) < 3) or (s[1] not in self._funcs) or (s[2] in self.ignore):
+                continue
+            pywikibot.output( item )
+            self._funcs[s[1]].append( item )
+
+        self.tmpl_available_spec = tmpl_available_spec
+        gen = pagegenerators.PrefixingPageGenerator(prefix = u'Template:FileContentsByBot/')
+        buf = []
+        for item in gen:
+            item = item.title()
+            if (item[-4:] == "/doc"):           # all docs
+                continue
+            item = os.path.split(item)[1]
+            if (item[0].lower() == item[0]):    # e.g. 'generic'
+                continue
+            buf.append( item )
+        if buf:
+            self.tmpl_available_spec = buf
+            pywikibot.output( u'\n\t...Following specialized templates found, check them since they are used now...\n' )
+            pywikibot.output( u'tmpl_available_spec = [ %s ]\n' % u", ".join(buf) )
+
+        return []
+
+    def downloadImage(self):
+        self.image_filename  = os.path.split(self.image.fileUrl())[-1]
+        self.image_fileext   = os.path.splitext(self.image_filename)[1]
+        self.image_path      = urllib2.quote(os.path.join(scriptdir, ('cache/' + self.image_filename[-128:])))
+        
+        self.image_path_JPEG = self.image_path + u'.jpg'
+        
+        if os.path.exists(self.image_path):
+            return
+
+        pywikibot.get_throttle()
+        f_url, data = self.site.getUrl(self.image.fileUrl(), no_hostname=True, 
+                                       back_response=True)
+        # needed patch for 'getUrl' applied upstream in r10441
+        # (allows to re-read from back_response)
+        data = f_url.read()
+        del f_url   # free some memory (no need to keep a copy...)
+
+        f = open(self.image_path, 'wb')
+        f.write( data )
+        f.close()
+
+        # SVG: rasterize the SVG to bitmap (MAY BE GET FROM WIKI BY DOWNLOAD?...)
+        # (Mediawiki uses librsvg too: http://commons.wikimedia.org/wiki/SVG#SVGs_in_MediaWiki)
+        # http://stackoverflow.com/questions/6589358/convert-svg-to-png-in-python
+        # http://cairographics.org/pythoncairopil/
+        # http://cairographics.org/pyrsvg/
+        if self.image_fileext == u'.svg':
+            try:
+                svg = rsvg.Handle(self.image_path)
+                img = cairo.ImageSurface(cairo.FORMAT_ARGB32, svg.props.width, svg.props.height)
+                ctx = cairo.Context(img)
+                svg.render_cairo(ctx)
+                #img.write_to_png("svg.png")
+                Image.frombuffer("RGBA",( img.get_width(),img.get_height() ),
+                             img.get_data(),"raw","RGBA",0,1).save(self.image_path_JPEG, "JPEG")
+            except MemoryError:
+                self.image_path_JPEG = self.image_path
+        else:
+            try:
+                im = Image.open(self.image_path) # might be png, gif etc, for instance
+                #im.thumbnail(size, Image.ANTIALIAS) # size is 640x480
+                im.convert('RGB').save(self.image_path_JPEG, "JPEG")
+            except IOError, e:
+                if 'image file is truncated' in str(e):
+                    # im object has changed due to exception raised
+                    im.convert('RGB').save(self.image_path_JPEG, "JPEG")
+                else:
+                    self.image_path_JPEG = self.image_path
+            except:
+                self.image_path_JPEG = self.image_path
+
+        # PDF: support extract text and images
+        # (Mediawiki uses ghostscript: https://www.mediawiki.org/wiki/Extension:PdfHandler#Pre-requisites)
+        # http://vermeulen.ca/python-pdf.html
+        # http://code.activestate.com/recipes/511465-pure-python-pdf-to-text-converter/
+        # http://stackoverflow.com/questions/25665/python-module-for-converting-pdf-to-text
+        if self.image_fileext == u'.pdf':
+            pass
+
+    # LOOK ALSO AT: checkimages.CatImagesBot.checkStep
+    # (and category scripts/bots too...)
+    def checkStep(self):
+        #print self.image_path
+        pywikibot.output(u'Processing media %s ...' % self.image.title(asLink=True))
+
+        if gbv.useGuesses:
+            self.thrshld = self._thrshld_guesses
+        else:
+            self.thrshld = self._thrshld_default
+
+        self._info         = {}     # used for LOG/DEBUG OUTPUT ONLY
+        self._info_filter  = {}     # used for CATEGORIZATION
+        self._result_check = []
+        self._result_add   = []
+
+        # gather all information related to current image
+        self.gatherInformation()
+
+        # information template: use filter to select from gathered information
+        self._info_filter = {}
+        for item in self._funcs['filter']:
+            self._info_filter.update( self.__class__.__dict__[item](self) )
+
+        # categorization: use explicit searches for classification (rel = ?)
+        for item in self._funcs['cat']:
+            (cat, rel) = getattr(self, item)()
+            #print cat, result, len(result)
+            if rel:
+                self._result_check.append( cat )
+        self._result_check = list(set(self._result_check))
+
+        # categorization: conditional (only if the ones before are present)
+        # (does not trigger report to page)
+        for item in self._funcs['addcat']:
+            (cat, rel) = getattr(self, item)()
+            #print cat, result, len(result)
+            if rel:
+                self._result_add.append( cat )
+        self._result_add = list(set(self._result_add))
+
+        # categorization: use guesses for unreliable classification (rel = 0.1)
+        if not gbv.useGuesses:
+            return self._result_check
+        for item in self._funcs['guess']:
+            (cat, result, rel) = getattr(self, item)()
+            #print cat, result, len(result)
+            if result:
+                self._result_check.append( (cat, result, rel) )
+
+        return self._result_check
+
+    def tag_image(self):
+        self.clean_cache()
+
+        #if not self._existInformation(self._info_filter):  # information available?
+        if not self._result_check:                          # category available?
+            return False
+
+        pywikibot.get_throttle()
+        content = self.image.get()
+
+        content = self._append_to_template(content, u"Information", tmpl_FileContentsByBot)
+        for i, key in enumerate(self._info_filter):
+            item = self._info_filter[key]
+
+            info = self._make_infoblock(key, item)
+            if info:
+                content = self._append_to_template(content, u"FileContentsByBot", info)
+
+        tags = set([])
+        for i, cat in enumerate(list(set(self._result_check + self._result_add))):
+            tags.add( u"[[:Category:%s]]" % cat )
+            content = pywikibot.replaceCategoryLinks(content, [cat], site=self.site, addOnly=True)
+
+        content = pywikibot.replaceCategoryLinks( content, 
+                list(set(pywikibot.getCategoryLinks(content, site=self.site))),
+                site=self.site )
+        content = self._remove_category_or_template(content, u"Uncategorized")  # template
+        content = self._add_template(content, u"Check categories|year={{subst:#time:Y}}|month={{subst:#time:F}}|day={{subst:#time:j}}|category=[[Category:Categorized by DrTrigonBot]]", top=True)
+        print u"--- " * 20
+        print content
+        print u"--- " * 20
+        pywikibot.put_throttle()
+        self.image.put( content, comment="bot automatic categorization; adding %s" % u", ".join(tags),
+                                 botflag=False )
+
+        return True
+
+    def log_output(self):
+        # ColorRegions always applies here since there is at least 1 (THE average) color...
+        ignore = ['Properties', 'ColorAverage', 'ColorRegions'] # + ColorRegions
+        #if not self._existInformation(self._info):  # information available?
+        # information available? AND/OR category available?
+        if not (self._existInformation(self._info, ignore = ignore) or self._result_check):
+            return u""
+
+        ret  = []
+        ret.append( u"" )
+        ret.append( u"== [[:%s]] ==" % self.image.title() )
+        ret.append( u'{|' )
+        ret.append( u'|<div style="position:relative;">' )
+        ret.append( u"[[%s|200px]]" % self.image.title() )
+        ret.append( self._make_markerblock(self._info[u'Faces'], 200.) )
+        ret.append( self._make_markerblock(self._info[u'People'], 200.,
+                                           structure=['Position'], line='dashed') )
+        ret.append( u"</div>" )
+        ret.append( u'|<div style="position:relative;">' )
+        ret.append( u"[[%s|200px]]" % self.image.title() )
+        ret.append( self._make_markerblock(self._info[u'ColorRegions'], 200.,
+                                           structure=['Position']) )
+        ret.append( u"</div>" )
+        ret.append( u'|<div style="position:relative;">' )
+        ret.append( u"[[%s|200px]]" % self.image.title() )
+        ret.append( self._make_markerblock(self._info[u'_TrainedHuman ears'], 200.,
+                                           structure=['Position']) )
+        ret.append( self._make_markerblock(self._info[u'_TrainedHuman eyes'], 200.,
+                                           structure=['Position'], line='dashed') )
+        ret.append( u"</div>" )
+        ret.append( u'|}' )
+
+        color = {True: "rgb(0,255,0)", False: "rgb(255,0,0)"}[bool(self._result_check)]
+        ret.append( u"<div style='background:%s'>'''automatic categorization''': %s</div>" % (color, u", ".join(list(set(self._result_check + self._result_add)))) )
+
+        buf = []
+        for i, key in enumerate(self._info):
+            item = self._info[key]
+
+            info = self._make_infoblock(key, item, [])
+            if info:
+                buf.append( info )
+        ret.append( tmpl_FileContentsByBot[3:] + u"\n" + u"\n".join( buf ) + u"\n}}" )
+
+        return u"\n".join( ret )
+
+    def clean_cache(self):
+        if os.path.exists(self.image_path):
+            os.remove( self.image_path )
+        if os.path.exists(self.image_path_JPEG):
+            os.remove( self.image_path_JPEG )
+        #image_path_new = self.image_path_JPEG.replace(u"cache/", u"cache/0_DETECTED_")
+        #if os.path.exists(image_path_new):
+        #    os.remove( image_path_new )
+
+    # LOOK ALSO AT: checkimages.CatImagesBot.report
+    def report(self):
+        tagged = self.tag_image()
+        logged = self.log_output()
+        return (tagged, logged)
+
+    def _make_infoblock(self, cat, res, tmpl_available=None):
+        if not res:
+            return u''
+
+        if (tmpl_available == None):
+            tmpl_available = self.tmpl_available_spec
+
+        generic = (cat not in tmpl_available)
+        titles = res[0].keys()
+        if not titles:
+            return u''
+
+        result = []
+        #result.append( u'{{(!}}style="background:%s;"' % {True: 'green', False: 'red'}[report] )
+        if generic:
+            result.append( u"{{FileContentsByBot/generic|name=%s|" % cat )
+            buf = dict([ (key, []) for key in titles ])
+            for item in res:
+                for key in titles:
+                    buf[key].append( self._output_format(item[key]) )
+            for key in titles:
+                result.append( u"  {{FileContentsByBot/generic|name=%s|value=%s}}" % (key, u"; ".join(buf[key])) )
+        else:
+            result.append( u"{{FileContentsByBot/%s|" % cat )
+            for item in res:
+                result.append( u"  {{FileContentsByBot/%s" % cat )
+                for key in titles:
+                    if item[key]:   # (work-a-round for empty 'Eyes')
+                        result.append( self._output_format_flatten(key, item[key]) )
+                result.append( u"  }}" )
+        result.append( u"}}" )
+
+        return u"\n".join( result )
+
+    def _output_format(self, value):
+        if (type(value) == type(float())):
+            # round/strip floats
+            return "%.3f" % value
+        else:
+            # output string representation of variable
+            return str(value)
+
+    def _output_format_flatten(self, key, value):
+        # flatten structured varible recursively
+        if (type(value) == type(tuple())) or (type(value) == type(list())):
+            buf = []
+            for i, t in enumerate(value):
+                buf.append( self._output_format_flatten(key + (u"-%02i" % i), t) )
+            return u"\n".join( buf )
+        else:
+            # end of recursion
+            return u"  | %s = %s" % (key, self._output_format(value))
+
+    def _make_markerblock(self, res, size, structure=['Position', 'Eyes', 'Mouth', 'Nose'], line='solid'):
+        # same as in '_detectObjectFaces_CV'
+        colors = [ (0,0,255),
+            (0,128,255),
+            (0,255,255),
+            (0,255,0),
+            (255,128,0),
+            (255,255,0),
+            (255,0,0),
+            (255,0,255) ]
+        result = []
+        for i, r in enumerate(res):
+            if ('RGB' in r):
+                color = list(np.array((255,255,255))-np.array(r['RGBref']))
+            else:
+                color = list(colors[i%8])
+            color.reverse()
+            color = u"%02x%02x%02x" % tuple(color)
+            
+            #scale = r['size'][0]/size
+            scale = self.image_size[0]/size
+            f     = list(np.array(r[structure[0]])/scale)
+            
+            result.append( u'<div class="%s-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px %s #%s;"></div>' % tuple([structure[0].lower()] + f + [line, color]) )
+
+            for ei in range(len(structure)-1):
+                data = r[structure[ei+1]]
+                if data and (not hasattr(data[0], '__iter__')):    # Mouth and Nose are not lists
+                    data = [ r[structure[ei+1]] ]
+                for e in data:
+                    e = list(np.array(e)/scale)
+    
+                    result.append( u'<div class="%s-marker" style="position:absolute; left:%ipx; top:%ipx; width:%ipx; height:%ipx; border:2px solid #%s;"></div>' % tuple([structure[ei+1].lower()] + e + [color]) )
+
+        return u"\n".join( result )
+
+    # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
+    def _remove_category_or_template(self, text, name):
+        text = re.sub(u"[\{\[]{2}%s.*?[\}\]]{2}\n?" % name, u"", text)
+        return text
+
+    # place into 'textlib'
+    def _add_template(self, text, name, params={}, top=False, raw=False):
+        if top:
+            buf = [(u"{{%s}}" % name), text]
+        else:
+            if raw:
+                buf = [text, name]
+            else:
+                buf = [text, (u"{{%s}}" % name)]
+        return u"\n".join( buf )
+
+    # place into 'textlib' (or else e.g. 'catlib'/'templib'...)
+    def _append_to_template(self, text, name, append):
+        pattern  = re.compile(u"(\{\{%s.*?\n)(\s*\}\}\n{2})" % name, flags=re.S)
+        template = pattern.search(text).groups()
+        
+        template = u"".join( [template[0], append, u"\n", template[1]] )
+        
+        text = pattern.sub(template, text)
+        return text
+
+    # gather data from all information interfaces and assign confidences
+    def gatherInformation(self):
+        # Image size
+        self._detectProperties_PIL()
+        
+        # Faces and eyes (opencv pre-trained haar)
+        self._detectObjectFaces_CV()
+
+        for i in range(len(self._info['Faces'])):
+            data = self._info['Faces'][i]
+
+            c = (len(data['Eyes']) + 2.) / 4.
+            self._info['Faces'][i]['Confidence'] = c
+        
+        # Faces (extract EXIF data)
+        self._detectObjectFaces_EXIF()
+        # exclude duplicates... (CV and EXIF)
+
+        for i in range(len(self._info['Faces'])):
+            if 'Confidence' not in self._info['Faces'][i]:
+                self._info['Faces'][i]['ID'] = i+1
+                self._info['Faces'][i]['Confidence'] = self._thrshld_default
+
+        # Segments and colors
+        self._detectSegmentColors_JSEGnPIL()
+        # Average color
+        self._detectAverageColor_PIL()
+
+        max_dim = max(self.image_size)
+        for i in range(len(self._info['ColorRegions'])):
+            data = self._info['ColorRegions'][i]
+
+            # has to be in descending order since only 1 resolves (!)
+            #if   (data['Coverage'] >= 0.40) and (data['Delta_E']  <=  5.0):
+            #    c = 1.0
+            ##elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 15.0):
+            ##elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 10.0):
+            #elif (data['Coverage'] >= 0.25) and (data['Delta_E']  <= 10.0):
+            #    c = 0.75
+            #elif (data['Coverage'] >= 0.10) and (data['Delta_E']  <= 20.0):
+            #    c = 0.5
+            #else:
+            #    c = 0.1
+            ca = (data['Coverage'])**(1./7)                 # 0.15 -> ~0.75
+            #ca = (data['Coverage'])**(1./6)                 # 0.20 -> ~0.75
+            #ca = (data['Coverage'])**(1./5)                 # 0.25 -> ~0.75
+            #ca = (data['Coverage'])**(1./4)                 # 0.35 -> ~0.75
+            ##cb = (0.02 * (50. - data['Delta_E']))**(1.2)    # 10.0 -> ~0.75
+            #cb = (0.02 * (50. - data['Delta_E']))**(1./2)   # 20.0 -> ~0.75
+            ##cb = (0.02 * (50. - data['Delta_E']))**(1./3)   # 25.0 -> ~0.75
+            #cc = (1. - (data['Delta_R']/max_dim))**(1.)     # 0.25 -> ~0.75
+            #c  = ( 3*ca + cb ) / 4
+            #c  = ( cc + 6*ca + 2*cb ) / 9
+            c  = ca
+            self._info['ColorRegions'][i]['Confidence'] = c
+
+        # People/Pedestrian (opencv pre-trained hog)
+        self._detectObjectPeople_CV()
+        
+        for i in range(len(self._info['People'])):
+            data = self._info['People'][i]
+
+            if (data['Coverage'] >= 0.20):
+                c = 0.75
+            if (data['Coverage'] >= 0.10):    # at least 10% coverage needed
+                c = 0.5
+            else:
+                c = 0.1
+            self._info['People'][i]['Confidence'] = c
+
+        # general (self trained haar and cascade) classification
+        # http://www.computer-vision-software.com/blog/2009/11/faq-opencv-haartraining/
+        cascade_files = [#(u'TESTlower', 'haarcascade_lowerbody.xml'),
+                         #(u'TESTupper', 'haarcascade_upperbody.xml'),
+                         (u'Human ears', 'haarcascade_mcs_leftear.xml'),      # e.g. for 'Category:Human ears'
+                         (u'Human ears', 'haarcascade_mcs_rightear.xml'),     # e.g. for 'Category:Human ears'
+                         (u'Human eyes', 'haarcascade_lefteye_2splits.xml'),  # e.g. for 'Category:Human eyes', http://yushiqi.cn/research/eyedetection
+                         (u'Human eyes', 'haarcascade_righteye_2splits.xml'),]# e.g. for 'Category:Human eyes', http://yushiqi.cn/research/eyedetection
+                         #dtbext/opencv/haarcascades/haarcascade_mcs_lefteye.xml
+                         #dtbext/opencv/haarcascades/haarcascade_mcs_righteye.xml
+                         # (others include indifferent (left and/or right) and pair)
+                         #(u'Aeroplane', 'haarcascade_aeroplane.xml'),]        # e.g. for 'Category:Unidentified aircraft'
+                         #(u'Hands', 'PLEASE_TEST_US/1256617233-1-haarcascade_hand.xml'),]
+                         #(u'Hands', 'PLEASE_TEST_US/1256617233-2-haarcascade-hand.xml'),]
+                         #(u'Hands', 'PLEASE_TEST_US/aGest.xml'),]
+        for cf in cascade_files:
+            self._detectObjectTrained_CV(*cf)
+
+        # optical and other text recognition (tesseract & ocropus, ...)
+        self._detectEmbeddedText_popplerNpdfminer()
+        #self._recognizeOpticalText_x()
+        # (no full recognition but just classify as 'contains text')
+
+        # barcode and Data Matrix recognition (libdmtx/pydmtx, zbar, gocr?)
+        self._recognizeOpticalCodes_dmtxNzbar()
+
+        for i in range(len(self._info['OpticalCodes'])):
+            self._info['OpticalCodes'][i]['Confidence'] = self._info['OpticalCodes'][i]['Quality']/2.
+
+        # Chessboard (opencv reference detector)
+        self._detectObjectChessboard_CV()
+
+        for i in range(len(self._info['Chessboard'])):
+            self._info['Chessboard'][i]['Confidence'] = len(self._info['Chessboard'][i]['Corners'])/49.
+
+        # ??? classification of detected features (RTrees, KNearest, Boost, SVM, MLP, NBayes, ...)
+        # ??? (may be do this in '_cat_...()' or '_filter_...()' ?!?...)
+        # http://opencv.itseez.com/doc/tutorials/ml/introduction_to_svm/introduction_to_svm.html
+        # http://stackoverflow.com/questions/8687885/python-opencv-svm-implementation
+        # https://code.ros.org/trac/opencv/browser/trunk/opencv/samples/python2/letter_recog.py?rev=6480
+        #self._classifyObjectAll_CV()
+
+        # general (trained) detection AND classification (BoW)
+        # uses feature detection (SIFT, SURF, ...) AND classification (SVM, ...)
+        #self._detectclassifyObjectAll_CV()
+
+    def _existInformation(self, info, ignore = ['Properties', 'ColorAverage']):
+        result = []
+        for item in info:
+            if item in ignore:
+                continue
+            if info[item]:
+                result.append( item )
+        return result
+
+    def _filter_Properties(self):
+        # >>> never drop <<<
+        result = self._info['Properties']
+        return {'Properties': result}
+
+    def _filter_Faces(self):
+        result = self._info['Faces']
+        if (len(result) < self._thrhld_group_size):
+            buf = []
+            for item in self._info['Faces']:
+                # >>> drop if below thrshld <<<
+                if (item['Confidence'] >= self.thrshld):
+                    buf.append( item )
+            result = buf
+        return {'Faces': result}
+
+    def _filter_People(self):
+        result = self._info['People']
+        if (len(result) < self._thrhld_group_size):
+            buf = []
+            for item in self._info['People']:
+                # >>> drop if below thrshld <<<
+                if (item['Confidence'] >= self.thrshld):
+                    buf.append( item )
+            result = buf
+        return {'People': result}
+
+    def _filter_ColorRegions(self):
+        #result = {}
+        result = []
+        for item in self._info['ColorRegions']:
+            ## >>> drop wrost ones... (ignore all below 0.2) <<<
+            #if (result.get(item['Color'], {'Confidence': 0.2})['Confidence'] < item['Confidence']):
+            #    result[item['Color']] = item
+            # >>> drop if below thrshld <<<
+            if (item['Confidence'] >= self.thrshld):
+                result.append( item )
+        #return {'ColorRegions': [result[item] for item in result]}
+        return {'ColorRegions': result}
+
+    def _filter_ColorAverage(self):
+        # >>> never drop <<<
+        result = self._info['ColorAverage']
+        return {'ColorAverage': result}
+
+    def _filter_OpticalCodes(self):
+        # use all, since detection should be very reliable
+        #result = self._info['OpticalCodes']
+        result = []
+        for item in self._info['OpticalCodes']:
+            # >>> drop if below thrshld <<<
+            if (item['Confidence'] >= self.thrshld):
+                result.append( item )
+        return {'OpticalCodes': result}
+
+    def _filter_Chessboard(self):
+        # use all, since detection should be very reliable
+        result = self._info['Chessboard']
+        return {'Chessboard': result}
+
+    def _filter_Text(self):
+        # use all, since detection should be very reliable
+        result = self._info['Text']
+        return {'Text': result}
+
 
 gbv = Global()
 
