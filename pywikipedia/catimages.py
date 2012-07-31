@@ -628,8 +628,6 @@ class FileData(object):
             rxcountpages = re.compile(r"/Type\s*/Page([^s]|$)", re.MULTILINE|re.DOTALL)    # PDF v. 1.3,1.4,1.5,1.6
             pc = len(rxcountpages.findall( file(self.image_path,"rb").read() ))
 
-            self.image_size = (1, 1)    # unknown?!? (page size)
-
             result = { 'Format':     u'PDF',
                        'Mode':       u'-',
                        'Palette':    u'-',
@@ -1256,7 +1254,7 @@ class FileData(object):
         else:
             (width, height) = self.image_size
         wasRotated = (height > width)
-        aspect = float(height)/width
+        aspect = float(height)/(width or 1)
         
         if   (make in ['sony', 'nikon', 'panasonic', 'casio', 'ricoh']):
             # UNTESTED: ['sony', 'nikon', 'casio', 'ricoh']
