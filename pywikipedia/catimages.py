@@ -1641,7 +1641,7 @@ class CatImages_Default(FileData):
 
 
 # Image by content categorization derived from 'checkimages.py'.
-class CatImagesBot(CatImages_Default, checkimages.main):
+class CatImagesBot(checkimages.main, CatImages_Default):
 #    def __init__(self, site, logFulNumber = 25000, sendemailActive = False,
 #                 duplicatesReport = False, logFullError = True): pass
 #    def setParameters(self, imageName, timestamp, uploader): pass
