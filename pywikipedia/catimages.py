@@ -1254,7 +1254,7 @@ class FileData(object):
         else:
             (width, height) = self.image_size
         wasRotated = (height > width)
-        aspect = float(height)/(width or 1)
+        aspect = float(height or 1)/(width or 1)
         
         if   (make in ['sony', 'nikon', 'panasonic', 'casio', 'ricoh']):
             # UNTESTED: ['sony', 'nikon', 'casio', 'ricoh']
