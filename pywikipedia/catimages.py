@@ -1016,8 +1016,12 @@ class FileData(object):
             #                       layoutmode='normal', laparams=laparams, outdir=None)
             #device = pdfdevice.TagExtractor(rsrcmgr, outfp, codec='utf-8')
             fp = file(self.image_path, 'rb')
-            pdfinterp.process_pdf(rsrcmgr, device, fp, set(), maxpages=0, password='',
-                        caching=True, check_extractable=False)
+            try:
+                pdfinterp.process_pdf(rsrcmgr, device, fp, set(), maxpages=0, password='',
+                            caching=True, check_extractable=False)
+            except AssertionError:
+                pywikibot.output(u'WARNING: pdfminer missed, may be corrupt [_detectEmbeddedText_popplerNpdfminer]')
+                return
             fp.close()
             device.close()
             data = outfp.getvalue().splitlines(True)
