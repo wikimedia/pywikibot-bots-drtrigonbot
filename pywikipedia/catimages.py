@@ -367,9 +367,10 @@ class FileData(object):
 
         # similar to face detection
         smallImg = np.empty( (cv.Round(img.shape[1]/scale), cv.Round(img.shape[0]/scale)), dtype=np.uint8 )
-        gray = cv2.cvtColor( img, cv.CV_BGR2GRAY )
+        #gray = cv2.cvtColor( img, cv.CV_BGR2GRAY )
+        gray = img
         smallImg = cv2.resize( gray, smallImg.shape, interpolation=cv2.INTER_LINEAR )
-        smallImg = cv2.equalizeHist( smallImg )
+        #smallImg = cv2.equalizeHist( smallImg )
         img = smallImg
         
         hog = cv2.HOGDescriptor()
@@ -381,7 +382,9 @@ class FileData(object):
         # run the detector with default parameters. to get a higher hit-rate
         # (and more false alarms, respectively), decrease the hitThreshold and
         # groupThreshold (set groupThreshold to 0 to turn off the grouping completely).
-        found = list(hog.detectMultiScale(img, 0, (8,8), (32,32), 1.05, 2))
+        # detectMultiScale(img, hit_threshold=0, win_stride=Size(),
+        #                  padding=Size(), scale0=1.05, group_threshold=2)
+        found = list(hog.detectMultiScale(img, 0.25, (8,8), (32,32), 1.05, 2))
 
         # people haar/cascaded classifier
         # use 'haarcascade_fullbody.xml', ... also (like face detection)
@@ -936,7 +939,7 @@ class FileData(object):
         smallImg = cv2.equalizeHist( smallImg )
 
         objects = list(cascade.detectMultiScale( smallImg,
-            1.1, 2, 0
+            1.1, 5, 0
             #|cv.CV_HAAR_FIND_BIGGEST_OBJECT
             #|cv.CV_HAAR_DO_ROUGH_SEARCH
             |cv.CV_HAAR_SCALE_IMAGE,
@@ -1425,7 +1428,7 @@ class CatImages_Default(FileData):
                      #dtbext/opencv/haarcascades/haarcascade_mcs_righteye.xml
                      # (others include indifferent (left and/or right) and pair)
                      (u'Automobiles', 'cars3.xml'),                       # http://www.youtube.com/watch?v=c4LobbqeKZc
-                     (u'Hands', '1256617233-2-haarcascade-hand.xml', 400.),]    # http://www.andol.info/
+                     (u'Hands', '1256617233-2-haarcascade-hand.xml', 300.),]    # http://www.andol.info/
                      #(u'Aeroplanes', 'haarcascade_aeroplane.xml'),]      # e.g. for 'Category:Unidentified aircraft'
 
     # Category:Unidentified people
@@ -2104,7 +2107,7 @@ class CatImagesBot(checkimages.main, CatImages_Default):
                 data = self._info[cat][i]
                 # detect images with this as one of the main contents only thus
                 # high coverage requested as a minimal confidence estimation
-                self._info[cat][i]['Confidence'] = (data['Coverage'])**(3./10)  # 0.40 -> ~0.75
+                self._info[cat][i]['Confidence'] = (data['Coverage'])**(1./5)  # 0.25 -> ~0.75
 
         # optical and other text recognition (tesseract & ocropus, ...)
         self._detectEmbeddedText_popplerNpdfminer()
