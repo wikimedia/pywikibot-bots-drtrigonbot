@@ -395,7 +395,7 @@ class FileData(object):
             raise IOError(u"No such file: '%s'" % xml)
         cascade       = cv2.CascadeClassifier(xml)
         objects = list(cascade.detectMultiScale( smallImg,
-            1.1, 2, 0
+            1.1, 3, 0
             #|cv.CV_HAAR_FIND_BIGGEST_OBJECT
             #|cv.CV_HAAR_DO_ROUGH_SEARCH
             |cv.CV_HAAR_SCALE_IMAGE,
@@ -1293,7 +1293,7 @@ class FileData(object):
                                                buf[i*4+2]*sx, buf[i*4+3]*sy] })
                     if ('Face%iName'%i) in res:
                         print res['Face%iName'%i], res['Face%iCategory'%i], res['Face%iBirthday'%i]
-        elif (make == 'olympus'):
+        elif ('olympus' in make):
             # UNTESTED: 'olympus'
             if set(['FacesDetected', 'FaceDetectArea']).issubset(found):
                 buf = map(int, res['FaceDetectArea'].split(' '))
@@ -1613,7 +1613,7 @@ class CatImages_Default(FileData):
     def _guess_hands_Hands(self):
         result = self._info_filter['Hands']
  
-        return (u'Hands', ((len(result) == 1) and (result[0]['Coverage'] >= .40)))
+        return (u'Hands', ((len(result) == 1) and (result[0]['Coverage'] >= .50)))
 
     # Category:Black     (  0,   0,   0)
     # Category:Blue‎      (  0,   0, 255)
