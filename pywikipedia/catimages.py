@@ -17,8 +17,8 @@ This script understands the following command-line arguments:
 -cat[:#]            Use a category as recursive generator
                     (if no given 'Category:Media_needing_categories' is used)
 
--start[:#]          Start already form File:[:#] or if no file given start
-                    from top (instead of resuming last run).
+-start[:#]          Start after File:[:#] or if no file given start from top
+                    (instead of resuming last run).
 
 -limit              The number of images to check (default: 80)
 
@@ -47,7 +47,7 @@ __version__ = '$Id$'
 
 # python default packages
 import re, time, urllib2, os, locale, sys, datetime, math, shutil
-import StringIO, string
+import StringIO, string, json # fallback: simplejson
 from subprocess import Popen, PIPE
 import Image
 #import ImageFilter
@@ -70,13 +70,14 @@ try:
     import gtk
     import rsvg                     # gnome-python2-rsvg (binding to librsvg)
     import cairo
+#    import magic
 except:
     # either raise the ImportError later or skip it
     pass
 # modules needing compilation are imported later on request:
 # (see https://jira.toolserver.org/browse/TS-1452)
 # e.g. opencv, jseg, slic, pydmtx, zbar
-# binaries: exiftool, pdftotext
+# binaries: exiftool, pdftotext, ffprobe (ffmpeg)
 
 # pywikipedia framework python packages
 import wikipedia as pywikibot
@@ -120,20 +121,7 @@ tmpl_FileContentsByBot = u"""}}
 tmpl_available_spec = []    # auto-generated
 
 
-# Other common useful functions
-def printWithTimeZone(message):
-    """ Function to print the messages followed by the TimeZone encoded
-    correctly.
-
-    """
-    if message[-1] != ' ':
-        message = '%s ' % unicode(message)
-    if locale.getlocale()[1]:
-        time_zone = unicode(time.strftime(u"%d %b %Y %H:%M:%S (UTC)", time.gmtime()), locale.getlocale()[1])
-    else:
-        time_zone = unicode(time.strftime(u"%d %b %Y %H:%M:%S (UTC)", time.gmtime()))
-    pywikibot.output(u"%s%s" % (message, time_zone))
-
+# global variables
 class Global(object):
     # default environment settings
     # Command line configurable parameters
@@ -448,7 +436,7 @@ class FileData(object):
         return
 
     # .../opencv/samples/cpp/bagofwords_classification.cpp
-    def _detectclassifyObjectAll_CV(self, cls):
+    def _detectclassifyObjectAll_CV(self):
         """Uses the 'The Bag of Words model' for detection and classification"""
 
         # http://app-solut.com/blog/2011/07/the-bag-of-words-model-in-opencv-2-2/
@@ -465,6 +453,8 @@ class FileData(object):
         # parts of code here should/have to be placed into e.g. a own
         # class in 'dtbext/opencv/__init__.py' script/module
         
+        self._info['Classify'] = []
+
         trained = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus',
                    'car', 'cat', 'chair', 'cow', 'diningtable', 'dog',
                    'horse', 'motorbike', 'person', 'pottedplant', 'sheep',
@@ -494,25 +484,15 @@ class FileData(object):
         out = sys.stdout.getvalue()
         sys.stdout = stdout
         #print out
-        try:
-            if not result:
-                raise
-            os.remove(bowDescPath)
-        except:
-            print "PROBLEM!!!"
-            #raise
-            self._info['Classify'] = {}
-            return []
-        #result = list(np.abs(np.array(result)))
-        (mi, ma) = (min(result), max(result))
-        #for i in range(len(result)):
-        #    print "%12s %.3f" % (trained[i], result[i]), ((result[i] == mi) or (result[i] == ma))
+        if not result:
+            raise ImportError("BoW did not resolve; no results found!")
+        os.remove(bowDescPath)
 
         # now make the algo working; confer also
         # http://www.xrce.xerox.com/layout/set/print/content/download/18763/134049/file/2004_010.pdf
         # http://people.csail.mit.edu/torralba/shortCourseRLOC/index.html
 
-        self._info['Classify'] = dict([ (trained[i], abs(r)) for i, r in enumerate(result) ])
+        self._info['Classify'] = [dict([ (trained[i], r) for i, r in enumerate(result) ])]
         return
 
     # a lot more paper and possible algos exist; (those with code are...)
@@ -665,6 +645,14 @@ class FileData(object):
                        #'stat':       os.stat(self.image_path),
                        'Palette':    str(len(i.palette.palette)) if i.palette else u'-',
                        'Pages':      pc, }
+
+#        # audio and video streams files
+#        # 'ffprobe' (ffmpeg) and module 'magic' (libmagic) could be of some use
+#        d = self._FFMPEGgetData()
+#        print d['format']['format_name'].upper(), len(d['streams'])
+#        m = magic.open(magic.MAGIC_MIME)    # or 'magic.MAGIC_NONE'
+#        m.load()
+#        print m.file(self.image_path)
 
         result['Dimensions'] = self.image_size
         result['Filesize']   = os.path.getsize(self.image_path)
@@ -905,7 +893,7 @@ class FileData(object):
         return im
 
     # Category:...      (several; look at self.gatherInformation for more hints)
-    def _detectObjectTrained_CV(self, info_desc, cascade_file):
+    def _detectObjectTrained_CV(self, info_desc, cascade_file, maxdim=500.):
         # general (self trained) classification (e.g. people, ...)
         # http://www.computer-vision-software.com/blog/2009/11/faq-opencv-haartraining/
 
@@ -924,7 +912,7 @@ class FileData(object):
             raise IOError(u"No such file: '%s'" % xml)
         cascade       = cv2.CascadeClassifier(xml)
 
-        self._info[u'_Trained%s' % info_desc] = []
+        self._info[info_desc] = []
         scale = 1.
         try:
             img    = cv2.imread( self.image_path_JPEG, 1 )
@@ -933,8 +921,7 @@ class FileData(object):
             
             # !!! the 'scale' here IS RELEVANT FOR THE DETECTION RATE;
             # how small and how many features are detected
-            scale  = max([1., np.average(np.array(img.shape)[0:2]/500.)])
-            #scale  = max([1., np.average(np.array(img.shape)[0:2]/300.)])
+            scale  = max([1., np.average(np.array(img.shape)[0:2]/maxdim)])
         except IOError:
             pywikibot.output(u'WARNING: unknown file type [_detectObjectTrained_CV]')
             return
@@ -957,11 +944,13 @@ class FileData(object):
 
         result = []
         for i, r in enumerate(objects):
-            result.append({ 'Position': tuple(np.int_(np.array(r)*scale)) })
+            data = { 'Position': tuple(np.int_(np.array(r)*scale)) }
+            data['Coverage'] = float(data['Position'][2]*data['Position'][3])/(self.image_size[0]*self.image_size[1])
+            result.append( data )
 
         # generic detection ...
 
-        self._info[u'_Trained%s' % info_desc] = result
+        self._info[info_desc] = result
         return
 
     def _recognizeOpticalText_x(self):
@@ -981,7 +970,7 @@ class FileData(object):
 
         if self.image_fileext == u'.pdf':
 #            # poppler pdftotext
-#            # (similar as in '_EXIFgetData' but with stderr)
+#            # (similar as in '_EXIFgetData' but with stderr and no json output)
 #            # http://poppler.freedesktop.org/
 #            # http://www.izzycode.com/bash/how-to-install-pdf2text-on-centos-fedora-redhat.html
 #            # MIGHT BE BETTER TO USE AS PYTHON MODULE:
@@ -1091,7 +1080,7 @@ class FileData(object):
                             'Data':     data,
                             'Position': pos,
                             'Type':     u'DataMatrix',
-                            'Quality':  2*0.75, })
+                            'Quality':  10, })
         
         self._info['OpticalCodes'] = result
 
@@ -1118,12 +1107,14 @@ class FileData(object):
 
         for symbol in zbar_img:
             i += 1
+            p = np.array(symbol.location)   # list of points within code region/area
+            p = (min(p[:,0]), min(p[:,1]), (max(p[:,0])-min(p[:,0])), (max(p[:,1])-min(p[:,1])))
             result.append({ #'components': symbol.components,
                             'ID':         (i+1),
                             #'Count':      symbol.count,         # 'ID'?
                             'Data':       symbol.data or u'-',
-                            'Position':   symbol.location,      # (left, top, width, height)?
-                            'Quality':    symbol.quality,       # usable for 'Confidence'?
+                            'Position':   p,                    # (left, top, width, height)
+                            'Quality':    symbol.quality,       # usable for 'Confidence'
                             'Type':       symbol.type, })
         
         # further detection ?
@@ -1183,6 +1174,7 @@ class FileData(object):
         # (is UNFORTUNATELY NOT ABLE to handle all tags, e.g. 'FacesDetected', ...)
         
         res = {}
+        enable_recovery()   # enable recovery from hard crash
         try:
             if hasattr(pyexiv2, 'ImageMetadata'):
                 metadata = pyexiv2.ImageMetadata(self.image_path)
@@ -1212,23 +1204,20 @@ class FileData(object):
             pass
         except RuntimeError:
             pass
+        disable_recovery()  # disable since everything worked out fine
         
         
         # http://www.sno.phy.queensu.ca/~phil/exiftool/
         # MIGHT BE BETTER TO USE AS PYTHON MODULE; either by wrapper or perlmodule:
         # http://search.cpan.org/~gaas/pyperl-1.0/perlmodule.pod
         # (or use C++ with embbedded perl to write a python module)
-        data = Popen("exiftool %s" % self.image_path, 
-                     shell=True, stdout=PIPE).stdout.readlines()
+        data = Popen("exiftool -j %s" % self.image_path, 
+                     shell=True, stdout=PIPE).stdout.read()
         if not data:
             raise ImportError("exiftool not found!")
         #res  = {}
-        for item in data:
-            #print item.strip()
-            #res.update( dict([ map(string.strip, string.split(item, sep=':', maxsplit=1)) ]) )
-            item    = map(string.strip, string.split(item, sep=':', maxsplit=1))
-            item[0] = item[0].replace(' ', '')
-            res.update( dict([ item ]) )
+        for item in json.loads(data):
+            res.update( item )
         #print res
         
         return res
@@ -1248,7 +1237,7 @@ class FileData(object):
         data  = []
 
         if 'ImageWidth' in res:
-            (width, height) = (res['ImageWidth'], res['ImageHeight'])
+            (width, height) = (str(res['ImageWidth']), str(res['ImageHeight']))
             (width, height) = (re.sub(u'p[tx]', u'', width), re.sub(u'p[tx]', u'', height))
             try:
                 (width, height) = (int(float(width)+0.5), int(float(height)+0.5))
@@ -1258,7 +1247,6 @@ class FileData(object):
         else:
             (width, height) = self.image_size
         wasRotated = (height > width)
-        aspect = float(height or 1)/(width or 1)
         
         if   (make in ['sony', 'nikon', 'panasonic', 'casio', 'ricoh']):
             # UNTESTED: ['sony', 'nikon', 'casio', 'ricoh']
@@ -1268,6 +1256,7 @@ class FileData(object):
                 if 'FaceOrientation' in res:
                     print res['FaceOrientation']    # for rotation 'rot'
                 # 'crop' for 'casio' omitted here...
+                aspect = float(height)/width
                 if (aspect <= 3./4):
                     (fw, fh) = (320, 320 * aspect)
                 else:
@@ -1401,9 +1390,40 @@ class FileData(object):
         self._info['Faces'] += data
         return
 
+    def _FFMPEGgetData(self):
+        # (similar as in '_EXIFgetData')
+        data = Popen("ffprobe -v quiet -print_format json -show_format -show_streams %s" % self.image_path, 
+                     shell=True, stdout=PIPE).stdout.read()
+        if not data:
+            raise ImportError("ffprobe (ffmpeg) not found!")
+        res = json.loads(data)
+        
+        return res
+
 
 # all classification methods and definitions - default variation
 class CatImages_Default(FileData):
+    #ignore = []
+    ignore = ['color']
+    
+    _thrhld_group_size = 4
+    #_thrshld_guesses = 0.1
+    _thrshld_default = 0.75
+
+    # for '_detectObjectTrained_CV'
+    cascade_files = [(u'Legs', 'haarcascade_lowerbody.xml'),
+                     (u'Torsos', 'haarcascade_upperbody.xml'),
+                     (u'Ears', 'haarcascade_mcs_leftear.xml'),
+                     (u'Ears', 'haarcascade_mcs_rightear.xml'),
+                     (u'Eyes', 'haarcascade_lefteye_2splits.xml'),        # (http://yushiqi.cn/research/eyedetection)
+                     (u'Eyes', 'haarcascade_righteye_2splits.xml'),       # (http://yushiqi.cn/research/eyedetection)
+                     #dtbext/opencv/haarcascades/haarcascade_mcs_lefteye.xml
+                     #dtbext/opencv/haarcascades/haarcascade_mcs_righteye.xml
+                     # (others include indifferent (left and/or right) and pair)
+                     (u'Automobiles', 'cars3.xml'),                       # http://www.youtube.com/watch?v=c4LobbqeKZc
+                     (u'Hands', '1256617233-2-haarcascade-hand.xml', 400.),]    # http://www.andol.info/
+                     #(u'Aeroplanes', 'haarcascade_aeroplane.xml'),]      # e.g. for 'Category:Unidentified aircraft'
+
     # Category:Unidentified people
     def _cat_people_People(self):
         #relevance = bool(self._info_filter['People'])
@@ -1485,6 +1505,18 @@ class CatImages_Default(FileData):
 
         return (u'Animated %s' % result[0]['Format'], relevance)
 
+    # Category:Human ears
+    def _cat_ears_HumanEars(self):
+        relevance = bool(self._info_filter['Ears'])
+
+        return (u'Human ears', relevance)
+
+    # Category:Human eyes
+    def _cat_eyes_HumanEyes(self):
+        relevance = bool(self._info_filter['Eyes'])
+
+        return (u'Human eyes', relevance)
+
     # Category:Categorized by DrTrigonBot
     def _addcat_BOT(self):
         # - ALWAYS -
@@ -1522,85 +1554,57 @@ class CatImages_Default(FileData):
 #
 #        return (fmt, bool(fmt))
 
-    # Category:Unidentified people
-    def _guess__People(self):
-        #result  = copy.deepcopy(self._info_filter['Faces'])
+#    # Category:Unidentified people
+#    def _guess_Classify_People(self):
+#        pass
+#    # Category:Unidentified maps
+#    def _guess_Classify_Maps(self):
+#        pass
+#    # Category:Unidentified flags
+#    def _guess_Classify_Flags(self):
+#        pass
+#    # Category:Unidentified plants
+#    def _guess_Classify_Plants(self):
+#        pass
+#    # Category:Unidentified coats of arms
+#    def _guess_Classify_CoatsOfArms(self):
+#        pass
+#    # Category:Unidentified buildings
+#    def _guess_Classify_Buildings(self):
+#        pass
+#    # Category:Unidentified trains
+#    def _guess_Classify_Trains(self):
+#        pass
+#    # Category:Unidentified automobiles
+#    def _guess_Classify_Automobiles(self):
+#        pass
+#    # Category:Unidentified buses
+#    def _guess_Classify_Buses(self):
+#        pass
 
-        cls = 'person'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        else:
-            result = []                             # nothing found
+    # Category:Human legs
+    def _guess_legs_HumanLegs(self):
+        relevance = bool(self._info_filter['Legs'])
 
-        return (u'Unidentified people', result, 0.1)
+        return (u'Human legs', relevance)
 
-    ## Category:Unidentified maps
-    #def _guess__Maps(self):
-    #    return (u'Unidentified maps', self._detectclassifyObjectAll_CV('maps'), 0.1)
+    # Category:Human torsos
+    def _guess_torsos_HumanTorsos(self):
+        relevance = bool(self._info_filter['Torsos'])
 
-    ## Category:Unidentified flags
-    #def _guess__Flags(self):
-    #    return (u'Unidentified flags', self._detectclassifyObjectAll_CV('flags'), 0.1)
+        return (u'Human torsos', relevance)
 
-    # Category:Unidentified plants
-    def _guess__Plants(self):
-        cls = 'pottedplant'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        else:
-            result = []                             # nothing found
+    # Category:Automobiles
+    def _guess_automobiles_Automobiles(self):
+        relevance = bool(self._info_filter['Automobiles'])
 
-        return (u'Unidentified plants', result, 0.1)
+        return (u'Automobiles', relevance)
 
-    ## Category:Unidentified coats of arms
-    #def _guessCoatsOfArms(self):
-    #    return (u'Unidentified coats of arms', self._detectclassifyObjectAll_CV('coats of arms'), 0.1)
+    # Category:Hands
+    def _guess_hands_Hands(self):
+        relevance = bool(self._info_filter['Hands'])
 
-    ## Category:Unidentified buildings
-    #def _guessBuildings(self):
-    #    return (u'Unidentified buildings', self._detectclassifyObjectAll_CV('buildings'), 0.1)
-
-    # Category:Unidentified trains
-    def _guess__Trains(self):
-        cls = 'train'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        else:
-            result = []                             # nothing found
-
-        return (u'Unidentified trains', result, 0.1)
-
-    # Category:Unidentified automobiles
-    def _guess__Automobiles(self):
-        cls = 'bus'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        else:
-            result = []                             # nothing found
-        cls = 'car'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result += [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        cls = 'motorbike'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result += [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        return (u'Unidentified automobiles', result, 0.1)
-
-    # Category:Unidentified buses
-    def _guess__Buses(self):
-        cls = 'bus'
-        if (self._info_filter['classify'].get(cls, 0.0) >= 0.5): # >= threshold 50%
-            #result = [ {'confidence': self._info_filter['classify'][cls]} ] # ok
-            result = [ {'confidence': -self._info_filter['classify'][cls]} ] # ok - BUT UNRELIABLE THUS (-)
-        else:
-            result = []                             # nothing found
-
-        return (u'Unidentified buses', result, 0.1)
+        return (u'Hands', relevance)
 
     # Category:Black     (  0,   0,   0)
     # Category:Blue‎      (  0,   0, 255)
@@ -1647,13 +1651,6 @@ class CatImagesBot(checkimages.main, CatImages_Default):
 #    def __init__(self, site, logFulNumber = 25000, sendemailActive = False,
 #                 duplicatesReport = False, logFullError = True): pass
 #    def setParameters(self, imageName, timestamp, uploader): pass
-
-    #ignore = []
-    ignore = ['color']
-    
-    _thrhld_group_size = 4
-    _thrshld_guesses = 0.1
-    _thrshld_default = 0.75
 
     # or may be '__init__' ... ???
     def load_licenses(self):
@@ -1753,15 +1750,13 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         #print self.image_path
         pywikibot.output(u'Processing media %s ...' % self.image.title(asLink=True))
 
-        if gbv.useGuesses:
-            self.thrshld = self._thrshld_guesses
-        else:
-            self.thrshld = self._thrshld_default
+        self.thrshld = self._thrshld_default
 
         self._info         = {}     # used for LOG/DEBUG OUTPUT ONLY
         self._info_filter  = {}     # used for CATEGORIZATION
         self._result_check = []
         self._result_add   = []
+        self._result_guess = []
 
         # gather all information related to current image
         self.gatherInformation()
@@ -1769,7 +1764,7 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         # information template: use filter to select from gathered information
         self._info_filter = {}
         for item in self._funcs['filter']:
-            self._info_filter.update( self.__class__.__dict__[item](self) )
+            self._info_filter.update( getattr(self, item)() )
 
         # categorization: use explicit searches for classification (rel = ?)
         for item in self._funcs['cat']:
@@ -1792,10 +1787,10 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         if not gbv.useGuesses:
             return self._result_check
         for item in self._funcs['guess']:
-            (cat, result, rel) = getattr(self, item)()
+            (cat, rel) = getattr(self, item)()
             #print cat, result, len(result)
-            if result:
-                self._result_check.append( (cat, result, rel) )
+            if rel:
+                self._result_guess.append( cat )
 
         return self._result_check
 
@@ -1803,7 +1798,7 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         self.clean_cache()
 
         #if not self._existInformation(self._info_filter):  # information available?
-        if not self._result_check:                          # category available?
+        if not (self._result_check + self._result_guess):   # category available?
             return False
 
         pywikibot.get_throttle()
@@ -1827,6 +1822,10 @@ class CatImagesBot(checkimages.main, CatImages_Default):
                 site=self.site )
         content = self._remove_category_or_template(content, u"Uncategorized")  # template
         content = self._add_template(content, u"Check categories|year={{subst:#time:Y}}|month={{subst:#time:F}}|day={{subst:#time:j}}|category=[[Category:Categorized by DrTrigonBot]]", top=True)
+
+        for i, cat in enumerate(self._result_guess):
+            content += u"\n<!--DrTrigonBot-guess-- [[Category:%s]] -->" % cat
+
         print u"--- " * 20
         print content
         print u"--- " * 20
@@ -1850,25 +1849,33 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         ret.append( u'{|' )
         ret.append( u'|<div style="position:relative;">' )
         ret.append( u"[[%s|200px]]" % self.image.title() )
-        ret.append( self._make_markerblock(self._info[u'Faces'], 200.) )
+        ret.append( self._make_markerblock(self._info[u'Faces'], 200.,
+                                           structure=['Position', 'Eyes', 'Mouth', 'Nose']) )
         ret.append( self._make_markerblock(self._info[u'People'], 200.,
-                                           structure=['Position'], line='dashed') )
+                                           line='dashed') )
         ret.append( u"</div>" )
         ret.append( u'|<div style="position:relative;">' )
         ret.append( u"[[%s|200px]]" % self.image.title() )
-        ret.append( self._make_markerblock(self._info[u'ColorRegions'], 200.,
-                                           structure=['Position']) )
+        ret.append( self._make_markerblock(self._info[u'ColorRegions'], 200.) )
+        ret.append( self._make_markerblock(self._info[u'OpticalCodes'], 200.,
+                                           line='dashed') )
         ret.append( u"</div>" )
         ret.append( u'|<div style="position:relative;">' )
         ret.append( u"[[%s|200px]]" % self.image.title() )
-        ret.append( self._make_markerblock(self._info[u'_TrainedHuman ears'], 200.,
-                                           structure=['Position']) )
-        ret.append( self._make_markerblock(self._info[u'_TrainedHuman eyes'], 200.,
-                                           structure=['Position'], line='dashed') )
+        ret.append( self._make_markerblock(self._info[u'Ears'], 200.) )
+        ret.append( self._make_markerblock(self._info[u'Eyes'], 200.) )
+        ret.append( self._make_markerblock(self._info[u'Legs'], 200.,
+                                           line='dashed') )
+        ret.append( self._make_markerblock(self._info[u'Torsos'], 200.,
+                                           line='dashed') )
+        ret.append( self._make_markerblock(self._info[u'Automobiles'], 200.,
+                                           line='dashed') )
+        ret.append( self._make_markerblock(self._info[u'Hands'], 200.,
+                                           line='dashed') )
         ret.append( u"</div>" )
         ret.append( u'|}' )
 
-        color = {True: "rgb(0,255,0)", False: "rgb(255,0,0)"}[bool(self._result_check)]
+        color = {True: "rgb(0,255,0)", False: "rgb(255,0,0)"}[bool(self._result_check + self._result_guess)]
         ret.append( u"<div style='background:%s'>'''automatic categorization''': %s</div>" % (color, u", ".join(list(set(self._result_check + self._result_add)))) )
 
         buf = []
@@ -1950,7 +1957,7 @@ class CatImagesBot(checkimages.main, CatImages_Default):
             # end of recursion
             return u"  | %s = %s" % (key, self._output_format(value))
 
-    def _make_markerblock(self, res, size, structure=['Position', 'Eyes', 'Mouth', 'Nose'], line='solid'):
+    def _make_markerblock(self, res, size, structure=['Position'], line='solid'):
         # same as in '_detectObjectFaces_CV'
         colors = [ (0,0,255),
             (0,128,255),
@@ -2068,7 +2075,7 @@ class CatImagesBot(checkimages.main, CatImages_Default):
             c  = ca
             self._info['ColorRegions'][i]['Confidence'] = c
 
-        # People/Pedestrian (opencv pre-trained hog)
+        # People/Pedestrian (opencv pre-trained hog and haarcascade)
         self._detectObjectPeople_CV()
         
         for i in range(len(self._info['People'])):
@@ -2076,29 +2083,24 @@ class CatImagesBot(checkimages.main, CatImages_Default):
 
             if (data['Coverage'] >= 0.20):
                 c = 0.75
-            if (data['Coverage'] >= 0.10):    # at least 10% coverage needed
+            if (data['Coverage'] >= 0.10):      # at least 10% coverage needed
                 c = 0.5
             else:
                 c = 0.1
             self._info['People'][i]['Confidence'] = c
 
-        # general (self trained haar and cascade) classification
+        # general (opencv pre-trained, third-party and self-trained haar
+        # and cascade) classification
         # http://www.computer-vision-software.com/blog/2009/11/faq-opencv-haartraining/
-        cascade_files = [#(u'TESTlower', 'haarcascade_lowerbody.xml'),
-                         #(u'TESTupper', 'haarcascade_upperbody.xml'),
-                         (u'Human ears', 'haarcascade_mcs_leftear.xml'),      # e.g. for 'Category:Human ears'
-                         (u'Human ears', 'haarcascade_mcs_rightear.xml'),     # e.g. for 'Category:Human ears'
-                         (u'Human eyes', 'haarcascade_lefteye_2splits.xml'),  # e.g. for 'Category:Human eyes', http://yushiqi.cn/research/eyedetection
-                         (u'Human eyes', 'haarcascade_righteye_2splits.xml'),]# e.g. for 'Category:Human eyes', http://yushiqi.cn/research/eyedetection
-                         #dtbext/opencv/haarcascades/haarcascade_mcs_lefteye.xml
-                         #dtbext/opencv/haarcascades/haarcascade_mcs_righteye.xml
-                         # (others include indifferent (left and/or right) and pair)
-                         #(u'Aeroplane', 'haarcascade_aeroplane.xml'),]        # e.g. for 'Category:Unidentified aircraft'
-                         #(u'Hands', 'PLEASE_TEST_US/1256617233-1-haarcascade_hand.xml'),]
-                         #(u'Hands', 'PLEASE_TEST_US/1256617233-2-haarcascade-hand.xml'),]
-                         #(u'Hands', 'PLEASE_TEST_US/aGest.xml'),]
-        for cf in cascade_files:
+        for cf in self.cascade_files:
             self._detectObjectTrained_CV(*cf)
+
+            cat = cf[0]
+            for i in range(len(self._info[cat])):
+                data = self._info[cat][i]
+                # detect images with this as one of the main contents only thus
+                # high coverage requested as a minimal confidence estimation
+                self._info[cat][i]['Confidence'] = (data['Coverage'])**(3./10)  # 0.40 -> ~0.75
 
         # optical and other text recognition (tesseract & ocropus, ...)
         self._detectEmbeddedText_popplerNpdfminer()
@@ -2109,7 +2111,7 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         self._recognizeOpticalCodes_dmtxNzbar()
 
         for i in range(len(self._info['OpticalCodes'])):
-            self._info['OpticalCodes'][i]['Confidence'] = self._info['OpticalCodes'][i]['Quality']/2.
+            self._info['OpticalCodes'][i]['Confidence'] = min(0.75*self._info['OpticalCodes'][i]['Quality']/10., 1.)
 
         # Chessboard (opencv reference detector)
         self._detectObjectChessboard_CV()
@@ -2124,9 +2126,9 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         # https://code.ros.org/trac/opencv/browser/trunk/opencv/samples/python2/letter_recog.py?rev=6480
         #self._classifyObjectAll_CV()
 
-        # general (trained) detection AND classification (BoW)
+        # general (self-trained) detection AND classification (BoW)
         # uses feature detection (SIFT, SURF, ...) AND classification (SVM, ...)
-        #self._detectclassifyObjectAll_CV()
+#        self._detectclassifyObjectAll_CV()
 
     def _existInformation(self, info, ignore = ['Properties', 'ColorAverage']):
         result = []
@@ -2202,6 +2204,64 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         result = self._info['Text']
         return {'Text': result}
 
+    def _filter_Legs(self):
+        result = []
+        for item in self._info['Legs']:
+            # >>> drop if below thrshld <<<
+            if (item['Confidence'] >= self.thrshld):
+                result.append( item )
+        return {'Legs': result}
+
+    def _filter_Torsos(self):
+        result = []
+        for item in self._info['Torsos']:
+            # >>> drop if below thrshld <<<
+            if (item['Confidence'] >= self.thrshld):
+                result.append( item )
+        return {'Torsos': result}
+
+    def _filter_Ears(self):
+        result = []
+        for item in self._info['Ears']:
+            # >>> drop if below thrshld <<<
+            if (item['Confidence'] >= self.thrshld):
+                result.append( item )
+        return {'Ears': result}
+
+    def _filter_Eyes(self):
+        result = []
+        for item in self._info['Eyes']:
+            # >>> drop if below thrshld <<<
+            if (item['Confidence'] >= self.thrshld):
+                result.append( item )
+        return {'Eyes': result}
+
+    def _filter_Automobiles(self):
+        result = []
+        for item in self._info['Automobiles']:
+            # >>> drop if below thrshld <<<
+            if (item['Confidence'] >= self.thrshld):
+                result.append( item )
+        return {'Automobiles': result}
+
+    def _filter_Hands(self):
+        result = []
+        for item in self._info['Hands']:
+            # >>> drop if below thrshld <<<
+            if (item['Confidence'] >= self.thrshld):
+                result.append( item )
+        return {'Hands': result}
+
+#    def _filter_Classify(self):
+#        from operator import itemgetter
+#        result = sorted(self._info['Classify'][0].items(), key=itemgetter(1))
+#        result.reverse()
+#        pywikibot.output(u' Best: %s' % result[:3] )
+#        pywikibot.output(u'Worst: %s' % result[-3:] )
+#
+#        # >>> dummy: drop all (not reliable yet since untrained) <<<
+#        return {'Classify': []}
+
 
 gbv = Global()
 
@@ -2219,7 +2279,7 @@ def checkbot():
     # debug:    'python catimages.py -debug'
     # run/test: 'python catimages.py [-start:File:abc]'
     sys.argv += ['-family:commons', '-lang:commons']
-    sys.argv += ['-noguesses']
+    #sys.argv += ['-noguesses']
 
     # try to resume last run and continue
     if os.path.exists( os.path.join(scriptdir, 'cache/catimages_start') ):
