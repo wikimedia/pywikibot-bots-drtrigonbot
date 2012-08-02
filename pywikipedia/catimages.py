@@ -1319,11 +1319,11 @@ class FileData(object):
         elif (make == 'canon'):
             if   set(['FacesDetected', 'FaceDetectFrameSize']).issubset(found) \
                  and (int(res['FacesDetected'])):
-                # UNTESTED: older models store face detect information
-                (width, height) = map(int, res['FaceDetectFrameSize'].split(' '))
-                fw = map(int, res['FaceWidth'].split(' '))
-                i = 1
+                # TESTED: older models store face detect information
+                (width, height) = map(int, res['FaceDetectFrameSize'].split(' '))   # default: (320,240)
                 (sx, sy) = (1./width, 1./height)
+                fw = res['FaceWidth'] or 35
+                i = 1
                 while ('Face%iPosition'%i) in res:
                     buf = map(int, res['Face%iPosition'%i].split(' '))
                     (x1, y1) = ((buf[0] + width/2. - fw)*sx, (buf[1] + height/2. - fw)*sy)
@@ -1358,7 +1358,9 @@ class FileData(object):
                         (x2, y2) = (x1+buf_w[i]*sx, y1+buf_h[i]*sy)
                         data.append({ 'Position': (x1, y1, x2, y2) })
         else:
-            pass    # not supported (yet...)
+            # not supported (yet...)
+            if make:
+                pywikibot.output(u"WARNING: skipped '%s' since not supported (yet) [_detectObjectFaces_EXIF]" % make)
         
         # finally, rotate face coordinates if image was rotated
         if wasRotated:
@@ -1591,27 +1593,27 @@ class CatImages_Default(FileData):
 
     # Category:Human legs
     def _guess_legs_HumanLegs(self):
-        relevance = bool(self._info_filter['Legs'])
-
-        return (u'Human legs', relevance)
+        result = self._info_filter['Legs']
+ 
+        return (u'Human legs', ((len(result) == 1) and (result[0]['Coverage'] >= .40)))
 
     # Category:Human torsos
     def _guess_torsos_HumanTorsos(self):
-        relevance = bool(self._info_filter['Torsos'])
-
-        return (u'Human torsos', relevance)
+        result = self._info_filter['Torsos']
+ 
+        return (u'Human torsos', ((len(result) == 1) and (result[0]['Coverage'] >= .40)))
 
     # Category:Automobiles
     def _guess_automobiles_Automobiles(self):
-        relevance = bool(self._info_filter['Automobiles'])
-
-        return (u'Automobiles', relevance)
+        result = self._info_filter['Automobiles']
+ 
+        return (u'Automobiles', ((len(result) == 1) and (result[0]['Coverage'] >= .40)))
 
     # Category:Hands
     def _guess_hands_Hands(self):
-        relevance = bool(self._info_filter['Hands'])
-
-        return (u'Hands', relevance)
+        result = self._info_filter['Hands']
+ 
+        return (u'Hands', ((len(result) == 1) and (result[0]['Coverage'] >= .40)))
 
     # Category:Black     (  0,   0,   0)
     # Category:Blue‎      (  0,   0, 255)
@@ -2398,6 +2400,7 @@ def checkbot():
         except pywikibot.exceptions.NoPage:
             continue
         resultCheck = mainClass.checkStep()
+        tagged = False
         try:
             (tagged, ret) = mainClass.report()
             if ret:
