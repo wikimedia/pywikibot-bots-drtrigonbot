@@ -1293,7 +1293,7 @@ class FileData(object):
                                                buf[i*4+2]*sx, buf[i*4+3]*sy] })
                     if ('Face%iName'%i) in res:
                         print res['Face%iName'%i], res['Face%iCategory'%i], res['Face%iBirthday'%i]
-        elif ('olympus' in make):
+        elif make and ('olympus' in make):
             # UNTESTED: 'olympus'
             if set(['FacesDetected', 'FaceDetectArea']).issubset(found):
                 buf = map(int, res['FaceDetectArea'].split(' '))
