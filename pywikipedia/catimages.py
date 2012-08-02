@@ -1215,6 +1215,10 @@ class FileData(object):
                      shell=True, stdout=PIPE).stdout.read()
         if not data:
             raise ImportError("exiftool not found!")
+        try:   # work-a-round for badly encoded exif data (from pywikibot/comms/http.py)
+            data = unicode(data, 'utf-8', errors = 'strict')
+        except UnicodeDecodeError:
+            data = unicode(data, 'utf-8', errors = 'replace')
         #res  = {}
         for item in json.loads(data):
             res.update( item )
