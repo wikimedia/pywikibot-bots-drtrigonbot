@@ -293,6 +293,7 @@ class FileData(object):
                 (30, 30) )
             data = { 'ID':       (i+1),
                      'Position': tuple(np.int_(r*scale)), 
+                     'Type':     u'-',
                      'Eyes':     [],
                      'Mouth':    (),
                      'Nose':     (), }
@@ -895,7 +896,7 @@ class FileData(object):
 
         return im
 
-    # Category:...      (several; look at self.gatherInformation for more hints)
+    # Category:...      (several; look at self.gatherFeatures for more hints)
     def _detectObjectTrained_CV(self, info_desc, cascade_file, maxdim=500.):
         # general (self trained) classification (e.g. people, ...)
         # http://www.computer-vision-software.com/blog/2009/11/faq-opencv-haartraining/
@@ -1012,6 +1013,9 @@ class FileData(object):
                 pdfinterp.process_pdf(rsrcmgr, device, fp, set(), maxpages=0, password='',
                             caching=True, check_extractable=False)
             except AssertionError:
+                pywikibot.output(u'WARNING: pdfminer missed, may be corrupt [_detectEmbeddedText_popplerNpdfminer]')
+                return
+            except TypeError:
                 pywikibot.output(u'WARNING: pdfminer missed, may be corrupt [_detectEmbeddedText_popplerNpdfminer]')
                 return
             fp.close()
@@ -1387,11 +1391,12 @@ class FileData(object):
             data[i]['Position'] = (p[0], p[1], (p[0]-p[2])*np.sign(p[0]-p[2]), 
                                                (p[3]-p[1])*np.sign(p[3]-p[1]))
 
-            data[i] = { 'Position':   tuple(map(int, data[i]['Position'])),
-                        'ID':         (i+1),
-                        'Eyes':       [],
-                        'Mouth':      (),
-                        'Nose':       (), }
+            data[i] = { 'Position': tuple(map(int, data[i]['Position'])),
+                        'ID':       (i+1),
+                        'Type':     u'Exif',
+                        'Eyes':     [],
+                        'Mouth':    (),
+                        'Nose':     (), }
             data[i]['Coverage'] = float(data[i]['Position'][2]*data[i]['Position'][3])/(self.image_size[0]*self.image_size[1])
 
         # exclude duplicates...
@@ -1410,7 +1415,9 @@ class FileData(object):
         return res
 
 
-# all classification methods and definitions - default variation
+# all classification and categorization methods and definitions - default variation
+#  use simplest classification I can think of (self-made) and do categorization
+#  mostly based on filtered/reported features
 class CatImages_Default(FileData):
     #ignore = []
     ignore = ['color']
@@ -1432,6 +1439,82 @@ class CatImages_Default(FileData):
                      (u'Automobiles', 'cars3.xml'),                       # http://www.youtube.com/watch?v=c4LobbqeKZc
                      (u'Hands', '1256617233-2-haarcascade-hand.xml', 300.),]    # http://www.andol.info/
                      #(u'Aeroplanes', 'haarcascade_aeroplane.xml'),]      # e.g. for 'Category:Unidentified aircraft'
+
+    # very simple / rought / poor-man's min. thresshold classification
+    # (done by guessing, does not need to be trained)
+    # replace/improve this with RTrees, KNearest, Boost, SVM, MLP, NBayes, ...
+    def classifyFeatures(self):
+        # classification of detected features (should use RTrees, KNearest, Boost, SVM, MLP, NBayes, ...)
+        # ??? (may be do this in '_cat_...()' or '_filter_...()' ?!?...)
+
+        # Faces and eyes (opencv pre-trained haar and extracted EXIF data)
+        # exclude duplicates... (CV and EXIF)
+        for i in range(len(self._info['Faces'])):
+            if self._info['Faces'][i]['Type'] == u'Exif':
+                c = self._thrshld_default
+            else:
+                c = (len(self._info['Faces'][i]['Eyes']) + 2.) / 4.
+            self._info['Faces'][i]['Confidence'] = c
+            self._info['Faces'][i]['ID'] = i+1
+
+        # Segments and colors / Average color
+        max_dim = max(self.image_size)
+        for i in range(len(self._info['ColorRegions'])):
+            data = self._info['ColorRegions'][i]
+
+            # has to be in descending order since only 1 resolves (!)
+            #if   (data['Coverage'] >= 0.40) and (data['Delta_E']  <=  5.0):
+            #    c = 1.0
+            ##elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 15.0):
+            ##elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 10.0):
+            #elif (data['Coverage'] >= 0.25) and (data['Delta_E']  <= 10.0):
+            #    c = 0.75
+            #elif (data['Coverage'] >= 0.10) and (data['Delta_E']  <= 20.0):
+            #    c = 0.5
+            #else:
+            #    c = 0.1
+            ca = (data['Coverage'])**(1./7)                 # 0.15 -> ~0.75
+            #ca = (data['Coverage'])**(1./6)                 # 0.20 -> ~0.75
+            #ca = (data['Coverage'])**(1./5)                 # 0.25 -> ~0.75
+            #ca = (data['Coverage'])**(1./4)                 # 0.35 -> ~0.75
+            ##cb = (0.02 * (50. - data['Delta_E']))**(1.2)    # 10.0 -> ~0.75
+            #cb = (0.02 * (50. - data['Delta_E']))**(1./2)   # 20.0 -> ~0.75
+            ##cb = (0.02 * (50. - data['Delta_E']))**(1./3)   # 25.0 -> ~0.75
+            #cc = (1. - (data['Delta_R']/max_dim))**(1.)     # 0.25 -> ~0.75
+            #c  = ( 3*ca + cb ) / 4
+            #c  = ( cc + 6*ca + 2*cb ) / 9
+            c  = ca
+            self._info['ColorRegions'][i]['Confidence'] = c
+
+        # People/Pedestrian (opencv pre-trained hog and haarcascade)
+        for i in range(len(self._info['People'])):
+            data = self._info['People'][i]
+
+            if (data['Coverage'] >= 0.20):
+                c = 0.75
+            if (data['Coverage'] >= 0.10):      # at least 10% coverage needed
+                c = 0.5
+            else:
+                c = 0.1
+            self._info['People'][i]['Confidence'] = c
+
+        # general (opencv pre-trained, third-party and self-trained haar
+        # and cascade) classification
+        for cf in self.cascade_files:
+            cat = cf[0]
+            for i in range(len(self._info[cat])):
+                data = self._info[cat][i]
+                # detect images with this as one of the main contents only thus
+                # high coverage requested as a minimal confidence estimation
+                self._info[cat][i]['Confidence'] = (data['Coverage'])**(1./5)  # 0.25 -> ~0.75
+
+        # barcode and Data Matrix recognition (libdmtx/pydmtx, zbar, gocr?)
+        for i in range(len(self._info['OpticalCodes'])):
+            self._info['OpticalCodes'][i]['Confidence'] = min(0.75*self._info['OpticalCodes'][i]['Quality']/10., 1.)
+
+        # Chessboard (opencv reference detector)
+        for i in range(len(self._info['Chessboard'])):
+            self._info['Chessboard'][i]['Confidence'] = len(self._info['Chessboard'][i]['Corners'])/49.
 
     # Category:Unidentified people
     def _cat_people_People(self):
@@ -1767,10 +1850,19 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         self._result_add   = []
         self._result_guess = []
 
-        # gather all information related to current image
-        self.gatherInformation()
+        # gather all features (information) related to current image
+        self.gatherFeatures()
 
-        # information template: use filter to select from gathered information
+        # classification of detected features (should use RTrees, KNearest, Boost, SVM, MLP, NBayes, ...)
+        # ??? (may be do this in '_cat_...()' or '_filter_...()' ?!?...)
+        # http://opencv.itseez.com/doc/tutorials/ml/introduction_to_svm/introduction_to_svm.html
+        # http://stackoverflow.com/questions/8687885/python-opencv-svm-implementation
+        # https://code.ros.org/trac/opencv/browser/trunk/opencv/samples/python2/letter_recog.py?rev=6480
+        self.classifyFeatures()      # assign confidences
+        # replace/improve this with RTrees, KNearest, Boost, SVM, MLP, NBayes, ...
+
+        # information template: use filter to select from gathered features
+        #                       the ones that get reported
         self._info_filter = {}
         for item in self._funcs['filter']:
             self._info_filter.update( getattr(self, item)() )
@@ -2028,75 +2120,24 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         text = pattern.sub(template, text)
         return text
 
-    # gather data from all information interfaces and assign confidences
-    def gatherInformation(self):
+    # gather data from all information interfaces
+    def gatherFeatures(self):
         # Image size
         self._detectProperties_PIL()
         
         # Faces and eyes (opencv pre-trained haar)
         self._detectObjectFaces_CV()
-
-        for i in range(len(self._info['Faces'])):
-            data = self._info['Faces'][i]
-
-            c = (len(data['Eyes']) + 2.) / 4.
-            self._info['Faces'][i]['Confidence'] = c
-        
         # Faces (extract EXIF data)
         self._detectObjectFaces_EXIF()
         # exclude duplicates... (CV and EXIF)
-
-        for i in range(len(self._info['Faces'])):
-            if 'Confidence' not in self._info['Faces'][i]:
-                self._info['Faces'][i]['ID'] = i+1
-                self._info['Faces'][i]['Confidence'] = self._thrshld_default
 
         # Segments and colors
         self._detectSegmentColors_JSEGnPIL()
         # Average color
         self._detectAverageColor_PIL()
 
-        max_dim = max(self.image_size)
-        for i in range(len(self._info['ColorRegions'])):
-            data = self._info['ColorRegions'][i]
-
-            # has to be in descending order since only 1 resolves (!)
-            #if   (data['Coverage'] >= 0.40) and (data['Delta_E']  <=  5.0):
-            #    c = 1.0
-            ##elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 15.0):
-            ##elif (data['Coverage'] >= 0.20) and (data['Delta_E']  <= 10.0):
-            #elif (data['Coverage'] >= 0.25) and (data['Delta_E']  <= 10.0):
-            #    c = 0.75
-            #elif (data['Coverage'] >= 0.10) and (data['Delta_E']  <= 20.0):
-            #    c = 0.5
-            #else:
-            #    c = 0.1
-            ca = (data['Coverage'])**(1./7)                 # 0.15 -> ~0.75
-            #ca = (data['Coverage'])**(1./6)                 # 0.20 -> ~0.75
-            #ca = (data['Coverage'])**(1./5)                 # 0.25 -> ~0.75
-            #ca = (data['Coverage'])**(1./4)                 # 0.35 -> ~0.75
-            ##cb = (0.02 * (50. - data['Delta_E']))**(1.2)    # 10.0 -> ~0.75
-            #cb = (0.02 * (50. - data['Delta_E']))**(1./2)   # 20.0 -> ~0.75
-            ##cb = (0.02 * (50. - data['Delta_E']))**(1./3)   # 25.0 -> ~0.75
-            #cc = (1. - (data['Delta_R']/max_dim))**(1.)     # 0.25 -> ~0.75
-            #c  = ( 3*ca + cb ) / 4
-            #c  = ( cc + 6*ca + 2*cb ) / 9
-            c  = ca
-            self._info['ColorRegions'][i]['Confidence'] = c
-
         # People/Pedestrian (opencv pre-trained hog and haarcascade)
         self._detectObjectPeople_CV()
-        
-        for i in range(len(self._info['People'])):
-            data = self._info['People'][i]
-
-            if (data['Coverage'] >= 0.20):
-                c = 0.75
-            if (data['Coverage'] >= 0.10):      # at least 10% coverage needed
-                c = 0.5
-            else:
-                c = 0.1
-            self._info['People'][i]['Confidence'] = c
 
         # general (opencv pre-trained, third-party and self-trained haar
         # and cascade) classification
@@ -2104,38 +2145,18 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         for cf in self.cascade_files:
             self._detectObjectTrained_CV(*cf)
 
-            cat = cf[0]
-            for i in range(len(self._info[cat])):
-                data = self._info[cat][i]
-                # detect images with this as one of the main contents only thus
-                # high coverage requested as a minimal confidence estimation
-                self._info[cat][i]['Confidence'] = (data['Coverage'])**(1./5)  # 0.25 -> ~0.75
-
         # optical and other text recognition (tesseract & ocropus, ...)
         self._detectEmbeddedText_popplerNpdfminer()
-        #self._recognizeOpticalText_x()
+#        self._recognizeOpticalText_x()
         # (no full recognition but just classify as 'contains text')
 
         # barcode and Data Matrix recognition (libdmtx/pydmtx, zbar, gocr?)
         self._recognizeOpticalCodes_dmtxNzbar()
 
-        for i in range(len(self._info['OpticalCodes'])):
-            self._info['OpticalCodes'][i]['Confidence'] = min(0.75*self._info['OpticalCodes'][i]['Quality']/10., 1.)
-
         # Chessboard (opencv reference detector)
         self._detectObjectChessboard_CV()
 
-        for i in range(len(self._info['Chessboard'])):
-            self._info['Chessboard'][i]['Confidence'] = len(self._info['Chessboard'][i]['Corners'])/49.
-
-        # ??? classification of detected features (RTrees, KNearest, Boost, SVM, MLP, NBayes, ...)
-        # ??? (may be do this in '_cat_...()' or '_filter_...()' ?!?...)
-        # http://opencv.itseez.com/doc/tutorials/ml/introduction_to_svm/introduction_to_svm.html
-        # http://stackoverflow.com/questions/8687885/python-opencv-svm-implementation
-        # https://code.ros.org/trac/opencv/browser/trunk/opencv/samples/python2/letter_recog.py?rev=6480
-        #self._classifyObjectAll_CV()
-
-        # general (self-trained) detection AND classification (BoW)
+        # general (self-trained) detection WITH classification (BoW)
         # uses feature detection (SIFT, SURF, ...) AND classification (SVM, ...)
 #        self._detectclassifyObjectAll_CV()
 
