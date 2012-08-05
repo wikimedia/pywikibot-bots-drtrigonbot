@@ -2420,6 +2420,10 @@ def checkbot():
             mainClass.downloadImage()
         except pywikibot.exceptions.NoPage:
             continue
+        except KeyError:
+            pywikibot.output(u"ERROR: was not able to process page %s!!!\n" %\
+                             image.title(asLink=True))
+            continue
         resultCheck = mainClass.checkStep()
         tagged = False
         try:
