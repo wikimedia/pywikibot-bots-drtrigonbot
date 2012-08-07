@@ -1243,7 +1243,7 @@ class FileData(object):
         if 'Make' in res:
             make = res['Make'].lower()
         else:
-            make = None
+            make = '?'
         found = set(res.keys())
         data  = []
 
@@ -1259,7 +1259,7 @@ class FileData(object):
             (width, height) = self.image_size
         wasRotated = (height > width)
         
-        if   (make in ['sony', 'nikon', 'panasonic', 'casio', 'ricoh']):
+        if   True in [item in make for item in ['sony', 'nikon', 'panasonic', 'casio', 'ricoh']]:
             # UNTESTED: ['sony', 'nikon', 'casio', 'ricoh']
             #   TESTED: ['panasonic']
             if set(['FacesDetected', 'Face1Position']).issubset(found):
@@ -1287,7 +1287,7 @@ class FileData(object):
                     if ('RecognizedFace%iName'%i) in res:
                         print res['RecognizedFace%iName'%i], res['RecognizedFace%iAge'%i]
                     i += 1
-        elif (make == 'fujifilm'):
+        elif 'fujifilm' in make:
             # UNTESTED: 'fujifilm'
             if set(['FacesDetected', 'FacePositions']).issubset(found):
                 buf = map(int, res['FacePositions'].split(' '))
@@ -1297,13 +1297,13 @@ class FileData(object):
                                                buf[i*4+2]*sx, buf[i*4+3]*sy] })
                     if ('Face%iName'%i) in res:
                         print res['Face%iName'%i], res['Face%iCategory'%i], res['Face%iBirthday'%i]
-        elif make and ('olympus' in make):
+        elif 'olympus' in make:
             # UNTESTED: 'olympus'
             if set(['FacesDetected', 'FaceDetectArea']).issubset(found):
                 buf = map(int, res['FaceDetectArea'].split(' '))
                 for i in range(int(res['MaxFaces'])):
                     data.append({ 'Position': [buf[i*4], buf[i*4+1], buf[i*4+2], buf[i*4+3]] })
-        elif make in ['pentax', 'sanyo']:
+        elif True in [item in make for item in ['pentax', 'sanyo']]:
             # UNTESTED: ['pentax', 'sanyo']
             if set(['FacesDetected']).issubset(found):
                 i = 1
@@ -1320,7 +1320,7 @@ class FileData(object):
                     (x1, y1) = (buf[0]*sx, buf[1]*sy)
                     (x2, y2) = (buf[2]*sx, buf[3]*sy)
                     data.append({ 'Position': (x1, y1, x2, y2) })
-        elif (make == 'canon'):
+        elif 'canon' in make:
             if   set(['FacesDetected', 'FaceDetectFrameSize']).issubset(found) \
                  and (int(res['FacesDetected'])):
                 # TESTED: older models store face detect information
@@ -1365,6 +1365,9 @@ class FileData(object):
             # not supported (yet...)
             if make:
                 pywikibot.output(u"WARNING: skipped '%s' since not supported (yet) [_detectObjectFaces_EXIF]" % make)
+                available = [item in res for item in ['FacesDetected', 'ValidAFPoints']]
+                if True in available:
+                    pywikibot.output(u"WARNING: FacesDetected: %s - ValidAFPoints: %s" % tuple(available))
         
         # finally, rotate face coordinates if image was rotated
         if wasRotated:
@@ -1436,8 +1439,9 @@ class CatImages_Default(FileData):
                      #dtbext/opencv/haarcascades/haarcascade_mcs_lefteye.xml
                      #dtbext/opencv/haarcascades/haarcascade_mcs_righteye.xml
                      # (others include indifferent (left and/or right) and pair)
-                     (u'Automobiles', 'cars3.xml'),                       # http://www.youtube.com/watch?v=c4LobbqeKZc
-                     (u'Hands', '1256617233-2-haarcascade-hand.xml', 300.),]    # http://www.andol.info/
+                     (u'Automobiles', 'cars3.xml'),]                      # http://www.youtube.com/watch?v=c4LobbqeKZc
+                     #(u'Hands', '1256617233-2-haarcascade-hand.xml', 300.),]    # http://www.andol.info/
+                     # ('Hands' does not behave very well, in fact it detects any kind of skin and other things...)
                      #(u'Aeroplanes', 'haarcascade_aeroplane.xml'),]      # e.g. for 'Category:Unidentified aircraft'
 
     # very simple / rought / poor-man's min. thresshold classification
@@ -1692,11 +1696,11 @@ class CatImages_Default(FileData):
  
         return (u'Automobiles', ((len(result) == 1) and (result[0]['Coverage'] >= .40)))
 
-    # Category:Hands
-    def _guess_hands_Hands(self):
-        result = self._info_filter['Hands']
- 
-        return (u'Hands', ((len(result) == 1) and (result[0]['Coverage'] >= .50)))
+    ## Category:Hands
+    #def _guess_hands_Hands(self):
+    #    result = self._info_filter['Hands']
+    #
+    #    return (u'Hands', ((len(result) == 1) and (result[0]['Coverage'] >= .50)))
 
     # Category:Black     (  0,   0,   0)
     # Category:Blue‎      (  0,   0, 255)
@@ -1971,8 +1975,8 @@ class CatImagesBot(checkimages.main, CatImages_Default):
                                            line='dashed') )
         ret.append( self._make_markerblock(self._info[u'Automobiles'], 200.,
                                            line='dashed') )
-        ret.append( self._make_markerblock(self._info[u'Hands'], 200.,
-                                           line='dashed') )
+        #ret.append( self._make_markerblock(self._info[u'Hands'], 200.,
+        #                                   line='dashed') )
         ret.append( u"</div>" )
         ret.append( u'|}' )
 
@@ -2274,13 +2278,13 @@ class CatImagesBot(checkimages.main, CatImages_Default):
                 result.append( item )
         return {'Automobiles': result}
 
-    def _filter_Hands(self):
-        result = []
-        for item in self._info['Hands']:
-            # >>> drop if below thrshld <<<
-            if (item['Confidence'] >= self.thrshld):
-                result.append( item )
-        return {'Hands': result}
+    #def _filter_Hands(self):
+    #    result = []
+    #    for item in self._info['Hands']:
+    #        # >>> drop if below thrshld <<<
+    #        if (item['Confidence'] >= self.thrshld):
+    #            result.append( item )
+    #    return {'Hands': result}
 
 #    def _filter_Classify(self):
 #        from operator import itemgetter
