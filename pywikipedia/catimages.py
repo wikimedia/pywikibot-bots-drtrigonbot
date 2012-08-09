@@ -479,12 +479,14 @@ class FileData(object):
         #color_dst = cv2.cvtColor(dst, cv.CV_GRAY2BGR)
 
         # lines
+        data = {}
         USE_STANDARD = True
         if USE_STANDARD:
             #lines = cv.HoughLines2(dst, storage, cv.CV_HOUGH_STANDARD, 1, pi / 180, 100, 0, 0)
             lines = cv2.HoughLines(dst, 1, math.pi / 180, 100)
-            if len(lines):
+            if (lines is not None) and len(lines):
                 lines = lines[0]
+                data['Lines'] = len(lines)
             #for (rho, theta) in lines[:100]:
             #    a = math.cos(theta)
             #    b = math.sin(theta)
@@ -501,8 +503,9 @@ class FileData(object):
 
         # circles
         circles = cv2.HoughCircles(src, cv.CV_HOUGH_GRADIENT, 2, src.shape[0]/4)#, 200, 100 )
-        if len(circles):
+        if (circles is not None) and len(circles):
             circles = circles[0]
+            data['Circles'] = len(circles)
         #for c in circles:
         #    center = (cv.Round(c[0]), cv.Round(c[1]))
         #    radius = cv.Round(c[2])
@@ -514,8 +517,10 @@ class FileData(object):
         #cv2.imshow("people detector", color_dst)
         #c = cv2.waitKey(0) & 255
 
-        self._info['Geometry'] = [{ 'Lines':   len(lines),
-                                    'Circles': len(circles) }]
+        if data:
+            result = {'Lines': '-', 'Circles': '-'}
+            result.update(data)
+            self._info['Geometry'] = [result]
         return
 
     # .../opencv/samples/cpp/bagofwords_classification.cpp
@@ -1379,9 +1384,11 @@ class FileData(object):
         elif 'olympus' in make:
             # UNTESTED: 'olympus'
             if set(['FacesDetected', 'FaceDetectArea']).issubset(found):
-                buf = map(int, res['FaceDetectArea'].split(' '))
-                for i in range(int(res['MaxFaces'])):
-                    data.append({ 'Position': [buf[i*4], buf[i*4+1], buf[i*4+2], buf[i*4+3]] })
+                buf = map(int, res['FacesDetected'].split(' '))
+                if buf[0] or buf[1]:
+                    buf = map(int, res['FaceDetectArea'].split(' '))
+                    for i in range(int(res['MaxFaces'])):
+                        data.append({ 'Position': [buf[i*4], buf[i*4+1], buf[i*4+2], buf[i*4+3]] })
         elif True in [item in make for item in ['pentax', 'sanyo']]:
             # UNTESTED: ['pentax', 'sanyo']
             if set(['FacesDetected']).issubset(found):
