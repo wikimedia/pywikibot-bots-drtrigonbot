@@ -439,6 +439,85 @@ class FileData(object):
         self._info['People'] = result
         return
 
+    # https://code.ros.org/trac/opencv/browser/trunk/opencv/samples/python/houghlines.py?rev=2770
+    def _detectObjectGeometry_CV(self):
+        # http://docs.opencv.org/modules/imgproc/doc/feature_detection.html#cornerharris
+        # http://docs.opencv.org/modules/imgproc/doc/feature_detection.html#houghcircles
+        # http://docs.opencv.org/modules/imgproc/doc/feature_detection.html#houghlines
+        # http://docs.opencv.org/modules/imgproc/doc/feature_detection.html#houghlinesp
+
+        self._info['Geometry'] = []
+        scale = 1.
+        try:
+            img = cv2.imread(self.image_path_JPEG, 1)
+
+            if (img == None):
+                raise IOError
+
+            # !!! the 'scale' here IS RELEVANT FOR THE DETECTION RATE;
+            # how small and how many features are detected
+            scale  = max([1., np.average(np.array(img.shape)[0:2]/500.)])
+        except IOError:
+            pywikibot.output(u'WARNING: unknown file type [_detectObjectLines_CV]')
+            return
+        except AttributeError:
+            pywikibot.output(u'WARNING: unknown file type [_detectObjectLines_CV]')
+            return
+
+        # similar to face or people detection
+        smallImg = np.empty( (cv.Round(img.shape[1]/scale), cv.Round(img.shape[0]/scale)), dtype=np.uint8 )
+        gray = cv2.cvtColor( img, cv.CV_BGR2GRAY )
+        # smooth it, otherwise a lot of false circles may be detected
+        #gray = cv2.GaussianBlur( gray, (9, 9), 2 )
+        gray = cv2.GaussianBlur( gray, (5, 5), 2 )
+        smallImg = cv2.resize( gray, smallImg.shape, interpolation=cv2.INTER_LINEAR )
+        #smallImg = cv2.equalizeHist( smallImg )
+        src = smallImg
+        
+        # https://code.ros.org/trac/opencv/browser/trunk/opencv/samples/python/houghlines.py?rev=2770
+        dst = cv2.Canny(src, 50, 200)
+        #color_dst = cv2.cvtColor(dst, cv.CV_GRAY2BGR)
+
+        # lines
+        USE_STANDARD = True
+        if USE_STANDARD:
+            #lines = cv.HoughLines2(dst, storage, cv.CV_HOUGH_STANDARD, 1, pi / 180, 100, 0, 0)
+            lines = cv2.HoughLines(dst, 1, math.pi / 180, 100)
+            if len(lines):
+                lines = lines[0]
+            #for (rho, theta) in lines[:100]:
+            #    a = math.cos(theta)
+            #    b = math.sin(theta)
+            #    x0 = a * rho 
+            #    y0 = b * rho
+            #    pt1 = (cv.Round(x0 + 1000*(-b)), cv.Round(y0 + 1000*(a)))
+            #    pt2 = (cv.Round(x0 - 1000*(-b)), cv.Round(y0 - 1000*(a)))
+            #    cv2.line(color_dst, pt1, pt2, cv.RGB(255, 0, 0), 3, 8)
+        else:
+            #lines = cv.HoughLines2(dst, storage, cv.CV_HOUGH_PROBABILISTIC, 1, pi / 180, 50, 50, 10)
+            lines = cv2.HoughLinesP(dst, 1, math.pi / 180, 100) 
+            #for line in lines:
+            #    cv2.line(color_dst, line[0], line[1], cv.CV_RGB(255, 0, 0), 3, 8)
+
+        # circles
+        circles = cv2.HoughCircles(src, cv.CV_HOUGH_GRADIENT, 2, src.shape[0]/4)#, 200, 100 )
+        if len(circles):
+            circles = circles[0]
+        #for c in circles:
+        #    center = (cv.Round(c[0]), cv.Round(c[1]))
+        #    radius = cv.Round(c[2])
+        #    # draw the circle center
+        #    cv2.circle( color_dst, center, 3, cv.CV_RGB(0,255,0), -1, 8, 0 )
+        #    # draw the circle outline
+        #    cv2.circle( color_dst, center, radius, cv.CV_RGB(0,0,255), 3, 8, 0 )
+
+        #cv2.imshow("people detector", color_dst)
+        #c = cv2.waitKey(0) & 255
+
+        self._info['Geometry'] = [{ 'Lines':   len(lines),
+                                    'Circles': len(circles) }]
+        return
+
     # .../opencv/samples/cpp/bagofwords_classification.cpp
     def _detectclassifyObjectAll_CV(self):
         """Uses the 'The Bag of Words model' for detection and classification"""
@@ -1243,7 +1322,7 @@ class FileData(object):
         if 'Make' in res:
             make = res['Make'].lower()
         else:
-            make = '?'
+            make = ''
         found = set(res.keys())
         data  = []
 
@@ -1363,11 +1442,11 @@ class FileData(object):
                         data.append({ 'Position': (x1, y1, x2, y2) })
         else:
             # not supported (yet...)
-            if make:
+            available = [item in res for item in ['FacesDetected', 'ValidAFPoints']]
+            unknown   = ['face' in item.lower() for item in res.keys()]
+            if make and (True in (available+unknown)):
                 pywikibot.output(u"WARNING: skipped '%s' since not supported (yet) [_detectObjectFaces_EXIF]" % make)
-                available = [item in res for item in ['FacesDetected', 'ValidAFPoints']]
-                if True in available:
-                    pywikibot.output(u"WARNING: FacesDetected: %s - ValidAFPoints: %s" % tuple(available))
+                pywikibot.output(u"WARNING: FacesDetected: %s - ValidAFPoints: %s" % tuple(available))
         
         # finally, rotate face coordinates if image was rotated
         if wasRotated:
@@ -1439,8 +1518,8 @@ class CatImages_Default(FileData):
                      #dtbext/opencv/haarcascades/haarcascade_mcs_lefteye.xml
                      #dtbext/opencv/haarcascades/haarcascade_mcs_righteye.xml
                      # (others include indifferent (left and/or right) and pair)
-                     (u'Automobiles', 'cars3.xml'),]                      # http://www.youtube.com/watch?v=c4LobbqeKZc
-                     #(u'Hands', '1256617233-2-haarcascade-hand.xml', 300.),]    # http://www.andol.info/
+                     (u'Automobiles', 'cars3.xml'),                       # http://www.youtube.com/watch?v=c4LobbqeKZc
+                     (u'Hands', '1256617233-2-haarcascade-hand.xml', 300.),]    # http://www.andol.info/
                      # ('Hands' does not behave very well, in fact it detects any kind of skin and other things...)
                      #(u'Aeroplanes', 'haarcascade_aeroplane.xml'),]      # e.g. for 'Category:Unidentified aircraft'
 
@@ -2142,6 +2221,9 @@ class CatImagesBot(checkimages.main, CatImages_Default):
 
         # People/Pedestrian (opencv pre-trained hog and haarcascade)
         self._detectObjectPeople_CV()
+
+        # Geometric object (opencv hough line and circle)
+        self._detectObjectGeometry_CV()
 
         # general (opencv pre-trained, third-party and self-trained haar
         # and cascade) classification

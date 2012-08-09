@@ -27,7 +27,8 @@ Created on Fri Jun 15 12:56:38 2012
 #           HaarTraining/src/mergevec /home/ursin/Desktop/test/samples.dat /home/ursin/Desktop/test/samples.vec
 #  7.) use: perl createtestsamples.pl positives.dat negatives.dat tests 1000
 #  8.) use: nice -n 20 opencv_haartraining -data haarcascade -vec samples.vec -bg negatives.dat -nstages 20 -nsplits 2 -minhitrate 0.999 -maxfalsealarm 0.5 -npos 7000 -nneg 3019 -w 20 -h 20 -nonsym -mem 512 -mode ALL
-#           (TEST WITH: opencv_traincascade !?)
+#       OR: dmtcp_checkpoint opencv_haartraining -data haarcascade -vec samples.vec -bg negatives.dat -nstages 20 -nsplits 2 -minhitrate 0.999 -maxfalsealarm 0.5 -npos 7000 -nneg 3019 -w 20 -h 20 -nonsym -mem 512 -mode ALL
+#           (TEST WITH: opencv_traincascade !? / RESTART WITH: dmtcp_restart_script.sh)
 #-->
 #  9.) use: convert_cascade --size="20x20" haarcascade haarcascade.xml
 # 10.) use: performance -data haarcascade.xml -info tests.dat -ni
