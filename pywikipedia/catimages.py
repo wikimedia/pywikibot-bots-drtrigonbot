@@ -352,7 +352,7 @@ class FileData(object):
             img = cv2.imread(self.image_path_JPEG, 1)
 
             if (img == None) or (min(img.shape[:2]) < 100) or (not img.data):
-                raise IOError
+                return
 
             # !!! the 'scale' here IS RELEVANT FOR THE DETECTION RATE;
             # how small and how many features are detected
@@ -458,10 +458,10 @@ class FileData(object):
             # how small and how many features are detected
             scale  = max([1., np.average(np.array(img.shape)[0:2]/500.)])
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type [_detectObjectLines_CV]')
+            pywikibot.output(u'WARNING: unknown file type [_detectObjectGeometry_CV]')
             return
         except AttributeError:
-            pywikibot.output(u'WARNING: unknown file type [_detectObjectLines_CV]')
+            pywikibot.output(u'WARNING: unknown file type [_detectObjectGeometry_CV]')
             return
 
         # similar to face or people detection
@@ -718,6 +718,7 @@ class FileData(object):
             i.seek(0)    # restore default
 
             # http://grokbase.com/t/python/image-sig/082psaxt6k/embedded-icc-profiles
+            # python-lcms (littlecms)
             #icc = i.app['APP2']     # jpeg
             #icc = i.tag[34675]      # tiff
             #icc = re.sub('[^%s]'%string.printable, ' ', icc)
@@ -1873,8 +1874,16 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         
         self.image_path_JPEG = self.image_path + u'.jpg'
         
+        #print self.image._latestInfo    # all info wikimedia got from content (mime, sha1, ...)
+        
         if os.path.exists(self.image_path):
             return
+
+        # .ogx                for application/ogg
+        # .ogv                for video/ogg
+        # .oga, .ogg and .spx for audio/ogg
+        if self.image_fileext in [u'.ogv', u'.ogg']:
+            raise IOError(u"File format '%s' not supported yet" % self.image_fileext)
 
         pywikibot.get_throttle()
         f_url, data = self.site.getUrl(self.image.fileUrl(), no_hostname=True, 
@@ -1925,6 +1934,9 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         # http://stackoverflow.com/questions/25665/python-module-for-converting-pdf-to-text
         if self.image_fileext == u'.pdf':
             pass
+        
+        # FULL TIFF support (e.g. group4)
+        # http://code.google.com/p/pylibtiff/
 
     # LOOK ALSO AT: checkimages.CatImagesBot.checkStep
     # (and category scripts/bots too...)
@@ -2253,7 +2265,7 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         # uses feature detection (SIFT, SURF, ...) AND classification (SVM, ...)
 #        self._detectclassifyObjectAll_CV()
 
-    def _existInformation(self, info, ignore = ['Properties', 'ColorAverage']):
+    def _existInformation(self, info, ignore = ['Properties', 'ColorAverage', 'Geometry']):
         result = []
         for item in info:
             if item in ignore:
@@ -2516,6 +2528,9 @@ def checkbot():
         except KeyError:
             pywikibot.output(u"ERROR: was not able to process page %s!!!\n" %\
                              image.title(asLink=True))
+            continue
+        except IOError, err:
+            pywikibot.output(u"WARNING: %s, skipped..." % err)
             continue
         resultCheck = mainClass.checkStep()
         tagged = False
