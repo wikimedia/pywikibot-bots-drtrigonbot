@@ -2040,7 +2040,7 @@ class CatImagesBot(checkimages.main, CatImages_Default):
 
     def log_output(self):
         # ColorRegions always applies here since there is at least 1 (THE average) color...
-        ignore = ['Properties', 'ColorAverage', 'ColorRegions'] # + ColorRegions
+        ignore = ['Properties', 'ColorAverage', 'ColorRegions', 'Geometry']
         #if not self._existInformation(self._info):  # information available?
         # information available? AND/OR category available?
         if not (self._existInformation(self._info, ignore = ignore) or self._result_check):
@@ -2265,7 +2265,7 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         # uses feature detection (SIFT, SURF, ...) AND classification (SVM, ...)
 #        self._detectclassifyObjectAll_CV()
 
-    def _existInformation(self, info, ignore = ['Properties', 'ColorAverage', 'ColorRegions', 'Geometry']):
+    def _existInformation(self, info, ignore = ['Properties', 'ColorAverage']):
         result = []
         for item in info:
             if item in ignore:
