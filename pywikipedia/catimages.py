@@ -1868,6 +1868,9 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         return []
 
     def downloadImage(self):
+        #print self.image_path
+        pywikibot.output(u'Processing media %s ...' % self.image.title(asLink=True))
+
         self.image_filename  = os.path.split(self.image.fileUrl())[-1]
         self.image_fileext   = os.path.splitext(self.image_filename)[1]
         self.image_path      = urllib2.quote(os.path.join(scriptdir, ('cache/' + self.image_filename[-128:])))
@@ -1941,9 +1944,6 @@ class CatImagesBot(checkimages.main, CatImages_Default):
     # LOOK ALSO AT: checkimages.CatImagesBot.checkStep
     # (and category scripts/bots too...)
     def checkStep(self):
-        #print self.image_path
-        pywikibot.output(u'Processing media %s ...' % self.image.title(asLink=True))
-
         self.thrshld = self._thrshld_default
 
         self._info         = {}     # used for LOG/DEBUG OUTPUT ONLY
@@ -2265,7 +2265,7 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         # uses feature detection (SIFT, SURF, ...) AND classification (SVM, ...)
 #        self._detectclassifyObjectAll_CV()
 
-    def _existInformation(self, info, ignore = ['Properties', 'ColorAverage', 'Geometry']):
+    def _existInformation(self, info, ignore = ['Properties', 'ColorAverage', 'ColorRegions', 'Geometry']):
         result = []
         for item in info:
             if item in ignore:
