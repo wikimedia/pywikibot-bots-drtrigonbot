@@ -351,7 +351,8 @@ class FileData(object):
         try:
             img = cv2.imread(self.image_path_JPEG, 1)
 
-            if (img == None) or (min(img.shape[:2]) < 100) or (not img.data):
+            if (img == None) or (min(img.shape[:2]) < 100) or (not img.data) \
+               or (self.image_size[0] is None):
                 return
 
             # !!! the 'scale' here IS RELEVANT FOR THE DETECTION RATE;
@@ -1005,7 +1006,7 @@ class FileData(object):
         scale = 1.
         try:
             img    = cv2.imread( self.image_path_JPEG, 1 )
-            if img == None:
+            if (img == None) or (self.image_size[0] is None):
                 raise IOError
             
             # !!! the 'scale' here IS RELEVANT FOR THE DETECTION RATE;
