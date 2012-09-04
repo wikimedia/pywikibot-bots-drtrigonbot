@@ -1313,6 +1313,7 @@ class FileData(object):
         except UnicodeDecodeError:
             data = unicode(data, 'utf-8', errors = 'replace')
         #res  = {}
+        data = re.sub("(?<!\")\(Binary data (?P<size>\d*) bytes\)", "\"(Binary data \g<size> bytes)\"", data)  # work-a-round some issue
         for item in json.loads(data):
             res.update( item )
         #print res
