@@ -141,7 +141,7 @@ class Global(object):
 class FileData(object):
     # .../opencv/samples/c/facedetect.cpp
     # http://opencv.willowgarage.com/documentation/python/genindex.html
-    def _detectObjectFaces_CV(self):
+    def _detect_Faces_CV(self):
         """Converts an image to grayscale and prints the locations of any
            faces found"""
         # http://python.pastebin.com/m76db1d6b
@@ -215,10 +215,10 @@ class FileData(object):
             # how small and how many features are detected as faces (or eyes)
             scale  = max([1., np.average(np.array(img.shape)[0:2]/500.)])
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type [_detectObjectFaces_CV]')
+            pywikibot.output(u'WARNING: unknown file type [_detect_Faces_CV]')
             return
         except AttributeError:
-            pywikibot.output(u'WARNING: unknown file type [_detectObjectFaces_CV]')
+            pywikibot.output(u'WARNING: unknown file type [_detect_Faces_CV]')
             return
 
         #detectAndDraw( image, cascade, nestedCascade, scale );
@@ -249,8 +249,8 @@ class FileData(object):
             #|cv.CV_HAAR_DO_ROUGH_SEARCH
             |cv.CV_HAAR_SCALE_IMAGE,
             (30, 30) ))
-        #faces = self._dropRegions(faces + facesprofil)[0]
-        faces = self._dropRegions(faces + facesprofil, overlap=True)[0]
+        #faces = self._util_merge_Regions(faces + facesprofil)[0]
+        faces = self._util_merge_Regions(faces + facesprofil, overlap=True)[0]
         faces = np.array(faces)
         #if faces:
         #    self._drawRect(faces) #call to a python pil
@@ -305,7 +305,7 @@ class FileData(object):
                     #|CV_HAAR_DO_CANNY_PRUNING
                     |cv.CV_HAAR_SCALE_IMAGE,
                     (30, 30) )
-                nestedObjects = self._dropRegions(list(nestedObjects) +
+                nestedObjects = self._util_merge_Regions(list(nestedObjects) +
                                                   list(nestedLeftEye) + 
                                                   list(nestedRightEye), overlap=True)[0]
             smallImgROI = smallImg[(ry+4*dy):(ry+rheight),rx:(rx+rwidth)]
@@ -395,7 +395,7 @@ class FileData(object):
 
     # .../opencv/samples/cpp/peopledetect.cpp
     # + Haar/Cascade detection
-    def _detectObjectPeople_CV(self):
+    def _detect_People_CV(self):
         # http://stackoverflow.com/questions/10231380/graphic-recognition-of-people
         # https://code.ros.org/trac/opencv/ticket/1298
         # http://opencv.itseez.com/modules/gpu/doc/object_detection.html
@@ -417,10 +417,10 @@ class FileData(object):
             scale  = max([1., np.average(np.array(img.shape)[0:2]/400.)])
             #scale  = max([1., np.average(np.array(img.shape)[0:2]/300.)])
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type [_detectObjectPeople_CV]')
+            pywikibot.output(u'WARNING: unknown file type [_detect_People_CV]')
             return
         except AttributeError:
-            pywikibot.output(u'WARNING: unknown file type [_detectObjectPeople_CV]')
+            pywikibot.output(u'WARNING: unknown file type [_detect_People_CV]')
             return
 
         # similar to face detection
@@ -464,7 +464,7 @@ class FileData(object):
         #print("tdetection time = %gms\n", t*1000.)
         bbox = gtk.gdk.Rectangle(*(0,0,img.shape[1],img.shape[0]))
         # exclude duplicates (see also in 'classifyFeatures()')
-        found_filtered = [gtk.gdk.Rectangle(*f) for f in self._dropRegions(found, sub=True)[0]]
+        found_filtered = [gtk.gdk.Rectangle(*f) for f in self._util_merge_Regions(found, sub=True)[0]]
         result = []
         for i in range(len(found_filtered)):
             r = found_filtered[i]
@@ -488,18 +488,29 @@ class FileData(object):
         self._info['People'] = result
         return
 
-    # https://code.ros.org/trac/opencv/browser/trunk/opencv/samples/python/houghlines.py?rev=2770
-    def _detectObjectGeometry_CV(self):
-        # http://docs.opencv.org/modules/imgproc/doc/feature_detection.html#cornerharris
-        # http://docs.opencv.org/modules/imgproc/doc/feature_detection.html#houghcircles
-        # http://docs.opencv.org/modules/imgproc/doc/feature_detection.html#houghlines
-        # http://docs.opencv.org/modules/imgproc/doc/feature_detection.html#houghlinesp
-
+    def _detect_Geometry_CV(self):
         self._info['Geometry'] = []
 
         # skip file formats not supported (yet?)
         if (self.image_mime[1] in ['ogg', 'pdf', 'vnd.djvu']):
             return
+
+        result = self._util_get_Geometry_CV()
+
+        self._info['Geometry'] = [{'Lines': result['Lines'], 'Circles': result['Circles'], 'Corners': result['Corners']}]
+        return
+
+    # https://code.ros.org/trac/opencv/browser/trunk/opencv/samples/python/houghlines.py?rev=2770
+    def _util_get_Geometry_CV(self):
+        # http://docs.opencv.org/modules/imgproc/doc/feature_detection.html#cornerharris
+        # http://docs.opencv.org/modules/imgproc/doc/feature_detection.html#houghcircles
+        # http://docs.opencv.org/modules/imgproc/doc/feature_detection.html#houghlines
+        # http://docs.opencv.org/modules/imgproc/doc/feature_detection.html#houghlinesp
+        
+        if hasattr(self, '_buffer_Geometry'):
+            return self._buffer_Geometry
+
+        self._buffer_Geometry = {}
 
         scale = 1.
         try:
@@ -512,11 +523,11 @@ class FileData(object):
             # how small and how many features are detected
             scale  = max([1., np.average(np.array(img.shape)[0:2]/500.)])
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type [_detectObjectGeometry_CV]')
-            return
+            pywikibot.output(u'WARNING: unknown file type [_detect_Geometry_CV]')
+            return self._buffer_Geometry
         except AttributeError:
-            pywikibot.output(u'WARNING: unknown file type [_detectObjectGeometry_CV]')
-            return
+            pywikibot.output(u'WARNING: unknown file type [_detect_Geometry_CV]')
+            return self._buffer_Geometry
 
         # similar to face or people detection
         smallImg = np.empty( (cv.Round(img.shape[1]/scale), cv.Round(img.shape[0]/scale)), dtype=np.uint8 )
@@ -534,9 +545,9 @@ class FileData(object):
         edges = cv2.Canny(src, 10, 10)
         #color_dst = cv2.cvtColor(dst, cv.CV_GRAY2BGR)
 
-        # edges
+        # edges (in this sensitve form a meassure for color gradients)
         data = {}
-        data['EdgeRatio'] = (edges != 0).sum()/float(edges.shape[0]*edges.shape[1])
+        data['Edge_Ratio'] = float((edges != 0).sum())/(edges.shape[0]*edges.shape[1])
 
         # lines
         USE_STANDARD = True
@@ -593,13 +604,12 @@ class FileData(object):
         #c = cv2.waitKey(0) & 255
 
         if data:
-            result = {'Lines': '-', 'Circles': '-', 'EdgeRatio': '-', 'Corners': '-'}
-            result.update(data)
-            self._info['Geometry'] = [result]
-        return
+            self._buffer_Geometry = {'Lines': '-', 'Circles': '-', 'Edge_Ratio': '-', 'Corners': '-'}
+            self._buffer_Geometry.update(data)
+        return self._buffer_Geometry
 
     # .../opencv/samples/cpp/bagofwords_classification.cpp
-    def _detectclassifyObjectAll_CV(self):
+    def _detectclassify_ObjectAll_CV(self):
         """Uses the 'The Bag of Words model' for detection and classification"""
 
         # http://app-solut.com/blog/2011/07/the-bag-of-words-model-in-opencv-2-2/
@@ -663,7 +673,7 @@ class FileData(object):
     # http://library.wolfram.com/infocenter/Demos/5725/#downloads
     # http://code.google.com/p/pymeanshift/wiki/Examples
     # (http://pythonvision.org/basic-tutorial, http://luispedro.org/software/mahotas, http://packages.python.org/pymorph/)
-    def _detectSegmentColors_JSEGnPIL(self):    # may be SLIC other other too...
+    def _detect_SegmentColors_JSEGnPIL(self):    # may be SLIC other other too...
         self._info['ColorRegions'] = []
 
         # skip file formats not supported (yet?)
@@ -683,21 +693,21 @@ class FileData(object):
             (l, t) = (0, 0)
             i = im
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type [_detectSegmentColors_JSEGnPIL]')
+            pywikibot.output(u'WARNING: unknown file type [_detect_SegmentColors_JSEGnPIL]')
             return
 
         result = []
         try:
             #h = i.histogram()   # average over WHOLE IMAGE
-            (pic, scale) = self._JSEGdetectColorSegments(i)          # split image into segments first
-            #(pic, scale) = self._SLICdetectColorSegments(i)          # split image into superpixel first
-            hist = self._PILgetColorSegmentsHist(i, pic, scale)         #
-            #pic  = self._ColorRegionsMerge_ColorSimplify(pic, hist)  # iteratively in order to MERGE similar regions
-            #(pic, scale_) = self._JSEGdetectColorSegments(pic)       # (final split)
-            ##(pic, scale) = self._JSEGdetectColorSegments(pic)        # (final split)
-            #hist = self._PILgetColorSegmentsHist(i, pic, scale)         #
+            (pic, scale) = self._util_detect_ColorSegments_JSEG(i)      # split image into segments first
+            #(pic, scale) = self._util_detect_ColorSegments_SLIC(i)      # split image into superpixel first
+            hist = self._util_get_ColorSegmentsHist_PIL(i, pic, scale)  #
+            #pic  = self._util_merge_ColorSegments(pic, hist)            # iteratively in order to MERGE similar regions
+            #(pic, scale_) = self._util_detect_ColorSegments_JSEG(pic)   # (final split)
+            ##(pic, scale) = self._util_detect_ColorSegments_JSEG(pic)    # (final split)
+            #hist = self._util_get_ColorSegmentsHist_PIL(i, pic, scale)  #
         except TypeError:
-            pywikibot.output(u'WARNING: unknown file type [_detectSegmentColors_JSEGnPIL]')
+            pywikibot.output(u'WARNING: unknown file type [_detect_SegmentColors_JSEGnPIL]')
             return
         i = 0
         # (may be do an additional region merge according to same color names...)
@@ -705,7 +715,7 @@ class FileData(object):
             if (coverage < 0.05):    # at least 5% coverage needed (help for debugging/log_output)
                 continue
 
-            data = self._colormathDeltaEaverageColor(h)
+            data = self._util_average_Color_colormath(h)
             data['Coverage'] = float(coverage)
             data['ID']       = (i+1)
             data['Center']   = (int(center[0]+l), int(center[1]+t))
@@ -725,7 +735,7 @@ class FileData(object):
     # http://code.google.com/p/python-colormath/
     # http://en.wikipedia.org/wiki/Color_difference
     # http://www.farb-tabelle.de/en/table-of-color.htm
-    def _detectAverageColor_PIL(self):
+    def _detect_AverageColor_PILnCV(self):
         self._info['ColorAverage'] = []
 
         # skip file formats not supported (yet?)
@@ -738,13 +748,15 @@ class FileData(object):
             i = Image.open(self.image_path_JPEG)
             h = i.histogram()
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type [_detectAverageColor_PIL]')
+            pywikibot.output(u'WARNING: unknown file type [_detect_AverageColor_PILnCV]')
             return
 
-        self._info['ColorAverage'] = [self._colormathDeltaEaverageColor(h)]
+        result             = self._util_average_Color_colormath(h)
+        result['Gradient'] = self._util_get_Geometry_CV().get('Edge_Ratio', None) or '-'
+        self._info['ColorAverage'] = [result]
         return
 
-    def _detectProperties_PIL(self):
+    def _detect_Properties_PIL(self):
         self.image_size = (None, None)
         self._info['Properties'] = [{'Format': u'-', 'Pages': 0}]
         if self.image_fileext == u'.svg':   # MIME: 'application/xml; charset=utf-8'
@@ -790,7 +802,7 @@ class FileData(object):
             try:
                 i = Image.open(self.image_path)
             except IOError:
-                pywikibot.output(u'WARNING: unknown (image) file type [_detectProperties_PIL]')
+                pywikibot.output(u'WARNING: unknown (image) file type [_detect_Properties_PIL]')
                 return
 
             # http://mail.python.org/pipermail/image-sig/1999-May/000740.html
@@ -822,7 +834,7 @@ class FileData(object):
                        'Pages':      pc, }
         elif self.image_mime[1] == 'ogg':   # MIME: 'application/ogg; charset=binary'
             # 'ffprobe' (ffmpeg); audio and video streams files (ogv, oga, ...)
-            d = self._FFMPEGgetData()
+            d = self._util_get_DataStreams_FFMPEG()
             #print d
             mediafmt = u'%s (%s)' % ( d['format']['format_name'].upper(),
                                       u', '.join([u'%s/%s' % (s["codec_type"], s.get("codec_name",u'?')) for s in d['streams']]) )
@@ -832,7 +844,7 @@ class FileData(object):
         # djvu: python-djvulibre or python-djvu for djvu support
         # http://pypi.python.org/pypi/python-djvulibre/0.3.9
         else:
-            pywikibot.output(u'WARNING: unknown (generic) file type [_detectProperties_PIL]')
+            pywikibot.output(u'WARNING: unknown (generic) file type [_detect_Properties_PIL]')
             return
 
         result['Dimensions'] = self.image_size
@@ -850,7 +862,7 @@ class FileData(object):
     # http://en.wikipedia.org/wiki/Color_difference
     # http://www.farb-tabelle.de/en/table-of-color.htm
     # http://www5.konicaminolta.eu/de/messinstrumente/color-light-language.html
-    def _colormathDeltaEaverageColor(self, h):
+    def _util_average_Color_colormath(self, h):
         # split into red, green, blue
         r = h[0:256]
         g = h[256:256*2]
@@ -869,8 +881,8 @@ class FileData(object):
         count = sum([int(c > ma) for c in h])
 
         data = { #'histogram': h,
-                 'RGB':       rgb,
-                 'PeakRatio': float(count)/len(h), }
+                 'RGB':   rgb,
+                 'Peaks': float(count)/len(h), }
 
         #colors = pycolorname.RAL.colors
         #colors = pycolorname.pantone.Formula_Guide_Solid
@@ -917,17 +929,17 @@ class FileData(object):
 
         return data
 
-    def _JSEGdetectColorSegments(self, im):
+    def _util_detect_ColorSegments_JSEG(self, im):
         tmpjpg = os.path.join(scriptdir, "cache/jseg_buf.jpg")
         tmpgif = os.path.join(scriptdir, "cache/jseg_buf.gif")
 
-        # same scale func as in '_detectObjectFaces_CV'
+        # same scale func as in '_detect_Faces_CV'
         scale  = max([1., np.average(np.array(im.size)[0:2]/200.)])
         #print np.array(im.size)/scale, scale
         try:
             smallImg = im.resize( tuple(np.int_(np.array(im.size)/scale)), Image.ANTIALIAS )
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type [_JSEGdetectColorSegments]')
+            pywikibot.output(u'WARNING: unknown file type [_util_detect_ColorSegments_JSEG]')
             return
         
         #im.thumbnail(size, Image.ANTIALIAS) # size is 640x480
@@ -967,7 +979,7 @@ class FileData(object):
     # http://planet.scipy.org/
     # http://peekaboo-vision.blogspot.ch/2012/05/superpixels-for-python-pretty-slic.html
     # http://ivrg.epfl.ch/supplementary_material/RK_SLICSuperpixels/index.html
-    def _SLICdetectColorSegments(self, img):
+    def _util_detect_ColorSegments_SLIC(self, img):
         import dtbext.slic as slic
 
         im = np.array(img)
@@ -985,7 +997,7 @@ class FileData(object):
         #return (pic, 1.)
         return (region_labels, 1.)
 
-    def _PILgetColorSegmentsHist(self, im, pic, scale):
+    def _util_get_ColorSegmentsHist_PIL(self, im, pic, scale):
         if not (type(np.ndarray(None)) == type(pic)):
             pix = np.array(pic)
             #Image.fromarray(10*pix).show()
@@ -996,7 +1008,7 @@ class FileData(object):
         try:
             smallImg = im.resize( tuple(np.int_(np.array(im.size)/scale)), Image.ANTIALIAS )
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type [_PILgetColorSegmentsHist]')
+            pywikibot.output(u'WARNING: unknown file type [_util_get_ColorSegmentsHist_PIL]')
             return
 
         imgsize = float(smallImg.size[0]*smallImg.size[1])
@@ -1027,7 +1039,7 @@ class FileData(object):
 
     # http://www.scipy.org/SciPyPackages/Ndimage
     # http://www.pythonware.com/library/pil/handbook/imagefilter.htm
-    def _ColorRegionsMerge_ColorSimplify(self, im, hist):
+    def _util_merge_ColorSegments(self, im, hist):
         # merge regions by simplifying through average color and re-running
         # JSEG again...
 
@@ -1081,7 +1093,7 @@ class FileData(object):
         return im
 
     # Category:...      (several; look at self.gatherFeatures for more hints)
-    def _detectObjectTrained_CV(self, info_desc, cascade_file, maxdim=500.):
+    def _detect_Trained_CV(self, info_desc, cascade_file, maxdim=500.):
         # general (self trained) classification (e.g. people, ...)
         # http://www.computer-vision-software.com/blog/2009/11/faq-opencv-haartraining/
 
@@ -1116,10 +1128,10 @@ class FileData(object):
             # how small and how many features are detected
             scale  = max([1., np.average(np.array(img.shape)[0:2]/maxdim)])
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type [_detectObjectTrained_CV]')
+            pywikibot.output(u'WARNING: unknown file type [_detect_Trained_CV]')
             return
         except AttributeError:
-            pywikibot.output(u'WARNING: unknown file type [_detectObjectTrained_CV]')
+            pywikibot.output(u'WARNING: unknown file type [_detect_Trained_CV]')
             return
 
         # similar to face detection
@@ -1148,7 +1160,7 @@ class FileData(object):
 
     # ./run-test (ocropus/ocropy)
     # (in fact all scripts/executables used here are pure python scripts!!!)
-    def _recognizeOpticalText_ocropus(self):
+    def _recognize_OpticalText_ocropus(self):
         # optical text recognition (tesseract & ocropus, ...)
         # (no full recognition but - at least - just classify as 'contains text')
         # http://www.claraocr.org/de/ocr/ocr-software/open-source-ocr.html
@@ -1215,7 +1227,7 @@ class FileData(object):
 
         print data
  
-    def _detectEmbeddedText_popplerNpdfminer(self):
+    def _detect_EmbeddedText_poppler(self):
         # may be also: http://www.reportlab.com/software/opensource/rl-toolkit/
 
         self._info['Text'] = []
@@ -1224,7 +1236,7 @@ class FileData(object):
             return
 
         # poppler pdftotext/pdfimages
-        # (similar as in '_EXIFgetData' but with stderr and no json output)
+        # (similar as in '_util_get_DataTags_EXIF' but with stderr and no json output)
         # http://poppler.freedesktop.org/
         # http://www.izzycode.com/bash/how-to-install-pdf2text-on-centos-fedora-redhat.html
         # MIGHT BE BETTER TO USE AS PYTHON MODULE:
@@ -1245,7 +1257,9 @@ class FileData(object):
 
         tmp_path = os.path.join(os.path.split(self.image_path)[0], 'tmp/')
         os.mkdir( tmp_path )
-        proc = Popen("pdfimages -p %s %s/" % (self.image_path, tmp_path), 
+# switch this part off since 'pdfimages' (on toolserver) is too old
+#        proc = Popen("pdfimages -p %s %s/" % (self.image_path, tmp_path), 
+        proc = Popen("pdfimages %s %s/" % (self.image_path, tmp_path), 
                      shell=True, stderr=PIPE)#.stderr.readlines()
         proc.wait()
         if proc.returncode:
@@ -1253,12 +1267,10 @@ class FileData(object):
         images = os.listdir( tmp_path )
         pages  = set()
         for f in images:
-            pages.add( int(f.split('-')[1]) )
+#            pages.add( int(f.split('-')[1]) )
             os.remove( os.path.join(tmp_path, f) )
         os.rmdir( tmp_path )
         
-        pages = list(pages)
-
         ## pdfminer (tools/pdf2txt.py)
         ## http://denis.papathanasiou.org/?p=343 (for layout and images)
         #debug = 0
@@ -1283,10 +1295,10 @@ class FileData(object):
         #    pdfinterp.process_pdf(rsrcmgr, device, fp, set(), maxpages=0, password='',
         #                caching=True, check_extractable=False)
         #except AssertionError:
-        #    pywikibot.output(u'WARNING: pdfminer missed, may be corrupt [_detectEmbeddedText_popplerNpdfminer]')
+        #    pywikibot.output(u'WARNING: pdfminer missed, may be corrupt [_detect_EmbeddedText_poppler]')
         #    return
         #except TypeError:
-        #    pywikibot.output(u'WARNING: pdfminer missed, may be corrupt [_detectEmbeddedText_popplerNpdfminer]')
+        #    pywikibot.output(u'WARNING: pdfminer missed, may be corrupt [_detect_EmbeddedText_poppler]')
         #    return
         #fp.close()
         #device.close()
@@ -1298,14 +1310,15 @@ class FileData(object):
                    'Lines':    l1,
                    #'Data':     data,
                    #'Position': pos,
-                   'Images':   u'%s (on %s page(s))' % (len(images), len(pages)),  # pages containing images
+#                   'Images':   u'%s (on %s page(s))' % (len(images), len(list(pages))),  # pages containing images
+                   'Images':   u'%s' % len(images),
                    'Type':     u'-', }  # 'Type' could be u'OCR' above...
 
         self._info['Text'] = [result]
 
         return
 
-    def _recognizeOpticalCodes_dmtxNzbar(self):
+    def _recognize_OpticalCodes_dmtxNzbar(self):
         # barcode and Data Matrix recognition (libdmtx/pydmtx, zbar, gocr?)
         # http://libdmtx.wikidot.com/libdmtx-python-wrapper
         # http://blog.globalstomp.com/2011/09/decoding-qr-code-code-128-code-39.html
@@ -1341,7 +1354,7 @@ class FileData(object):
 
             scale  = max([1., np.average(np.array(img.size)/200.)])
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type [_recognizeOpticalCodes_dmtxNzbar]')
+            pywikibot.output(u'WARNING: unknown file type [_recognize_OpticalCodes_dmtxNzbar]')
             return
         
         smallImg = img.resize( (int(img.size[0]/scale), int(img.size[1]/scale)) )
@@ -1376,7 +1389,7 @@ class FileData(object):
             img = Image.open(self.image_path_JPEG).convert('L')
             width, height = img.size
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type [_recognizeOpticalCodes_dmtxNzbar]')
+            pywikibot.output(u'WARNING: unknown file type [_recognize_OpticalCodes_dmtxNzbar]')
             return
         
         scanner = zbar.ImageScanner()
@@ -1404,7 +1417,7 @@ class FileData(object):
         self._info['OpticalCodes'] = result
         return
 
-    def _detectObjectChessboard_CV(self):
+    def _detect_Chessboard_CV(self):
         # Chessboard (opencv reference detector)
         # http://nullege.com/codes/show/src%40o%40p%40opencvpython-HEAD%40samples%40chessboard.py/12/cv.FindChessboardCorners/python
 
@@ -1426,10 +1439,10 @@ class FileData(object):
 
             scale  = max([1., np.average(np.array(im.shape)[0:2]/500.)])
         except IOError:
-            pywikibot.output(u'WARNING: unknown file type [_detectObjectChessboard_CV]')
+            pywikibot.output(u'WARNING: unknown file type [_detect_Chessboard_CV]')
             return
         except AttributeError:
-            pywikibot.output(u'WARNING: unknown file type [_detectObjectChessboard_CV]')
+            pywikibot.output(u'WARNING: unknown file type [_detect_Chessboard_CV]')
             return
 
         smallImg = np.empty( (cv.Round(im.shape[1]/scale), cv.Round(im.shape[0]/scale)), dtype=np.uint8 )
@@ -1456,12 +1469,12 @@ class FileData(object):
 
         return
 
-    def _EXIFgetData(self):
+    def _util_get_DataTags_EXIF(self):
         # http://tilloy.net/dev/pyexiv2/tutorial.html
         # (is UNFORTUNATELY NOT ABLE to handle all tags, e.g. 'FacesDetected', ...)
         
-        if hasattr(self, '_EXIFbuf'):
-            return self._EXIFbuf
+        if hasattr(self, '_buffer_EXIF'):
+            return self._buffer_EXIF
 
         res = {}
         enable_recovery()   # enable recovery from hard crash
@@ -1514,12 +1527,12 @@ class FileData(object):
         for item in json.loads(data):
             res.update( item )
         #print res
-        self._EXIFbuf = res
+        self._buffer_EXIF = res
         
-        return self._EXIFbuf
+        return self._buffer_EXIF
 
-    def _detectObjectFaces_EXIF(self):
-        res = self._EXIFgetData()
+    def _detect_Faces_EXIF(self):
+        res = self._util_get_DataTags_EXIF()
         
         # http://u88.n24.queensu.ca/exiftool/forum/index.php?topic=3156.0
         # http://u88.n24.queensu.ca/pub/facetest.pl
@@ -1653,7 +1666,7 @@ class FileData(object):
             available = [item in res for item in ['FacesDetected', 'ValidAFPoints']]
             unknown   = ['face' in item.lower() for item in res.keys()]
             if make and (True in (available+unknown)):
-                pywikibot.output(u"WARNING: skipped '%s' since not supported (yet) [_detectObjectFaces_EXIF]" % make)
+                pywikibot.output(u"WARNING: skipped '%s' since not supported (yet) [_detect_Faces_EXIF]" % make)
                 pywikibot.output(u"WARNING: FacesDetected: %s - ValidAFPoints: %s" % tuple(available))
         
         # finally, rotate face coordinates if image was rotated
@@ -1689,15 +1702,15 @@ class FileData(object):
                         'Nose':     (), }
             data[i]['Coverage'] = float(data[i]['Position'][2]*data[i]['Position'][3])/(self.image_size[0]*self.image_size[1])
 
-        # (exclusion of duplicates is done later by '_dropRegions')
+        # (exclusion of duplicates is done later by '_util_merge_Regions')
 
         self._info['Faces'] += data
         return
     
-    def _detectObjectHistory_EXIF(self):
+    def _detect_History_EXIF(self):
         self._info['History'] = []
 
-        res = self._EXIFgetData()
+        res = self._util_get_DataTags_EXIF()
 
         #a = []
         #for k in res.keys():
@@ -1735,20 +1748,23 @@ class FileData(object):
         self._info['History'] = result
         return
 
-    def _FFMPEGgetData(self):
-        if hasattr(self, '_FFMPEGbuf'):
-            return self._FFMPEGbuf
+    def _util_get_DataStreams_FFMPEG(self):
+        # switch this part off since 'ffprobe' (on toolserver) is too old
+        return None
 
-        # (similar as in '_EXIFgetData')
+        if hasattr(self, '_buffer_FFMPEG'):
+            return self._buffer_FFMPEG
+
+        # (similar as in '_util_get_DataTags_EXIF')
         data = Popen("ffprobe -v quiet -print_format json -show_format -show_streams %s" % self.image_path, 
                      shell=True, stdout=PIPE).stdout.read()
         if not data:
             raise ImportError("ffprobe (ffmpeg) not found!")
-        self._FFMPEGbuf = json.loads(data)
+        self._buffer_FFMPEG = json.loads(data)
         
-        return self._FFMPEGbuf
+        return self._buffer_FFMPEG
 
-    def _detectStreams_FFMPEG(self):
+    def _detect_Streams_FFMPEG(self):
         self._info['Streams'] = []
 
         # skip file formats that interfere and can cause strange results (pdf is oga?!)
@@ -1756,7 +1772,7 @@ class FileData(object):
             return
 
         # audio and video streams files (ogv, oga, ...)
-        d = self._FFMPEGgetData()
+        d = self._util_get_DataStreams_FFMPEG()
         if not d:
             return
 
@@ -1784,7 +1800,7 @@ class FileData(object):
             self._info['Streams'] = result
         return
 
-    def _dropRegions(self, regs, sub=False, overlap=False):
+    def _util_merge_Regions(self, regs, sub=False, overlap=False):
         # sub=False, overlap=False ; level 0 ; similar regions, similar position (default)
         # sub=True,  overlap=False ; level 1 ; region contained in other, any shape/size
         # sub=False, overlap=True  ; level 2 ; center of region conatained in other
@@ -1830,7 +1846,7 @@ class FileData(object):
                         drop.append( i1 )
                     elif (ar2 >= thsr) and (i1 not in drop):
                         drop.append( i2 )
-                # from '_detectObjectFaces_CV()'
+                # from '_detect_Faces_CV()'
                 if overlap:
                     if (r2[0] <= c1[0] <= (r2[0] + r2[2])) and \
                        (r2[1] <= c1[1] <= (r2[1] + r2[3])) and (i2 not in drop):
@@ -1857,7 +1873,7 @@ class CatImages_Default(FileData):
     #_thrshld_guesses = 0.1
     _thrshld_default = 0.75
 
-    # for '_detectObjectTrained_CV'
+    # for '_detect_Trained_CV'
     cascade_files = [(u'Legs', 'haarcascade_lowerbody.xml'),
                      (u'Torsos', 'haarcascade_upperbody.xml'),
                      (u'Ears', 'haarcascade_mcs_leftear.xml'),
@@ -1947,9 +1963,9 @@ class CatImages_Default(FileData):
         for i in range(len(self._info['Chessboard'])):
             self._info['Chessboard'][i]['Confidence'] = len(self._info['Chessboard'][i]['Corners'])/49.
 
-        # Geometric object (opencv hough line, circle, edges, corner, ...)
-        if self._info['Geometry']:
-            self._info['Geometry'][0]['Confidence'] = 1. - self._info['Geometry'][0]['EdgeRatio']
+        ## Geometric object (opencv hough line, circle, edges, corner, ...)
+        #if self._info['Geometry']:
+        #    self._info['Geometry'][0]['Confidence'] = 1. - self._info['Geometry'][0]['Edge_Ratio']
 
     # Category:Unidentified people
     def _cat_people_People(self):
@@ -2058,11 +2074,10 @@ class CatImages_Default(FileData):
         return (u'Videos', (True in [u'video/' in s['Format'] for s in result]))
 
     # Category:Graphics
-    def _cat_multi_Graphics(self):
-        result1 = self._info_filter['Geometry']
-        result2 = self._info_filter['ColorAverage']
-        relevance = (result1 and result1[0]['EdgeRatio'] < 0.1) and \
-                    (result2[0]['PeakRatio'] < 0.1)
+    def _cat_coloraverage_Graphics(self):
+        result = self._info_filter['ColorAverage']
+        relevance = (result[0]['Gradient'] < 0.1) and \
+                    (0.005 < result[0]['Peaks'] < 0.1)  # black/white texts are below that
 
         return (u'Graphics', bool(relevance))
 
@@ -2374,7 +2389,7 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         self._result_guess = []
 
         # flush internal buffers
-        for attr in ['_EXIFbuf', '_FFMPEGbuf']:#, '_content_text']:
+        for attr in ['_buffer_EXIF', '_buffer_FFMPEG', '_buffer_Geometry']:#, '_content_text']:
             if hasattr(self, attr):
                 delattr(self, attr)
 
@@ -2462,7 +2477,7 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         self.image.put( content, comment="bot automatic categorization; adding %s" % u", ".join(tags),
                                  botflag=False )
 
-# TODO:
+# TODO: (work-a-round if https://bugzilla.wikimedia.org/show_bug.cgi?id=6421 not solved)
 #        if hasattr(self, '_content_text'):
 #            textpage = pywikibot.Page(self.site, os.path.join(self.image.title(), u'Contents/Text'))
 #            textpage.put( self._content_text, comment="bot adding content from %s" % textpage.title(asLink=True),
@@ -2593,7 +2608,7 @@ class CatImagesBot(checkimages.main, CatImages_Default):
             return u"  | %s = %s" % (key, self._output_format(value))
 
     def _make_markerblock(self, res, size, structure=['Position'], line='solid'):
-        # same as in '_detectObjectFaces_CV'
+        # same as in '_detect_Faces_CV'
         colors = [ (0,0,255),
             (0,128,255),
             (0,255,255),
@@ -2657,55 +2672,55 @@ class CatImagesBot(checkimages.main, CatImages_Default):
     # gather data from all information interfaces
     def gatherFeatures(self):
         # Image size
-        self._detectProperties_PIL()
+        self._detect_Properties_PIL()
         
         self._info['Faces'] = []
         # Faces (extract EXIF data)
-        self._detectObjectFaces_EXIF()
+        self._detect_Faces_EXIF()
         # Faces and eyes (opencv pre-trained haar)
-        self._detectObjectFaces_CV()
+        self._detect_Faces_CV()
         # exclude duplicates (CV and EXIF)
         faces = [item['Position'] for item in self._info['Faces']]
-        for i in self._dropRegions(faces)[1]:
+        for i in self._util_merge_Regions(faces)[1]:
             del self._info['Faces'][i]
 
         # Segments and colors
-        self._detectSegmentColors_JSEGnPIL()
+        self._detect_SegmentColors_JSEGnPIL()
         # Average color
-        self._detectAverageColor_PIL()
+        self._detect_AverageColor_PILnCV()
 
         # People/Pedestrian (opencv pre-trained hog and haarcascade)
-        self._detectObjectPeople_CV()
+        self._detect_People_CV()
 
         # Geometric object (opencv hough line, circle, edges, corner, ...)
-        self._detectObjectGeometry_CV()
+        self._detect_Geometry_CV()
 
         # general (opencv pre-trained, third-party and self-trained haar
         # and cascade) classification
         # http://www.computer-vision-software.com/blog/2009/11/faq-opencv-haartraining/
         for cf in self.cascade_files:
-            self._detectObjectTrained_CV(*cf)
+            self._detect_Trained_CV(*cf)
 
         # optical and other text recognition (tesseract & ocropus, ...)
-        self._detectEmbeddedText_popplerNpdfminer()
-#        self._recognizeOpticalText_ocropus()
+        self._detect_EmbeddedText_poppler()
+#        self._recognize_OpticalText_ocropus()
         # (may be just classify as 'contains text', may be store text, e.g. to wikisource)
 
         # barcode and Data Matrix recognition (libdmtx/pydmtx, zbar, gocr?)
-        self._recognizeOpticalCodes_dmtxNzbar()
+        self._recognize_OpticalCodes_dmtxNzbar()
 
         # Chessboard (opencv reference detector)
-        self._detectObjectChessboard_CV()
+        self._detect_Chessboard_CV()
 
         # general (self-trained) detection WITH classification (BoW)
         # uses feature detection (SIFT, SURF, ...) AND classification (SVM, ...)
-#        self._detectclassifyObjectAll_CV()
+#        self._detectclassify_ObjectAll_CV()
 
         # general handling of all audio and video formats
-        self._detectStreams_FFMPEG()
+        self._detect_Streams_FFMPEG()
 
         # general file EXIF history information
-        self._detectObjectHistory_EXIF()
+        self._detect_History_EXIF()
 
     def _existInformation(self, info, ignore = ['Properties', 'ColorAverage']):
         result = []
@@ -2826,13 +2841,13 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         result = self._info['Streams']
         return {'Streams': result}
 
-    def _filter_Geometry(self):
-        result = []
-        for item in self._info['Geometry']:
-            # >>> drop if below thrshld <<<
-            if (item['Confidence'] >= self.thrshld):
-                result.append( item )
-        return {'Geometry': result}
+    #def _filter_Geometry(self):
+    #    result = []
+    #    for item in self._info['Geometry']:
+    #        # >>> drop if below thrshld <<<
+    #        if (item['Confidence'] >= self.thrshld):
+    #            result.append( item )
+    #    return {'Geometry': result}
 
     #def _filter_Hands(self):
     #    result = []
@@ -2858,7 +2873,7 @@ gbv = Global()
 def checkbot():
     """ Main function """
     # Command line configurable parameters
-    limit = 250 # How many images to check?
+    limit = 150 # How many images to check?
     untagged = False # Use the untagged generator
     sendemailActive = False # Use the send-email
     train = False
@@ -3124,7 +3139,7 @@ def trainbot(generator, mainClass, image_old_namespace, image_namespace):
     linear_svm = mlpy.LibSvm(kernel_type='linear') # new linear SVM instance
     linear_svm.learn(z, y) # learn from principal components
     
-    # !!! train also BoW (bag-of-words) in '_detectclassifyObjectAll_CV' resp. 'opencv.BoWclassify.main' !!!
+    # !!! train also BoW (bag-of-words) in '_detectclassify_ObjectAll_CV' resp. 'opencv.BoWclassify.main' !!!
     
     xmin, xmax = z[:,0].min()-0.1, z[:,0].max()+0.1
     ymin, ymax = z[:,1].min()-0.1, z[:,1].max()+0.1
