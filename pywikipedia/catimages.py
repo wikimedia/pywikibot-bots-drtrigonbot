@@ -290,6 +290,7 @@ class FileData(object):
                 #|CV_HAAR_DO_CANNY_PRUNING
                 |cv.CV_HAAR_SCALE_IMAGE,
                 (30, 30) )
+            nestedObjects = self._util_merge_Regions(list(nestedObjects), overlap=True)[0]
             if len(nestedObjects) < 2:
                 nestedLeftEye = cascadelefteye.detectMultiScale( smallImgROI,
                     1.1, 2, 0
@@ -308,6 +309,8 @@ class FileData(object):
                 nestedObjects = self._util_merge_Regions(list(nestedObjects) +
                                                   list(nestedLeftEye) + 
                                                   list(nestedRightEye), overlap=True)[0]
+            #if len(nestedObjects) > 2:
+            #    nestedObjects = self._util_merge_Regions(list(nestedObjects), close=True)[0]
             smallImgROI = smallImg[(ry+4*dy):(ry+rheight),rx:(rx+rwidth)]
             nestedMouth = cascademouth.detectMultiScale( smallImgROI,
                 1.1, 2, 0
@@ -442,7 +445,9 @@ class FileData(object):
         # groupThreshold (set groupThreshold to 0 to turn off the grouping completely).
         # detectMultiScale(img, hit_threshold=0, win_stride=Size(),
         #                  padding=Size(), scale0=1.05, group_threshold=2)
+        enable_recovery()   # enable recovery from hard crash
         found = list(hog.detectMultiScale(img, 0.25, (8,8), (32,32), 1.05, 2))
+        disable_recovery()  # enable recovery from hard crash
 
         # people haar/cascaded classifier
         # use 'haarcascade_fullbody.xml', ... also (like face detection)
@@ -1257,7 +1262,7 @@ class FileData(object):
 
         tmp_path = os.path.join(os.path.split(self.image_path)[0], 'tmp/')
         os.mkdir( tmp_path )
-# switch this part off since 'pdfimages' (on toolserver) is too old
+# switch this part off since 'pdfimages' (on toolserver) is too old; TS-1449
 #        proc = Popen("pdfimages -p %s %s/" % (self.image_path, tmp_path), 
         proc = Popen("pdfimages %s %s/" % (self.image_path, tmp_path), 
                      shell=True, stderr=PIPE)#.stderr.readlines()
@@ -1749,18 +1754,35 @@ class FileData(object):
         return
 
     def _util_get_DataStreams_FFMPEG(self):
-        # switch this part off since 'ffprobe' (on toolserver) is too old
-        return None
-
         if hasattr(self, '_buffer_FFMPEG'):
             return self._buffer_FFMPEG
 
         # (similar as in '_util_get_DataTags_EXIF')
-        data = Popen("ffprobe -v quiet -print_format json -show_format -show_streams %s" % self.image_path, 
-                     shell=True, stdout=PIPE).stdout.read()
-        if not data:
+# switch this part off since 'ffprobe' (on toolserver) is too old; TS-1449
+#        data = Popen("ffprobe -v quiet -print_format json -show_format -show_streams %s" % self.image_path, 
+        proc = Popen("ffprobe -v quiet -show_format -show_streams %s" % self.image_path.replace('%', '%%'), 
+                     shell=True, stdout=PIPE)#.stdout.read()
+        proc.wait()
+        if proc.returncode == 127:
             raise ImportError("ffprobe (ffmpeg) not found!")
-        self._buffer_FFMPEG = json.loads(data)
+        data = proc.stdout.read().strip()
+#        self._buffer_FFMPEG = json.loads(data)
+        res, key, cur = {}, '', {}
+        for item in data.splitlines():
+            if (item[0] == '['):
+                if not (item[1] == '/'):
+                    key = item[1:-1]
+                    cur = {}
+                    if key not in res:
+                        res[key] = []
+                else:
+                    res[key].append( cur )
+            else:
+                val = item.split('=')
+                cur[val[0].strip()] = val[1].strip()
+        if res:
+            res = { 'streams': res['STREAM'], 'format': res['FORMAT'][0] }
+        self._buffer_FFMPEG = res
         
         return self._buffer_FFMPEG
 
@@ -1768,7 +1790,8 @@ class FileData(object):
         self._info['Streams'] = []
 
         # skip file formats that interfere and can cause strange results (pdf is oga?!)
-        if (self.image_mime[1] in ['pdf']):
+        # or file formats not supported (yet?)
+        if (self.image_mime[1] in ['pdf']) or (self.image_fileext in [u'.svg']):
             return
 
         # audio and video streams files (ogv, oga, ...)
@@ -1784,13 +1807,15 @@ class FileData(object):
                 dim = (s["width"], s["height"])
                 #asp  = s["display_aspect_ratio"]
             elif (s["codec_type"] == "audio"):
-                rate = u'%s/%s/%s' % (s["channels"], s["sample_fmt"], s["sample_rate"])
+# switch this part off since 'ffprobe' (on toolserver) is too old
+#                rate = u'%s/%s/%s' % (s["channels"], s["sample_fmt"], s["sample_rate"])
+                rate = u'%s/%s/%s' % (s["channels"], u'-', int(float(s["sample_rate"])))
                 dim  = None
             elif (s["codec_type"] == "data"):
                 rate = None
                 dim  = None
 
-            result.append({ 'ID':         s["index"] + 1,
+            result.append({ 'ID':         int(s["index"]) + 1,
                             'Format':     u'%s/%s' % (s["codec_type"], s.get("codec_name",u'?')),
                             'Rate':       rate or u'-',
                             'Dimensions': dim or u'-',
@@ -1800,10 +1825,11 @@ class FileData(object):
             self._info['Streams'] = result
         return
 
-    def _util_merge_Regions(self, regs, sub=False, overlap=False):
-        # sub=False, overlap=False ; level 0 ; similar regions, similar position (default)
-        # sub=True,  overlap=False ; level 1 ; region contained in other, any shape/size
-        # sub=False, overlap=True  ; level 2 ; center of region conatained in other
+    def _util_merge_Regions(self, regs, sub=False, overlap=False, close=False):
+        # sub=False, overlap=False, close=False ; level 0 ; similar regions, similar position (default)
+        # sub=True,  overlap=False, close=False ; level 1 ; region contained in other, any shape/size
+        # sub=False, overlap=True,  close=False ; level 2 ; center of region conatained in other
+        # sub=False, overlap=False, close=True  ; level 3 ; regions placed close together
 
         if not regs:
             return ([], [])
@@ -1850,6 +1876,9 @@ class FileData(object):
                 if overlap:
                     if (r2[0] <= c1[0] <= (r2[0] + r2[2])) and \
                        (r2[1] <= c1[1] <= (r2[1] + r2[3])) and (i2 not in drop):
+                        drop.append( i1 )
+                if close:
+                    if (check[0] >= 0.985) and (i2 not in drop):     # at least (!)
                         drop.append( i1 )
 
                 i2 += 1
@@ -1987,7 +2016,7 @@ class CatImages_Default(FileData):
         result = self._info_filter['People']
 
         relevance = (len(result) >= self._thrhld_group_size) and \
-                    (not self._cat_multi_Graphics()[1])
+                    (not self._cat_coloraverage_Graphics()[1])
 
         return (u'Groups', relevance)
 
@@ -2076,7 +2105,7 @@ class CatImages_Default(FileData):
     # Category:Graphics
     def _cat_coloraverage_Graphics(self):
         result = self._info_filter['ColorAverage']
-        relevance = (result[0]['Gradient'] < 0.1) and \
+        relevance = (result and result[0]['Gradient'] < 0.1) and \
                     (0.005 < result[0]['Peaks'] < 0.1)  # black/white texts are below that
 
         return (u'Graphics', bool(relevance))
