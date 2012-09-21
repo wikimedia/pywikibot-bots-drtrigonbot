@@ -841,9 +841,7 @@ class FileData(object):
             # 'ffprobe' (ffmpeg); audio and video streams files (ogv, oga, ...)
             d = self._util_get_DataStreams_FFMPEG()
             #print d
-            mediafmt = u'%s (%s)' % ( d['format']['format_name'].upper(),
-                                      u', '.join([u'%s/%s' % (s["codec_type"], s.get("codec_name",u'?')) for s in d['streams']]) )
-            result = { 'Format': mediafmt }
+            result = { 'Format': u'%s' % d['format']['format_name'].upper() }
         #elif self.image_mime[0] =='audio':  # MIME: 'audio/midi; charset=binary'
         #    result = {}
         # djvu: python-djvulibre or python-djvu for djvu support
@@ -1760,7 +1758,7 @@ class FileData(object):
         # (similar as in '_util_get_DataTags_EXIF')
 # switch this part off since 'ffprobe' (on toolserver) is too old; TS-1449
 #        data = Popen("ffprobe -v quiet -print_format json -show_format -show_streams %s" % self.image_path, 
-        proc = Popen("ffprobe -v quiet -show_format -show_streams %s" % self.image_path.replace('%', '%%'), 
+        proc = Popen("ffprobe -v quiet -show_format -show_streams %s" % self.image_path,#.replace('%', '%%'), 
                      shell=True, stdout=PIPE)#.stdout.read()
         proc.wait()
         if proc.returncode == 127:
@@ -1804,7 +1802,7 @@ class FileData(object):
             #print s
             if   (s["codec_type"] == "video"):
                 rate = s["avg_frame_rate"]
-                dim = (s["width"], s["height"])
+                dim = (int(s["width"]), int(s["height"]))
                 #asp  = s["display_aspect_ratio"]
             elif (s["codec_type"] == "audio"):
 # switch this part off since 'ffprobe' (on toolserver) is too old
