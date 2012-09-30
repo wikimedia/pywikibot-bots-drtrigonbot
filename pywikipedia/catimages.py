@@ -1816,7 +1816,7 @@ class FileData(object):
             result.append({ 'ID':         int(s["index"]) + 1,
                             'Format':     u'%s/%s' % (s["codec_type"], s.get("codec_name",u'?')),
                             'Rate':       rate or u'-',
-                            'Dimensions': dim or u'-',
+                            'Dimensions': dim or (None, None),
                             })
 
         if 'image' not in d["format"]["format_name"]:
