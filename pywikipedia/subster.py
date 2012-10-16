@@ -93,7 +93,7 @@ bot_config = {    # unicode values
             'ods':             '',              #
             # may be 'hours' have to be added too (e.g. for 'ar')
             'cron':            '',              # DRTRIGON-102
-            'error':           repr('\n<noinclude>%(error)s</noinclude>\n'), # DRTRIGON-116
+            'error':           repr('<noinclude>\n%(error)s\n</noinclude>'), # DRTRIGON-116
             #'djvu': ... u"djvused -e 'n' \"%s\"" ... djvutext.py
             #'pdf': ... u"pdftotext" or python module
             #'imageocr', 'swfocr', ...
