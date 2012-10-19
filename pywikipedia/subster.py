@@ -42,7 +42,7 @@ import re, sys, os, string, time
 import difflib
 import BeautifulSoup
 import StringIO, zipfile, csv, urllib
-import mailbox, mimetypes, datetime, locale
+import mailbox, mimetypes, datetime, email.utils
 import openpyxl.reader.excel
 import crontab
 import logging
@@ -541,9 +541,8 @@ class SubsterMailbox(mailbox.mbox):
             sender   = message['from']       # Could possibly be None.
             timestmp = message['date']       # Could possibly be None.
 
-            locale.setlocale(locale.LC_TIME, 'en_US')   # datetime in mails saved in 'en_US' by toolserver
-            timestmp = re.split('[+-]', timestmp)[0].strip()
-            timestmp = datetime.datetime.strptime(timestmp, '%a, %d %b %Y %H:%M:%S')
+            timestmp = time.mktime( email.utils.parsedate(timestmp) )
+            timestmp = datetime.datetime.fromtimestamp( timestmp )
 
             if sender in unique:
                 (j, timestmp_j) = unique[sender]
