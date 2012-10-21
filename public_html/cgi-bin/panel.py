@@ -88,12 +88,14 @@ Filter: %(filter)s<br>
 <a href="%(graphlink-ecount)s"><img src="%(graphlink-ecount)s" alt=""></a>
 <a href="%(graphlink-ecount-sed)s"><img src="%(graphlink-ecount-sed)s" alt=""></a><br>
 <br>
+<div style="width:100%%; overflow:scroll; border:0px solid #000000; margin:1em;">
 <table class="wikitable">
 <tr><td>Total runs:</td><td>%(start_count)s</td></tr>
 <tr><td>Successful runs:</td><td>%(end_count)s</td></tr>
 <tr><td>Difference:</td><td>%(run_diff)s</td></tr>
 <tr><td>Uptime [s]:</td><td>%(uptimes)s</td></tr>
 </table>
+</div>
 <br>
 History compressed: %(histcomp_count)s (times)<br>
 <br>
@@ -470,7 +472,7 @@ def logstat(form):
 		end   = numpy.array(stat[item]['etiming']['end'])
 		start = numpy.array(stat[item]['etiming']['start'])
 		if end.shape == start.shape:
-			d['uptimes'].append( list(end-start-3600) )	# -3600 because of time jump during 'set TZ'
+			d['uptimes'].append( list(end-start-7200) )	# -2*60*60 because of time jump during 'set TZ'
 		else:
 			d['uptimes'].append( '-' )
 
@@ -508,7 +510,7 @@ def logstat(form):
 		p4 = ax.step(d[:,0], d[:,4], marker='x', where='mid')
 		p5 = ax.step(d[:,0], d[:,5], marker='x', where='mid')
 		p6 = ax.step(d[:,0], d[:,6], marker='x', where='mid')
-		plt.legend([p2, p3, p4, p5, p6], stat[last]['mcount'].keys()[1:], loc='center left')
+		plt.legend([p2, p3, p4, p5, p6], stat[last]['mcount'].keys()[1:], loc='upper left', prop={'size':8})
 		plt.grid(True, which='both')
 		# format the ticks
 		ax.xaxis.set_major_locator(MonthLocator())
@@ -530,7 +532,7 @@ def logstat(form):
 		ax = fig.add_axes(ax_size)
 		p1 = ax.step(d[:,0], d[:,1], marker='x', where='mid')
 		# legend
-		plt.legend([p1], stat[last]['mcount'].keys(), loc='upper left')
+		plt.legend([p1], stat[last]['mcount'].keys(), loc='upper left', prop={'size':8})
 		# grid
 		plt.grid(True, which='both')
 		# format the ticks
@@ -557,7 +559,7 @@ def logstat(form):
 		p4 = ax.step(d[:,0], d[:,4], marker='x', where='mid')
 		p5 = ax.step(d[:,0], d[:,5], marker='x', where='mid')
 		p6 = ax.step(d[:,0], d[:,6], marker='x', where='mid')
-		plt.legend([p1, p2, p3, p4, p5, p6], stat[last]['ecount'].keys(), loc='upper left')
+		plt.legend([p1, p2, p3, p4, p5, p6], stat[last]['ecount'].keys(), loc='upper left', bbox_to_anchor=[-0.15, 1.0], ncol=2, prop={'size':8})
 		plt.grid(True, which='both')
 		plt.ylim(ymax=10)
 		# format the ticks
@@ -579,7 +581,7 @@ def logstat(form):
 			1-0.1-0.05, 1-0.15-0.05]
 		ax = fig.add_axes(ax_size)
 		p1 = ax.step(d[:,0], (d[:,4]-d[:,1]), marker='x', where='mid')
-		plt.legend([p1], ['runs failed'])
+		plt.legend([p1], ['runs failed'], prop={'size':8})
 		plt.grid(True, which='both')
 		# format the ticks
 		ax.xaxis.set_major_locator(MonthLocator())
