@@ -232,9 +232,10 @@ def logging_statistics(logfile):
 	              'end':       botdonemsg,
 	              'histcomp':  'RUN BOT: Compressing Discussion Summary',
 	              'sum_disc':  'RUN BOT: Discussion Summary',
-	              'subster':   'RUN BOT: "SubsterBot"', }
-	ecount    = { 'start': 0, 'end': 0, 'histcomp': 0, 'sum_disc': 0, 'subster': 0, }
-	etiming   = { 'start': [], 'end': [], 'histcomp': [], 'sum_disc': [], 'subster': [],
+	              'subster':   'RUN BOT: "SubsterBot"',
+	              'catimages': 'RUN BOT: Categorize Images (by content)', }
+	ecount    = { 'start': 0, 'end': 0, 'histcomp': 0, 'sum_disc': 0, 'subster': 0, 'catimages': 0 }
+	etiming   = { 'start': [], 'end': [], 'histcomp': [], 'sum_disc': [], 'subster': [], 'catimages': [],
 	              'mainstart': None, 'mainend': None, }
 	resources = { 'files': set(), }
 
@@ -481,9 +482,9 @@ def logstat(form):
 	d['ecount'][:,0] = epoch2num(d['ecount'][:,0])
 
 	data.update({
-		'run_diff':		"</td><td>".join( map(str, d['ecount'][:,1]-d['ecount'][:,3]) ),
-		'start_count':		"</td><td>".join( map(str, d['ecount'][:,1]) ),
-		'end_count':		"</td><td>".join( map(str, d['ecount'][:,3]) ),
+		'run_diff':		"</td><td>".join( map(str, d['ecount'][:,4]-d['ecount'][:,1]) ),
+		'start_count':		"</td><td>".join( map(str, d['ecount'][:,4]) ),
+		'end_count':		"</td><td>".join( map(str, d['ecount'][:,1]) ),
 		'uptimes':		"</td><td>".join( map(str, d['uptimes']) ),
 		'graphlink-mcount':	sys.argv[0] + r"?action=logstat&amp;format=graph-mcount",
 		'graphlink-mcount-i':	sys.argv[0] + r"?action=logstat&amp;format=graph-mcount-i",
@@ -495,8 +496,11 @@ def logstat(form):
 	# plot graphs output
 	if   (format == 'graph-mcount'):
 		d = d['mcount']
-		fig = plt.figure(figsize=(4,3))
-		ax = fig.add_subplot(111)
+		fig = plt.figure(figsize=(5,3))
+		#ax = fig.add_subplot(111)
+		ax_size = [0.125, 0.15, 
+			1-0.1-0.05, 1-0.15-0.05]
+		ax = fig.add_axes(ax_size)
 		#plot1 = ax.bar(range(len(xdata)), xdata)
 		#p1 = ax.plot(d[:,0], d[:,1])	# 'info'
 		p2 = ax.step(d[:,0], d[:,2], marker='x', where='mid')
@@ -519,8 +523,11 @@ def logstat(form):
 		return show_onwebpage(plt)
 	elif (format == 'graph-mcount-i'):
 		d = d['mcount']
-		fig = plt.figure(figsize=(4,3))
-		ax = fig.add_subplot(111)
+		fig = plt.figure(figsize=(5,3))
+		#ax = fig.add_subplot(111)
+		ax_size = [0.125, 0.15, 
+			1-0.1-0.05, 1-0.15-0.05]
+		ax = fig.add_axes(ax_size)
 		p1 = ax.step(d[:,0], d[:,1], marker='x', where='mid')
 		# legend
 		plt.legend([p1], stat[last]['mcount'].keys(), loc='upper left')
@@ -539,14 +546,18 @@ def logstat(form):
 		return show_onwebpage(plt)
 	elif (format == 'graph-ecount'):
 		d = d['ecount']
-		fig = plt.figure(figsize=(4,3))
-		ax = fig.add_subplot(111)
+		fig = plt.figure(figsize=(5,3))
+		#ax = fig.add_subplot(111)
+		ax_size = [0.125, 0.15, 
+			1-0.1-0.05, 1-0.15-0.05]
+		ax = fig.add_axes(ax_size)
 		p1 = ax.step(d[:,0], d[:,1], marker='x', where='mid')
 		p2 = ax.step(d[:,0], d[:,2], marker='x', where='mid')
 		p3 = ax.step(d[:,0], d[:,3], marker='x', where='mid')
 		p4 = ax.step(d[:,0], d[:,4], marker='x', where='mid')
 		p5 = ax.step(d[:,0], d[:,5], marker='x', where='mid')
-		plt.legend([p1, p2, p3, p4, p5], stat[last]['ecount'].keys(), loc='upper left')
+		p6 = ax.step(d[:,0], d[:,6], marker='x', where='mid')
+		plt.legend([p1, p2, p3, p4, p5, p6], stat[last]['ecount'].keys(), loc='upper left')
 		plt.grid(True, which='both')
 		plt.ylim(ymax=10)
 		# format the ticks
@@ -562,9 +573,12 @@ def logstat(form):
 		return show_onwebpage(plt)
 	elif (format == 'graph-ecount-sed'):
 		d = d['ecount']
-		fig = plt.figure(figsize=(4,3))
-		ax = fig.add_subplot(111)
-		p1 = ax.step(d[:,0], (d[:,1]-d[:,3]), marker='x', where='mid')
+		fig = plt.figure(figsize=(5,3))
+		#ax = fig.add_subplot(111)
+		ax_size = [0.125, 0.15, 
+			1-0.1-0.05, 1-0.15-0.05]
+		ax = fig.add_axes(ax_size)
+		p1 = ax.step(d[:,0], (d[:,4]-d[:,1]), marker='x', where='mid')
 		plt.legend([p1], ['runs failed'])
 		plt.grid(True, which='both')
 		# format the ticks
