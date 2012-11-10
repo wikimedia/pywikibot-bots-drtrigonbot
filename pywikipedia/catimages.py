@@ -69,7 +69,10 @@ try:
     import cv2
     sys.path.remove('/usr/local/lib/python2.6/')
     import pyexiv2
-    import gtk
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        import gtk                  # ignore warning: "GtkWarning: could not open display"
     import rsvg                     # gnome-python2-rsvg (binding to librsvg)
     import cairo
     import magic                    # python-magic (binding to libmagic)
