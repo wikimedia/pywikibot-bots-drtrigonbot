@@ -9,12 +9,13 @@ data.
 
 # (C) Daniel Herding, 2005
 # (C) Dr. Trigon, 2009-2010
+# (C) Pywikipedia bot team, 2010-2012
 #
 # DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: botlist.py 9597 2011-10-08 09:52:43Z xqt $'
+__version__='$Id: botlist.py 10485 2012-08-15 14:13:57Z xqt $'
 #
 
 import re, sys, pickle
@@ -81,7 +82,7 @@ def refresh(site, sysop=False, witheditsonly=True):
         botlist.extend([w['name'] for w in data['query']['allusers']])
 
         if 'query-continue' in data:
-            params['aufrom'] = data['query-continue']['allusers']['aufrom']
+            params.update(data['query-continue']['allusers'])
         else:
             break
 

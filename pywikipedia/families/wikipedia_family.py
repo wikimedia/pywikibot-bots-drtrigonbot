@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikipedia_family.py 10440 2012-07-04 12:27:10Z xqt $'
+__version__ = '$Id: wikipedia_family.py 10672 2012-11-08 07:09:37Z xqt $'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 
@@ -11,39 +11,46 @@ class Family(family.Family):
         self.name = 'wikipedia'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'nl', 'it', 'pl', 'es', 'ru', 'ja', 'pt', 'zh',
-            'sv', 'vi', 'uk', 'ca', 'no', 'fi', 'cs', 'hu', 'ko', 'fa', 'id',
-            'tr', 'ar', 'ro', 'sk', 'eo', 'da', 'sr', 'lt', 'ms', 'he', 'eu',
-            'sl', 'bg', 'kk', 'vo', 'hr', 'war', 'hi', 'et', 'gl', 'az', 'nn',
-            'simple', 'la', 'el', 'th', 'new', 'roa-rup', 'oc', 'sh', 'ka',
-            'mk', 'tl', 'ht', 'pms', 'te', 'ta', 'be-x-old', 'be', 'br', 'ceb',
-            'lv', 'sq', 'jv', 'mg', 'cy', 'lb', 'mr', 'is', 'bs', 'yo', 'an',
-            'lmo', 'hy', 'fy', 'bpy', 'ml', 'pnb', 'sw', 'bn', 'io', 'af', 'gu',
-            'zh-yue', 'ne', 'nds', 'ur', 'ku', 'ast', 'scn', 'su', 'qu', 'uz',
-            'diq', 'ba', 'tt', 'my', 'ga', 'cv', 'ia', 'nap', 'bat-smg',
-            'map-bms', 'wa', 'als', 'kn', 'am', 'gd', 'bug', 'tg', 'zh-min-nan',
-            'yi', 'vec', 'sco', 'hif', 'roa-tara', 'os', 'arz', 'nah', 'mzn',
-            'sah', 'ky', 'mn', 'sa', 'pam', 'hsb', 'li', 'mi', 'si', 'co',
-            'ckb', 'gan', 'glk', 'bo', 'fo', 'bar', 'bcl', 'ilo', 'mrj', 'se',
-            'fiu-vro', 'nds-nl', 'tk', 'vls', 'ps', 'gv', 'rue', 'dv', 'nrm',
-            'pag', 'pa', 'koi', 'rm', 'km', 'kv', 'udm', 'csb', 'mhr', 'fur',
-            'mt', 'wuu', 'zea', 'lij', 'ug', 'lad', 'pi', 'sc', 'bh',
-            'zh-classical', 'xmf', 'or', 'nov', 'ksh', 'ang', 'kw', 'so', 'stq',
-            'nv', 'hak', 'ay', 'frr', 'frp', 'ext', 'szl', 'pcd', 'ie', 'gag',
-            'haw', 'xal', 'ln', 'rw', 'pdc', 'pfl', 'krc', 'vep', 'crh', 'eml',
-            'gn', 'ace', 'to', 'ce', 'kl', 'arc', 'myv', 'dsb', 'as', 'bjn',
-            'pap', 'tpi', 'lbe', 'mdf', 'wo', 'jbo', 'kab', 'sn', 'av',
-            'cbk-zam', 'ty', 'srn', 'kbd', 'lo', 'lez', 'ab', 'mwl', 'ltg',
-            'na', 'ig', 'kg', 'tet', 'za', 'kaa', 'nso', 'zu', 'rmy', 'cu',
-            'tn', 'chr', 'chy', 'got', 'sm', 'bi', 'bm', 'iu', 'pih', 'ik',
-            'ss', 'sd', 'pnt', 'cdo', 'ee', 'ha', 'ti', 'bxr', 'ts', 'om', 'ks',
-            'ki', 've', 'sg', 'rn', 'cr', 'dz', 'lg', 'ak', 'ff', 'tum', 'fj',
-            'st', 'tw', 'ch', 'xh', 'ny',
+            'en', 'de', 'fr', 'nl', 'it', 'es', 'pl', 'ru', 'ja', 'pt', 'zh',
+            'sv', 'vi', 'uk', 'ca', 'no', 'fi', 'cs', 'fa', 'hu', 'ko', 'ro',
+            'id', 'ar', 'tr', 'sk', 'kk', 'eo', 'da', 'sr', 'lt', 'eu', 'ms',
+            'he', 'bg', 'sl', 'vo', 'hr', 'war', 'hi', 'et', 'gl', 'nn', 'az',
+            'simple', 'la', 'el', 'th', 'sh', 'oc', 'new', 'mk', 'ka',
+            'roa-rup', 'tl', 'pms', 'ht', 'be', 'te', 'uz', 'ta', 'be-x-old',
+            'lv', 'br', 'ceb', 'sq', 'jv', 'mg', 'cy', 'mr', 'lb', 'is', 'bs',
+            'hy', 'my', 'yo', 'an', 'lmo', 'ml', 'pnb', 'fy', 'bpy', 'af', 'sw',
+            'bn', 'io', 'ne', 'gu', 'zh-yue', 'scn', 'ur', 'ba', 'nds', 'ku',
+            'ast', 'qu', 'su', 'diq', 'tt', 'ga', 'ky', 'cv', 'ia', 'nap',
+            'bat-smg', 'map-bms', 'als', 'wa', 'kn', 'am', 'ckb', 'sco', 'gd',
+            'bug', 'tg', 'mzn', 'zh-min-nan', 'yi', 'vec', 'arz', 'hif',
+            'roa-tara', 'nah', 'os', 'sah', 'mn', 'sa', 'pam', 'hsb', 'li',
+            'mi', 'si', 'se', 'co', 'gan', 'glk', 'bar', 'fo', 'ilo', 'bo',
+            'bcl', 'mrj', 'fiu-vro', 'nds-nl', 'ps', 'tk', 'vls', 'gv', 'rue',
+            'pa', 'dv', 'xmf', 'pag', 'nrm', 'zea', 'kv', 'koi', 'km', 'rm',
+            'csb', 'lad', 'udm', 'or', 'mhr', 'mt', 'fur', 'lij', 'wuu', 'ug',
+            'pi', 'sc', 'zh-classical', 'frr', 'bh', 'nov', 'ksh', 'ang', 'so',
+            'stq', 'kw', 'nv', 'hak', 'ay', 'vep', 'frp', 'pcd', 'ext', 'szl',
+            'gag', 'gn', 'ie', 'ln', 'haw', 'eml', 'xal', 'pfl', 'rw', 'pdc',
+            'krc', 'crh', 'ace', 'to', 'as', 'ce', 'kl', 'arc', 'dsb', 'myv',
+            'bjn', 'pap', 'sn', 'tpi', 'lbe', 'lez', 'kab', 'mdf', 'wo', 'jbo',
+            'av', 'srn', 'cbk-zam', 'ty', 'bxr', 'lo', 'kbd', 'ab', 'tet',
+            'mwl', 'ltg', 'na', 'kg', 'ig', 'nso', 'za', 'kaa', 'zu', 'rmy',
+            'chy', 'cu', 'tn', 'chr', 'got', 'cdo', 'sm', 'bi', 'bm', 'iu',
+            'pih', 'ss', 'sd', 'pnt', 'ee', 'om', 'ha', 'ki', 'ti', 'ts', 'ks',
+            'sg', 've', 'rn', 'cr', 'ak', 'tum', 'lg', 'dz', 'ny', 'ik', 'ff',
+            'ch', 'st', 'fj', 'tw', 'xh',
         ]
 
         self.langs = dict([(lang, '%s.wikipedia.org' % lang) for lang in self.languages_by_size])
 
         # Override defaults
+        self.namespaces[2]['cs'] = [u'Wikipedista', u'Uživatel', u'Wikipedistka']
+        self.namespaces[3]['cs'] =  [u'Diskuse s wikipedistou', u'Diskuse s uživatelem', u'Diskuse s wikipedistkou', u'Wikipedista diskuse', u'Wikipedistka diskuse', u'Uživatel diskuse', u'Uživatelka diskuse']
+        self.namespaces[12]['de'] = [u'Benutzer Diskussion', u'BD', u'Benutzerin Diskussion'],
+        self.namespaces[12]['de'] = [u'Hilfe', u'H']
+        self.namespaces[13]['de'] = [u'Hilfe Diskussion', u'HD']
+        self.namespaces[2]['fr'] = [u'Utilisateur', u'Utilisatrice']
+        self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisatrice', u'Discussion Utilisateur']
         self.namespaces[1]['ja'] = [u'ノート', u'トーク']
         self.namespaces[3]['ja'] = [u'利用者‐会話', u'利用者・トーク']
         self.namespaces[7]['ja'] = [u'ファイル‐ノート', u'ファイル・トーク', u'Image talk', u'画像‐ノート']
@@ -54,6 +61,9 @@ class Family(family.Family):
         self.namespaces[13]['ja'] = [u'Help‐ノート', u'ヘルプ・トーク']
         self.namespaces[14]['ja'] = [u'Category', u'カテゴリ']
         self.namespaces[15]['ja'] = [u'Category‐ノート', u'カテゴリ・トーク']
+        self.namespaces[12]['nl'] = [u'Help', u'H']
+        self.namespaces[2]['pt'] =  [u'Usuário(a)', u'Utilizador', u'Usuário', u'Usuária']
+        self.namespaces[3]['pt'] = [u'Usuário(a) Discussão', u'Utilizador Discussão', u'Usuário Discussão', u'Usuária Discussão']
 
         # Most namespaces are inherited from family.Family.
         # Translation used on all wikis for the different namespaces.
@@ -77,7 +87,7 @@ class Family(family.Family):
             'av': u'Wikipedia',
             'ay': u'Wikipidiya',
             'az': u'Vikipediya',
-            'ba': u'Wikipedia',
+            'ba': u'Википедия',
             'bar': u'Wikipedia',
             'bat-smg': u'Vikipedėjė',
             'bcl': u'Wikipedia',
@@ -164,7 +174,7 @@ class Family(family.Family):
             'ie': u'Wikipedia',
             'ig': u'Wikipedia',
             'ik': u'Wikipedia',
-            'ilo': u'Wikipedia',
+            'ilo': [u'Wikipedia', u'WP'],
             'io': [u'Wikipedio', u'Wikipedia'],
             'is': u'Wikipedia',
             'it': [u'Wikipedia', u'WP'],
@@ -230,7 +240,7 @@ class Family(family.Family):
             'new': u'विकिपिडिया',
             'nl': [u'Wikipedia', u'WP'],
             'nn': [u'Wikipedia', u'WP'],
-            'no': u'Wikipedia',
+            'no': [u'Wikipedia', u'WP'],
             'nov': u'Wikipedia',
             'nrm': u'Wikipedia',
             'nso': u'Wikipedia',
@@ -271,7 +281,7 @@ class Family(family.Family):
             'scn': u'Wikipedia',
             'sco': u'Wikipedia',
             'sd': u'Wikipedia',
-            'se': u'Wikipedia',
+            'se': [u'Wikipedia', u'WP'],
             'sg': u'Wikipedia',
             'sh': u'Wikipedia',
             'si': [u'විකිපීඩියා', u'Wikipedia'],
@@ -342,7 +352,7 @@ class Family(family.Family):
             'ab': [u'Авикипедиа ахцәажәара', u'Обсуждение Авикипедиа'],
             'ace': [u'Marit Wikipedia', u'Pembicaraan Wikipedia'],
             'af': u'Wikipediabespreking',
-            'ak': u'Wikipedia talk',
+            'ak': u'Wikipedia nkɔmbɔ',
             'als': u'Wikipedia Diskussion',
             'am': u'ውክፔዲያ ውይይት',
             'an': u'Descusión Wikipedia',
@@ -355,7 +365,7 @@ class Family(family.Family):
             'av': u'Обсуждение Wikipedia',
             'ay': u'Wikipidiyan Aruskipäwi',
             'az': u'Vikipediya müzakirəsi',
-            'ba': [u'Wikipedia буйынса фекерләшеү', u'Wikipedia б-са фекер алышыу'],
+            'ba': [u'Википедия буйынса фекерләшеү', u'Википедия б-са фекер алышыу'],
             'bar': u'Wikipedia Diskussion',
             'bat-smg': [u'Vikipedėjės aptarėms', u'Vikipedėjė aptarimas'],
             'bcl': u'Olay sa Wikipedia',
@@ -418,12 +428,12 @@ class Family(family.Family):
             'fy': u'Wikipedy oerlis',
             'ga': u'Plé Vicipéide',
             'gag': [u'Vikipediyanın laflanması', u'Vikipediya tartışma'],
-            'gan': u'Wikipedia talk',
+            'gan': u'Wikipedia 談詑',
             'gd': [u'An deasbaireachd aig Uicipeid', u'Wikipedia talk'],
             'gl': u'Conversa Wikipedia',
             'glk': u'بحث Wikipedia',
             'gn': u'Vikipetã myangekõi',
-            'got': u'Wikipedia talk',
+            'got': u'𐌸𐌹𐍃 Wikipedia 𐌲𐌰𐍅𐌰𐌿𐍂𐌳𐌾𐌰',
             'gu': u'વિકિપીડિયા ચર્ચા',
             'gv': u'Resooney Wikipedia',
             'ha': u'Wikipedia talk',
@@ -431,7 +441,7 @@ class Family(family.Family):
             'haw': u'Kūkākūkā o Wikipikia',
             'he': u'שיחת ויקיפדיה',
             'hi': [u'विकिपीडिया वार्ता', u'विवा', u'WPT'],
-            'hif': u'Wikipedia talk',
+            'hif': u'Wikipedia baat',
             'hr': u'Razgovor Wikipedija',
             'hsb': u'Wikipedija diskusija',
             'ht': [u'Diskisyon Wikipedya', u'Wikipedia talk'],
@@ -442,7 +452,7 @@ class Family(family.Family):
             'ie': u'Wikipedia Discussion',
             'ig': u'Okwu Wikipedia',
             'ik': u'Wikipedia talk',
-            'ilo': u'Wikipedia tungtungan',
+            'ilo': [u'Wikipedia tungtungan', u'WT'],
             'io': [u'Wikipedio Debato', u'Wikipedia talk'],
             'is': u'Wikipediaspjall',
             'it': u'Discussioni Wikipedia',
@@ -465,9 +475,9 @@ class Family(family.Family):
             'krc': u'Википедия сюзюу',
             'ks': u'Wikipedia talk',
             'ksh': u'Wikipedia Klaaf',
-            'ku': u'Gotûbêja Wîkîpediyayê',
+            'ku': [u'Gotûbêja Wîkîpediyayê', u'Wîkîpediya nîqaş'],
             'kv': [u'Википедия донъялӧм', u'Обсуждение Wikipedia', u'Обсуждение Википедии'],
-            'kw': [u'Kescows Wikipedia', u'Cows Wikipedia', u'Keskows Wikipedia'],
+            'kw': [u'Keskows Wikipedia', u'Cows Wikipedia', u'Kescows Wikipedia'],
             'ky': u'Wikipedia баарлашуу',
             'la': [u'Disputatio Vicipaediae', u'Disputatio Wikipedia'],
             'lad': [u'Diskusyón de Vikipedya', u'Vikipedya Discusión', u'Diskussión de Vikipedya'],
@@ -498,7 +508,7 @@ class Family(family.Family):
             'mwl': [u'Biquipédia cumbersa', u'Wikipedia cumbersa', u'Biquipédia Discussão'],
             'my': u'Wikipedia talk',
             'myv': u'Википедиясь кортамось',
-            'mzn': [u'ویکی‌پدیا گپ', u'Wikipedia گپ', u'بحث ویکی‌پدیا'],
+            'mzn': [u'ویکی پدیا گپ', u'Wikipedia گپ', u'بحث ویکی‌پدیا'],
             'na': u'Wikipedia talk',
             'nah': [u'Huiquipedia tēixnāmiquiliztli', u'Wikipedia tēixnāmiquiliztli', u'Wikipedia Discusión'],
             'nap': [u'Wikipedia chiàcchiera', u'Discussioni Wikipedia'],
@@ -518,7 +528,7 @@ class Family(family.Family):
             'om': u'Wikipedia talk',
             'or': [u'ଉଇକିପିଡ଼ିଆ ଆଲୋଚନା', u'Wikipedia talk', u'WT'],
             'os': [u'Википедийы тæрхон', u'Дискусси Википеди'],
-            'pa': u'ਵਿਕਿਪੀਡਿਆ ਚਰਚਾ',
+            'pa': [u'ਵਿਕਿਪੀਡਿਆ ਗੱਲ-ਬਾਤ', u'ਵਿਕਿਪੀਡਿਆ ਚਰਚਾ'],
             'pag': u'Wikipedia talk',
             'pam': u'Wikipedia talk',
             'pap': u'Wikipedia talk',
@@ -579,7 +589,7 @@ class Family(family.Family):
             'tl': u'Usapang Wikipedia',
             'tn': u'Wikipedia talk',
             'to': u'Wikipedia talk',
-            'tpi': u'Wikipedia talk',
+            'tpi': u'Wikipedia toktok',
             'tr': u'Vikipedi tartışma',
             'ts': u'Wikipedia talk',
             'tt': [u'Википедия бәхәсе', u'Wikipedia talk', u'Обсуждение Википедии', u'Википедия bäxäse'],
@@ -646,6 +656,7 @@ class Family(family.Family):
             'bg': u'Портал',
             'bn': u'প্রবেশদ্বার',
             'bpy': u'হমিলদুৱার',
+            'bs': u'Portal',
             'ca': u'Portal',
             'ce': u'Ков',
             'ckb': u'دەروازە',
@@ -702,6 +713,7 @@ class Family(family.Family):
             'roa-tara': u'Portale',
             'ru': u'Портал',
             'scn': u'Purtali',
+            'se': u'Portála',
             'sh': u'Portal',
             'si': u'ද්වාරය',
             'sk': u'Portál',
@@ -719,6 +731,8 @@ class Family(family.Family):
             'tr': u'Portal',
             'tt': u'Портал',
             'uk': u'Портал',
+            'ur': u'باب',
+            'uz': u'Portal',
             'vec': u'Portałe',
             'vi': u'Chủ đề',
             'wuu': u'Transwiki',
@@ -745,6 +759,7 @@ class Family(family.Family):
             'bg': u'Портал беседа',
             'bn': [u'প্রবেশদ্বার আলোচনা', u'Portal talk', u'കവാടത്തിന്റെ സംവാദം'],
             'bpy': [u'হমিলদুৱার য়্যারী', u'Portal talk'],
+            'bs': u'Razgovor o portalu',
             'ca': u'Portal Discussió',
             'ce': u'Ков дийцаре',
             'ckb': u'لێدوانی دەروازە',
@@ -762,12 +777,12 @@ class Family(family.Family):
             'fa': u'بحث درگاه',
             'fi': u'Keskustelu teemasivusta',
             'fr': u'Discussion Portail',
-            'gl': u'Portal talk',
+            'gl': u'Conversa portal',
             'he': u'שיחת פורטל',
             'hi': [u'प्रवेशद्वार वार्ता', u'प्रवा'],
             'hr': u'Razgovor o portalu',
             'hu': [u'Portálvita', u'Portál vita'],
-            'hy': u'Պորտալի  քննարկում',
+            'hy': u'Պորտալի քննարկում',
             'ia': u'Discussion Portal',
             'id': u'Pembicaraan Portal',
             'is': u'Gáttaspjall',
@@ -801,6 +816,7 @@ class Family(family.Family):
             'roa-tara': u'\'Ngazzaminde d\'u Portale',
             'ru': u'Обсуждение портала',
             'scn': u'Discussioni purtali',
+            'se': u'Portálaságastallan',
             'sh': u'Razgovor o portalu',
             'si': [u'ද්වාරය සාකච්ඡාව', u'Portal talk'],
             'sk': u'Diskusia k portálu',
@@ -818,6 +834,8 @@ class Family(family.Family):
             'tr': u'Portal tartışma',
             'tt': u'Портал бәхәсе',
             'uk': u'Обговорення порталу',
+            'ur': u'تبادلۂ خیال باب',
+            'uz': u'Portal munozarasi',
             'vec': u'Discussion portałe',
             'vi': u'Thảo luận Chủ đề',
             'wuu': u'Transwiki talk',
@@ -847,6 +865,7 @@ class Family(family.Family):
             'ia': u'Appendice',
             'it': u'Progetto',
             'ja': u'プロジェクト',
+            'kk': u'Жоба',
             'ko': u'위키프로젝트',
             'lmo': u'Purtaal',
             'lt': u'Vikiprojektas',
@@ -857,6 +876,7 @@ class Family(family.Family):
             'ro': u'Proiect',
             'ru': u'Инкубатор',
             'scn': u'Pruggettu',
+            'uz': u'Loyiha',
             'vec': u'Projeto',
         }
 
@@ -877,6 +897,7 @@ class Family(family.Family):
             'ia': u'Discussion Appendice',
             'it': u'Discussioni progetto',
             'ja': u'プロジェクト‐ノート',
+            'kk': u'Жоба талқылауы',
             'ko': u'위키프로젝트토론',
             'lmo': u'Descüssiun Purtaal',
             'lt': u'Vikiprojekto aptarimas',
@@ -887,6 +908,7 @@ class Family(family.Family):
             'ro': u'Discuție Proiect',
             'ru': u'Обсуждение Инкубатора',
             'scn': u'Discussioni pruggettu',
+            'uz': u'Loyiha munozarasi',
             'vec': u'Discussion projeto',
         }
 
@@ -948,6 +970,22 @@ class Family(family.Family):
             'als': u'Nochricht Diskussion',
         }
 
+        self.namespaces[446] = {
+            'en': u'Education Program',
+        }
+
+        self.namespaces[447] = {
+            'en': u'Education Program talk',
+        }
+
+        self.namespaces[710] = {
+            'en': u'TimedText',
+        }
+
+        self.namespaces[711] = {
+            'en': u'TimedText talk',
+        }
+
         self.category_redirect_templates = {
             '_default': (),
             'ar': (u'تحويل تصنيف',
@@ -956,7 +994,6 @@ class Family(family.Family):
             'arz': (u'تحويل تصنيف',),
             'cs': (u'Zastaralá kategorie',),
             'da': (u'Kategoriomdirigering',),
-            # 'de' has removed its template
             'en': (u'Category redirect',
                    u'Category redirect3',
                    u"Categoryredirect",
@@ -979,7 +1016,6 @@ class Family(family.Family):
                    u'Kat-redirekt',),
             'id': (u'Alih kategori',
                    u'Alihkategori',),
-            # 'it' has removed its template
             'ja': (u'Category redirect',),
             'ko': (u'분류 넘겨주기',),
             'mk': (u'Премести категорија',),
@@ -988,7 +1024,6 @@ class Family(family.Family):
                    u'Categoryredirect',
                    u'Category redirect',),
             'mt': (u'Redirect kategorija',),
-            # 'nl' has removed its template
             'no': (u'Category redirect',
                    u'Kategoriomdirigering',
                    u'Kategori-omdirigering',),
@@ -1036,10 +1071,6 @@ class Family(family.Family):
             # ([[MediaWiki:Disambiguationspage]])
             # first char must be in uppercase
             '_default': [u'Disambig'], # for default MediaWiki message only
-            'arc': [u'ܬ.ܐ.', u'ܕ', u'Disambig'],
-            'az':  [u'Dəqiqləşdirmə'],
-            'ba':  [u'Күп мәғәнәлелек'],
-            'bn':  [u'দ্ব্যর্থতা নিরসন', u'Disambig'],
             'cdo': [u'Gì-ngiê', u'Disambig'],
             'fo':  [u'Fleiri týdningar'],
             'frp': [u'Homonimos', u'Disambig'],
@@ -1053,14 +1084,10 @@ class Family(family.Family):
                     u'Disambig'],
             'kg':  [u'Bisongidila'],
             'krc': [u'Кёб магъаналы', u'Disambig'],
-            'la':  [u'Discretiva', u'Disnomen'], #{{Disambig}} is not a disambig
-            'lb':  [u'Homonymie', u'Disambig', u'Homonymie Ofkierzungen'],
             'li':  [u'Verdudeliking', u'Verdudelikingpazjena', u'Vp'],
             'lmo': [u'Desambiguació', u'Dezambiguasiú', u'Desambiguazion',
                     u'Desambiguassiú', u'Desambiguació'],
             'mn':  [u'Салаа утгатай', u'Disambig'],
-            'nl':  [u'Dp', u'DP', u'Dp2', u'Dpintro', u'Cognomen',
-                    u'Dp cognomen'],
             'nn':  [u'Fleirtyding', u'Tobokstavforkorting', u'Pekerside',
                     u'Peikar', u'Disambig'],
             'no':  [u'Peker', u'Etternavn', u'Disambig',
@@ -1070,10 +1097,6 @@ class Family(family.Family):
             'nrm': [u'Page dé frouque'],
             'qu':  [u"Sut'ichana qillqa", u'Disambig', u'SJM'],
             'rmy': [u'Dudalipen'],
-            'ro':  [u'Dezambiguizare', u'Disambig', u'Hndis', u'Dez',
-                    u'Dezamb', u'Persoane omonime', u'DezGeo',
-                    u'Dezambiguizare comitate SUA'],
-            'sc':  [u'Disambigua'],
             'sk':  [u'Disambig', u'Rozlišovacia stránka', u'Disambiguation'],
             'srn': [u'Dp'],
             'tg':  [u'Ибҳомзудоӣ', u'Disambig', u'Рафъи ибҳом',
@@ -1088,8 +1111,6 @@ class Family(family.Family):
             'wo':  [u'Bokktekki'],
             'yi':  [u'באדייטען'],
             'zea': [u'Dp', u'Deurverwiespagina'],
-            'zh':  [u'Disambig', u'消歧义', u'消歧义页', u'消歧義', u'消歧義頁',
-                    u'Letter disambig', u'Isomerdab'],
             'zh-classical':  [u'Disambig', u'釋義', u'消歧義'],
             'zh-yue': [u'搞清楚', u'Disambig'],
         }

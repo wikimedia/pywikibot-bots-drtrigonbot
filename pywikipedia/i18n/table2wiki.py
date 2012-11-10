@@ -52,6 +52,11 @@ msg = {
 		'table2wiki-no-warning': u'Uživatelem řízený robot: Syntaxe tabulky změněna',
 		'table2wiki-warnings': u'Uživatelem řízený robot: Syntaxe tabulky změněna - {{PLURAL:count|1 varování|%(count)d varování}}!',
 	},
+	# Author: Kaare
+	'da': {
+		'table2wiki-no-warning': u'Brugerkontrolleret robot: Tabelsyntaks opdateret',
+		'table2wiki-warnings': u'Brugerkontrolleret robot: Tabelsyntaks opdateret – {{PLURAL:count|1 advarsel|%(count)d advarsler}}!',
+	},
 	# Author: Xqt
 	'de': {
 		'table2wiki-no-warning': u'Bot: Tabellensyntax konvertiert',
@@ -59,8 +64,12 @@ msg = {
 	},
 	# Author: Erdemaslancan
 	'diq': {
-		'table2wiki-no-warning': u'Karberê qontrolkarê boti: imlay tabloy kerd newi',
+		'table2wiki-no-warning': u'Karberê qontrolkarê boti: İmlay tabloy kerd anewi',
 		'table2wiki-warnings': u'Botê kontrolkarê karberan: imlay tabloy kerd newi {{PLURAL:count|1|%(count)d}}',
+	},
+	# Author: Glavkos
+	'el': {
+		'table2wiki-no-warning': u'Ρομπότ ελεγχόμενο από το χρήστη: Ο πίνακας σύνταξης ενημερώθηκε',
 	},
 	# Author: Xqt
 	'en': {
@@ -77,6 +86,11 @@ msg = {
 		'table2wiki-no-warning': u'ربات کنترل‌شده توسط کاربر: به‌روزرسانی ترکیب جدول',
 		'table2wiki-warnings': u'ربات کنترل‌شده توسط کاربر: به‌روز‌رسانی ترکیب جدول - {{PLURAL:count|۱ هشدار|%(count)d هشدار}}!',
 	},
+	# Author: Olli
+	'fi': {
+		'table2wiki-no-warning': u'Käyttäjän ohjaama botti: Taulukon syntaksi päivitetty',
+		'table2wiki-warnings': u'Käyttäjän ohjaama botti: Taulukon syntaksi päivitetty - {{PLURAL:count|1 varoitus|%(count)d varoitusta}}!',
+	},
 	# Author: Od1n
 	'fr': {
 		'table2wiki-no-warning': u'Robot : wikification syntaxe tableaux',
@@ -84,8 +98,8 @@ msg = {
 	},
 	# Author: ChrisPtDe
 	'frp': {
-		'table2wiki-no-warning': u'Robot : vouiquificacion sintaxa tablôs',
-		'table2wiki-warnings': u'Robot : vouiquificacion sintaxa tablôs - {{PLURAL:count|1 avèrtissement|%(count)d avèrtissements}} !',
+		'table2wiki-no-warning': u'Robot controlâ per un utilisator : sintaxa de les grelyes betâye a jorn',
+		'table2wiki-warnings': u'Robot controlâ per un utilisator : sintaxa de les grelyes betâye a jorn - {{PLURAL:count|1 avèrtissement|%(count)d avèrtissements}} !',
 	},
 	# Author: Murma174
 	'frr': {
@@ -132,7 +146,7 @@ msg = {
 	# Author: Snævar
 	'is': {
 		'table2wiki-no-warning': u'Handvirkt vélmenni: Málskipan töflu uppfærð',
-		'table2wiki-warnings': u'Handvirkt vélmenni: Málskipan töflu uppfært - {{PLURAL:count|1|%(count)d}} viðvaranir!',
+		'table2wiki-warnings': u'Handvirkt vélmenni: Málskipan töflu uppfært - {{PLURAL:count|ein viðvörun|%(count)d viðvaranir}}!',
 	},
 	# Author: Gianfranco
 	'it': {
@@ -144,6 +158,11 @@ msg = {
 	'ja': {
 		'table2wiki-no-warning': u'ロボットによる: 表をHTMLからウィキ文法に更新',
 		'table2wiki-warnings': u'ロボットによる: 表をHTMLからウィキ文法に更新 - 警告 {{PLURAL:count|1|%(count)d}}',
+	},
+	# Author: NoiX180
+	'jv': {
+		'table2wiki-no-warning': u'Boté panganggo: sintaks tabèl dianyari',
+		'table2wiki-warnings': u'Boté panganggo: sintaks tabèl dianyari - {{PLURAL:count|1 pèngetan|%(count)d pèngetan}}!',
 	},
 	'kk': {
 		'table2wiki-no-warning': u'Басқарылмалы бот: Кесте пішімі түзетілді',
@@ -292,19 +311,20 @@ msg = {
 		'table2wiki-warnings': u'Напівавтоматичний бот: синтаксис таблиці оновлено - {{PLURAL:count|1 попередження|%(count)d попереджень}}!',
 	},
 	# Author: Alunardon90
+	# Author: GatoSelvadego
 	'vec': {
-		'table2wiki-no-warning': u'Robot controłà da\'l utente: sintasi dełe tabełe ajornà',
-		'table2wiki-warnings': u'Robot controłà da\'l utente: tabeła sintasi ajornada - {{PLURAL:count|1 avixo|%(count)d avixi}}!',
+		'table2wiki-no-warning': u'Robot controłà dal utente: sintasi de łe tabełe axornà',
+		'table2wiki-warnings': u'Robot controłà dal utente: tabeła sintasi axornada - {{PLURAL:count|1 avixo|%(count)d avixi}}!',
 	},
 	# Author: Minh Nguyen
 	'vi': {
 		'table2wiki-no-warning': u'Bot có người điều khiển: Cập nhật cú pháp bảng',
 		'table2wiki-warnings': u'Bot có người điều khiển: Cập nhật cú pháp bảng – {{PLURAL:count|1|%(count)d}} cảnh báo!',
 	},
-	# Author: Anakmalaysia
+	# Author: Yfdyh000
 	'zh': {
-		'table2wiki-no-warning': u'用户控制机器人：更新表语法',
-		'table2wiki-warnings': u'用户控制机器人：更新表语法——但有%(count)d个警告！',
+		'table2wiki-no-warning': u'用户控制的机器人：更新表语法',
+		'table2wiki-warnings': u'用户控制的机器人：更新表语法——但有%(count)d个警告！',
 	},
 	# Author: Breawycker
 	# Author: Justincheng12345

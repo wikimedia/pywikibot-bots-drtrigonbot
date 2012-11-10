@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikinews_family.py 10414 2012-06-22 11:49:13Z xqt $'
+__version__ = '$Id: wikinews_family.py 10672 2012-11-08 07:09:37Z xqt $'
 
 # The Wikimedia family that is known as Wikinews
 
@@ -11,27 +11,20 @@ class Family(family.Family):
         self.name = 'wikinews'
 
         self.languages_by_size = [
-            'sr', 'en', 'pl', 'fr', 'de', 'it', 'es', 'pt', 'zh', 'ru', 'ja',
-            'sv', 'ta', 'ca', 'el', 'cs', 'fa', 'ar', 'fi', 'ro', 'he', 'bg',
+            'sr', 'en', 'pl', 'fr', 'de', 'it', 'es', 'pt', 'ru', 'zh', 'ja',
+            'sv', 'ca', 'ta', 'el', 'cs', 'fa', 'ar', 'fi', 'ro', 'he', 'bg',
             'tr', 'sq', 'uk', 'no', 'bs', 'ko', 'eo',
         ]
 
         self.langs = dict([(lang, '%s.wikinews.org' % lang) for lang in self.languages_by_size])
 
         # Override defaults
-        self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisateur']
-        self.namespaces[2]['fr'] = [u'Utilisateur']
         self.namespaces[14]['en'] = [u'Category', u'CAT']
         self.namespaces[10]['zh'] = [u'Template', u'模板', u'样板', u'樣板']
         self.namespaces[12]['zh'] = [u'Help', u'帮助', u'幫助']
         self.namespaces[14]['zh'] = [u'Category', u'分类', u'分類']
-        self.namespaces[3]['pt'] = [u'Utilizador Discussão', u'Usuário Discussão', u'Utilizadora Discussão']
-        self.namespaces[2]['pt'] = [u'Utilizador', u'Usuário', u'Utilizadora']
         self.namespaces[3]['ca'] = [u'Usuari Discussió']
         self.namespaces[2]['ca'] = [u'Usuari']
-        self.namespaces[3]['de'] = [u'Benutzer Diskussion', u'Benutzerin Diskussion']
-        self.namespaces[13]['de'] = [u'Hilfe Diskussion']
-        self.namespaces[12]['de'] = [u'Hilfe']
         self.namespaces[3]['cs'] = [u'Diskuse s redaktorem', u'Diskuse s redaktorkou', u'Diskuse s uživatelem', u'Redaktor diskuse', u'Redaktorka diskuse', u'Uživatel diskuse', u'Uživatelka diskuse', u'Diskuse s uživatelkou']
         self.namespaces[2]['cs'] = [u'Redaktor', u'Redaktorka', u'Uživatel', u'Uživatelka']
         self.namespaces[3]['pl'] = [u'Dyskusja wikireportera', u'Dyskusja wikireporterki']
@@ -43,7 +36,7 @@ class Family(family.Family):
         # You only need to enter translations that differ from _default.
         self.namespaces[4] = {
             '_default': self.namespaces[4]['_default'],
-            'ar': [u'ويكي الأخبار', u'Wikinews'],
+            'ar': [u'ويكي الأخبار', u'وخ'],
             'bg': [u'Уикиновини', u'Wikinews'],
             'bs': [u'Wikivijesti', u'Wikinews'],
             'ca': [u'Viquinotícies', u'Wikinews'],
@@ -78,7 +71,7 @@ class Family(family.Family):
         }
         self.namespaces[5] = {
             '_default': self.namespaces[5]['_default'],
-            'ar': u'نقاش ويكي الأخبار',
+            'ar': [u'نقاش ويكي الأخبار', u'نو'],
             'bg': u'Уикиновини беседа',
             'bs': u'Razgovor s Wikivijestima',
             'ca': u'Viquinotícies Discussió',

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wiktionary_family.py 10437 2012-07-03 10:27:45Z xqt $'
+__version__ = '$Id: wiktionary_family.py 10672 2012-11-08 07:09:37Z xqt $'
 
 # The Wikimedia family that is known as Wiktionary
 
@@ -11,35 +11,32 @@ class Family(family.Family):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'el', 'ko', 'tr', 'pl', 'ta',
-            'sv', 'vi', 'de', 'kn', 'nl', 'io', 'fi', 'hu', 'pt', 'no', 'my',
-            'id', 'it', 'li', 'ml', 'et', 'ja', 'es', 'fa', 'ku', 'ar', 'ro',
-            'lo', 'cs', 'gl', 'ca', 'uk', 'eu', 'bg', 'eo', 'te', 'vo', 'br',
-            'oc', 'hr', 'is', 'th', 'simple', 'scn', 'sr', 'af', 'cy', 'fy',
-            'sw', 'tl', 'ast', 'fj', 'ur', 'he', 'la', 'wa', 'sq', 'da', 'hy',
-            'sl', 'zh-min-nan', 'tt', 'hi', 'az', 'lv', 'ka', 'pnb', 'nn', 'lb',
-            'tk', 'hsb', 'kk', 'bs', 'nah', 'mk', 'km', 'be', 'wo', 'ga', 'ang',
-            'co', 'ms', 'gn', 'mr', 'csb', 'sk', 'st', 'nds', 'ia', 'si', 'sh',
-            'sd', 'tg', 'ug', 'ky', 'kl', 'an', 'zu', 'mn', 'gu', 'sa', 'ps',
-            'fo', 'kw', 'rw', 'ss', 'ie', 'qu', 'gv', 'om', 'roa-rup', 'iu',
-            'bn', 'chr', 'so', 'su', 'za', 'gd', 'am', 'mt', 'mi', 'tpi', 'ik',
-            'yi', 'or', 'ln', 'uz', 'sm', 'ti', 'jbo', 'sg', 'jv', 'na', 'pa',
-            'tn', 'dv', 'ne', 'ha', 'ks', 'ay', 'ts',
+            'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'el', 'ko', 'sv', 'tr', 'pl',
+            'ta', 'nl', 'vi', 'de', 'kn', 'fi', 'io', 'hu', 'pt', 'no', 'my',
+            'id', 'it', 'li', 'ku', 'ml', 'et', 'ja', 'es', 'fa', 'ar', 'ro',
+            'cs', 'lo', 'te', 'gl', 'eu', 'ca', 'uk', 'fj', 'br', 'bg', 'eo',
+            'hr', 'oc', 'vo', 'is', 'th', 'simple', 'scn', 'sr', 'af', 'cy',
+            'sw', 'fy', 'tl', 'zh-min-nan', 'ast', 'nn', 'he', 'ur', 'la', 'wa',
+            'da', 'hy', 'sq', 'sm', 'sl', 'hi', 'tt', 'az', 'lv', 'ka', 'pnb',
+            'lb', 'nah', 'tk', 'bs', 'hsb', 'kk', 'sk', 'ps', 'km', 'mk', 'be',
+            'ga', 'wo', 'ang', 'co', 'ms', 'gn', 'mr', 'csb', 'st', 'nds', 'ia',
+            'si', 'sh', 'sd', 'tg', 'ky', 'ug', 'kl', 'jbo', 'mn', 'an', 'zu',
+            'sa', 'gu', 'rw', 'fo', 'kw', 'gv', 'qu', 'ss', 'ie', 'mt', 'om',
+            'chr', 'roa-rup', 'iu', 'bn', 'am', 'so', 'su', 'za', 'gd', 'jv',
+            'mi', 'tpi', 'ik', 'yi', 'ln', 'or', 'uz', 'ti', 'sg', 'na', 'dv',
+            'tn', 'pa', 'ne', 'ha', 'ks', 'ay', 'ts',
         ]
 
         self.langs = dict([(lang, '%s.wiktionary.org' % lang) for lang in self.languages_by_size])
 
         # Override defaults
-        self.namespaces[12]['nl'] = [u'Help']
         self.namespaces[3]['eo'] = [u'Uzanta diskuto', u'Vikipediista diskuto', u'Uzula diskuto']
-        self.namespaces[3]['pt'] = [u'Utilizador Discussão', u'Usuário Discussão', u'Utilizadora Discussão']
-        self.namespaces[2]['pt'] = [u'Utilizador', u'Usuário', u'Utilizadora']
+        self.namespaces[10]['zh'] = [u'Template', u'模板', u'样板', u'樣板']
+        self.namespaces[12]['zh'] = [u'Help', u'帮助', u'幫助']
+        self.namespaces[14]['zh'] = [u'Category', u'分类', u'分類']
         self.namespaces[15]['bn'] = [u'বিষয়শ্রেণী আলোচনা']
         self.namespaces[14]['bn'] = [u'বিষয়শ্রেণী']
-        self.namespaces[13]['de'] = [u'Hilfe Diskussion']
-        self.namespaces[12]['de'] = [u'Hilfe']
-        self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisateur']
-        self.namespaces[2]['fr'] = [u'Utilisateur']
+        self.namespaces[3]['de'] = [u'Benutzer Diskussion', u'BD', u'Benutzerin Diskussion']
         self.namespaces[13]['da'] = [u'Hjælp diskussion', u'Hjælp-diskussion']
         self.namespaces[9]['da'] = [u'MediaWiki diskussion', u'MediaWiki-diskussion']
         self.namespaces[11]['hi'] = [u'साँचा वार्ता']
@@ -50,12 +47,7 @@ class Family(family.Family):
         self.namespaces[2]['hi'] = [u'सदस्य']
         self.namespaces[9]['hi'] = [u'मीडियाविकि वार्ता']
         self.namespaces[8]['hi'] = [u'मीडियाविकि']
-        self.namespaces[3]['cs'] = [u'Diskuse s uživatelem', u'Uživatel diskuse', u'Uživatelka diskuse', u'Diskuse s uživatelkou']
-        self.namespaces[2]['cs'] = [u'Uživatel', u'Uživatelka']
         self.namespaces[9]['ro'] = [u'Discuție MediaWiki', u'Discuţie MediaWiki']
-        self.namespaces[10]['zh'] = [u'Template', u'模板', u'样板', u'樣板']
-        self.namespaces[12]['zh'] = [u'Help', u'帮助', u'幫助']
-        self.namespaces[14]['zh'] = [u'Category', u'分类', u'分類']
         self.namespaces[3]['ca'] = [u'Usuari Discussió']
         self.namespaces[2]['ca'] = [u'Usuari']
 
@@ -104,13 +96,13 @@ class Family(family.Family):
             'gd': u'Wiktionary',
             'gl': u'Wiktionary',
             'gn': u'Wiktionary',
-            'gu': [u'વિક્ષનરી', u'Wiktionary'],
+            'gu': u'વિક્શનરી',
             'gv': u'Wiktionary',
             'ha': u'Wiktionary',
             'he': [u'ויקימילון', u'Wiktionary'],
             'hi': [u'विक्षनरी', u'Wiktionary'],
             'hr': [u'Wječnik', u'Wiktionary'],
-            'hsb': u'Wiktionary',
+            'hsb': [u'Wikisłownik', u'Wiktionary'],
             'hu': [u'Wikiszótár', u'Wiktionary'],
             'hy': [u'Վիքիբառարան', u'Wiktionary'],
             'ia': [u'Wiktionario', u'Wiktionary'],
@@ -131,7 +123,7 @@ class Family(family.Family):
             'kn': u'Wiktionary',
             'ko': u'위키낱말사전',
             'ks': u'Wiktionary',
-            'ku': [u'Wîkîferheng', u'Wiktionary'],
+            'ku': u'Wîkîferheng',
             'kw': u'Wiktionary',
             'ky': u'Wiktionary',
             'la': [u'Victionarium', u'Wiktionary'],
@@ -191,7 +183,7 @@ class Family(family.Family):
             'ta': [u'விக்சனரி', u'Wiktionary', u'விக்கிபீடியா'],
             'te': [u'విక్షనరీ', u'Wiktionary'],
             'tg': u'Wiktionary',
-            'th': u'Wiktionary',
+            'th': [u'วิกิพจนานุกรม', u'Wiktionary'],
             'ti': u'Wiktionary',
             'tk': [u'Wikisözlük', u'Wiktionary'],
             'tl': u'Wiktionary',
@@ -261,13 +253,13 @@ class Family(family.Family):
             'gd': u'An deasbaireachd aig Wiktionary',
             'gl': u'Conversa Wiktionary',
             'gn': u'Wiktionary myangekõi',
-            'gu': u'વિક્ષનરી ચર્ચા',
+            'gu': u'વિક્શનરી ચર્ચા',
             'gv': u'Resooney Wiktionary',
             'ha': u'Wiktionary talk',
             'he': u'שיחת ויקימילון',
             'hi': u'विक्षनरी वार्ता',
             'hr': u'Razgovor Wječnik',
-            'hsb': u'Wiktionary diskusija',
+            'hsb': [u'Diskusija k Wikisłownikej', u'Wiktionary diskusija'],
             'hu': [u'Wikiszótár-vita', u'Wikiszótár vita'],
             'hy': u'Վիքիբառարանի քննարկում',
             'ia': u'Discussion Wiktionario',
@@ -288,7 +280,7 @@ class Family(family.Family):
             'kn': u'Wiktionary ಚರ್ಚೆ',
             'ko': u'위키낱말사전토론',
             'ks': u'Wiktionary talk',
-            'ku': u'Wîkîferheng nîqaş',
+            'ku': [u'Gotûbêja Wîkîferhengê', u'Wîkîferheng gotûbêj', u'Wîkîferheng nîqaş'],
             'kw': [u'Kescows Wiktionary', u'Cows Wiktionary', u'Keskows Wiktionary'],
             'ky': u'Wiktionary баарлашуу',
             'la': u'Disputatio Victionarii',
@@ -318,7 +310,7 @@ class Family(family.Family):
             'oc': u'Discussion Wikiccionari',
             'om': u'Wiktionary talk',
             'or': [u'Wiktionary ଆଲୋଚନା', u'ଉଇକିପିଡ଼ିଆ ଆଲୋଚନା'],
-            'pa': u'Wiktionary ਚਰਚਾ',
+            'pa': [u'Wiktionary ਗੱਲ-ਬਾਤ', u'Wiktionary ਚਰਚਾ'],
             'pl': u'Wikidyskusja',
             'pnb': u'گل ات',
             'ps': u'د ويکيسيند خبرې اترې',
@@ -350,12 +342,12 @@ class Family(family.Family):
             'ta': [u'விக்சனரி பேச்சு', u'விக்கிபீடியா பேச்சு'],
             'te': [u'విక్షనరీ చర్చ', u'Wiktionary చర్చ'],
             'tg': u'Баҳси Wiktionary',
-            'th': u'คุยเรื่องWiktionary',
+            'th': [u'คุยเรื่องวิกิพจนานุกรม', u'คุยเรื่องWiktionary'],
             'ti': u'Wiktionary talk',
             'tk': u'Wikisözlük çekişme',
             'tl': u'Usapang Wiktionary',
             'tn': u'Wiktionary talk',
-            'tpi': u'Wiktionary talk',
+            'tpi': u'Wiktionary toktok',
             'tr': u'Vikisözlük tartışma',
             'ts': u'Wiktionary talk',
             'tt': [u'Wiktionary бәхәсе', u'Обсуждение Wiktionary', u'Wiktionary bäxäse'],
@@ -442,7 +434,7 @@ class Family(family.Family):
             'it': u'Discussioni appendice',
             'ja': u'付録・トーク',
             'ko': u'부록 토론',
-            'ku': u'Pêvek nîqaş',
+            'ku': u'Gotûbêja pêvekê',
             'lb': u'Annexen Diskussioun',
             'lt': u'Sąrašo aptarimas',
             'lv': u'Pielikuma diskusija',
@@ -474,6 +466,7 @@ class Family(family.Family):
             'ru': [u'Конкорданс', u'Concordance'],
             'sv': u'Appendix',
             'uk': u'Індекс',
+            'zh': u'Transwiki',
         }
 
         self.namespaces[103] = {
@@ -483,7 +476,7 @@ class Family(family.Family):
             'en': u'Concordance talk',
             'fr': u'Discussion Transwiki',
             'ia': u'Discussion Appendice',
-            'ku': u'Nimînok nîqaş',
+            'ku': u'Gotûbêja nimînokê',
             'lt': u'Priedo aptarimas',
             'pl': u'Dyskusja indeksu',
             'pt': u'Vocabulário Discussão',
@@ -491,6 +484,7 @@ class Family(family.Family):
             'ru': [u'Обсуждение конкорданса', u'Concordance talk'],
             'sv': u'Appendixdiskussion',
             'uk': u'Обговорення індексу',
+            'zh': u'Transwiki talk',
         }
 
         self.namespaces[104] = {
@@ -513,7 +507,7 @@ class Family(family.Family):
             'de': u'Thesaurus Diskussion',
             'en': u'Index talk',
             'fr': u'Discussion Portail',
-            'ku': u'Portal nîqaş',
+            'ku': u'Gotûbêja portalê',
             'mr': u'सूची चर्चा',
             'pl': u'Dyskusja portalu',
             'pt': u'Rimas Discussão',

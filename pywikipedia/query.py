@@ -22,11 +22,12 @@ This module allow you to use the API in a simple and easy way.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: query.py 10174 2012-05-03 13:16:35Z xqt $'
+__version__ = '$Id: query.py 10624 2012-10-30 16:25:44Z xqt $'
 #
 
 import time
 import wikipedia as pywikibot
+import config
 try:
     #For Python 2.6 newer
     import json
@@ -38,8 +39,8 @@ except ImportError:
     import simplejson as json
 
 
-def GetData(params, site=None, useAPI=True, retryCount=5, encodeTitle=True,
-            sysop=False, back_response=False):
+def GetData(params, site=None, useAPI=True, retryCount=config.maxretries,
+            encodeTitle=True, sysop=False, back_response=False):
     """Get data from the query api, and convert it into a data object
     """
     if ('action' in params) and pywikibot.simulate and \

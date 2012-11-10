@@ -21,7 +21,7 @@ Command line options:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: watchlist.py 10255 2012-05-26 13:23:03Z xqt $'
+__version__='$Id: watchlist.py 10485 2012-08-15 14:13:57Z xqt $'
 #
 
 import wikipedia as pywikibot
@@ -87,7 +87,7 @@ def refresh(site, sysop=False):
         watchlist.extend([w['title'] for w in data['query']['watchlist']])
 
         if 'query-continue' in data:
-            params['wlstart'] = data['query-continue']['watchlist']['wlstart']
+            params.update(data['query-continue']['watchlist'])
         else:
             break
 

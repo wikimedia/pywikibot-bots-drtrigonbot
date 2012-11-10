@@ -51,7 +51,6 @@ and arguments can be:
 -always        Don't prompt you for each replacement.
 
 """
-from __future__ import generators
 #
 # (C) Daniel Herding, 2004.
 # (C) Purodha Blissenbach, 2009.
@@ -60,7 +59,7 @@ from __future__ import generators
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: redirect.py 10246 2012-05-24 13:53:07Z xqt $'
+__version__='$Id: redirect.py 10487 2012-08-16 08:14:41Z xqt $'
 #
 import re, sys, datetime
 import wikipedia as pywikibot
@@ -190,7 +189,7 @@ class RedirectGenerator:
                     if done: break
                     yield x['pageid']
                 if not done and 'query-continue' in data:
-                    params['apfrom'] = data['query-continue']['allpages']['apfrom']
+                    params.update(data['query-continue']['allpages'])
                 else:
                     break
 

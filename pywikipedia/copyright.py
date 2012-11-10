@@ -82,12 +82,11 @@ You can include also the text to examine directly on the command line:
 # Distributed under the terms of the MIT license.
 #
 
-from __future__ import generators
 import re, codecs, os, time, urllib, urllib2, httplib
 import wikipedia as pywikibot
 import pagegenerators, config
 
-__version__='$Id: copyright.py 9804 2011-12-17 13:27:59Z xqt $'
+__version__='$Id: copyright.py 10487 2012-08-16 08:14:41Z xqt $'
 
 # Search keywords added to all the queries.
 no_result_with_those_words = '-Wikipedia'

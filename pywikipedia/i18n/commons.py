@@ -123,8 +123,8 @@ msg = {
 	},
 	# Author: ChrisPtDe
 	'frp': {
-		'commons-file-moved': u'Lo [[:File:%(localfile)s|fichiér]] at étâ dèplaciê vers [[:commons:File:%(commonsfile)s|Commons]].',
-		'commons-file-now-available': u'Ora, lo fichiér est disponiblo dessus [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
+		'commons-file-moved': u'[[:File:%(localfile)s|Fichiér]] dèplaciê vers [[:commons:File:%(commonsfile)s|commons]].',
+		'commons-file-now-available': u'Ora lo fichiér est disponiblo dessus [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
 	},
 	# Author: Murma174
 	'frr': {
@@ -191,6 +191,11 @@ msg = {
 		'commons-file-moved': u'[[:File:%(localfile)s|このファイル]]は[[:commons:File:%(commonsfile)s|コモンズ]]へと移動しました。',
 		'commons-file-now-available': u'このファイルは[[:commons:File:%(commonsfile)s|ウィキメディア・コモンズ]]で利用できるようになりました。',
 	},
+	# Author: NoiX180
+	'jv': {
+		'commons-file-moved': u'[[:Berkas:%(localfile)s|Berkas]] dipindhahaké nèng [[:commons:Berkas:%(commonsfile)s|commons]].',
+		'commons-file-now-available': u'Berkas saiki wis sumadhiya nèng [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
+	},
 	# Author: Purodha
 	'ksh': {
 		'commons-file-moved': u'Di Dattei [[:File:%(localfile)s|File]] wood op [[:commons:File:%(commonsfile)s|Wikimedia Commons]] jelaat.',
@@ -206,7 +211,9 @@ msg = {
 		'commons-file-moved': u'[[:File:%(localfile)s|Besjtand]] is verplaats nao [[:commons:File:%(commonsfile)s|commons]].',
 		'commons-file-now-available': u'Dit besjtand steit noe op [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
 	},
+	# Author: Homo
 	'lt': {
+		'commons-file-moved': u'[[:File:%(localfile)s|Failas]] perkeltas į [[:commons:File:%(commonsfile)s|Vikiteką]].',
 		'commons-file-now-available': u'Failas įkeltas į [[:commons:File:%(commonsfile)s|Wikimedia Commons projektą]].',
 	},
 	# Author: Dark Eagle
@@ -234,6 +241,11 @@ msg = {
 		'commons-file-moved': u'[[:File:%(localfile)s|Податотеката]] е преместена на [[:commons:File:%(commonsfile)s|Ризницата]].',
 		'commons-file-now-available': u'Податотеката сега е достапна на [[:commons:File:%(commonsfile)s|Заедничката Ризница]].',
 	},
+	# Author: Praveenp
+	'ml': {
+		'commons-file-moved': u'[[:File:%(localfile)s|പ്രമാണം]] [[:commons:File:%(commonsfile)s|കോമൺസിലേയ്ക്ക്]] മാറ്റിയിരിക്കുന്നു.',
+		'commons-file-now-available': u'പ്രമാണം ഇപ്പോൾ  [[:commons:File:%(commonsfile)s|വിക്കിമീഡിയ കോമൺസിൽ]] ലഭ്യമാണ്.',
+	},
 	# Author: Anakmalaysia
 	'ms': {
 		'commons-file-moved': u'[[:File:%(localfile)s|Fail]] dipindahkan ke [[:commons:File:%(commonsfile)s|Commons]].',
@@ -257,6 +269,11 @@ msg = {
 	'nl': {
 		'commons-file-moved': u'[[:File:%(localfile)s|Bestand]] is verplaatst naar [[:commons:File:%(commonsfile)s|commons]].',
 		'commons-file-now-available': u'Dit bestand staat nu op [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
+	},
+	# Author: Shisir 1945
+	'or': {
+		'commons-file-moved': u'[[:File:%(localfile)s|File]] ଗଲା [[:commons:File:%(commonsfile)s|commons]] କୁ',
+		'commons-file-now-available': u'ଫାଇଲ୍‌ ଏଠାରେ ଉପଲବ୍ଧ [[:commons:File:%(commonsfile)s|Wikimedia Commons]]',
 	},
 	# Author: Sp5uhe
 	'pl': {
@@ -307,9 +324,15 @@ msg = {
 		'commons-file-now-available': u'Súbor je teraz k dispozícii na [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
 	},
 	# Author: Dbc334
+	# Author: Eleassar
 	'sl': {
 		'commons-file-moved': u'[[:File:%(localfile)s|Datoteka]] prestavljena v [[:commons:File:%(commonsfile)s|Zbirko]].',
-		'commons-file-now-available': u'Datoteka je sedaj na voljo na [[:commons:File:%(commonsfile)s|Zbirki Wikimedia]].',
+		'commons-file-now-available': u'Datoteka je odslej na razpolago v [[:commons:File:%(commonsfile)s|Wikimedijini Zbirki]].',
+	},
+	# Author: Euriditi
+	'sq': {
+		'commons-file-moved': u'[[:Skeda:%(localfile)s|Skeda]] u zhvendos tek [[:commons:File:%(commonsfile)s|commons]].',
+		'commons-file-now-available': u'Skeda është e disponueshme në [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
 	},
 	# Author: Rancher
 	'sr': {
@@ -325,6 +348,11 @@ msg = {
 	'sv': {
 		'commons-file-moved': u'[[:File:%(localfile)s|Fil]] flyttad till [[:commons:File:%(commonsfile)s|commons]].',
 		'commons-file-now-available': u'Filen är nu tillgänglig på [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
+	},
+	# Author: Przemub
+	'szl': {
+		'commons-file-moved': u'[[:File:%(localfile)s|Plik]] przeciepanŏ dŏ [[:commons:File:%(commonsfile)s|commons]].',
+		'commons-file-now-available': u'Plik terozki dostympny na [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
 	},
 	# Author: AnakngAraw
 	'tl': {
@@ -353,8 +381,9 @@ msg = {
 	},
 	# Author: Candalua
 	# Author: Alunardon90
+	# Author: GatoSelvadego
 	'vec': {
-		'commons-file-moved': u'[[:File:%(localfile)s|File]] spostà su [[:commons:File:%(commonsfile)s|commons]].',
+		'commons-file-moved': u'[[:File:%(localfile)s|File]] spostà so [[:commons:File:%(commonsfile)s|commons]].',
 		'commons-file-now-available': u'Sto file deso te ło cati so [[:commons:File:%(commonsfile)s|Wikimedia Commons]].',
 	},
 	# Author: Minh Nguyen

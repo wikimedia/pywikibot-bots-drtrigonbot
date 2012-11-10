@@ -1,11 +1,10 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: test_family.py 10434 2012-07-01 11:47:26Z xqt $'
+__version__ = '$Id: test_family.py 10502 2012-08-23 10:22:31Z xqt $'
 
 import family
 
 # The test wikipedia family
-
 class Family(family.Family):
     def __init__(self):
         family.Family.__init__(self)
@@ -138,6 +137,12 @@ class Family(family.Family):
         }
         self.namespaces[133] = {
             '_default': u'نقاش المساعدة',
+        }
+        self.namespaces[710] = {
+            '_default': u'TimedText',
+        }
+        self.namespaces[711] = {
+            '_default': u'TimedText talk',
         }
         self.namespaces[1198] = {
             '_default': u'Translations',

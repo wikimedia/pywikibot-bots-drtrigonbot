@@ -33,19 +33,29 @@ msg = {
 		'djvutext-creating': u'Robot: Vytvářím stránku s textem extrahovaným z DjVu',
 	},
 	# Author: Peter Alberti
+	# Author: Christian List
 	'da': {
-		'djvutext-creating': u'Robot: Opretter side med tekst udtrykket fra DjVu',
+		'djvutext-creating': u'Robot: Opretter side med tekst fra DjVu',
 	},
 	# Author: Purodha
+	# Author: Das Schäfchen
 	'de': {
-		'djvutext-creating': u'Robot: Erstelle eine Seite mit aus DjVu extrahiertem Text',
+		'djvutext-creating': u'Bot: Erstelle eine Seite mit aus DjVu extrahiertem Text',
 	},
 	# Author: Erdemaslancan
 	'diq': {
-		'djvutext-creating': u'Boti: Vetene DjVu fına dekerde pela',
+		'djvutext-creating': u'Boti: Vetışe metne DjVu fına dekerde pela',
+	},
+	# Author: Glavkos
+	'el': {
+		'djvutext-creating': u'Ρομπότ: Δημιουργία σελίδας με κείμενο που έχει εξαχθεί από το DjVu',
 	},
 	'en': {
 		'djvutext-creating': u'Robot: Creating page with text extracted from DjVu',
+	},
+	# Author: Remux
+	'eo': {
+		'djvutext-creating': u'Roboto: Kreante paĝon kun la teksto ekstraktita de DjVu',
 	},
 	# Author: Armando-Martin
 	# Author: Xqt
@@ -60,6 +70,11 @@ msg = {
 	'fa': {
 		'djvutext-creating': u'ربات: ایجاد صفحه با متن استخراج‌شده از دژاوو',
 	},
+	# Author: Olli
+	# Author: Crt
+	'fi': {
+		'djvutext-creating': u'Botti: Luodaan sivu DjVu-tiedostosta puretulle tekstille',
+	},
 	# Author: EileenSanda
 	'fo': {
 		'djvutext-creating': u'Bottur: Upprættar síðu við teksti sum er tikin frá DjVu',
@@ -67,6 +82,10 @@ msg = {
 	# Author: Grondin
 	'fr': {
 		'djvutext-creating': u'Robot : Création de la page avec le texte extrait depuis DjVu',
+	},
+	# Author: ChrisPtDe
+	'frp': {
+		'djvutext-creating': u'Robot : crèacion de la pâge avouéc de tèxto teriê fôr de DjVu',
 	},
 	# Author: Murma174
 	'frr': {
@@ -112,6 +131,10 @@ msg = {
 	'ja': {
 		'djvutext-creating': u'ロボットによる: DjVuから抽出した文章でページを作成',
 	},
+	# Author: NoiX180
+	'jv': {
+		'djvutext-creating': u'Bot: Nggawé kaca saka teks sing dijupuk saka DjVu',
+	},
 	# Author: Purodha
 	'ksh': {
 		'djvutext-creating': u'Bot: Donn en Sigg aanlääje, woh Täx drobb es, dä uss em <i lang=en">DjVu</i> eruß jetrocke wood.',
@@ -127,6 +150,10 @@ msg = {
 	# Author: StefanusRA
 	'map-bms': {
 		'djvutext-creating': u'Bot: Nggawe kaca nganggo teks sing diekstrak sekang DjVu',
+	},
+	# Author: Jagwar
+	'mg': {
+		'djvutext-creating': u'Rôbô : Famoronana ilay p ejy amin\'ny alalan\'ny lahatsoratra avy amin\'ny DjVu',
 	},
 	# Author: Bjankuloski06
 	'mk': {
@@ -148,6 +175,10 @@ msg = {
 	'nl': {
 		'djvutext-creating': u'Robot: pagina aangemaakt met tekst uit een DjVu-bestand',
 	},
+	# Author: Shisir 1945
+	'or': {
+		'djvutext-creating': u'ରୋବଟ୍‌: DjVu ରୁ ଆସିଥିବା ପାଠ୍ୟରୁ ପୃଷ୍ଟା ତିଆରି ହେଉଛି',
+	},
 	# Author: Mikołka
 	'pl': {
 		'djvutext-creating': u'Robot utworzył stronę na podstawie pliku DJVu',
@@ -163,10 +194,6 @@ msg = {
 	# Author: Pedroca cerebral
 	'pt-br': {
 		'djvutext-creating': u'Bot: Criando página com texto extraído do DjVu',
-	},
-	# Author: KRLS
-	'qqq': {
-		'djvutext-creating': u'Robot: Creació de pàgina amb text extret de DjVu',
 	},
 	# Author: Minisarm
 	'ro': {
@@ -184,6 +211,10 @@ msg = {
 	'sl': {
 		'djvutext-creating': u'Robot: Ustvarjanje strani z besedilom, izvlečenim iz DjVu',
 	},
+	# Author: Euriditi
+	'sq': {
+		'djvutext-creating': u'Roboti: Duke krijuar faqe me tekst të ekstraktuar nga DjVu',
+	},
 	# Author: Rancher
 	'sr': {
 		'djvutext-creating': u'Робот: направљена страница с текстом изведеним из DjVu-а',
@@ -195,6 +226,10 @@ msg = {
 	# Author: WikiPhoenix
 	'sv': {
 		'djvutext-creating': u'Robot: Skapar sida med extraherad text från DjVu',
+	},
+	# Author: Przemub
+	'szl': {
+		'djvutext-creating': u'Robot: Złōnaczyniy zajty z Djvu',
 	},
 	# Author: AnakngAraw
 	'tl': {
@@ -219,6 +254,10 @@ msg = {
 	# Author: Minh Nguyen
 	'vi': {
 		'djvutext-creating': u'Bot: Tạo trang theo văn bản trích từ DjVu',
+	},
+	# Author: Harvzsf
+	'war': {
+		'djvutext-creating': u'Robot: Ginhihimo in pakli pinaagi hin sinurat nga ginkuha tikang ha DjVu',
 	},
 	# Author: Anakmalaysia
 	'zh': {

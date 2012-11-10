@@ -178,7 +178,7 @@ badword at all but can be used for some bad-nickname.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: welcome.py 10067 2012-03-31 07:56:23Z xqt $'
+__version__ = '$Id: welcome.py 10458 2012-07-21 12:28:01Z xqt $'
 #
 
 import time, re, urllib, locale
@@ -243,6 +243,7 @@ netext = {
         'ja': u'{{subst:Welcome/intro}}\n{{subst:welcome|%s}} ',
         'ka': u'{{ახალი მომხმარებელი}}--%s',
         'ml': u'{{ബദൽ:സ്വാഗതം/bot}} %s',
+        'nap': u'{{Bemmenuto}}%s',
         'nl': u'{{hola|bot|%s}}',
         'no': u'{{subst:bruker:jhs/vk}} %s',
         'pdc':u'{{subst:Wilkum}}%s',
@@ -353,6 +354,7 @@ random_sign = {
     'fr': u'Projet:Service de Parrainage Actif/Signatures',
     'it': u'Project:Benvenuto_Bot/Firme',
     'ja': None, #jawiki comminuty discussion oppose , [[ja:Wikipedia:Bot作業依頼/ウェルカムメッセージ貼り付け依頼]]
+    'nap': u'User:Cellistbot/Firme',
     'roa-tara': u'Wikipedia:Bovègne Bot/Firme',
     'ru': u'Участник:LatitudeBot/Sign',
     'vec': u'Utente:FriBot/Firme',

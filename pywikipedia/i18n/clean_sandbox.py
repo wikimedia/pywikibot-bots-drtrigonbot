@@ -51,8 +51,10 @@ msg = {
 	'cy': {
 		'clean_sandbox-cleaned': u'Robot: Wedi ei wacáu\'n awtomatig',
 	},
+	# Author: Christian List
+	# Author: Kaare
 	'da': {
-		'clean_sandbox-cleaned': u'Bot: Nyt sand (fra[[Skabelon:Sandkasse tekst]])',
+		'clean_sandbox-cleaned': u'Robot: Nyt sand',
 	},
 	'de': {
 		'clean_sandbox-cleaned': u'Bot: Setze Spielwiese zurück.',
@@ -74,8 +76,9 @@ msg = {
 	},
 	# Author: Dferg
 	# Author: Xqt
+	# Author: Invadinado
 	'es': {
-		'clean_sandbox-cleaned': u'Bot: limpieza automatizada',
+		'clean_sandbox-cleaned': u'Bot: Limpieza automatizada',
 	},
 	# Author: An13sa
 	'eu': {
@@ -98,7 +101,7 @@ msg = {
 	},
 	# Author: ChrisPtDe
 	'frp': {
-		'clean_sandbox-cleaned': u'Robot : neteyê ôtomaticament',
+		'clean_sandbox-cleaned': u'Robot : neteyâjo ôtomatico',
 	},
 	# Author: Murma174
 	'frr': {
@@ -143,6 +146,10 @@ msg = {
 	},
 	'ja': {
 		'clean_sandbox-cleaned': u'ロボットによる: 砂場ならし',
+	},
+	# Author: NoiX180
+	'jv': {
+		'clean_sandbox-cleaned': u'Bot: Diresiki sacara otomatis',
 	},
 	'ko': {
 		'clean_sandbox-cleaned': u'로봇: 연습장 비움',
@@ -196,6 +203,10 @@ msg = {
 	'nn': {
 		'clean_sandbox-cleaned': u'robot: automatisk rydjing',
 	},
+	# Author: Shisir 1945
+	'or': {
+		'clean_sandbox-cleaned': u'ରୋବଟ୍‌: ସ୍ୱଂୟ ସଫା ହେଲା',
+	},
 	# Author: Sp5uhe
 	'pl': {
 		'clean_sandbox-cleaned': u'Robot oczyścił automatycznie',
@@ -235,6 +246,10 @@ msg = {
 	'sl': {
 		'clean_sandbox-cleaned': u'Robot: Samodejno čiščenje',
 	},
+	# Author: Euriditi
+	'sq': {
+		'clean_sandbox-cleaned': u'Roboti: Pastrim automatik',
+	},
 	# Author: Rancher
 	'sr': {
 		'clean_sandbox-cleaned': u'Робот: очишћен песак',
@@ -245,6 +260,10 @@ msg = {
 	},
 	'sv': {
 		'clean_sandbox-cleaned': u'Robot krattar sandlådan.',
+	},
+	# Author: Przemub
+	'szl': {
+		'clean_sandbox-cleaned': u'Robot: Pucowaniy',
 	},
 	# Author: Aswn
 	'ta': {
@@ -274,8 +293,9 @@ msg = {
 		'clean_sandbox-cleaned': u'Робот: Автоматична очистка',
 	},
 	# Author: Alunardon90
+	# Author: GatoSelvadego
 	'vec': {
-		'clean_sandbox-cleaned': u'Robot: Pułitura automatega',
+		'clean_sandbox-cleaned': u'Robot: Pułidura automatega',
 	},
 	# Author: Minh Nguyen
 	'vi': {

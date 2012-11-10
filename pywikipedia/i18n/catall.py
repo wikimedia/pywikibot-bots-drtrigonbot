@@ -11,6 +11,10 @@ msg = {
 	'ar': {
 		'catall-changing': u'بوت: تغيير التصنيفات',
 	},
+	# Author: Man2fly2002
+	'arc': {
+		'catall-changing': u'ܪܘܒܘܛ: ܫܚܠܦܬܐ ܕܣܕܪ̈ܐ',
+	},
 	# Author: Xuacu
 	# Author: Esbardu
 	'ast': {
@@ -44,12 +48,17 @@ msg = {
 	'cs': {
 		'catall-changing': u'Robot: Měním kategorie',
 	},
+	# Author: Christian List
+	# Author: Kaare
+	'da': {
+		'catall-changing': u'Robot: Ændrer kategorier',
+	},
 	'de': {
 		'catall-changing': u'Bot: Wechsele Kategorien',
 	},
 	# Author: Erdemaslancan
 	'diq': {
-		'catall-changing': u'Boti kategoriy vurnay',
+		'catall-changing': u'Boti kategoriy pêro vurnay',
 	},
 	# Author: Geraki
 	'el': {
@@ -57,6 +66,10 @@ msg = {
 	},
 	'en': {
 		'catall-changing': u'Robot: Changing categories',
+	},
+	# Author: Remux
+	'eo': {
+		'catall-changing': u'Roboto: Ŝanĝante kategoriojn',
 	},
 	# Author: Armando-Martin
 	# Author: Xqt
@@ -80,6 +93,10 @@ msg = {
 	},
 	'fr': {
 		'catall-changing': u'Bot: Change categories',
+	},
+	# Author: ChrisPtDe
+	'frp': {
+		'catall-changing': u'Robot : change catègories',
 	},
 	# Author: Murma174
 	'frr': {
@@ -120,6 +137,14 @@ msg = {
 	'ja': {
 		'catall-changing': u'ロボットによる: カテゴリ変更',
 	},
+	# Author: NoiX180
+	'jv': {
+		'catall-changing': u'Bot: Nggawé katégori',
+	},
+	# Author: Amazigh84
+	'kab': {
+		'catall-changing': u'Aṛubut: Azdam taggayin',
+	},
 	'ksh': {
 		'catall-changing': u'Bot: Saachjruppe tuusche of dobei donn',
 	},
@@ -134,9 +159,17 @@ msg = {
 	'lt': {
 		'catall-changing': u'robotas: Keičiamos kategorijos',
 	},
+	# Author: Papuass
+	'lv': {
+		'catall-changing': u'Robots: Maina kategorijas',
+	},
 	# Author: StefanusRA
 	'map-bms': {
 		'catall-changing': u'Bot: Ngowahi kategori',
+	},
+	# Author: Jagwar
+	'mg': {
+		'catall-changing': u'Rôbô: manova sokajy',
 	},
 	# Author: Bjankuloski06
 	'mk': {
@@ -153,6 +186,10 @@ msg = {
 	# Author: Servien
 	'nds-nl': {
 		'catall-changing': u'Bot: wieziging van kategorieën',
+	},
+	# Author: सरोज कुमार ढकाल
+	'ne': {
+		'catall-changing': u'रोबोट : श्रेणीहरु बदल्दै',
 	},
 	# Author: Siebrand
 	'nl': {
@@ -195,6 +232,10 @@ msg = {
 	'sl': {
 		'catall-changing': u'Robot: Spreminjanje kategorij',
 	},
+	# Author: Euriditi
+	'sq': {
+		'catall-changing': u'Roboti: Duke ndryshuar kategoritë',
+	},
 	# Author: Rancher
 	'sr': {
 		'catall-changing': u'Робот: промењене категорије',
@@ -210,9 +251,17 @@ msg = {
 	'sw': {
 		'catall-changing': u'Karagosi: Kubadilisha jamii',
 	},
+	# Author: Przemub
+	'szl': {
+		'catall-changing': u'Robot pomjyńa kategoryje',
+	},
 	# Author: Aswn
 	'ta': {
 		'catall-changing': u'தானியங்கி: பகுப்புகள் மாற்றப்படுகின்றன',
+	},
+	# Author: Veeven
+	'te': {
+		'catall-changing': u'బాటు: వర్గాలను మార్చింది',
 	},
 	# Author: AnakngAraw
 	'tl': {
@@ -225,6 +274,10 @@ msg = {
 	# Author: Incelemeelemani
 	'tr': {
 		'catall-changing': u'Robot: Kategorileri değiştiriyor',
+	},
+	# Author: Sahran
+	'ug': {
+		'catall-changing': u'ماشىنا ئادەم: كاتېگورىيە ئۆزگەرتىۋاتىدۇ',
 	},
 	# Author: A1
 	'uk': {
@@ -241,6 +294,10 @@ msg = {
 	# Author: Srtxg
 	'wa': {
 		'catall-changing': u'Robot: candjant les categoreyes',
+	},
+	# Author: Harvzsf
+	'war': {
+		'catall-changing': u'Robot: Ginbabalyo an mga kaarangay',
 	},
 	# Author: פוילישער
 	'yi': {

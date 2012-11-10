@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: commons_family.py 10205 2012-05-11 16:34:51Z shizhao $'
+__version__ = '$Id: commons_family.py 10642 2012-11-01 14:13:43Z xqt $'
 
 import family
 
@@ -53,19 +53,17 @@ class Family(family.Family):
         self.category_redirect_templates = {
             'commons': (u'Category redirect',
                         u'Categoryredirect',
+                        u'Synonym taxon category redirect',
+                        u'Invalid taxon category redirect',
+                        u'Monotypic taxon category redirect',
                         u'See cat',
                         u'Seecat',
+                        u'See category',
                         u'Catredirect',
                         u'Cat redirect',
-                        u'CatRed',
                         u'Cat-red',
                         u'Catredir',
                         u'Redirect category'),
-        }
-
-        self.disambiguationTemplates = {
-            'commons': [u'Disambig', u'Disambiguation', u'Razločitev',
-                        u'Begriffsklärung']
         }
 
         self.disambcatname = {
@@ -78,9 +76,6 @@ class Family(family.Family):
 
     def dbName(self, code):
         return 'commonswiki_p'
-
-    def shared_image_repository(self, code):
-        return ('commons', 'commons')
 
     if family.config.SSL_connection:
 

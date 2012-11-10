@@ -7,9 +7,10 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: i18n.py 10432 2012-06-30 15:47:55Z xqt $'
+__version__ = '$Id: i18n.py 10578 2012-10-14 17:39:04Z xqt $'
 
 import re, sys
+import locale
 from pywikibot import Error
 import wikipedia as pywikibot
 import config
@@ -440,9 +441,10 @@ def input(twtitle, parameters=None, password=False):
         import table.
         Translation code should be set by in the user_config.py like
         userinterface_lang = 'de'
-        default is mylang setting
+        default is os locale setting
 
     """
-    code = config.userinterface_lang or config.mylang
+    code = config.userinterface_lang or \
+           locale.getdefaultlocale()[0].split('_')[0]
     trans = twtranslate(code, twtitle, parameters)
     return pywikibot.input(trans, password)

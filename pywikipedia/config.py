@@ -7,7 +7,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: config.py 10361 2012-06-16 19:21:45Z drtrigon $'
+__version__ = '$Id: config.py 10632 2012-10-31 11:39:46Z xqt $'
 
 import os, re
 import sys as __sys
@@ -103,7 +103,7 @@ except:
 # The encoding the user would like to see text transliterated to. This can be
 # set to a charset (e.g. 'ascii', 'iso-8859-1' or 'cp850'), and we will output
 # only characters that exist in that charset. However, the characters will be
-# output using console_encoding. 
+# output using console_encoding.
 # If this is not defined on Windows, we emit a Warning explaining the user
 # to either switch to a Unicode-able font and use
 #    transliteration_target = None
@@ -124,7 +124,7 @@ userinterface = 'terminal'
 
 # i18n setting for user interface language
 # default is config.mylang or 'en'
-userinterface_lang = None
+userinterface_lang = 'en' # None
 
 # Should we transliterate characters that do not exist in the console
 # character set?
@@ -352,6 +352,7 @@ msn_appid = ''
 # Using the Flickr api
 flickr = {
     'api_key': u'',  # Provide your key!
+    'api_secret': u'',  # Api secret of your key (optional)
     'review': False,  # Do we use automatically make our uploads reviewed?
     'reviewer': u'', # If so, under what reviewer name?
     }
@@ -449,12 +450,14 @@ cosmetic_changes = False
 # If you want the bot to also do cosmetic changes when editing a page on a
 # foreign wiki, set cosmetic_changes_mylang_only to False, but be careful!
 cosmetic_changes_mylang_only = True
+
 # The dictionary cosmetic_changes_enable should contain a tuple of languages
 # for each site where you wish to enable in addition to your own langlanguage
 # (if cosmetic_changes_mylang_only is set)
 # Please set your dictionary by adding such lines to your user-config.py:
 # cosmetic_changes_enable['wikipedia'] = ('de', 'en', 'fr')
 cosmetic_changes_enable = {}
+
 # The dictionary cosmetic_changes_disable should contain a tuple of languages
 # for each site where you wish to disable cosmetic changes. You may use it with
 # cosmetic_changes_mylang_only is False, but you can also disable your own

@@ -14,9 +14,9 @@ are taken into account.
 """
 
 #
-# (C) Pywikipedia team, 2008-2011
+# (C) Pywikipedia team, 2008-2012
 #
-__version__ = '$Id: category_redirect.py 9692 2011-10-30 15:03:29Z xqt $'
+__version__ = '$Id: category_redirect.py 10500 2012-08-22 23:01:01Z xqt $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -71,6 +71,7 @@ class CategoryRedirectBot(object):
                 'no': "Kategori:Wikipedia omdirigertekategorier",
                 'pl': "Kategoria:Przekierowania kategorii",
                 'pt': "Categoria:!Redirecionamentos de categorias",
+                'ru': "Категория:Википедия:Категории-дубликаты",
                 'simple': "Category:Category redirects",
                 'vi': u"Thể loại:Thể loại đổi hướng",
                 'zh': u"Category:已重定向的分类",
@@ -262,11 +263,6 @@ class CategoryRedirectBot(object):
                 assert len(result['query-continue'].keys()) == 1, \
                        "More than one query-continue key returned: %s" \
                        % result['query-continue'].keys()
-                query_type = result['query-continue'].keys()[0]
-                assert (query_type in querydata.keys()
-                        or query_type in querydata.values()), \
-                       "Site returned unknown query-continue type '%s'"\
-                       % query_type
                 querydata.update(result['query-continue'][query_type])
             else:
                 return

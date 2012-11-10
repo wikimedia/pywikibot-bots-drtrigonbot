@@ -141,12 +141,15 @@ msg = {
 		'solve_disambiguation-unknown-page': u'(anhysbys)',
 	},
 	# Author: Sarrus
+	# Author: Christian List
+	# Author: Kaare
 	'da': {
-		'solve_disambiguation-links-removed': u'Retter flertydigt link til: %(from)s - Fjernede link(s)',
-		'solve_disambiguation-links-resolved': u'Retter flertydigt link til: %(from)s - Ændrede link(s) til %(to)s',
+		'solve_disambiguation-adding-dn-template': u'Robotassisteret flertydig: %(from)s - Markeret til at kræve en eksperts opmærksomhed',
+		'solve_disambiguation-links-removed': u'Robotassisteret flertydig: %(from)s - Fjernede link(s).',
+		'solve_disambiguation-links-resolved': u'Robotassisteret flertydig: %(from)s - Ændrede link(s) til %(to)s',
 		'solve_disambiguation-redirect-adding-dn-template': u'Robotassisteret flertydig: %(from)s - markeret til at kræve en eksperts opmærksomhed',
-		'solve_disambiguation-redirect-removed': u'Retter flertydigt link til: %(from)s - Fjernede link(s)',
-		'solve_disambiguation-redirect-resolved': u'Retter flertydigt link til: %(from)s - Ændrede link(s) til %(to)s',
+		'solve_disambiguation-redirect-removed': u'Robotassisteret flertydig: %(from)s - Fjernede link(s)',
+		'solve_disambiguation-redirect-resolved': u'Robotassisteret flertydig: %(from)s - Ændrede link(s) til %(to)s',
 		'solve_disambiguation-unknown-page': u'(ukendt)',
 	},
 	# Author: The Evil IP address
@@ -163,10 +166,10 @@ msg = {
 	# Author: Erdemaslancan
 	'diq': {
 		'solve_disambiguation-adding-dn-template': u'Destegin da botiya maneo bin: %(from)s - Resber icab keno deye mor be',
-		'solve_disambiguation-links-removed': u'Peştiyin dê boti ra maneo bin: %(from)s - gıre(y) wedaryay.',
+		'solve_disambiguation-links-removed': u'Peşti da boti ra maneo bin: %(from)s - gıre(y) wedaryay.',
 		'solve_disambiguation-links-resolved': u'Destegin da Botiya maneo bin: %(from)s - Gıre(y) vurneyay u ard %(to)s',
 		'solve_disambiguation-redirect-adding-dn-template': u'Destegin da botiya maneo bin: %(from)s - Resber icab keno deye mor be',
-		'solve_disambiguation-redirect-removed': u'Rehberinda Boti ra maneo bin: %(from)s - gırey hewadeya.',
+		'solve_disambiguation-redirect-removed': u'Peşti da boti ra maneo bin: %(from)s - gıre(y) wedaryay.',
 		'solve_disambiguation-redirect-resolved': u'Destegin da Botiya maneo bin: %(from)s - Gıre(y) vurneyay u ard %(to)s',
 		'solve_disambiguation-unknown-page': u'(Ne sılasneno)',
 	},
@@ -201,14 +204,19 @@ msg = {
 	},
 	# Author: Dferg
 	# Author: Fitoschido
+	# Author: Invadinado
 	'es': {
 		'solve_disambiguation-adding-dn-template': u'Desambiguación asistida por robot: %(from)s - Marcado que necesita atención de especialista',
 		'solve_disambiguation-links-removed': u'Desambiguación asistida por robot: %(from)s - Enlace(s) eliminados.',
-		'solve_disambiguation-links-resolved': u'Bot:Desambiguación asistida: %(from)s - Cambiando enlace(s) para %(to)s',
+		'solve_disambiguation-links-resolved': u'Bot: Desambiguación asistida, cambiando enlaces hacia «%(from)s» por «%(to)s»',
 		'solve_disambiguation-redirect-adding-dn-template': u'Desambiguación asistida por robot: %(from)s - Marcado que necesita atención de especialista',
 		'solve_disambiguation-redirect-removed': u'Desambiguación asistida por robot: %(from)s - Enlace(s) eliminados',
 		'solve_disambiguation-redirect-resolved': u'Desambiguación asistida por robot: %(from)s - Enlace(s) cambiado(s) a %(to)s',
 		'solve_disambiguation-unknown-page': u'(desconocido)',
+	},
+	# Author: Avjoska
+	'et': {
+		'solve_disambiguation-unknown-page': u'(tundmatu)',
 	},
 	# Author: An13sa
 	'eu': {
@@ -239,6 +247,7 @@ msg = {
 	# Author: EileenSanda
 	'fo': {
 		'solve_disambiguation-redirect-removed': u'Rættar leinkju við fleiri týdningum til: %(from)s - Tók burtur leinkju(r)',
+		'solve_disambiguation-redirect-resolved': u'Rætta leinkju við fleiri meiningum: %(from)s - Broytti leinkju(r) til %(to)s',
 		'solve_disambiguation-unknown-page': u'(ókent)',
 	},
 	# Author: IAlex
@@ -255,12 +264,12 @@ msg = {
 	},
 	# Author: ChrisPtDe
 	'frp': {
-		'solve_disambiguation-adding-dn-template': u'Homonimia solucionâ avouéc un robot : %(from)s - Marcâ coment demandent l’atencion d’un èxpèrt',
-		'solve_disambiguation-links-removed': u'Homonimia solucionâ avouéc un robot : %(from)s - Retrèt du (des) lim(s).',
-		'solve_disambiguation-links-resolved': u'Homonimia solucionâ avouéc un robot : %(from)s - Changements du (des) lim(s) por %(to)s',
-		'solve_disambiguation-redirect-adding-dn-template': u'Homonimia solucionâ avouéc un robot : %(from)s - Marcâ coment demandent l’atencion d’un èxpèrt',
-		'solve_disambiguation-redirect-removed': u'Homonimia solucionâ avouéc un robot : %(from)s - Retrèt du (des) lim(s)',
-		'solve_disambiguation-redirect-resolved': u'Homonimia solucionâ avouéc un robot : %(from)s - Changements du (des) lim(s) por %(to)s',
+		'solve_disambiguation-adding-dn-template': u'Homonimia solucionâye avouéc un robot : %(from)s - marcâye coment demandent l’atencion d’un èxpèrt',
+		'solve_disambiguation-links-removed': u'Homonimia solucionâye avouéc un robot : %(from)s - lim(s) enlevâ(s).',
+		'solve_disambiguation-links-resolved': u'Homonimia solucionâye avouéc un robot : %(from)s - lim(s) changiê(s) por %(to)s',
+		'solve_disambiguation-redirect-adding-dn-template': u'Homonimia solucionâye avouéc un robot : %(from)s - marcâye coment demandent l’atencion d’un èxpèrt',
+		'solve_disambiguation-redirect-removed': u'Homonimia solucionâye avouéc un robot : %(from)s - lim(s) enlevâ(s)',
+		'solve_disambiguation-redirect-resolved': u'Homonimia solucionâye avouéc un robot : %(from)s - lim(s) changiê(s) por %(to)s',
 		'solve_disambiguation-unknown-page': u'(encognu)',
 	},
 	# Author: Murma174
@@ -330,6 +339,10 @@ msg = {
 		'solve_disambiguation-redirect-removed': u'Bottal támogatott egyértelműsítés: %(from)s – hivatkozások eltávolítása',
 		'solve_disambiguation-redirect-resolved': u'Bottal végzett egyértelműsítés: %(from)s –> %(to)s',
 		'solve_disambiguation-unknown-page': u'(ismeretlen)',
+	},
+	# Author: Xelgen
+	'hy': {
+		'solve_disambiguation-unknown-page': u'(անհայտ)',
 	},
 	# Author: McDutchie
 	'ia': {
@@ -402,6 +415,7 @@ msg = {
 	},
 	# Author: Whym
 	# Author: Fryed-peach
+	# Author: Shirayuki
 	'ja': {
 		'solve_disambiguation-adding-dn-template': u'ロボット補助による曖昧さ回避: %(from)s - 専門家のチェックが必要として印付けしました',
 		'solve_disambiguation-links-removed': u'ロボット補助による曖昧さ回避: %(from)s - リンクを除去しました',
@@ -409,7 +423,21 @@ msg = {
 		'solve_disambiguation-redirect-adding-dn-template': u'ロボット補助による曖昧さ回避: %(from)s - 専門家のチェックが必要として印付けしました',
 		'solve_disambiguation-redirect-removed': u'ロボット補助による曖昧さ回避: %(from)s - リンクを除去しました',
 		'solve_disambiguation-redirect-resolved': u'ロボット補助による曖昧さ回避: %(from)s - リンクを%(to)sに変更しました',
-		'solve_disambiguation-unknown-page': u'（不明）',
+		'solve_disambiguation-unknown-page': u'(不明)',
+	},
+	# Author: NoiX180
+	'jv': {
+		'solve_disambiguation-adding-dn-template': u'Disambiguasi mawa pitulungan bot: %(from)s - Ditandhai amarga butuh pagatèné ahli',
+		'solve_disambiguation-links-removed': u'Disambiguasi mawa pitulungan bot: %(from)s - Pranala disingkiraké.',
+		'solve_disambiguation-links-resolved': u'Disambiguasi mawa pitulungan bot: %(from)s - Ngganti pranala dadi %(to)s',
+		'solve_disambiguation-redirect-adding-dn-template': u'Disambiguasi mawa pitulungan bot: %(from)s - Ditandhai amarga butuh pagatèné ahli',
+		'solve_disambiguation-redirect-removed': u'Disambiguasi mawa pitulungan bot: %(from)s - Nyingkiraké pranala',
+		'solve_disambiguation-redirect-resolved': u'Disambiguasi mawa pitulungan bot: %(from)s - Ngganti pranala dadi %(to)s',
+		'solve_disambiguation-unknown-page': u'(ora dingertèni)',
+	},
+	# Author: David1010
+	'ka': {
+		'solve_disambiguation-unknown-page': u'(უცნობი)',
 	},
 	'kk': {
 		'solve_disambiguation-links-removed': u'Айрықты мағыналарды бот көмегімен шешу: %(from)s - Removed link(s).',
@@ -458,9 +486,10 @@ msg = {
 		'solve_disambiguation-unknown-page': u'(onbekannt)',
 	},
 	# Author: Hugo.arg
+	# Author: Homo
 	'lt': {
-		'solve_disambiguation-links-removed': u'Nuorodų į nukrepiamąjį straipsnį keitimas: %(from)s - Pašalintos nuorodos',
-		'solve_disambiguation-links-resolved': u'Nuorodų į nukrepiamąjį straipsnį keitimas: %(from)s - Pakeistos nuorodos į %(to)s',
+		'solve_disambiguation-links-removed': u'Nuorodų į nukreipiamąjį straipsnį keitimas: %(from)s - Pašalintos nuorodos',
+		'solve_disambiguation-links-resolved': u'Nuorodų į nukreipiamąjį straipsnį keitimas: %(from)s - Pakeistos nuorodos į %(to)s',
 		'solve_disambiguation-redirect-removed': u'Nuorodų į peradresavimo straipsnį keitimas: %(from)s - Pašalintos nuorodos',
 		'solve_disambiguation-redirect-resolved': u'Nuorodų į peradresavimo straipsnį keitimas: %(from)s - Pakeistos nuorodos į %(to)s',
 		'solve_disambiguation-unknown-page': u'(nežinomas)',
@@ -545,6 +574,16 @@ msg = {
 	# Author: Lionslayer
 	'my': {
 		'solve_disambiguation-unknown-page': u'(အမည်မသိ)',
+	},
+	# Author: محک
+	'mzn': {
+		'solve_disambiguation-adding-dn-template': u'گجگجی بیری ربوت کومک جه: %(from)s - عَلِمِک‌بزه، متخصص توجه محتاج بی‌ین وسّه',
+		'solve_disambiguation-links-removed': u'گجگجی بیری ربوت کومک جه: %(from)s - لینک(ئون) ِحذف.',
+		'solve_disambiguation-links-resolved': u'گجگجی بیری ربوت کومک جه: %(from)s - لینک [[%(to)s]] ره',
+		'solve_disambiguation-redirect-adding-dn-template': u'گجگجی بیری ربوت کومک جه: %(from)s - علمک بی‌یشته متخصص توجه هاکردن وسّه',
+		'solve_disambiguation-redirect-removed': u'گجگجی بیری ربوت کومک جه: %(from)s - لینک(ئون) ِحذف',
+		'solve_disambiguation-redirect-resolved': u'گجگجی بیری ربوت کومک جه: %(from)s - لینک [[%(to)s]] ره',
+		'solve_disambiguation-unknown-page': u'(نامعلوم)',
 	},
 	# Author: Teòtlalili
 	'nah': {
@@ -787,6 +826,10 @@ msg = {
 		'solve_disambiguation-redirect-removed': u'தானியங்கி உதவியுடன் செய்த குழப்பச்சீரமைப்பு: %(from)s  - link(s) நீக்கப்பட்டன',
 		'solve_disambiguation-unknown-page': u'(அறியாதது)',
 	},
+	# Author: Veeven
+	'te': {
+		'solve_disambiguation-unknown-page': u'(తెలియదు)',
+	},
 	# Author: AnakngAraw
 	'tl': {
 		'solve_disambiguation-adding-dn-template': u'Paglilinaw na may tulong ng robot: %(from)s - Tinatakan bilang kailangan ng pagpansin ng dalubhasa',
@@ -843,6 +886,7 @@ msg = {
 		'solve_disambiguation-unknown-page': u'(невідома)',
 	},
 	# Author: Alunardon90
+	# Author: GatoSelvadego
 	'vec': {
 		'solve_disambiguation-adding-dn-template': u'Dixanbiguasion automatega: %(from)s -  Ga da esare controłà da esperti',
 		'solve_disambiguation-links-removed': u'Dixanbiguasion automatega: %(from)s - Cołegamenti rimosi',
@@ -850,7 +894,7 @@ msg = {
 		'solve_disambiguation-redirect-adding-dn-template': u'Dixanbiguasion automatega: %(from)s -  Ga da esare controłà da esperti',
 		'solve_disambiguation-redirect-removed': u'Dixanbiguasion automatega:: %(from)s - Cołegamenti rimosi',
 		'solve_disambiguation-redirect-resolved': u'Dixanbiguasion automatega: %(from)s - Inversion rindirisamento/i verso %(to)s',
-		'solve_disambiguation-unknown-page': u'(sconosudo)',
+		'solve_disambiguation-unknown-page': u'(sconosuo)',
 	},
 	# Author: Minh Nguyen
 	'vi': {

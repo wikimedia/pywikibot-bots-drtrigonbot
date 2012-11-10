@@ -86,11 +86,12 @@ msg = {
 		'featured-good': u'Robot: Mae %(page)s yn erthygl dda',
 	},
 	# Author: Emaus
+	# Author: Christian List
 	'da': {
-		'featured-featured': u'Bot: %(page)s er en fremragende artikel',
-		'featured-former': u'Bot: %(page)s er en tidligere fremragende artikel',
-		'featured-good': u'Bot: %(page)s er en god artikel',
-		'featured-list': u'Bot: %(page)s er en fremragende liste',
+		'featured-featured': u'Robot: %(page)s er en fremragende artikel',
+		'featured-former': u'Robot: %(page)s er en tidligere fremragende artikel',
+		'featured-good': u'Robot: %(page)s er en god artikel',
+		'featured-list': u'Robot: %(page)s er en fremragende liste',
 	},
 	'de': {
 		'featured-featured': u'Bot: %(page)s ist ein ausgezeichneter Artikel',
@@ -100,20 +101,21 @@ msg = {
 	},
 	# Author: Erdemaslancan
 	'diq': {
-		'featured-featured': u'Boti pela %(page)s [[Weş wesiqeya]]',
-		'featured-former': u'Boti pela %(page)s veri [[Weş wesiqeya verên]] biya',
-		'featured-good': u'Boti pela %(page)s [[Weş wesiqe]]ya',
-		'featured-list': u'Boti pela %(page)s [[Weş listey]]a',
+		'featured-featured': u'Boti pera %(page)s yew [[Wikipedia:Weş wesiqe|Weş wesiqeya]]',
+		'featured-former': u'Boti pera %(page)s veror [[Wikipedia:Weş wesiqeya verên|Weş wesiqeya verênan]] ra yew biya',
+		'featured-good': u'Boti pera %(page)s yew [[Wikipedia:Wesiqaya qeliteyın|Wesiqaya qeliteyına]]',
+		'featured-list': u'Boti pera %(page)s yew [[Wikipedia:Weş listey|Weş listeya]]',
 	},
 	'dsb': {
 		'featured-featured': u'Bot: %(page)s jo wuběrny nastawk',
 	},
 	# Author: Geraki
+	# Author: Glavkos
 	'el': {
 		'featured-featured': u'Ρομπότ: το %(page)s είναι αξιόλογο άρθρο',
 		'featured-former': u'Ρομπότ: το %(page)s είναι πρώην αξιόλογο άρθρο',
 		'featured-good': u'Ρομπότ: το %(page)s είναι καλό άρθρο',
-		'featured-list': u'Ρομπότ: το %(page)s είναι ένας αξιόλογος κατάλογος',
+		'featured-list': u'Ρομπότ: το %(page)s είναι ένας κατάλογος αξιόλογων',
 	},
 	'en': {
 		'featured-featured': u'Robot: %(page)s is a featured article',
@@ -160,10 +162,10 @@ msg = {
 	},
 	# Author: ChrisPtDe
 	'frp': {
-		'featured-featured': u'Bot : lim AdQ por %(page)s',
-		'featured-former': u'Bot : %(page)s est un viely articllo de qualitât',
-		'featured-good': u'Bot : lim BA por %(page)s',
-		'featured-list': u'Bot : %(page)s est una lista de qualitât',
+		'featured-featured': u'Robot : %(page)s est un articllo de qualitât',
+		'featured-former': u'Robot : %(page)s est un viely articllo de qualitât',
+		'featured-good': u'Robot : %(page)s est un bon articllo',
+		'featured-list': u'Robot : %(page)s est na lista de qualitât',
 	},
 	'frr': {
 		'featured-featured': u'Bot: %(page)s as en auer a miaten guden artiikel',
@@ -249,6 +251,13 @@ msg = {
 		'featured-good': u'ロボットによる: 良質な記事へのリンク %(page)s',
 		'featured-list': u'ロボットによる: 秀逸な一覧へのリンク %(page)s',
 	},
+	# Author: NoiX180
+	'jv': {
+		'featured-featured': u'Bot: %(page)s artikel pinilih',
+		'featured-former': u'Bot: %(page)s bekas artikel pinilih',
+		'featured-good': u'Bot: %(page)s artikel apik',
+		'featured-list': u'Bot: %(page)s daptar pinilih',
+	},
 	'ka': {
 		'featured-featured': u'ბოტი: რჩეული სტატიის ბმული გვერდისათვის %(page)s',
 	},
@@ -330,6 +339,13 @@ msg = {
 	'nv': {
 		'featured-featured': u'Naaltsoos %(page)s kʼad nizhónígo ályaa',
 	},
+	# Author: Shisir 1945
+	'or': {
+		'featured-featured': u'ରୋବଟ୍‌: %(page)s ହେଉଛି ଗୋଟିଏ ବିଶେଷ ଲେଖା',
+		'featured-former': u'ରୋବଟ୍‌: %(page)s ହେଉଛି ଗୋଟିଏ ପୁର୍ବତନ ବିଶେଷ ଲେଖା',
+		'featured-good': u'ରୋବଟ୍‌: %(page)s ହେଉଛି ଗୋଟିଏ ଭଲ ଲେଖା',
+		'featured-list': u'ରୋବଟ୍‌: %(page)s ହେଉଛି ଏକ ବିଶେଷ ତାଲିକା',
+	},
 	# Author: Sp5uhe
 	'pl': {
 		'featured-featured': u'Robot informuje, że %(page)s jest artykułem na medal',
@@ -388,6 +404,10 @@ msg = {
 		'featured-good': u'Bot: %(page)s je dober članek',
 		'featured-list': u'Bot: %(page)s je izbrani seznam',
 	},
+	# Author: Euriditi
+	'sq': {
+		'featured-good': u'Roboti: %(page)s është një artikull i mirë',
+	},
 	# Author: Rancher
 	'sr': {
 		'featured-featured': u'Робот: %(page)s је сјајан чланак',
@@ -408,6 +428,13 @@ msg = {
 		'featured-former': u'Bot: %(page)s är en före detta utmärkt artikel',
 		'featured-good': u'Bot: %(page)s är en läsvärd artikel',
 		'featured-list': u'Bot: %(page)s är en utmärkt list',
+	},
+	# Author: Przemub
+	'szl': {
+		'featured-featured': u'Robot: %(page)s je medalowym artiklem',
+		'featured-former': u'Robot: %(page)s niy je medalowym artiklem',
+		'featured-good': u'Robot: %(page)s je dobrym artiklem',
+		'featured-list': u'Robot: %(page)s je dobrõ listõ.',
 	},
 	# Author: Aswn
 	'ta': {
@@ -453,11 +480,12 @@ msg = {
 		'featured-list': u'Бот: %(page)s вибраний список',
 	},
 	# Author: Alunardon90
+	# Author: GatoSelvadego
 	'vec': {
-		'featured-featured': u'Robot: %(page)s el xe on articoło in evidensa',
-		'featured-former': u'Robot: %(page)s el jera on articoło in evidensa',
+		'featured-featured': u'Robot: %(page)s el xe un articoło in evidensa',
+		'featured-former': u'Robot: %(page)s el jera un articoło in evidensa',
 		'featured-good': u'Robot: %(page)s el xe on articoło de cuałità',
-		'featured-list': u'Robot: %(page)s el xe inte un elenco de primo piano',
+		'featured-list': u'Robot: %(page)s el xe inte un elenco de primo pian',
 	},
 	# Author: Minh Nguyen
 	'vi': {

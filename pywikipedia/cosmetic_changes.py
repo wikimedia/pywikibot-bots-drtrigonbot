@@ -57,7 +57,7 @@ your user-config.py:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: cosmetic_changes.py 10438 2012-07-04 10:27:20Z xqt $'
+__version__ = '$Id: cosmetic_changes.py 10452 2012-07-09 13:18:08Z xqt $'
 #
 import sys, re
 import wikipedia as pywikibot
@@ -515,6 +515,13 @@ class CosmeticChangesToolkit:
         text = pywikibot.replaceExcept(text, linkR, handleOneLink,
                                        ['comment', 'math', 'nowiki', 'pre',
                                         'startspace'])
+        ##fixing pipe and trailing for fa. Thanks ZxxZxxZ
+        if self.site.lang == 'fa':
+            faChrs = u'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك' + u'ًٌٍَُِّْٓٔ'
+            text = re.sub(u'\[\[([^\]\|]*)]]([‌%s]+)' % faChrs,
+                          ur'[[\1|\1\2]]', text)
+            text = re.sub(u'\[\[([^\]\|]*)\|(.+?)]]([‌%s]+)' % faChrs,
+                          ur'[[\1|\2\3]]', text)
         return text
 
     def resolveHtmlEntities(self, text):
@@ -739,7 +746,9 @@ class CosmeticChangesToolkit:
             text = pywikibot.replaceExcept(text, u'ه', u'ھ', exceptions)
         text = pywikibot.replaceExcept(text, u'ك', u'ک', exceptions)
         text = pywikibot.replaceExcept(text, ur'[ىي]', u'ی', exceptions)
+        return text
         # replace persian/arabic digits
+        ## deactivated due to bug #3539407
         for i in xrange(0, 10):
             text = pywikibot.replaceExcept(text, old[i], new[i], exceptions)
         # do not change digits in class, style and table params
@@ -752,11 +761,6 @@ class CosmeticChangesToolkit:
         # replace digits
         for i in xrange(0, 10):
             text = pywikibot.replaceExcept(text, str(i), new[i], exceptions)
-        ##fixing pipe and trailing for fa. Thanks ZxxZxxZ
-        if self.site.lang=='fa':
-            faChrs = u'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك' + u'ًٌٍَُِّْٓٔ'
-            text = re.sub(u'\[\[([^\]\|]*)]]([‌%s]+)' % faChrs, ur'[[\1|\1\2]]', text)
-            text = re.sub(u'\[\[([^\]\|]*)\|(.+?)]]([‌%s]+)' % faChrs, ur'[[\1|\2\3]]', text)
         return text
 
     # Retrieved from "http://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup"

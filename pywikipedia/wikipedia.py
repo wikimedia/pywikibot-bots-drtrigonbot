@@ -113,13 +113,12 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
     and thus not slow down other bot threads anymore.
 
 """
-from __future__ import generators
 #
 # (C) Pywikipedia bot team, 2003-2012
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 10448 2012-07-09 09:43:08Z xqt $'
+__version__ = '$Id: wikipedia.py 10669 2012-11-07 13:21:02Z xqt $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -140,18 +139,7 @@ from BeautifulSoup import BeautifulSoup, BeautifulStoneSoup, SoupStrainer
 import weakref
 # Splitting the bot into library parts
 from pywikibot import *
-
-# Set the locale to system default. This will ensure correct string
-# handling for non-latin characters on Python 2.3.x. For Python 2.4.x it's no
-# longer needed.
-locale.setlocale(locale.LC_ALL, '')
-
 import config, login, query, version
-
-try:
-    set # introduced in Python2.4: faster and future
-except NameError:
-    from sets import Set as set
 
 # Check Unicode support (is this a wide or narrow python build?)
 # See http://www.python.org/doc/peps/pep-0261/
@@ -311,17 +299,14 @@ class Page(object):
             t = t.strip()
             # Remove left-to-right and right-to-left markers.
             t = t.replace(u'\u200e', '').replace(u'\u200f', '')
-            # leading colon implies main namespace instead of the default
+
             if t.startswith(':'):
                 t = t[1:]
-                self._namespace = 0
+                prefix = True
             else:
-                self._namespace = defaultNamespace
-
-            if not t:
-                raise InvalidTitle(u"Invalid title '%s'" % title )
-
+                prefix = False
             self._namespace = defaultNamespace
+
             #
             # This code was adapted from Title.php : secureAndSplit()
             #
@@ -329,7 +314,16 @@ class Page(object):
             while True:
                 m = reNamespace.match(t)
                 if not m:
+                    # leading colon implies main namespace instead of default
+                    if t.startswith(':'):
+                        t = t[1:]
+                        self._namespace = 0
+                    elif prefix:
+                        self._namespace = 0
+                    else:
+                        self._namespace = defaultNamespace
                     break
+                prefix = False
                 p = m.group(1)
                 lowerNs = p.lower()
                 ns = self._site.getNamespaceIndex(lowerNs)
@@ -351,11 +345,6 @@ class Page(object):
                         if t == '':
                             t = self._site.mediawiki_message('Mainpage')
 
-                    # If there's an initial colon after the interwiki, that also
-                    # resets the default namespace
-                    if t != '' and t[0] == ':':
-                        self._namespace = 0
-                        t = t[1:]
                 elif lowerNs in self._site.family.get_known_families(site = self._site):
                     if self._site.family.get_known_families(site = self._site)[lowerNs] == self._site.family.name:
                         t = m.group(2)
@@ -384,6 +373,9 @@ not supported by PyWikipediaBot!"""
                     # If there's no recognized interwiki or namespace,
                     # then let the colon expression be part of the title.
                     break
+
+            if not t:
+                raise InvalidTitle(u"Invalid title '%s'" % title )
 
             sectionStart = t.find(u'#')
             # But maybe there are magic words like {{#time|}}
@@ -764,6 +756,14 @@ not supported by PyWikipediaBot!"""
             'inprop': ['protection', 'subjectid'],
             #'intoken': 'edit',
         }
+        params1=params.copy()
+        if self.site().lang==u"wikidata":
+            params['action']='wbgetentities'
+            params['sites']='enwiki'
+            del params['prop']
+            del params['rvprop']
+            del params['rvlimit']
+            del params['inprop']
         if oldid:
             params['rvstartid'] = oldid
         if expandtemplates:
@@ -774,6 +774,14 @@ not supported by PyWikipediaBot!"""
         textareaFound = False
         # retrying loop is done by query.GetData
         data = query.GetData(params, self.site(), sysop=sysop)
+        if self.site().lang==u"wikidata":
+            data['query']={'pages':data['entities']}
+            for pageid in data['entities'].keys():
+                if pageid=="-1":
+                    continue #Means the page does not exist
+                params1['titles']="Q"+pageid
+                ndata=query.GetData(params1, self.site(), sysop=sysop)['query']['pages']
+                data['query']['pages'].update(ndata)
         if 'error' in data:
             raise RuntimeError("API query error: %s" % data)
         if not 'pages' in data['query']:
@@ -1269,7 +1277,7 @@ not supported by PyWikipediaBot!"""
         if self._editTime and datetime:
             import datetime
             return datetime.datetime.strptime(str(self._editTime), '%Y%m%d%H%M%S')
-          
+
         return self._editTime
 
     def previousRevision(self):
@@ -1354,7 +1362,7 @@ not supported by PyWikipediaBot!"""
                     break
 
             if 'query-continue' in data and count < tllimit:
-                params["tlcontinue"] = data["query-continue"]["templates"]["tlcontinue"]
+                params.update(data["query-continue"]["templates"])
             else:
                 break
 
@@ -1518,10 +1526,13 @@ not supported by PyWikipediaBot!"""
                             for index in regex.findall(content):
                                 disambigs.add(index[:1].upper() + index[1:])
                     except NoPage:
-                        disambigs = set([self._site.mediawiki_message(
-                            'Disambiguationspage').split(':', 1)[1]])
-                    # add the default template(s)
-                    self._site._disambigtemplates = disambigs | default
+                        message = self._site.mediawiki_message(
+                            'Disambiguationspage').split(':', 1)[1]
+                        # add the default template(s) for default mw message
+                        # only
+                        disambigs = set([message[:1].upper() +
+                                         message[1:]]) | default
+                    self._site._disambigtemplates = disambigs
                 else:
                     # Normalize template capitalization
                     self._site._disambigtemplates = set(
@@ -1695,10 +1706,10 @@ not supported by PyWikipediaBot!"""
 
             if 'query-continue' in datas:
                 if 'backlinks' in datas['query-continue']:
-                    params['blcontinue'] = datas['query-continue']['backlinks']['blcontinue']
+                    params.update(datas['query-continue']['backlinks'])
 
                 if 'embeddedin' in datas['query-continue']:
-                    params['eicontinue'] = datas['query-continue']['embeddedin']['eicontinue']
+                    params.update(datas['query-continue']['embeddedin'])
             else:
                 allDone = True
 
@@ -1859,9 +1870,7 @@ not supported by PyWikipediaBot!"""
         #    restrictions = {}
         #else:
         restrictions = { 'edit': None, 'move': None }
-        try:
-            api_url = self.site().api_address()
-        except NotImplementedError:
+        if not self.site().has_api():
             return restrictions
 
         predata = {
@@ -1923,7 +1932,7 @@ not supported by PyWikipediaBot!"""
                             force, callback))
 
     def put(self, newtext, comment=None, watchArticle=None, minorEdit=True,
-            force=False, sysop=False, botflag=True, maxTries=-1):
+            force=False, sysop=False, botflag=True, maxTries=-1, wikidata={}):
         """Save the page with the contents of the first argument as the text.
 
         Optional parameters:
@@ -1940,25 +1949,27 @@ not supported by PyWikipediaBot!"""
             self.get()
         except:
             pass
-        sysop = self._getActionUser(action = 'edit', restriction = self.editRestriction, sysop = sysop)
+        sysop = self._getActionUser(action='edit',
+                                    restriction=self.editRestriction,
+                                    sysop=sysop)
         username = self.site().loggedInAs()
 
         # Check blocks
         self.site().checkBlocks(sysop = sysop)
 
         # Determine if we are allowed to edit
-        if not force:
+        if (not force) and (self.site().lang!=u"wikidata"):
             if not self.botMayEdit(username):
                 raise LockedPage(
                     u'Not allowed to edit %s because of a restricting template'
                     % self.title(asLink=True))
-            elif self.site().has_api() and self.namespace() in [2,3] \
+            elif self.site().has_api() and self.namespace() == 2 \
                  and (self.title().endswith('.css') or \
                       self.title().endswith('.js')):
                 titleparts = self.title().split("/")
                 userpageowner = titleparts[0].split(":")[1]
                 if userpageowner != username:
-                    # API enable: if title ends with .css or .js in ns2,3
+                    # API enable: if title ends with .css or .js in ns2
                     # it needs permission to edit user pages
                     if self.title().endswith('css'):
                         permission = 'editusercss'
@@ -1984,7 +1995,7 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
             self._editrestriction = False
         # If no comment is given for the change, use the default
         comment = comment or action
-        if config.cosmetic_changes and not self.isTalkPage() and \
+        if config.cosmetic_changes and not self.isTalkPage() and self.site().lang!=u"wikidata" and \
            not calledModuleName() in ('cosmetic_changes', 'touch'):
             if config.cosmetic_changes_mylang_only:
                 cc = (self.site().family.name == config.family and self.site().lang == config.mylang) or \
@@ -2021,7 +2032,9 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
             comment = encodeEsperantoX(comment)
 
         return self._putPage(newtext, comment, watchArticle, minorEdit,
-                             newPage, self.site().getToken(sysop = sysop), sysop = sysop, botflag=botflag, maxTries=maxTries)
+                             newPage, self.site().getToken(sysop = sysop),
+                             sysop = sysop, botflag=botflag, maxTries=maxTries,
+                             wikidata=wikidata)
 
     def _encodeArg(self, arg, msgForError):
         """Encode an ascii string/Unicode string to the site's encoding"""
@@ -2039,7 +2052,7 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
 
     def _putPage(self, text, comment=None, watchArticle=False, minorEdit=True,
                 newPage=False, token=None, newToken=False, sysop=False,
-                captcha=None, botflag=True, maxTries=-1):
+                captcha=None, botflag=True, maxTries=-1, wikidata={}):
         """Upload 'text' as new content of Page by API
 
         Don't use this directly, use put() instead.
@@ -2059,7 +2072,24 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
             'text': self._encodeArg(text, 'text'),
             'summary': self._encodeArg(comment, 'summary'),
         }
-
+        if wikidata:
+            params['title'] = self.title()
+            params['site'] = 'enwiki' #I'm working on making more flexible so i'll change that
+            params['action'] = u'wbset'+wikidata['type']
+            params['format'] = 'jsonfm'
+            if wikidata['type'] == u'item':
+                params['data'] = u'{"labels":{"%(label)s":{"language":"%(label)s","value":"%(value)s"}}}' \
+                                 % {'label': wikidata['label'],
+                                    'value': wikidata['value']}
+            elif wikidata['type'] == u'description':
+                params['value'] = wikidata['value']
+                params['language'] = wikidata['language']
+            elif wikidata['type'] == u'sitelink':
+                params['linksite'] = wikidata['site'] + u'wiki'
+                params['linktitle'] = wikidata['title']
+            else:
+                raise NotImplementedError(
+                    u'Wikidata action type "%s" is unknown' % wikidata['type'])
         if token:
             params['token'] = token
         else:
@@ -2113,6 +2143,8 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
                 params['nocreate'] = 1
             # Submit the prepared information
             try:
+                if wikidata:
+                    del params['text']
                 response, data = query.GetData(params, self.site(), sysop=sysop, back_response = True)
                 if isinstance(data,basestring):
                     raise KeyError
@@ -2172,7 +2204,7 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
                     faked = params
                     if 'text' in faked:
                         del faked['text']
-                    output("OriginalData:%s" % faked)
+                    output("OriginalData:%s" % unicode(repr(faked), "latin1"))
                     del faked
                 #------------------------
                 errorCode = data['error']['code']
@@ -2643,7 +2675,7 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
 
                 if 'query-continue' in datas:
                     if 'categories' in datas['query-continue']:
-                        params['clcontinue'] = datas['query-continue']['categories']['clcontinue']
+                        params.update(datas['query-continue']['categories'])
                 else:
                     allDone = True
             return cats
@@ -2953,20 +2985,22 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
             return self._versionhistory[:revCount]
         return self._versionhistory
 
-    def _getVersionHistory(self, getAll=False, skipFirst=False, reverseOrder=False,
-                           revCount=500):
+    def _getVersionHistory(self, getAll=False, skipFirst=False,
+                           reverseOrder=False, revCount=500, rvprop=None):
         """Load history informations by API query.
            Internal use for self.getVersionHistory(), don't use this function directly.
         """
         if not self.site().has_api() or self.site().versionnumber() < 8:
-            return self._getVersionHistoryOld(reExist, getAll, skipFirst, reverseOrder, revCount)
+            return self._getVersionHistoryOld(reExist, getAll, skipFirst,
+                                              reverseOrder, revCount)
         dataQ = []
         thisHistoryDone = False
+
         params = {
             'action': 'query',
             'prop': 'revisions',
             'titles': self.title(),
-            'rvprop': 'ids|timestamp|flags|comment|user|size|tags',
+            'rvprop': rvprop or 'ids|timestamp|user|comment|size|tags',
             'rvlimit': revCount,
         }
         while not thisHistoryDone:
@@ -2985,7 +3019,7 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
                     raise BadTitle('BadTitle: %s' % self)
 
             if 'query-continue' in result and getAll:
-                params['rvstartid'] = result['query-continue']['revisions']['rvstartid']
+                params.update(result['query-continue']['revisions'])
             else:
                 thisHistoryDone = True
 
@@ -2993,30 +3027,31 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
                 skipFirst = False
             else:
                 for r in pageInfo['revisions']:
-                    c = ''
-                    if 'comment' in r:
-                        c = r['comment']
-                    #revision id, edit date/time, user name, edit summary
-                    (revidStrr, timestampStrr, userStrr) = (None, None, None)
+                    # set defaults
+                    values = {
+                        'ids': None,
+                        'timestamp': None,
+                        'user': None,
+                        'flags': None,
+                        'comment': u'',
+                        'size': -1,
+                        'tags': [],
+                        'content': u'',
+                    }
+                    values.update(r)
                     if 'revid' in r:
-                        revidStrr = r['revid']
-                    if 'timestamp' in r:
-                        timestampStrr = r['timestamp']
-                    if 'user' in r:
-                        userStrr = r['user']
-                    s=-1 #Will return -1 if not found
-                    if 'size' in r:
-                        s = r['size']
-                    tags=[]
-                    if 'tags' in r:
-                        tags = r['tags']
-                    dataQ.append((revidStrr, timestampStrr, userStrr, c, s, tags))
+                        values['ids'] = r['revid']
+                    if '*' in r:
+                        values['content'] = r['*']
+                    elements = params['rvprop'].split('|')
+                    row = [values[e] for e in elements]
+                    dataQ.append(tuple(row))
                 if len(result['query']['pages'].values()[0]['revisions']) < revCount:
                     thisHistoryDone = True
         return dataQ
 
-    def _getVersionHistoryOld(self, getAll = False, skipFirst = False,
-                               reverseOrder = False, revCount=500):
+    def _getVersionHistoryOld(self, getAll=False, skipFirst=False,
+                              reverseOrder=False, revCount=500):
         """Load the version history page and return history information.
            Internal use for self.getVersionHistory(), don't use this function directly.
         """
@@ -3128,58 +3163,9 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
                     for match in r.finditer(data)  ]
 
         # Load history informations by API query.
-
-        dataQ = []
-        thisHistoryDone = False
-        params = {
-            'action': 'query',
-            'prop': 'revisions',
-            'titles': self.title(),
-            'rvprop': 'ids|timestamp|user|content',
-            'rvlimit': revCount,
-        }
-        while not thisHistoryDone:
-            if reverseOrder:
-                params['rvdir'] = 'newer'
-
-            result = query.GetData(params, self.site())
-            if 'error' in result:
-                raise RuntimeError("%s" % result['error'])
-            pageInfo = result['query']['pages'].values()[0]
-            if result['query']['pages'].keys()[0] == "-1":
-                if 'missing' in pageInfo:
-                    raise NoPage(self.site(), unicode(self),
-                                 "Page does not exist.")
-                elif 'invalid' in pageInfo:
-                    raise BadTitle('BadTitle: %s' % self)
-
-            if 'query-continue' in result and getAll:
-                params['rvstartid'] = result['query-continue']['revisions']['rvstartid']
-            else:
-                thisHistoryDone = True
-
-            if skipFirst:
-                skipFirst = False
-            else:
-                for r in pageInfo['revisions']:
-                    c = ''
-                    if 'comment' in r:
-                        c = r['comment']
-                    #revision id, edit date/time, user name, edit summary
-                    (revidStrr, timestampStrr, userStrr) = (None, None, None)
-                    if 'revid' in r:
-                        revidStrr = r['revid']
-                    if 'timestamp' in r:
-                        timestampStrr = r['timestamp']
-                    if 'user' in r:
-                        userStrr = r['user']
-                    s='' #Will return -1 if not found
-                    if '*' in r:
-                        s = r['*']
-                    dataQ.append((revidStrr, timestampStrr, userStrr, s))
-                if len(result['query']['pages'].values()[0]['revisions']) < revCount:
-                    thisHistoryDone = True
-        return dataQ
+        return self._getVersionHistory(getAll=getAll, skipFirst=skipFirst,
+                                       reverseOrder=reverseOrder, revCount=revCount,
+                                       rvprop='ids|timestamp|user|content')
 
     def contributingUsers(self, step=None, total=None):
         """Return a set of usernames (or IPs) of users who edited this page.
@@ -3594,10 +3580,11 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
                         count += 1
                         self._deletedRevs[parsetime2stamp(y['timestamp'])] = [y['timestamp'], y['user'], y['comment'] , y['*'], False]
 
-                if 'query-continue' in data and \
-                   data['query-continue']['deletedrevs']['drcontinue'].split(
-                       '|')[1] == self.title(withNamespace=False):
-                    params['drcontinue'] = data['query-continue']['deletedrevs']['drcontinue']
+                if 'query-continue' in data:
+                    if data['query-continue']['deletedrevs'].values()[0].split(
+                        '|')[1] == self.title(withNamespace=False):
+                        params.update(data['query-continue']['deletedrevs'])
+                    else: break
                 else:
                     break
             self._deletedRevsModified = False
@@ -4057,8 +4044,8 @@ class ImagePage(Page):
                                 page.
     fileIsOnCommons           : Return True if image stored on Wikimedia
                                 Commons.
-    fileIsShared              : Return True if image stored on Wikitravel
-                                shared repository.
+    fileIsShared              : Return True if image stored on a shared
+                                repository like Wikimedia Commons or Wikitravel.
     getFileMd5Sum             : Return image file's MD5 checksum.
     getFileVersionHistory     : Return the image file's version history.
     getFileVersionHistoryTable: Return the version history in the form of a
@@ -4067,10 +4054,10 @@ class ImagePage(Page):
     globalUsage               : Yield Pages on which the image is used globally
 
     """
-    def __init__(self, site, title, insite = None):
+    def __init__(self, site, title, insite=None):
         Page.__init__(self, site, title, insite, defaultNamespace=6)
         if self.namespace() != 6:
-            raise ValueError(u'BUG: %s is not in the image namespace!' % title)
+            raise ValueError(u"'%s' is not in the image namespace!" % title)
         self._imagePageHtml = None
         self._local = None
         self._latestInfo = {}
@@ -4130,7 +4117,7 @@ class ImagePage(Page):
                         break
 
                 if 'query-continue' in data and limit != 1:
-                    params['iistart'] = data['query-continue']['imageinfo']['iistart']
+                    params.update(data['query-continue']['imageinfo'])
                 else:
                     break
         except KeyError:
@@ -4294,7 +4281,7 @@ class ImagePage(Page):
                 yield Page(self.site(), iu['title'], defaultNamespace=iu['ns'])
 
             if 'query-continue' in data:
-                params['iucontinue'] = data['query-continue']['imageusage']['iucontinue']
+                params.update(data['query-continue']['imageusage'])
             else:
                 break
 
@@ -4355,7 +4342,7 @@ class ImagePage(Page):
                             yield Page(site, gu['title'])
 
             if 'query-continue' in data:
-                params['gucontinue'] = data['query-continue']['globalusage']['gucontinue']
+                params.update(data['query-continue']['globalusage'])
             else:
                 break
 
@@ -5043,7 +5030,7 @@ def Family(fam=None, fatal=True, force=False):
     @type fam: str
     @param fatal: if True, the bot will stop running if the given family is
         unknown. If False, it will only raise a ValueError exception.
-    @param fatal: bool
+    @type fatal: bool
     @return: a Family instance configured for the named family.
 
     """
@@ -6279,7 +6266,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                     }
                     datas = query.GetData(params, self)['query']['allmessages'][0]
                     if "missing" in datas:
-                        raise KeyError("message is not exist.")
+                        raise KeyError("message '%s' does not exist." % key)
                     elif datas['name'] not in self._mediawiki_messages:
                         self._mediawiki_messages[datas['name']] = datas['*']
                     #self._mediawiki_messages = _dict([(tag['name'].lower(), tag['*'])
@@ -6524,7 +6511,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                 if nbresults >= number:
                     break
             if 'query-continue' in result and nbresults < number:
-                params['lestart'] = result['query-continue']['logevents']['lestart']
+                params.update(result['query-continue']['logevents'])
             elif repeat:
                 nbresults = 0
                 try:
@@ -6535,8 +6522,11 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                 break
         return
 
-    def newpages(self, number = 10, get_redirect = False, repeat = False, namespace = 0, rcshow = ['!bot','!redirect'], user = None, returndict = False):
-        """Yield new articles (as Page objects) from Special:Newpages.
+    @deprecate_arg("get_redirect", None) #20120822
+    def newpages(self, user=None, returndict=False,
+                 number=10, repeat=False, namespace=0,
+                 rcshow = ['!bot','!redirect']):
+        """Yield new articles (as Page objects) from recent changes.
 
         Starts with the newest article and fetches the number of articles
         specified in the first argument. If repeat is True, it fetches
@@ -6544,42 +6534,35 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
         one, sleeping between subsequent fetches of Newpages.
 
         The objects yielded are dependent on parmater returndict.
-        When true, it yields a tuple composed of a Page object and a dict of attributes.
+        When true, it yields a tuple composed of a Page object and a dict of
+        attributes.
         When false, it yields a tuple composed of the Page object,
         timestamp (unicode), length (int), an empty unicode string, username
         or IP address (str), comment (unicode).
 
         """
-        # TODO: in recent MW versions Special:Newpages takes a namespace parameter,
-        #       and defaults to 0 if not specified.
+        # TODO: in recent MW versions Special:Newpages takes a namespace
+        #       parameter, and defaults to 0 if not specified.
         # TODO: Detection of unregistered users is broken
         # TODO: Repeat mechanism doesn't make much sense as implemented;
         #       should use both offset and limit parameters, and have an
         #       option to fetch older rather than newer pages
-        seen = set()
-        while True:
-            if self.has_api() and self.versionnumber() >= 10:
-                params = {
-                    'action': 'query',
-                    'list': 'recentchanges',
-                    'rctype': 'new',
-                    'rcnamespace': namespace,
-                    'rclimit': int(number),
-                    'rcprop': ['ids','title','timestamp','sizes','user','comment'],
-                    'rcshow': rcshow,
-                }
-                if user: params['rcuser'] = user
-                data = query.GetData(params, self)['query']['recentchanges']
 
-                for np in data:
-                    if np['pageid'] not in seen:
-                        seen.add(np['pageid'])
-                        page = Page(self, np['title'], defaultNamespace=np['ns'])
-                        if returndict:
-                            yield page, np
-                        else:
-                            yield page, np['timestamp'], np['newlen'], u'', np['user'], np['comment']
-            else:
+        # N.B. API still provides no way to access Special:Newpages content
+        # directly, so we get new pages indirectly through 'recentchanges'
+        if self.has_api() and self.versionnumber() >= 10:
+            gen = self.recentchanges(number=number, rcshow=rcshow, rctype='new',
+                                     namespace=namespace, repeat=repeat,
+                                     user=user, returndict=True)
+            for newpage, pageitem in gen:
+                if returndict:
+                    yield (newpage, pageitem)
+                else:
+                    yield (newpage, pageitem['timestamp'], pageitem['newlen'],
+                           u'', pageitem['user'], pageitem['comment'])
+        else:
+            seen = set()
+            while True:
                 path = self.newpages_address(n=number, namespace=namespace)
                 # The throttling is important here, so always enabled.
                 get_throttle()
@@ -6601,8 +6584,8 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                         seen.add(title)
                         page = Page(self, title)
                         yield page, date, length, loggedIn, username, comment
-            if not repeat:
-                break
+                if not repeat:
+                    break
 
     def longpages(self, number = 10, repeat = False):
         """Yield Pages from Special:Longpages.
@@ -6856,6 +6839,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
         if rcshow: params['rcshow'] = rcshow
         if rctype: params['rctype'] = rctype
 
+        seen = set()
         while True:
             data = query.GetData(params, self, encodeTitle = False)
             if 'error' in data:
@@ -6866,14 +6850,16 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                 raise ServerError("The APIs don't return data, the site may be down")
 
             for i in rcData:
-                page = Page(self, i['title'], defaultNamespace=i['ns'])
-                if returndict:
-                    yield page, i
-                else:
-                    comment = ''
-                    if 'comment' in i:
-                        comment = i['comment']
-                    yield page, i['timestamp'], i['newlen'], True, i['user'], comment
+                if i['pageid'] not in seen:
+                    seen.add(i['pageid'])
+                    page = Page(self, i['title'], defaultNamespace=i['ns'])
+                    if returndict:
+                        yield page, i
+                    else:
+                        comment = u''
+                        if 'comment' in i:
+                            comment = i['comment']
+                        yield page, i['timestamp'], i['newlen'], True, i['user'], comment
             if not repeat:
                 break
 
@@ -7127,7 +7113,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                 if count >= config.special_page_limit:
                     break
             if 'query-continue' in data and count < params['aplimit']:
-                params['apfrom'] = data['query-continue']['allpages']['apfrom']
+                params.update(data['query-continue']['allpages'])
             else:
                 break
 
@@ -7323,7 +7309,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                             break
 
                     if 'query-continue' in data and count < limit:
-                            params['euoffset'] = data[u'query-continue'][u'exturlusage'][u'euoffset']
+                            params.update(data[u'query-continue'][u'exturlusage'])
                     else:
                             break
         else:

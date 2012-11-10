@@ -56,6 +56,10 @@ msg = {
 	'en': {
 		'movepages-moving': u'Robot: Moved page',
 	},
+	# Author: Objectivesea
+	'eo': {
+		'movepages-moving': u'Roboto: Paĝon moviĝis',
+	},
 	# Author: Vivaelcelta
 	'es': {
 		'movepages-moving': u'Bot: Página trasladada',
@@ -79,7 +83,7 @@ msg = {
 	},
 	# Author: ChrisPtDe
 	'frp': {
-		'movepages-moving': u'Robot : pâge renomâ',
+		'movepages-moving': u'Robot : pâge renomâye',
 	},
 	'frr': {
 		'movepages-moving': u'Bot: Sidj fersköwen',
@@ -95,9 +99,17 @@ msg = {
 	'he': {
 		'movepages-moving': u'בוט: מעביר דף',
 	},
+	# Author: Ex13
+	'hr': {
+		'movepages-moving': u'Bot: premještena stranica',
+	},
 	# Author: Dj
 	'hu': {
 		'movepages-moving': u'Bot: átmozgatott lap',
+	},
+	# Author: Xelgen
+	'hy': {
+		'movepages-moving': u'Ռոբոտը տեղափոխում է էջը',
 	},
 	# Author: McDutchie
 	'ia': {
@@ -122,6 +134,10 @@ msg = {
 	'ja': {
 		'movepages-moving': u'ロボットによる: ページの移動',
 	},
+	# Author: NoiX180
+	'jv': {
+		'movepages-moving': u'Bot: Mindhahaké kaca',
+	},
 	# Author: Purodha
 	'ksh': {
 		'movepages-moving': u'Bot: di Sigg wood ömjenannt',
@@ -133,6 +149,10 @@ msg = {
 	# Author: Ooswesthoesbes
 	'li': {
 		'movepages-moving': u'Bot: verplaats pagina',
+	},
+	# Author: Papuass
+	'lv': {
+		'movepages-moving': u'Robots: Pārvietoja lapu',
 	},
 	# Author: StefanusRA
 	'map-bms': {
@@ -150,6 +170,10 @@ msg = {
 	'ms': {
 		'movepages-moving': u'Robot: Memindahkah laman',
 	},
+	# Author: Chrisportelli
+	'mt': {
+		'movepages-moving': u'Bot: Il-paġna tmexxiet',
+	},
 	# Author: Nghtwlkr
 	'no': {
 		'movepages-moving': u'Robot: Flyttet side',
@@ -161,8 +185,9 @@ msg = {
 	'nl': {
 		'movepages-moving': u'Robot: paginanaam gewijzigd',
 	},
+	# Author: Njardarlogar
 	'nn': {
-		'movepages-moving': u'robot: flytta sida',
+		'movepages-moving': u'robot: flytte sida',
 	},
 	# Author: Xqt
 	'pdc': {
@@ -198,6 +223,10 @@ msg = {
 	'sl': {
 		'movepages-moving': u'Robot: Prestavil stran',
 	},
+	# Author: Euriditi
+	'sq': {
+		'movepages-moving': u'Roboti: Faqe e zhvendosur',
+	},
 	# Author: Rancher
 	'sr': {
 		'movepages-moving': u'Робот: премештена страница',
@@ -214,9 +243,17 @@ msg = {
 	'sw': {
 		'movepages-moving': u'Karagosi: Kuhamisha ukurasa',
 	},
+	# Author: Przemub
+	'szl': {
+		'movepages-moving': u'Robot: Przeciepanŏ zajtã',
+	},
 	# Author: Aswn
 	'ta': {
 		'movepages-moving': u'தானியங்கி: பக்கம் நகர்த்தப்பட்டது',
+	},
+	# Author: Veeven
+	'te': {
+		'movepages-moving': u'బాటు: పేజీని తరలించింది',
 	},
 	# Author: AnakngAraw
 	'tl': {
@@ -234,6 +271,10 @@ msg = {
 	'uk': {
 		'movepages-moving': u'Робот: перейменування сторінки',
 	},
+	# Author: CoderSI
+	'uz': {
+		'movepages-moving': u'Bot: Sahifa ko\'chirildi',
+	},
 	# Author: Alunardon90
 	'vec': {
 		'movepages-moving': u'Robot: Pajina spostà',
@@ -241,6 +282,10 @@ msg = {
 	# Author: Minh Nguyen
 	'vi': {
 		'movepages-moving': u'Bot: Di chuyển trang',
+	},
+	# Author: Harvzsf
+	'war': {
+		'movepages-moving': u'Robot: Ginbalhin an pakli',
 	},
 	# Author: פוילישער
 	'yi': {

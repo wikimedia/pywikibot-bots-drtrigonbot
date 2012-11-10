@@ -7,7 +7,7 @@ File containing all standard fixes
 #
 # (C) Pywikipedia team, 2008-2010
 #
-__version__ = '$Id: fixes.py 9517 2011-09-08 20:48:36Z xqt $'
+__version__ = '$Id: fixes.py 10667 2012-11-07 08:59:44Z xqt $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -52,6 +52,7 @@ fixes = {
         'msg': {
             'ar':u'روبوت: تحويل/تصليح HTML',
             'be':u'Бот: карэкцыя HTML',
+            'be-x-old':u'Бот: карэкцыя HTML',
             'cs':u'převod/oprava HTML',
             'en':u'Robot: Converting/fixing HTML',
             'eo':u'Bot: koredtado de HTMLa teksto',
@@ -193,6 +194,7 @@ fixes = {
         'msg': {
             'ar':u'بوت: تصليح تهيئة الويكي',
             'be':u'Бот: Карэкцыя вiкi-сiнтаксiсу',
+            'be-x-old':u'Бот выпраўляе вiкi-сынтаксiс',
             'cs':u'Oprava wikisyntaxe',
             'de':u'Bot: Korrigiere Wiki-Syntax',
             'en':u'Robot: Fixing wiki syntax',
@@ -269,6 +271,7 @@ fixes = {
         'msg': {
             'ar':u'بوت: تصليح تهيئة الويكي',
             'be':u'Бот: Карэкцыя вiкi-сiнтаксiсу',
+            'be-x-old':u'Бот выпраўляе вiкi-сынтаксiс',
             'cs':u'Oprava wikisyntaxe',
             'de':u'Bot: Korrigiere Wiki-Syntax',
             'en':u'Robot: Fixing wiki syntax',

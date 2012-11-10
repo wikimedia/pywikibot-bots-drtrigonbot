@@ -92,7 +92,7 @@ Syntax examples:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: weblinkchecker.py 9482 2011-08-29 16:32:37Z xqt $'
+__version__='$Id: weblinkchecker.py 10457 2012-07-15 08:27:45Z xqt $'
 
 import sys, re
 import codecs, pickle
@@ -215,6 +215,8 @@ ignorelist = [
     re.compile('.*[\./@]itis\.gov(/.*)?'), # bot rejected on the site
     re.compile('.*[\./@]cev\.lu(/.*)?'), # bot rejected on the site
     re.compile('.*[\./@]science\.ksc\.nasa\.gov(/.*)?'), # very slow response resulting in bot error
+    re.compile('.*[\./@]britannica\.com(/.*)?'), #HTTP redirect loop
+    re.compile('.*[\./@]quickfacts\.census\.gov(/.*)?'), # bot rejected on the site
 ]
 
 def weblinksIn(text, withoutBracketed = False, onlyBracketed = False):

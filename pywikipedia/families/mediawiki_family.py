@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: mediawiki_family.py 10434 2012-07-01 11:47:26Z xqt $'
+__version__ = '$Id: mediawiki_family.py 10514 2012-09-04 08:59:10Z xqt $'
 
 import family
 
@@ -54,6 +54,12 @@ class Family(family.Family):
         }
         self.namespaces[106] = {
             '_default': u'Skin',
+        }
+        self.namespaces[828] = {
+            '_default': u'Module',
+        }
+        self.namespaces[829] = {
+            '_default': u'Module talk',
         }
         self.namespaces[107] = {
             '_default': u'Skin talk',

@@ -4,6 +4,10 @@ msg = {
 	'aeb': {
 		'unlink-unlinking': u'روبوت: إزالة وصلات "%s"',
 	},
+	# Author: Naudefj
+	'af': {
+		'unlink-unlinking': u'Robot: verwysing na "%s" verwyder',
+	},
 	'ar': {
 		'unlink-unlinking': u'روبوت: إزالة وصلات "%s"',
 	},
@@ -23,6 +27,10 @@ msg = {
 	# Author: Edinwiki
 	'bs': {
 		'unlink-unlinking': u'Bot: Odvajanje "%s".',
+	},
+	# Author: Vriullop
+	'ca': {
+		'unlink-unlinking': u'Bot: desenllaçant "%s"',
 	},
 	# Author: Utar
 	'cs': {
@@ -65,6 +73,10 @@ msg = {
 	},
 	'fr': {
 		'unlink-unlinking': u'Robot: Retire le lien "%s"',
+	},
+	# Author: ChrisPtDe
+	'frp': {
+		'unlink-unlinking': u'Robot : enléve lo lim « %s »',
 	},
 	# Author: Murma174
 	'frr': {
@@ -109,6 +121,10 @@ msg = {
 	'ja': {
 		'unlink-unlinking': u'ロボットによる: リンクを解除中 "%s"',
 	},
+	# Author: NoiX180
+	'jv': {
+		'unlink-unlinking': u'Bot: Medhot pranala "%s"',
+	},
 	# Author: Purodha
 	'ksh': {
 		'unlink-unlinking': u'Bot: Lenk op „%s“ fott nämme.',
@@ -128,6 +144,10 @@ msg = {
 	# Author: StefanusRA
 	'map-bms': {
 		'unlink-unlinking': u'Bot: ngeculna pranala "%s"',
+	},
+	# Author: Jagwar
+	'mg': {
+		'unlink-unlinking': u'Rôbô : Manala ny rohy "%s"',
 	},
 	# Author: Bjankuloski06
 	'mk': {

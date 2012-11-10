@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikisource_family.py 10434 2012-07-01 11:47:26Z xqt $'
+__version__ = '$Id: wikisource_family.py 10672 2012-11-08 07:09:37Z xqt $'
 
 # The Wikimedia family that is known as Wikisource
 
@@ -11,12 +11,12 @@ class Family(family.Family):
         self.name = 'wikisource'
 
         self.languages_by_size = [
-            'fr', 'en', 'de', 'ru', 'it', 'zh', 'pt', 'he', 'pl', 'es', 'sv',
-            'fa', 'hu', 'ar', 'ca', 'cs', 'ko', 'sl', 'ro', 'fi', 'vi', 'te',
-            'sa', 'el', 'bn', 'th', 'hr', 'hy', 'sr', 'no', 'nl', 'la', 'vec',
-            'ml', 'tr', 'ja', 'yi', 'br', 'uk', 'mk', 'id', 'ta', 'is', 'eo',
-            'da', 'be', 'li', 'bs', 'bg', 'sah', 'gu', 'et', 'az', 'mr', 'gl',
-            'lt', 'kn', 'cy', 'zh-min-nan', 'sk', 'fo',
+            'fr', 'en', 'de', 'ru', 'it', 'zh', 'pl', 'pt', 'he', 'es', 'sv',
+            'fa', 'hu', 'ar', 'cs', 'ca', 'ko', 'sl', 'ro', 'fi', 'vi', 'te',
+            'sa', 'el', 'bn', 'sr', 'hr', 'th', 'hy', 'no', 'nl', 'ml', 'la',
+            'vec', 'tr', 'ja', 'yi', 'br', 'eo', 'uk', 'id', 'ta', 'mk', 'is',
+            'da', 'be', 'gu', 'li', 'et', 'mr', 'bg', 'bs', 'sah', 'az', 'gl',
+            'lt', 'kn', 'cy', 'sk', 'zh-min-nan', 'fo',
         ]
 
         for lang in self.languages_by_size:
@@ -29,22 +29,12 @@ class Family(family.Family):
         self.namespaces[14]['zh'] = [u'Category', u'分类', u'分類']
         self.namespaces[3]['ca'] = [u'Usuari Discussió']
         self.namespaces[2]['ca'] = [u'Usuari']
-        self.namespaces[3]['cs'] = [u'Diskuse s uživatelem', u'Uživatel diskuse', u'Uživatelka diskuse', u'Diskuse s uživatelkou']
-        self.namespaces[2]['cs'] = [u'Uživatel', u'Uživatelka']
-        self.namespaces[12]['nl'] = [u'Help']
-        self.namespaces[3]['pt'] = [u'Utilizador Discussão', u'Usuário Discussão', u'Utilizadora Discussão']
-        self.namespaces[2]['pt'] = [u'Utilizador', u'Usuário', u'Utilizadora']
         self.namespaces[6]['vec'] = [u'File', u'Imagine']
         self.namespaces[9]['ro'] = [u'Discuție MediaWiki', u'Discuţie MediaWiki']
         self.namespaces[3]['pl'] = [u'Dyskusja wikiskryby', u'Dyskusja użytkownika', u'Dyskusja użytkowniczki']
         self.namespaces[2]['pl'] = [u'Wikiskryba', u'Użytkownik', u'Użytkowniczka']
-        self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisateur']
-        self.namespaces[2]['fr'] = [u'Utilisateur']
         self.namespaces[15]['bn'] = [u'বিষয়শ্রেণী আলোচনা']
         self.namespaces[14]['bn'] = [u'বিষয়শ্রেণী']
-        self.namespaces[3]['de'] = [u'Benutzer Diskussion', u'Benutzerin Diskussion']
-        self.namespaces[13]['de'] = [u'Hilfe Diskussion']
-        self.namespaces[12]['de'] = [u'Hilfe']
         self.namespaces[9]['da'] = [u'MediaWiki diskussion', u'MediaWiki-diskussion']
         self.namespaces[13]['da'] = [u'Hjælp diskussion', u'Hjælp-diskussion']
         self.namespaces[12]['ml'] = [u'സഹായം', u'H', u'സ']
@@ -351,6 +341,7 @@ class Family(family.Family):
             'bn': u'পাতা',
             'br': [u'Oberour', u'Author'],
             'ca': [u'Llibre', u'Index'],
+            'cy': u'Tudalen',
             'da': u'Side',
             'de': u'Index',
             'en': u'Page',
@@ -358,6 +349,7 @@ class Family(family.Family):
             'es': u'Índice',
             'et': [u'Register', u'Index'],
             'fa': [u'برگه', u'Page'],
+            'fi': u'Sivu',
             'fr': u'Page',
             'gu': u'પૃષ્ઠ',
             'he': u'עמוד',
@@ -392,6 +384,7 @@ class Family(family.Family):
             'bn': u'পাতা আলাপ',
             'br': [u'Kaozeadenn oberour', u'Author talk'],
             'ca': [u'Llibre Discussió', u'Index talk'],
+            'cy': u'Sgwrs Tudalen',
             'da': u'Sidediskussion',
             'de': [u'Index Diskussion', u'Index talk'],
             'en': u'Page talk',
@@ -399,6 +392,7 @@ class Family(family.Family):
             'es': u'Índice Discusión',
             'et': [u'Registri arutelu', u'Index talk'],
             'fa': u'گفتگوی برگه',
+            'fi': u'Keskustelu sivusta',
             'fr': u'Discussion Page',
             'gu': u'પૃષ્ઠ ચર્ચા',
             'he': u'שיחת עמוד',
@@ -432,11 +426,13 @@ class Family(family.Family):
             'be': u'Індэкс',
             'bn': u'প্রবেশদ্বার',
             'ca': u'Autor',
+            'cy': u'Indecs',
             'da': u'Indeks',
             'en': u'Index',
             'eo': u'Indekso',
             'et': u'Autor',
             'fa': u'فهرست',
+            'fi': u'Hakemisto',
             'fr': u'Portail',
             'gu': u'સૂચિ',
             'he': u'ביאור',
@@ -466,11 +462,13 @@ class Family(family.Family):
             'be': u'Размовы пра індэкс',
             'bn': u'প্রবেশদ্বার আলাপ',
             'ca': u'Autor Discussió',
+            'cy': u'Sgwrs Indecs',
             'da': u'Indeksdiskussion',
             'en': u'Index talk',
             'eo': u'Indekso-Diskuto',
             'et': u'Autori arutelu',
             'fa': u'گفتگوی فهرست',
+            'fi': u'Keskustelu hakemistosta',
             'fr': u'Discussion Portail',
             'gu': u'સૂચિ ચર્ચા',
             'he': u'שיחת ביאור',
@@ -502,6 +500,7 @@ class Family(family.Family):
             'it': u'Pagina',
             'pt': u'Em Tradução',
             'sv': u'Index',
+            'zh': u'Transwiki',
         }
 
         self.namespaces[109] = {
@@ -512,6 +511,7 @@ class Family(family.Family):
             'it': u'Discussioni pagina',
             'pt': u'Discussão Em Tradução',
             'sv': u'Indexdiskussion',
+            'zh': u'Transwiki talk',
         }
 
         self.namespaces[110] = {

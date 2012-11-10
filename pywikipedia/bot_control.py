@@ -85,8 +85,8 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '10450'
-__release_ver__   = '1.3'   # increase minor (1.x) at re-merges with framework
+__framework_rev__ = '10687' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__release_ver__   = '1.4'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
 
@@ -424,9 +424,12 @@ def main():
     # processing of messages on bot discussion page
     if pywikibot.getSite().messages():
         pywikibot.output(u'====== new messages on bot discussion page (last few lines) ======')
-        messagesforbot = pywikibot.Page(pywikibot.getSite(), u'User:DrTrigonBot').toggleTalkPage().get(get_redirect=True)
+        messages_page  = pywikibot.Page(pywikibot.getSite(), u'User:DrTrigonBot').toggleTalkPage()
+        messagesforbot = messages_page.get(get_redirect=True)
         pywikibot.output( u'\n'.join(messagesforbot.splitlines()[-10:]) )
         pywikibot.output(u'==================================================================')
+        # purge/reset messages (remove this message from queue) by "viewing" it
+        pywikibot.getSite().getUrl( os.path.join('/wiki', messages_page.urlname()) )
 
     # modification of timezone to be in sync with wiki
     os.environ['TZ'] = 'Europe/Amsterdam'

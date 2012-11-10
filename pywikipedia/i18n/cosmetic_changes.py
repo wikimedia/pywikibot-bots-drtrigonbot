@@ -83,9 +83,10 @@ msg = {
 		'cosmetic_changes-append': u'; Newidiadau i ymddangosiad y dudalen',
 		'cosmetic_changes-standalone': u'Robot: Newidiadau i ymddangosiad y dudalen',
 	},
+	# Author: Christian List
 	'da': {
 		'cosmetic_changes-append': u'; kosmetiske ændringer',
-		'cosmetic_changes-standalone': u'Bot: Kosmetiske ændringer',
+		'cosmetic_changes-standalone': u'Robot: Kosmetiske ændringer',
 	},
 	'de': {
 		'cosmetic_changes-append': u'; kosmetische Änderungen',
@@ -94,7 +95,7 @@ msg = {
 	# Author: Erdemaslancan
 	'diq': {
 		'cosmetic_changes-append': u'; kozmetik vurnayışi',
-		'cosmetic_changes-standalone': u'Boti Kozmetik vurnayışi kerdi',
+		'cosmetic_changes-standalone': u'Boti vurnayışo kozmetik keno',
 	},
 	'el': {
 		'cosmetic_changes-append': u'; διακοσμητικές αλλαγές',
@@ -103,6 +104,11 @@ msg = {
 	'en': {
 		'cosmetic_changes-append': u'; cosmetic changes',
 		'cosmetic_changes-standalone': u'Robot: Cosmetic changes',
+	},
+	# Author: Remux
+	'eo': {
+		'cosmetic_changes-append': u'; kosmetikaj ŝanĝoj',
+		'cosmetic_changes-standalone': u'Roboto: Kosmetikaj ŝanĝoj',
 	},
 	# Author: Xqt
 	'es': {
@@ -136,7 +142,7 @@ msg = {
 	# Author: ChrisPtDe
 	'frp': {
 		'cosmetic_changes-append': u'; changement de tipo cosmètico',
-		'cosmetic_changes-standalone': u'Robot : Changement de tipo cosmètico',
+		'cosmetic_changes-standalone': u'Robot : changement de tipo cosmètico',
 	},
 	'frr': {
 		'cosmetic_changes-append': u'; kosmeetisk feranerangen',
@@ -180,6 +186,10 @@ msg = {
 		'cosmetic_changes-append': u'; kozmetikai változtatások',
 		'cosmetic_changes-standalone': u'Bot: kozmetikai változtatások',
 	},
+	# Author: Xelgen
+	'hy': {
+		'cosmetic_changes-append': u'; կոսմետիկ փոփոխություններ',
+	},
 	'ia': {
 		'cosmetic_changes-append': u'; cambios cosmetic',
 		'cosmetic_changes-standalone': u'Robot: Cambios cosmetic',
@@ -216,6 +226,11 @@ msg = {
 	'ja': {
 		'cosmetic_changes-append': u'; 細部の編集',
 		'cosmetic_changes-standalone': u'ロボットによる: 細部の編集',
+	},
+	# Author: NoiX180
+	'jv': {
+		'cosmetic_changes-append': u'; panggantèn kosmètik',
+		'cosmetic_changes-standalone': u'Bot: Panggantèn kosmètik',
 	},
 	'ko': {
 		'cosmetic_changes-append': u'; 예쁘게 바꿈',
@@ -267,6 +282,11 @@ msg = {
 		'cosmetic_changes-append': u'; козметички промени',
 		'cosmetic_changes-standalone': u'Бот: козметички промени',
 	},
+	# Author: Praveenp
+	'ml': {
+		'cosmetic_changes-append': u'; സൗന്ദര്യമാറ്റങ്ങൾ',
+		'cosmetic_changes-standalone': u'യന്ത്രം: സൗന്ദര്യമാറ്റങ്ങൾ',
+	},
 	'ms': {
 		'cosmetic_changes-append': u'; perubahan kosmetik',
 		'cosmetic_changes-standalone': u'Bot: perubahan kosmetik',
@@ -299,6 +319,11 @@ msg = {
 	'nn': {
 		'cosmetic_changes-append': u'; kosmetiske endringar',
 		'cosmetic_changes-standalone': u'robot: kosmetiske endringar',
+	},
+	# Author: Shisir 1945
+	'or': {
+		'cosmetic_changes-append': u'; ପ୍ରସାଧନ ବଦଳ',
+		'cosmetic_changes-standalone': u'ରୋବଟ୍‌: ପ୍ରସାଧନ ବଦଳ',
 	},
 	'pdc': {
 		'cosmetic_changes-append': u'; gleenere Enneringe',
@@ -375,6 +400,11 @@ msg = {
 		'cosmetic_changes-append': u'; kosmetiska ändringar',
 		'cosmetic_changes-standalone': u'Bot: Kosmetiska ändringar',
 	},
+	# Author: Przemub
+	'szl': {
+		'cosmetic_changes-append': u'; kosmetykŏ',
+		'cosmetic_changes-standalone': u'Robot: Kosmetykŏ',
+	},
 	# Author: செல்வா
 	'ta': {
 		'cosmetic_changes-append': u'; மேலோட்டமான மாற்றங்கள்',
@@ -419,9 +449,10 @@ msg = {
 	},
 	# Author: Candalua
 	# Author: Alunardon90
+	# Author: GatoSelvadego
 	'vec': {
-		'cosmetic_changes-append': u'; modifiche estetiche',
-		'cosmetic_changes-standalone': u'Robot: Modifiche estetiche',
+		'cosmetic_changes-append': u'; modifeghe esteteghe',
+		'cosmetic_changes-standalone': u'Robot: Modifeghe esteteghe',
 	},
 	# Author: Emaus
 	'vep': {
@@ -443,8 +474,8 @@ msg = {
 	},
 	# Author: Yfdyh000
 	'zh': {
-		'cosmetic_changes-append': u';整洁的变更',
-		'cosmetic_changes-standalone': u'机器人：整洁的变更',
+		'cosmetic_changes-append': u';整理源码',
+		'cosmetic_changes-standalone': u'机器人：整理源码',
 	},
 	# Author: Breawycker
 	# Author: Justincheng12345

@@ -4,11 +4,11 @@
 """
 #
 # (C) Bryan Tong Minh, 2008
-# (C) Pywikipedia bot team, 2008-2010
+# (C) Pywikipedia bot team, 2008-2012
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: revertbot.py 9683 2011-10-30 10:50:42Z xqt $'
+__version__ = '$Id: revertbot.py 10485 2012-08-15 14:13:57Z xqt $'
 #
 
 import re
@@ -47,7 +47,7 @@ class BaseRevertBot(object):
                 if 'error' in data:
                     raise RuntimeError(data['error'])
                 if 'query-continue' in data:
-                    predata['uccontinue'] = data['query-continue']['usercontribs']
+                    predata.update(data['query-continue']['usercontribs'])
                 else:
                     never_continue = True
                 iterator = iter(data['query']['usercontribs'])

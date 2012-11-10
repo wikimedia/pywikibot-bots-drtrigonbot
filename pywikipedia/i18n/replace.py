@@ -57,15 +57,16 @@ msg = {
 		'replace-replacing': u'Bot: Yn amnewid testun yn awtomatig %(description)s',
 	},
 	# Author: Sarrus
+	# Author: Christian List
 	'da': {
-		'replace-replacing': u'Bot: Automatisk teksterstatning: %(description)s',
+		'replace-replacing': u'Robot: Automatisk erstatning af tekst: %(description)s',
 	},
 	'de': {
 		'replace-replacing': u'Bot: Automatisierte Textersetzung %(description)s',
 	},
 	# Author: Erdemaslancan
 	'diq': {
-		'replace-replacing': u'Boti %(description)s metn vurnayış xob xo kerd',
+		'replace-replacing': u'Boti metne %(description)s xob xo vurna',
 	},
 	'el': {
 		'replace-replacing': u'Ρομπότ: Αυτόματη αντικατάσταση κειμένου %(description)s',
@@ -106,7 +107,7 @@ msg = {
 	},
 	# Author: ChrisPtDe
 	'frp': {
-		'replace-replacing': u'Bot : remplacement de tèxto ôtomatisâ %(description)s',
+		'replace-replacing': u'Robot : remplacement de tèxto ôtomatisâ %(description)s',
 	},
 	'frr': {
 		'replace-replacing': u'Bot: Automatisiaret ütjwakselt tekst %(description)s',
@@ -165,6 +166,10 @@ msg = {
 	'ja': {
 		'replace-replacing': u'ロボットによる: 文字置き換え %(description)s',
 	},
+	# Author: NoiX180
+	'jv': {
+		'replace-replacing': u'Bot: Panggantèn teks otomatis %(description)s',
+	},
 	'ka': {
 		'replace-replacing': u'რობოტი: ტექსტის ავტომატური შეცვლა %(description)s',
 	},
@@ -177,6 +182,10 @@ msg = {
 	},
 	'ksh': {
 		'replace-replacing': u'Bot: hät outomatesch Täx jetuusch: %(description)s',
+	},
+	# Author: Ghybu
+	'ku': {
+		'replace-replacing': u'Bot: Otomatîk nivîs guherandin %(description)s',
 	},
 	# Author: UV
 	'la': {
@@ -225,6 +234,10 @@ msg = {
 	# Author: Lionslayer
 	'my': {
 		'replace-replacing': u'ဘော့ - စာသားများကို အလိုအလျောက် အစားထိုးခြင်း %(description)s',
+	},
+	# Author: محک
+	'mzn': {
+		'replace-replacing': u'ربوت: بنویشته‌ئون خادکار عوض-بدل بیّن %(description)s',
 	},
 	'no': {
 		'replace-replacing': u'robot: automatisk teksterstatning: %(description)s',
@@ -339,6 +352,10 @@ msg = {
 	# Author: Minh Nguyen
 	'vi': {
 		'replace-replacing': u'Bot: Tự động thay thế văn bản %(description)s',
+	},
+	# Author: פוילישער
+	'yi': {
+		'replace-replacing': u'באט: אויטאמאטישער טעקסט טויש %(description)s',
 	},
 	# Author: Demmy
 	'yo': {

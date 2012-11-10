@@ -97,8 +97,9 @@ msg = {
 	},
 	# Author: Dferg
 	# Author: Xqt
+	# Author: Invadinado
 	'es': {
-		'isbn-formatting': u'Bot: dando formato al ISBN',
+		'isbn-formatting': u'Bot: Estandarizando ISBN',
 	},
 	# Author: Pikne
 	'et': {
@@ -161,6 +162,10 @@ msg = {
 	'hu': {
 		'isbn-formatting': u'Bot: ISBN formázása',
 	},
+	# Author: Xelgen
+	'hy': {
+		'isbn-formatting': u'Ռոբոտը ուղղում է ԳՄՍՀի (ISBN) ձևաչափը',
+	},
 	# Author: McDutchie
 	'ia': {
 		'isbn-formatting': u'Robot: Formatation ISBN',
@@ -189,6 +194,10 @@ msg = {
 	# Author: Shirayuki
 	'ja': {
 		'isbn-formatting': u'ロボットによる: ISBN の整形',
+	},
+	# Author: NoiX180
+	'jv': {
+		'isbn-formatting': u'Bot: Mormat ISBN',
 	},
 	# Author: Purodha
 	'ksh': {
@@ -340,6 +349,10 @@ msg = {
 	'sv': {
 		'isbn-formatting': u'Robot: Formaterar ISBN',
 	},
+	# Author: Przemub
+	'szl': {
+		'isbn-formatting': u'Robot: ISBN',
+	},
 	# Author: செல்வா
 	'ta': {
 		'isbn-formatting': u'தானியங்கி: ISBN ஐ வடிவமைத்தல்',
@@ -372,12 +385,17 @@ msg = {
 		'isbn-formatting': u'Робот: Форматування ISBN',
 	},
 	# Author: Alunardon90
+	# Author: GatoSelvadego
 	'vec': {
-		'isbn-formatting': u'Robot: Formatasion de\'l ISBN',
+		'isbn-formatting': u'Robot: Formatasion del ISBN',
 	},
 	# Author: Minh Nguyen
 	'vi': {
 		'isbn-formatting': u'Bot: Định dạng ISBN',
+	},
+	# Author: Harvzsf
+	'war': {
+		'isbn-formatting': u'Robot: Ginfoformat an ISBN',
 	},
 	# Author: פוילישער
 	'yi': {

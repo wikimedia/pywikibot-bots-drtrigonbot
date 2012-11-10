@@ -54,15 +54,17 @@ msg = {
 	'cs': {
 		'noreferences-add-tag': u'Robot doplnil chybějící <references />',
 	},
+	# Author: Christian List
+	# Author: Kaare
 	'da': {
-		'noreferences-add-tag': u'Bot: Tilføj manglede {{reflist}}',
+		'noreferences-add-tag': u'Robot: Tilføjer manglende <references />-tag',
 	},
 	'de': {
 		'noreferences-add-tag': u'Bot: Trage fehlendes <references /> nach',
 	},
 	# Author: Erdemaslancan
 	'diq': {
-		'noreferences-add-tag': u'Boti etiketê <references /> dekerd de',
+		'noreferences-add-tag': u'Boti etiketo ke kemiyo <references /> o dekerd de',
 	},
 	# Author: Geraki
 	'el': {
@@ -75,19 +77,21 @@ msg = {
 		'noreferences-add-tag': u'Roboto: Aldono de "<references />"',
 	},
 	# Author: Vivaelcelta
+	# Author: Invadinado
 	'es': {
-		'noreferences-add-tag': u'Bot: Añado la etiqueta que faltaba <references />',
+		'noreferences-add-tag': u'Bot: Añadiendo etiqueta <references /> que faltaba',
 	},
 	# Author: Pikne
 	'et': {
-		'noreferences-add-tag': u'Robot: lisatud puuduv <references />-märgend',
+		'noreferences-add-tag': u'Robot: lisatud puuduv <references />-silt',
 	},
 	# Author: ZxxZxxZ
 	'fa': {
 		'noreferences-add-tag': u'ربات: افزودن برچسب <references /> که فراموش شده بود',
 	},
+	# Author: Crt
 	'fi': {
-		'noreferences-add-tag': u'Botti lisäsi puuttuvan {{viitteet}}-mallineen',
+		'noreferences-add-tag': u'Botti lisäsi puuttuvan <references />-elementin',
 	},
 	# Author: EileenSanda
 	'fo': {
@@ -146,6 +150,10 @@ msg = {
 	# Author: Shirayuki
 	'ja': {
 		'noreferences-add-tag': u'ロボットによる: <references /> タグの補完',
+	},
+	# Author: NoiX180
+	'jv': {
+		'noreferences-add-tag': u'Bot: Nambahaké tag <references /> sing ilang',
 	},
 	'ko': {
 		'noreferences-add-tag': u'봇: 이전에 없던 <references /> 추가',
@@ -223,6 +231,10 @@ msg = {
 	'pt-br': {
 		'noreferences-add-tag': u'Bot: Adicionando tag <references />',
 	},
+	# Author: Xqt
+	'qqq': {
+		'noreferences-add-tag': u'Edit summary when the bot adds a missing <code><references /></code> tag to the references section and if needed the section itself.\n\nDo not translate <code><references /></code>.',
+	},
 	# Author: Minisarm
 	'ro': {
 		'noreferences-add-tag': u'Robot: Adăugat tagul lipsă <references />',
@@ -284,6 +296,10 @@ msg = {
 	# Author: Minh Nguyen
 	'vi': {
 		'noreferences-add-tag': u'Bot: Thêm thẻ <references /> bị thiếu',
+	},
+	# Author: Harvzsf
+	'war': {
+		'noreferences-add-tag': u'Robot: Gindudugang an mga kulang nga mga <references /> nga tag',
 	},
 	# Author: פוילישער
 	'yi': {

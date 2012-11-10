@@ -159,11 +159,10 @@ talk about HTTP, where the typo has become part of the standard:
 
 Please type "replace.py -help | more" if you can't read the top of the help.
 """
-from __future__ import generators
 #
 # (C) Daniel Herding & the Pywikipedia team, 2004-2012
 #
-__version__='$Id: replace.py 10163 2012-05-01 14:40:41Z xqt $'
+__version__='$Id: replace.py 10576 2012-10-14 17:16:30Z xqt $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -496,8 +495,8 @@ class ReplaceRobot:
                     continue
                 if choice == 'b':
                     webbrowser.open("http://%s%s" % (
-                        page.site().hostname(),
-                        page.site().nice_get_address(page.title())
+                        page.site.hostname(),
+                        page.site.nice_get_address(page.title())
                     ))
                     i18n.input('pywikibot-enter-finished-browser')
                     try:

@@ -338,47 +338,21 @@ that you have to break it off, use "-continue" next time.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: interwiki.py 10244 2012-05-24 13:07:23Z xqt $'
+__version__ = '$Id: interwiki.py 10659 2012-11-04 09:17:59Z xqt $'
 #
 
 import sys, copy, re, os
 import time
 import codecs
 import socket
-
-try:
-    set # introduced in Python 2.4: faster and future
-except NameError:
-    from sets import Set as set
-
-try: sorted ## Introduced in 2.4
-except NameError:
-    def sorted(seq, cmp=None, key=None, reverse=False):
-        """Copy seq and sort and return it.
-        >>> sorted([3, 1, 2])
-        [1, 2, 3]
-        """
-        seq2 = copy.copy(seq)
-        if key:
-            if cmp is None:
-                cmp = __builtins__.cmp
-            seq2.sort(lambda x,y: cmp(key(x), key(y)))
-        else:
-            if cmp is None:
-                seq2.sort()
-            else:
-                seq2.sort(cmp)
-        if reverse:
-            seq2.reverse()
-        return seq2
-
+import webbrowser
 import wikipedia as pywikibot
 import config
 import catlib
 import pagegenerators
 from pywikibot import i18n
-import titletranslate, interwiki_graph
-import webbrowser
+import interwiki_graph
+import titletranslate
 
 docuReplacements = {
     '&pagegenerators_help;': pagegenerators.parameterHelp
@@ -403,6 +377,10 @@ class GiveUpOnPage(pywikibot.Error):
 # Subpage templates. Must be in lower case,
 # whereas subpage itself must be case sensitive
 moved_links = {
+    'ar' : ([u'documentation',
+             u'template documentation',
+             u'شرح',
+             u'توثيق'], u'/doc'),
     'bn' : (u'documentation', u'/doc'),
     'ca' : (u'ús de la plantilla', u'/ús'),
     'cs' : (u'dokumentace',   u'/doc'),
@@ -434,6 +412,7 @@ moved_links = {
     'hsb': ([u'dokumentacija', u'doc'], u'/Dokumentacija'),
     'hu' : (u'sablondokumentáció', u'/doc'),
     'id' : (u'template doc',  u'/doc'),
+    'ilo': (u'documentation', u'/doc'),
     'ja' : (u'documentation', u'/doc'),
     'ka' : (u'თარგის ინფო',   u'/ინფო'),
     'ko' : (u'documentation', u'/설명문서'),
@@ -444,6 +423,7 @@ moved_links = {
     'pt' : ([u'documentação', u'/doc'],  u'/doc'),
     'ro' : (u'documentaţie',  u'/doc'),
     'ru' : (u'doc',           u'/doc'),
+    'simple': ('documentation', u'/doc'),
     'sv' : (u'dokumentation', u'/dok'),
     'uk' : ([u'документація',
              u'doc',
@@ -466,6 +446,7 @@ ignoreTemplates = {
     'en' : [u'inuse', u'softredirect'],
     'fa' : [u'در دست ویرایش ۲', u'حذف سریع'],
     'pdc': [u'lösche'],
+    'zh' : [u'inuse'],
 }
 
 class Global(object):
@@ -1572,6 +1553,12 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                 time1 = str(time1)
             if type(time2) is long:
                 time2 = str(time2)
+            if '-' in time1:
+                pywikibot.output(u'BUG>>> in %s' % self.originPage.aslink(True))
+                pywikibot.output(u'time1:%s' % time1)
+                pywikibot.output(u'time2:%s' % time2)
+                time1 = str(pywikibot.parsetime2stamp(time1))
+
             t1 = (((int(time1[0:4]) * 12 + int(time1[4:6])) * 30 +
                    int(time1[6:8])) * 24 + int(time1[8:10])) * 60 + \
                    int(time1[10:12])
@@ -1674,13 +1661,21 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                             break
         else:
             for (site, page) in new.iteritems():
+                # edit restriction for some templates on zh-wiki where interlanguage keys are included
+                # by /doc subpage
+                smallWikiAllowed = not (page.site.sitename() == 'wikipedia:zh' and
+                                        page.namespace() == 10 and
+                                        u'Country data' in page.title(withNamespace=False))
                 # edit restriction on is-wiki
                 # http://is.wikipedia.org/wiki/Wikipediaspjall:V%C3%A9lmenni
+                # and zh-wiki for template namespace which prevents increasing the queue
                 # allow edits for the same conditions as -whenneeded
                 # or the last edit wasn't a bot
                 # or the last edit was 1 month ago
-                smallWikiAllowed = True
-                if globalvar.autonomous and page.site.sitename() == 'wikipedia:is':
+                if smallWikiAllowed and globalvar.autonomous and \
+                   (page.site.sitename() == 'wikipedia:is' or
+                    page.site.sitename() == 'wikipedia:zh' and
+                    page.namespace() == 10):
                     old={}
                     try:
                         for mypage in new[page.site].interwiki():
@@ -1852,7 +1847,7 @@ u'NOTE: number of edits are restricted at %s'
                 if not globalvar.cleanup and not globalvar.force or \
                    globalvar.cleanup and \
                    unicode(rmPage) not in globalvar.remove or \
-                   rmPage.site.lang in ['hak', 'hi', 'cdo'] and \
+                   rmPage.site.lang in ['hak', 'hi', 'cdo', 'sa'] and \
                    pywikibot.unicode_error: #work-arround for bug #3081100 (do not remove affected pages)
                     new[rmsite] = rmPage
                     pywikibot.output(
@@ -2325,6 +2320,11 @@ def compareLanguages(old, new, insite):
         commentname += '-removing'
     if modifying:
         commentname += '-modifying'
+    if commentname == 'interwiki-modifying' and len(modifying) == 1:
+        useFrom = True
+        commentname += '-from'
+    else:
+        useFrom = False
 
     if adding or removing or modifying:
         #Version info marks bots without unicode error
@@ -2336,10 +2336,11 @@ def compareLanguages(old, new, insite):
 
         changes = {'adding':    ', '.join([fmt(new, x) for x in adding]),
                    'removing':  ', '.join([fmt(old, x) for x in removing]),
-                   'modifying': ', '.join([fmt(new, x) for x in modifying])}
+                   'modifying': ', '.join([fmt(new, x) for x in modifying]),
+                   'from': u'' if not useFrom else old[modifying[0]]}
 
         mcomment += i18n.twtranslate(insite.lang, commentname) % changes
-        mods = i18n.twtranslate('en', commentname) % changes
+        mods = i18n.twtranslate(config.userinterface_lang, commentname) % changes
 
     return mods, mcomment, adding, removing, modifying
 

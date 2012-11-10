@@ -63,7 +63,7 @@ Options (may be omitted):
   -L LANG, --lang=LANG  set the language code to work on
   -n NAMESPACE, --namespace=NAMESPACE
                         only archive pages from a given namespace
-  -p PAGE, --page=PAGE  archive a single PAGE
+  -p PAGE, --page=PAGE  archive a single PAGE, default ns is a user talk page
   -s SALT, --salt=SALT  specify salt
   -S --simulate         Do not change pages, just simulate
 """
@@ -74,7 +74,7 @@ Options (may be omitted):
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: archivebot.py 10202 2012-05-07 12:21:06Z xqt $'
+__version__ = '$Id: archivebot.py 10623 2012-10-28 11:48:28Z xqt $'
 #
 import wikipedia as pywikibot
 from pywikibot import i18n
@@ -230,6 +230,9 @@ class DiscussionThread(object):
 # 14:23, 12. Jan. 2009 (UTC)
             pat = re.compile(r'(\d\d):(\d\d), (\d\d?)\. (\S+)\.? (\d\d\d\d) \((?:UTC|CES?T)\)')
             TM = pat.search(line)
+# ro.wiki: 4 august 2012 13:01 (EEST)
+        if not TM:
+            TM = re.search(r'(\d\d?) (\S+) (\d\d\d\d) (\d\d):(\d\d) \(.*?\)', line)
         if TM:
             TIME = txt2timestamp(TM.group(0),"%d. %b %Y kl. %H:%M (%Z)")
             if not TIME:
@@ -252,6 +255,8 @@ class DiscussionThread(object):
                 TIME = txt2timestamp(TM.group(0),"%H:%M, %B %d, %Y (%Z)")
             if not TIME:
                 TIME = txt2timestamp(TM.group(0),"%d. %Bta %Y kello %H.%M (%Z)")
+            if not TIME:
+                TIME = txt2timestamp(TM.group(0),"%d %B %Y %H:%M (%Z)")
             if not TIME:
                 TIME = txt2timestamp(re.sub(' *\([^ ]+\) *', '', TM.group(0)), "%H:%M, %d. %b. %Y")
             if TIME:
@@ -285,7 +290,7 @@ class DiscussionPage(pywikibot.Page):
     page. Feed threads to it and run an update() afterwards."""
 
     def __init__(self, title, archiver, vars=None):
-        pywikibot.Page.__init__(self, Site, title, defaultNamespace=3)
+        pywikibot.Page.__init__(self, Site, title)
         self.threads = []
         self.full = False
         self.archiver = archiver
@@ -367,7 +372,7 @@ class PageArchiver(object):
         self.tpl = tpl
         self.salt = salt
         self.force = force
-        self.Page = DiscussionPage(Page.title(),self)
+        self.Page = DiscussionPage(Page.title(), self)
         self.loadConfig()
         self.commentParams = {
                 'from' : self.Page.title(),
@@ -405,7 +410,7 @@ class PageArchiver(object):
         for tpl in self.Page.templatesWithParams(thistxt=self.Page.header):
             if tpl[0] == self.tpl:
                 for param in tpl[1]:
-                    item, value = param.split('=')
+                    item, value = param.split('=', 1)
                     self.set(item.strip(), value.strip())
                 found = True
                 break
@@ -427,7 +432,7 @@ class PageArchiver(object):
            and not self.key_ok():
             raise ArchiveSecurityError
         if not archive in self.archives:
-            self.archives[archive] = DiscussionPage(archive,self,vars)
+            self.archives[archive] = DiscussionPage(archive, self, vars)
         return self.archives[archive].feedThread(thread,maxArchiveSize)
 
     def analyzePage(self):
@@ -583,7 +588,8 @@ def main():
             for pg in file(options.filename,'r').readlines():
                 pagelist.append(pywikibot.Page(Site,pg))
         if options.pagename:
-            pagelist.append(pywikibot.Page(Site,options.pagename))
+            pagelist.append(pywikibot.Page(Site, options.pagename,
+                                           defaultNamespace=3))
 
         pagelist = sorted(pagelist)
         #if not options.namespace == None:

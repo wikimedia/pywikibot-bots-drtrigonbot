@@ -40,7 +40,7 @@ This script understands the following command-line arguments:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: clean_sandbox.py 10231 2012-05-20 19:56:01Z amir $'
+__version__ = '$Id: clean_sandbox.py 10606 2012-10-24 12:46:39Z amir $'
 #
 
 import time
@@ -92,7 +92,7 @@ sandboxTitle = {
     'da': u'Project:Sandkassen',
     'de': u'Project:Spielwiese',
     'en': u'Project:Sandbox',
-    'fa': [u'Project:صفحه تمرین', u'Project:آشنایی'],
+    'fa': [u'Project:صفحه تمرین', u'Project:آشنایی با ویرایش'],
     'fi': u'Project:Hiekkalaatikko',
     'fr': u'Project:Bac à sable',
     'he': u'Project:ארגז חול',

@@ -18,19 +18,17 @@ These parameters are supported to specify which pages titles to print:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: pagegenerators.py 10417 2012-06-23 16:12:26Z multichill $'
+__version__='$Id: pagegenerators.py 10574 2012-10-14 16:48:33Z xqt $'
 
-import wikipedia as pywikibot
-from pywikibot import deprecate_arg, i18n
-import config
-
-import traceback
 import re
 import sys
 import codecs
 import datetime
-
 import urllib, urllib2, time
+import traceback
+import wikipedia as pywikibot
+import config
+from pywikibot import deprecate_arg, i18n
 import date, catlib, userlib, query
 
 parameterHelp = u"""\
@@ -257,7 +255,7 @@ class GeneratorFactory(object):
                               "%s:%s" % (site.namespace(14), categoryname))
         return CategorizedPageGenerator(cat, start=startfrom, recurse=recurse)
 
-    def setSubCategoriesGen(self, arg, length, recurse = False):
+    def setSubCategoriesGen(self, arg, length, recurse=False):
         site = pywikibot.getSite()
         if len(arg) == length:
             categoryname = i18n.input('pywikibot-enter-category-name')
@@ -273,7 +271,8 @@ class GeneratorFactory(object):
 
         cat = catlib.Category(site,
                               "%s:%s" % (site.namespace(14), categoryname))
-        return SubCategoriesPageGenerator(cat, start=startfrom, recurse=recurse)
+        return SubCategoriesPageGenerator(cat,
+               start=startfrom, recurse=recurse)
 
     def handleArg(self, arg):
         """Parse one argument at a time.
@@ -291,14 +290,15 @@ class GeneratorFactory(object):
             fileLinksPageTitle = arg[11:]
             if not fileLinksPageTitle:
                 fileLinksPageTitle = i18n.input(
-                                        'pywikibot-enter-file-links-processing')
+                    'pywikibot-enter-file-links-processing')
             if fileLinksPageTitle.startswith(site.namespace(6)
                                              + ":"):
                 fileLinksPage = pywikibot.ImagePage(site,
                                                     fileLinksPageTitle)
             else:
                 fileLinksPage = pywikibot.ImagePage(site,
-                                                'Image:' + fileLinksPageTitle)
+                                                    'Image:' +
+                                                    fileLinksPageTitle)
             gen = FileLinksGenerator(fileLinksPage)
         elif arg.startswith('-unusedfiles'):
             if len(arg) == 12:
@@ -333,17 +333,17 @@ class GeneratorFactory(object):
             if len(arg) == 15:
                 gen = RandomRedirectPageGenerator()
             else:
-                gen = RandomRedirectPageGenerator(number = int(arg[16:]))
+                gen = RandomRedirectPageGenerator(number=int(arg[16:]))
         elif arg.startswith('-random'):
             if len(arg) == 7:
                 gen = RandomPageGenerator()
             else:
-                gen = RandomPageGenerator(number = int(arg[8:]))
+                gen = RandomPageGenerator(number=int(arg[8:]))
         elif arg.startswith('-recentchanges'):
             if len(arg) == 14:
                 gen = RecentchangesPageGenerator()
             else:
-                gen = RecentchangesPageGenerator(number = int(arg[15:]))
+                gen = RecentchangesPageGenerator(number=int(arg[15:]))
             gen = DuplicateFilterPageGenerator(gen)
         elif arg.startswith('-file'):
             textfilename = arg[6:]
@@ -558,16 +558,16 @@ def LogpagesPageGenerator(number=500, mode='', user=None, repeat=False,
                               repeat=repeat, namespace=namespace):
         yield page[0]
 
-def NewpagesPageGenerator(number=100, get_redirect=False, repeat=False, site=None,
-                          namespace=0):
+@deprecate_arg("get_redirect", None) #20120822
+def NewpagesPageGenerator(number=100, repeat=False, site=None, namespace=0):
     """
     Iterate Page objects for all new titles in a single namespace.
     """
     # defaults to namespace 0 because that's how Special:Newpages defaults
     if site is None:
         site = pywikibot.getSite()
-    for item in site.newpages(number=number, get_redirect=get_redirect,
-                              repeat=repeat, namespace=namespace):
+    for item in site.newpages(number=number, repeat=repeat, namespace=namespace,
+                              rcshow=['!redirect']):
         yield item[0]
 
 def RecentchangesPageGenerator(number=100, site=None):

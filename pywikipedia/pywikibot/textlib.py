@@ -11,7 +11,7 @@ and return a unicode string.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: textlib.py 10322 2012-06-08 07:29:39Z xqt $'
+__version__ = '$Id: textlib.py 10634 2012-10-31 16:58:50Z xqt $'
 
 
 import wikipedia as pywikibot
@@ -81,7 +81,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         # templates cascaded up to level 2, but no deeper. For arbitrary
         # depth, we'd need recursion which can't be done in Python's re.
         # After all, the language of correct parenthesis words is not regular.
-        'template':    re.compile(r'(?s){{(({{.*?}})|.)*}}'),
+        'template':    re.compile(r'(?s){{(({{.*?}})?.*?)*}}'),
         'hyperlink':   compileLinkR(),
         'gallery':     re.compile(r'(?is)<gallery.*?>.*?</gallery>'),
         # this matches internal wikilinks, but also interwiki, categories, and

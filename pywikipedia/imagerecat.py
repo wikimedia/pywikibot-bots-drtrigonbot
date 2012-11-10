@@ -24,7 +24,7 @@ The following command line parameters are supported:
                 wps : Work on all wikipedia's
 
 """
-__version__ = '$Id: imagerecat.py 9692 2011-10-30 15:03:29Z xqt $'
+__version__ = '$Id: imagerecat.py 10664 2012-11-05 20:57:05Z multichill $'
 #
 #  (C) Multichill 2008-2011
 #  (C) Pywikipedia bot team, 2008-2011
@@ -282,9 +282,9 @@ def getUsage(use):
 def applyAllFilters(categories):
     ''' Apply all filters on categories. '''
     result = []
-    result = filterBlacklist(categories)
-    result = filterDisambiguation(result)
+    result = filterDisambiguation(categories)
     result = followRedirects(result)
+    result = filterBlacklist(result)
     result = filterCountries(result)
     result = filterParents(result)
     return result

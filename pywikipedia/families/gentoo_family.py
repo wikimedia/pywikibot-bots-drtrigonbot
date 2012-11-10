@@ -1,9 +1,8 @@
 # -*- coding: utf-8  -*-
 
-import urllib
-import family, config
+import family
 
-__version__ = '$Id: gentoo_family.py 7008 2009-07-01 06:14:26Z alexsh $'
+__version__ = '$Id: gentoo_family.py 10502 2012-08-23 10:22:31Z xqt $'
 
 # An inofficial Gentoo wiki project.
 # Ask for permission at http://gentoo-wiki.com/Help:Bots before running a bot.

@@ -28,16 +28,22 @@ msg = {
 	'bs': {
 		'fixing_redirects-fixing': u'Bot: Ispravljanje preusmjeravanja.',
 	},
+	# Author: Vriullop
+	'ca': {
+		'fixing_redirects-fixing': u'Bot: arreglant redireccions',
+	},
 	# Author: Asoxor
+	# Author: Calak
 	'ckb': {
-		'fixing_redirects-fixing': u'بۆت: چاکسازیی ڕەوانەکردنەوەکان',
+		'fixing_redirects-fixing': u'بۆت: چاکسازیی ڕەوانەکەرەکان',
 	},
 	'cs': {
 		'fixing_redirects-fixing': u'Robot opravil přesměrování',
 	},
 	# Author: Sarrus
+	# Author: Christian List
 	'da': {
-		'fixing_redirects-fixing': u'Bot: Retter omdirigering',
+		'fixing_redirects-fixing': u'Robot: Retter omdirigeringer',
 	},
 	# Author: Purodha
 	'de': {
@@ -45,7 +51,7 @@ msg = {
 	},
 	# Author: Erdemaslancan
 	'diq': {
-		'fixing_redirects-fixing': u'Boti hetenayışi kerdi araşt',
+		'fixing_redirects-fixing': u'Boti hetenayışi timar kerdi',
 	},
 	# Author: Geraki
 	'el': {
@@ -53,6 +59,10 @@ msg = {
 	},
 	'en': {
 		'fixing_redirects-fixing': u'Bot: Fixing redirects',
+	},
+	# Author: Remux
+	'eo': {
+		'fixing_redirects-fixing': u'Boto: Riparante redirektilojn',
 	},
 	# Author: Armando-Martin
 	'es': {
@@ -77,6 +87,10 @@ msg = {
 	'fr': {
 		'fixing_redirects-fixing': u'Robot: Correction des redirections',
 	},
+	# Author: ChrisPtDe
+	'frp': {
+		'fixing_redirects-fixing': u'Robot : corrèccion de les redirèccions',
+	},
 	# Author: Murma174
 	'frr': {
 		'fixing_redirects-fixing': u'Bot: Maage widjerfeerangen hial',
@@ -91,6 +105,10 @@ msg = {
 	},
 	'he': {
 		'fixing_redirects-fixing': u'בוט: מתקן הפניות',
+	},
+	# Author: Ex13
+	'hr': {
+		'fixing_redirects-fixing': u'Bot: popravljanje preusmjeravanja',
 	},
 	# Author: Dj
 	'hu': {
@@ -120,9 +138,17 @@ msg = {
 	'ja': {
 		'fixing_redirects-fixing': u'ロボットによる: リダイレクト回避',
 	},
+	# Author: NoiX180
+	'jv': {
+		'fixing_redirects-fixing': u'Bot: Mbeneraké pangalihan',
+	},
 	# Author: Purodha
 	'ksh': {
 		'fixing_redirects-fixing': u'Bot: Ömleidong repareere.',
+	},
+	# Author: George Animal
+	'ku': {
+		'fixing_redirects-fixing': u'Bot:Beralîkirinan serast bike',
 	},
 	# Author: Robby
 	'lb': {
@@ -132,9 +158,17 @@ msg = {
 	'li': {
 		'fixing_redirects-fixing': u'Bot: fix redireks',
 	},
+	# Author: Papuass
+	'lv': {
+		'fixing_redirects-fixing': u'Robots: Labo pāradresācijas',
+	},
 	# Author: StefanusRA
 	'map-bms': {
 		'fixing_redirects-fixing': u'Bot: Mbenerna pengalihan',
+	},
+	# Author: Jagwar
+	'mg': {
+		'fixing_redirects-fixing': u'Rôbô: fanitsiana fihodinana',
 	},
 	# Author: Bjankuloski06
 	'mk': {
@@ -143,6 +177,10 @@ msg = {
 	# Author: Anakmalaysia
 	'ms': {
 		'fixing_redirects-fixing': u'Bot: Membaiki lencongan',
+	},
+	# Author: Chrisportelli
+	'mt': {
+		'fixing_redirects-fixing': u'Bot: Tiswija tar-rindirizzi',
 	},
 	'no': {
 		'fixing_redirects-fixing': u'Robot: Retter omdirigeringer',
@@ -190,6 +228,10 @@ msg = {
 	'sl': {
 		'fixing_redirects-fixing': u'Bot: Popravljanje preusmeritev',
 	},
+	# Author: Euriditi
+	'sq': {
+		'fixing_redirects-fixing': u'Roboti: Duke korrigjuar ridrejtimet',
+	},
 	# Author: Rancher
 	'sr': {
 		'fixing_redirects-fixing': u'Бот: исправљена преусмерења',
@@ -201,9 +243,17 @@ msg = {
 	'sv': {
 		'fixing_redirects-fixing': u'Bot: Rättar omdirigeringar',
 	},
+	# Author: Przemub
+	'szl': {
+		'fixing_redirects-fixing': u'Bot: Naprawianiy pukniyńć',
+	},
 	# Author: Aswn
 	'ta': {
 		'fixing_redirects-fixing': u'தானியங்கி: வழிமாற்றிகள் சரிபார்க்கப்படுகின்றன',
+	},
+	# Author: Veeven
+	'te': {
+		'fixing_redirects-fixing': u'బాటు: దారిమార్పులను సరిచేసింది',
 	},
 	# Author: AnakngAraw
 	'tl': {
@@ -232,13 +282,17 @@ msg = {
 	'wa': {
 		'fixing_redirects-fixing': u'Robot: coridjaedje des redjiblaedjes',
 	},
+	# Author: Harvzsf
+	'war': {
+		'fixing_redirects-fixing': u'Bot: Gin-aayad in mga redirek',
+	},
 	# Author: פוילישער
 	'yi': {
 		'fixing_redirects-fixing': u'באט: פאררעכטן ווײַטערפירונגען',
 	},
-	# Author: Anakmalaysia
+	# Author: Yfdyh000
 	'zh': {
-		'fixing_redirects-fixing': u'机器人：修理重定向',
+		'fixing_redirects-fixing': u'机器人：修正重定向',
 	},
 	# Author: Breawycker
 	# Author: Justincheng12345

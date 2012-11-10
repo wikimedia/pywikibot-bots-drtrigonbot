@@ -30,7 +30,7 @@ Todo:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: flickrripper.py 10401 2012-06-21 06:18:43Z xqt $'
+__version__ = '$Id: flickrripper.py 10559 2012-10-12 22:55:43Z platonides $'
 
 import sys, urllib, re,  StringIO, hashlib, base64, time
 import wikipedia as pywikibot
@@ -495,13 +495,22 @@ def main():
     #imagerecat.initLists()
 
     #Get the api key
-    if config.flickr['api_key']:
-        flickr = flickrapi.FlickrAPI(config.flickr['api_key'])
-    else:
+    if not config.flickr['api_key']:
         pywikibot.output('Flickr api key not found! Get yourself an api key')
         pywikibot.output(
             'Any flickr user can get a key at http://www.flickr.com/services/api/keys/apply/')
         return
+
+    if config.flickr['api_secret']:
+        flickr = flickrapi.FlickrAPI(config.flickr['api_key'], config.flickr['api_secret'])
+        (token, frob) = flickr.get_token_part_one(perms='read')
+        if not token: # The user still hasn't authorised this app yet, get_token_part_one() will have spawn a browser window
+            pywikibot.input("Press ENTER after you authorized this program")
+        flickr.get_token_part_two((token, frob))
+    else:
+        print 'Accessing public content only'
+        flickr = flickrapi.FlickrAPI(config.flickr['api_key'])
+
 
     group_id = u''
     photoset_id = u''

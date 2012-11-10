@@ -3,15 +3,16 @@
 Library to work with users, their pages and talk pages.
 """
 #
-# (C) Pywikipedia bot team, 2008-2010
+# (C) Pywikipedia bot team, 2008-2012
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: userlib.py 10445 2012-07-08 10:08:16Z xqt $'
+__version__ = '$Id: userlib.py 10485 2012-08-15 14:13:57Z xqt $'
 
 import re
 import wikipedia as pywikibot
 import query, config
+
 
 class AutoblockUser(pywikibot.Error):
     """
@@ -19,21 +20,30 @@ class AutoblockUser(pywikibot.Error):
     an action is requested on a virtual autoblock user that's not available
     for him (i.e. roughly everything except unblock).
     """
+
+
 class UserActionRefuse(pywikibot.Error): pass
+
 
 class BlockError(UserActionRefuse): pass
 
+
 class AlreadyBlocked(BlockError): pass
+
 
 class UnblockError(UserActionRefuse): pass
 
+
 class BlockIDError(UnblockError): pass
 
+
 class AlreadyUnblocked(UnblockError): pass
+
 
 class InvalidUser(pywikibot.InvalidTitle):
     """The mediawiki API does not allow IP lookups."""
     pass
+
 
 ip_regexp = re.compile(r'^(?:(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}'
                        r'(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|'
@@ -327,7 +337,7 @@ class User(object):
                 if nbresults >= limit:
                     break
             if 'query-continue' in result and nbresults < limit:
-                params['ucstart'] = result['query-continue']['usercontribs']['ucstart']
+                params.update(result['query-continue']['usercontribs'])
             else:
                 break
         return
@@ -537,6 +547,7 @@ class User(object):
             raise UnblockError, data
         return True
 
+
 def getall(site, users, throttle=True, force=False):
     """Bulk-retrieve users data from site
 
@@ -561,6 +572,7 @@ def getall(site, users, throttle=True, force=False):
                 users[urg:urg + 250] = k
     else:
         _GetAllUI(site, users, throttle, force).run()
+
 
 class _GetAllUI(object):
     def __init__(self, site, users, throttle, force):
@@ -620,6 +632,7 @@ class _GetAllUI(object):
                 raise InvalidUser("User name '%s' is invalid. IP addresses are not supported." % user['name'])
             users[user['name']] = user
         return users
+
 
 if __name__ == '__main__':
     """

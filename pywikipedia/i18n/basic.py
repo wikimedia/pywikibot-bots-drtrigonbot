@@ -12,6 +12,10 @@ msg = {
 	'ar': {
 		'basic-changing': u'بوت: تغيير ...',
 	},
+	# Author: Man2fly2002
+	'arc': {
+		'basic-changing': u'ܪܘܒܘܛ: ܫܚܠܦܬܐ ...',
+	},
 	# Author: Xuacu
 	# Author: Esbardu
 	'ast': {
@@ -67,8 +71,10 @@ msg = {
 		'basic-changing': u'Bot: Yn newid ...',
 	},
 	# Author: Sarrus
+	# Author: Christian List
+	# Author: Kaare
 	'da': {
-		'basic-changing': u'Bot: Ændrer',
+		'basic-changing': u'Robot: Ændrer ...',
 	},
 	'de': {
 		'basic-changing': u'Bot: Ändere ...',
@@ -118,7 +124,7 @@ msg = {
 	},
 	# Author: ChrisPtDe
 	'frp': {
-		'basic-changing': u'Robot : Changiê ...',
+		'basic-changing': u'Robot : changement ...',
 	},
 	# Author: Murma174
 	'frr': {
@@ -188,6 +194,14 @@ msg = {
 	'ja': {
 		'basic-changing': u'ロボットによる: 編集',
 	},
+	# Author: NoiX180
+	'jv': {
+		'basic-changing': u'Bot: Ngganti ...',
+	},
+	# Author: Amazigh84
+	'kab': {
+		'basic-changing': u'Aṛubut: Azdam ...',
+	},
 	# Author: វ័ណថារិទ្ធ
 	'km': {
 		'basic-changing': u'Bot: កំពុងផ្លាស់ប្ដូរ ...',
@@ -198,6 +212,10 @@ msg = {
 	},
 	'ksh': {
 		'basic-changing': u'Bot: Änderung ...',
+	},
+	# Author: George Animal
+	'ku': {
+		'basic-changing': u'Robot: Diguherîne ...',
 	},
 	# Author: UV
 	'la': {
@@ -275,6 +293,10 @@ msg = {
 	'nds-nl': {
 		'basic-changing': u'Bot: wieziging ...',
 	},
+	# Author: सरोज कुमार ढकाल
+	'ne': {
+		'basic-changing': u'रोबोट : परिवर्तन गर्दै ...',
+	},
 	# Author: Siebrand
 	'nl': {
 		'basic-changing': u'Robot: bezig met wijzigen...',
@@ -284,6 +306,10 @@ msg = {
 	# Author: Njardarlogar
 	'nn': {
 		'basic-changing': u'robot: endrar...',
+	},
+	# Author: Jnanaranjan Sahu
+	'or': {
+		'basic-changing': u'Robot: ବଦଳଯାଉଛି...',
 	},
 	# Author: Xqt
 	'pdc': {
@@ -348,6 +374,10 @@ msg = {
 	'sw': {
 		'basic-changing': u'Karagosi: Yafanya mabadiliko ...',
 	},
+	# Author: Przemub
+	'szl': {
+		'basic-changing': u'Robot pomjyńo...',
+	},
 	# Author: செல்வா
 	'ta': {
 		'basic-changing': u'தானியங்கி: மாற்றம் ...',
@@ -373,8 +403,16 @@ msg = {
 	'tt': {
 		'basic-changing': u'Робот: үзгәртте ...',
 	},
+	# Author: Sahran
+	'ug': {
+		'basic-changing': u'ماشىنا ئادەم: ئۆزگەرتىۋاتىدۇ…',
+	},
 	'uk': {
 		'basic-changing': u'Бот: змінив ...',
+	},
+	# Author: CoderSI
+	'uz': {
+		'basic-changing': u'Bot: O\'zgartirildi ...',
 	},
 	# Author: Candalua
 	# Author: Alunardon90

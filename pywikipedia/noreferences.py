@@ -34,7 +34,7 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 
-__version__='$Id: noreferences.py 10272 2012-06-02 23:35:18Z xqt $'
+__version__='$Id: noreferences.py 10561 2012-10-13 06:02:40Z amir $'
 
 import re, sys
 import wikipedia as pywikibot
@@ -364,6 +364,7 @@ referencesSubstitute = {
         'be': u'{{зноскі}}',
         'da': u'{{reflist}}',
         'dsb':u'{{referency}}',
+        'fa': u'{{پانویس}}',
         'fi': u'{{viitteet}}',
         'hsb':u'{{referency}}',
         'hu': u'{{Források}}',
@@ -386,6 +387,7 @@ maintenance_category = {
         'be-x-old': u'Вікіпэдыя:Старонкі з адсутным сьпісам зносак',
         'de': u'Wikipedia:Seite mit fehlendem References-Tag',
         'en': u'Pages with missing references list',
+        'fa': u'صفحه‌های با یادکرد خراب (فقدان پانویس)',
         'ja': u'Refタグがあるのにreferencesタグがないページ',
         'simple': u'Wikipedia pages with broken references',
         'zh': u'参考资料格式错误的页面',

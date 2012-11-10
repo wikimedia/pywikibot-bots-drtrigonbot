@@ -50,7 +50,7 @@ TODO:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: commonscat.py 10364 2012-06-17 15:42:55Z amir $'
+__version__ = '$Id: commonscat.py 10533 2012-09-17 11:24:22Z mfarag $'
 #
 
 import wikipedia as pywikibot
@@ -68,6 +68,7 @@ commonscatTemplates = {
     'an' : (u'Commonscat', [u'Commons cat']),
     'ar' : (u'تصنيف كومنز', [u'Commonscat', u'تصنيف كومونز',
                              u'Commons cat', u'CommonsCat']),
+    'arz' : (u'Commons cat', [u'Commoncat']),
     'az' : (u'CommonsKat', [u'Commonscat']),
     'bn' : (u'কমন্সক্যাট', [u'Commonscat']),
     'ca' : (u'Commonscat', [u'Commons cat', u'Commons category']),
@@ -86,6 +87,7 @@ commonscatTemplates = {
                                   u'Sister project links']),
     'es' : (u'Commonscat', [u'Ccat', u'Commons cat', u'Categoría Commons',
                             u'Commonscat-inline']),
+    'et' : (u'Commonsi kategooria', [u'Commonscat', u'Commonskat', u'Commons cat', u'Commons category']),
     'eu' : (u'Commonskat', [u'Commonscat']),
     'fa' : (u'ویکی‌انبار-رده', [u'Commonscat', u'Commons cat',
                            u'انبار رده', u'Commons category',u'انبار-رده',u'جعبه پیوند به پروژه‌های خواهر',u'در پروژه‌های خواهر',u'پروژه‌های خواهر']),

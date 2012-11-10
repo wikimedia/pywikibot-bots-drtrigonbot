@@ -53,12 +53,12 @@ Please fix these if you are capable and motivated:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: nowcommons.py 10449 2012-07-09 09:48:21Z xqt $'
+__version__ = '$Id: nowcommons.py 10583 2012-10-15 20:20:14Z xqt $'
 #
 
 import sys, re, webbrowser, urllib
 import wikipedia as pywikibot
-import pagegenerators
+import pagegenerators as pg
 import image
 # only for nowCommonsMessage
 from imagetransfer import nowCommonsMessage
@@ -184,8 +184,6 @@ class NowCommonsDeleteBot:
         self.site = pywikibot.getSite()
         if repr(self.site) == 'commons:commons':
             sys.exit('Do not run this bot on Commons!')
-        ncList = self.ncTemplates()
-        self.nowCommonsTemplate = pywikibot.Page(self.site, 'Template:' + ncList[0])
 
     def ncTemplates(self):
         if self.site.lang in nowCommons:
@@ -224,14 +222,20 @@ class NowCommonsDeleteBot:
                     continue
                 url_local = x.group('urllocal')
                 url_commons = x.group('urlcommons')
-                pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<" % image_local)
-                pywikibot.output(u'Local: %s\nCommons: %s\n' % (url_local, url_commons))
+                pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
+                                 % image_local)
+                pywikibot.output(u'Local: %s\nCommons: %s\n'
+                                 % (url_local, url_commons))
                 result1 = webbrowser.open(url_local, 0, 1)
                 result2 = webbrowser.open(url_commons, 0, 1)
                 if image_local.split('Image:')[1] == image_commons:
-                    choice = pywikibot.inputChoice(u'The local and the commons images have the same name, continue?', ['Yes', 'No'], ['y', 'N'], 'N')
+                    choice = pywikibot.inputChoice(
+                        u'The local and the commons images have the same name, continue?',
+                        ['Yes', 'No'], ['y', 'N'], 'N')
                 else:
-                    choice = pywikibot.inputChoice(u'Are the two images equal?', ['Yes', 'No'], ['y', 'N'], 'N')
+                    choice = pywikibot.inputChoice(
+                        u'Are the two images equal?',
+                        ['Yes', 'No'], ['y', 'N'], 'N')
                 if choice.lower() in ['y', 'yes']:
                     yield [image_local, image_commons]
                 else:
@@ -247,8 +251,16 @@ class NowCommonsDeleteBot:
         if use_hash:
             gen = self.useHashGenerator()
         else:
-            gen = pagegenerators.ReferringPageGenerator(self.nowCommonsTemplate, followRedirects = True, onlyTemplateInclusion = True)
-            gen = pagegenerators.NamespaceFilterPageGenerator(gen, [6])
+            nowCommonsTemplates = [pywikibot.Page(self.site, title,
+                                                  defaultNamespace=10)
+                                   for title in self.ncTemplates()]
+            gens = [pg.ReferringPageGenerator(t, followRedirects=True,
+                                              onlyTemplateInclusion=True)
+                    for t in nowCommonsTemplates]
+            gen = pg.CombinedPageGenerator(gens)
+            gen = pg.NamespaceFilterPageGenerator(gen, [6])
+            gen = pg.DuplicateFilterPageGenerator(gen)
+            gen = pg.PreloadingGenerator(gen)
         return gen
 
     def findFilenameOnCommons(self, localImagePage):
@@ -338,8 +350,7 @@ class NowCommonsDeleteBot:
                                     % (localImagePage.title(withNamespace=False),
                                        commonsImagePage.title(withNamespace=False)))
                                 oImageRobot = image.ImageRobot(
-                                    pagegenerators.FileLinksGenerator(
-                                        localImagePage),
+                                    pg.FileLinksGenerator(localImagePage),
                                     localImagePage.title(withNamespace=False),
                                     commonsImagePage.title(withNamespace=False),
                                     '', replacealways, replaceloose)
@@ -350,7 +361,7 @@ class NowCommonsDeleteBot:
                                                                 page.title()).usingPages())) > 0 and \
                                                                 replaceloose:
                                     oImageRobot = image.ImageRobot(
-                                        pagegenerators.FileLinksGenerator(
+                                        pg.FileLinksGenerator(
                                             localImagePage),
                                         self.urlname(
                                             localImagePage.title(
@@ -394,7 +405,8 @@ class NowCommonsDeleteBot:
                                 % commonsImagePage.title())
                             pywikibot.output(commonsText)
                             choice = pywikibot.inputChoice(
-                                u'Does the description on Commons contain all required source and license information?',
+u'Does the description on Commons contain all required source and license\n'
+                                u'information?',
                                 ['yes', 'no'], ['y', 'N'], 'N')
                             if choice.lower() in ['y', 'yes']:
                                 localImagePage.delete(
