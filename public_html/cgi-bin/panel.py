@@ -472,7 +472,10 @@ def logstat(form):
 		end   = numpy.array(stat[item]['etiming']['end'])
 		start = numpy.array(stat[item]['etiming']['start'])
 		if end.shape == start.shape:
-			d['uptimes'].append( list(end-start-7200) )	# -2*60*60 because of time jump during 'set TZ'
+			runtime = end-start-7200		# -2*60*60 because of time jump during 'set TZ'
+			if runtime.min() < 0:			# DST or not; e.g. ('CET', 'CEST')
+				runtime += 3600
+			d['uptimes'].append( list(runtime) )
 		else:
 			d['uptimes'].append( '-' )
 
@@ -581,7 +584,8 @@ def logstat(form):
 			1-0.1-0.05, 1-0.15-0.05]
 		ax = fig.add_axes(ax_size)
 		p1 = ax.step(d[:,0], (d[:,4]-d[:,1]), marker='x', where='mid')
-		plt.legend([p1], ['runs failed'], prop={'size':8})
+		p2 = ax.step(d[:,0], d[:,1], marker='x', where='mid')
+		plt.legend([p1, p2], ['runs failed', 'successful'], prop={'size':8})
 		plt.grid(True, which='both')
 		# format the ticks
 		ax.xaxis.set_major_locator(MonthLocator())
