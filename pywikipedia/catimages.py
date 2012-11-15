@@ -518,7 +518,7 @@ class FileData(object):
         if hasattr(self, '_buffer_Geometry'):
             return self._buffer_Geometry
 
-        self._buffer_Geometry = {}
+        self._buffer_Geometry = {'Lines': '-', 'Circles': '-', 'Edge_Ratio': '-', 'Corners': '-'}
 
         scale = 1.
         try:
@@ -612,7 +612,6 @@ class FileData(object):
         #c = cv2.waitKey(0) & 255
 
         if data:
-            self._buffer_Geometry = {'Lines': '-', 'Circles': '-', 'Edge_Ratio': '-', 'Corners': '-'}
             self._buffer_Geometry.update(data)
         return self._buffer_Geometry
 
