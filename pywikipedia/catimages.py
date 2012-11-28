@@ -1260,7 +1260,7 @@ class FileData(object):
 #        self._content_text = data
         (s1, l1) = (len(u''.join(data)), len(data))
 
-        tmp_path = os.path.join(os.path.split(self.image_path)[0], 'tmp/')
+        tmp_path = os.path.join(os.environ.get('TMP', '/tmp'), 'DrTrigonBot/')
         os.mkdir( tmp_path )
 # switch this part off since 'pdfimages' (on toolserver) is too old; TS-1449
 #        proc = Popen("pdfimages -p %s %s/" % (self.image_path, tmp_path), 
