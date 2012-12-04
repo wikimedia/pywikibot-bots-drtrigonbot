@@ -106,7 +106,8 @@ if secure and url:
 
     # external unshortener API from ...
     #unshort   = "http://realurl.org/api/v1/getrealurl.php?url=%s"
-    unshort   = "http://www.unshorten.it/api1.0.php?responseFormat=xml&shortURL=%s"
+    #unshort   = "http://www.unshorten.it/api1.0.php?responseFormat=xml&shortURL=%s"    # needs API-key (free) now
+    unshort   = "http://api.unshort.me/?t=xml&r=%s"
     skip_list = ['://identi.ca',
                  '.wikimedia.org',
                  '://wikimediafoundation.org',
@@ -148,9 +149,10 @@ if secure and url:
             bs          = BeautifulSoup.BeautifulSoup(unshort_buf)
             #if (bs.status.contents[0] == "1"):
             #    longurl  = str(bs.real.contents[0])
-            #    page_buf = page_buf.replace(url, longurl)
-            if not bs.findAll('error'):
-                longurl  = str(bs.fullurl.contents[0])
+            #if not bs.findAll('error'):
+            #    longurl  = str(bs.fullurl.contents[0])
+            if (bs.success.contents[0] == "true"):
+                longurl  = str(bs.resolvedurl.contents[0])
                 page_buf = page_buf.replace(url, longurl)
 
         toc = time.time()
