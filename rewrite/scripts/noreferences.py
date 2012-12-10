@@ -34,7 +34,7 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 
-__version__='$Id$'
+__version__='$Id: noreferences.py 10754 2012-12-01 07:43:04Z xqt $'
 
 import re, sys
 import pywikibot

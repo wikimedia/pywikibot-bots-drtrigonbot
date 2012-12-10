@@ -17,7 +17,7 @@ This class extends httplib2, adding support for:
 # Partially distributed under Metaweb Technologies, Incs license
 #    which is compatible with the MIT license
 
-__version__ = '$Id$'
+__version__ = '$Id: threadedhttp.py 9062 2011-03-13 14:18:39Z xqt $'
 __docformat__ = 'epytext'
 
 # standard python libraries

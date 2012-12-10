@@ -36,7 +36,7 @@ This script understands the following command-line arguments:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '$Id: clean_sandbox.py 10768 2012-12-07 20:14:41Z drtrigon $'
 #
 
 import time

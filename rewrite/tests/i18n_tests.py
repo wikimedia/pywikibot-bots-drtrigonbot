@@ -4,7 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '$Id: i18n_tests.py 9058 2011-03-13 12:57:05Z xqt $'
 
 import unittest
 from pywikibot import i18n

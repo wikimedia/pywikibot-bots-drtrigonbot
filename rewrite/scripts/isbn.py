@@ -36,7 +36,7 @@ Furthermore, the following command line parameters are supported:
 
 """
 
-__version__='$Id$'
+__version__='$Id: isbn.py 10404 2012-06-21 18:19:05Z russblau $'
 
 import pywikibot
 from pywikibot import pagegenerators, i18n

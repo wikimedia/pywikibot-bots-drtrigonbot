@@ -20,7 +20,7 @@ and the bot will only work on that single page.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '$Id: basic.py 10404 2012-06-21 18:19:05Z russblau $'
 #
 
 import pywikibot

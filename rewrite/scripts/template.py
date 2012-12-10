@@ -103,7 +103,7 @@ pages:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id$'
+__version__='$Id: template.py 10386 2012-06-20 13:58:25Z xqt $'
 #
 import re, sys, string
 import pywikibot

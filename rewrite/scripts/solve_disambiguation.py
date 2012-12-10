@@ -75,7 +75,7 @@ To complete a move of a page, one can use:
 # (C) WikiWichtel, 2004
 # (C) Pywikipedia team, 2003-2009
 #
-__version__='$Id$'
+__version__='$Id: solve_disambiguation.py 10404 2012-06-21 18:19:05Z russblau $'
 #
 # Distributed under the terms of the MIT license.
 #

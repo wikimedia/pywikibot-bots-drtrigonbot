@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id$'
+__version__ = '$Id: osm_family.py 9041 2011-03-12 23:21:45Z xqt $'
 
 from pywikibot import family
 

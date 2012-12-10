@@ -2,7 +2,7 @@
 
 from pywikibot import family
 
-__version__ = '$Id$'
+__version__ = '$Id: gentoo_family.py 10503 2012-08-23 10:23:04Z xqt $'
 
 # An inofficial Gentoo wiki project.
 # Ask for permission at http://gentoo-wiki.com/Help:Bots before running a bot.

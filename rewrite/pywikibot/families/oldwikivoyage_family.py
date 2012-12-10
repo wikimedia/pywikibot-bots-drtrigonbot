@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from pywikibot import family
 
-__version__ = '$Id$'
+__version__ = '$Id: oldwikivoyage_family.py 10696 2012-11-11 10:08:17Z xqt $'
 
 #Family file for the original wikivoyage
 

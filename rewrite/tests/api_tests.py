@@ -4,7 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '$Id: api_tests.py 10285 2012-06-03 12:56:28Z valhallasw $'
 
 import unittest
 import pywikibot

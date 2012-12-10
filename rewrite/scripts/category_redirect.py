@@ -16,7 +16,7 @@ are taken into account.
 #
 # (C) Pywikipedia team, 2008-2011
 #
-__version__ = '$Id$'
+__version__ = '$Id: category_redirect.py 10404 2012-06-21 18:19:05Z russblau $'
 #
 # Distributed under the terms of the MIT license.
 #

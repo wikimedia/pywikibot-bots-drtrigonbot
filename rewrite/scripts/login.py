@@ -44,7 +44,7 @@ subdirectory.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '$Id: login.py 10395 2012-06-20 22:19:15Z xqt $'
 
 import logging
 import pywikibot

@@ -117,7 +117,7 @@ from __future__ import generators
 #
 # (C) Daniel Herding & the Pywikipedia team, 2004-2012
 #
-__version__='$Id$'
+__version__='$Id: replace.py 10577 2012-10-14 17:17:03Z xqt $'
 #
 # Distributed under the terms of the MIT license.
 #

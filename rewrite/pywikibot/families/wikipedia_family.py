@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 from pywikibot import family
 
-__version__ = '$Id$'
+__version__ = '$Id: wikipedia_family.py 10771 2012-12-08 13:45:00Z xqt $'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 

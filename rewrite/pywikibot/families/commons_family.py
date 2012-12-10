@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id$'
+__version__ = '$Id: commons_family.py 10673 2012-11-08 07:57:03Z xqt $'
 
 from pywikibot import family
 

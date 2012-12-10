@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id$'
+__version__ = '$Id: meta_family.py 10142 2012-04-20 16:12:35Z xqt $'
 
 from pywikibot import family
 

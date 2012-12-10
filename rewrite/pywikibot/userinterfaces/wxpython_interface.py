@@ -1,5 +1,5 @@
 
-__version__ = '$Id$'
+__version__ = '$Id: wxpython_interface.py 9065 2011-03-13 14:33:42Z xqt $'
 
 import sys; sys.path.append('..')
 

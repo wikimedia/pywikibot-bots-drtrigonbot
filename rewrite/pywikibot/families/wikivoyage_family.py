@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__version__ = '$Id$'
+__version__ = '$Id: wikivoyage_family.py 10728 2012-11-14 21:03:36Z xqt $'
 
 # The new wikivoyage family that is hosted at wikimedia
 

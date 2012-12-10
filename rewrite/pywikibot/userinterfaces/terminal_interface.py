@@ -4,7 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '$Id: terminal_interface.py 10423 2012-06-26 19:12:25Z valhallasw $'
 
 
 import traceback, re, sys

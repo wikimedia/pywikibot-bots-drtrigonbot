@@ -7,7 +7,7 @@ Tests for the page module.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '$Id: page_tests.py 9058 2011-03-13 12:57:05Z xqt $'
 
 
 import unittest

@@ -18,7 +18,7 @@ This module is responsible for
 # Distributed under the terms of the MIT license.
 #
 
-__version__ = '$Id$'
+__version__ = '$Id: http.py 8028 2010-03-18 17:29:14Z russblau $'
 __docformat__ = 'epytext'
 
 import Queue

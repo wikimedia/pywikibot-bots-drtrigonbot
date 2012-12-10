@@ -338,7 +338,7 @@ that you have to break it off, use "-continue" next time.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '$Id: interwiki.py 10660 2012-11-04 10:28:33Z xqt $'
 #
 
 import sys, copy, re, os

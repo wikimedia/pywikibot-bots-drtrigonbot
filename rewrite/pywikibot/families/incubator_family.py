@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id$'
+__version__ = '$Id: incubator_family.py 9589 2011-10-06 07:28:32Z xqt $'
 
 from pywikibot import family
 

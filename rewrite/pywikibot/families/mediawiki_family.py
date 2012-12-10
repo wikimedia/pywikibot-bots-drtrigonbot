@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id$'
+__version__ = '$Id: mediawiki_family.py 9577 2011-10-03 14:53:28Z xqt $'
 
 from pywikibot import family
 

@@ -3,7 +3,7 @@
 #
 # (C) Pywikipedia team, 2010-2012
 #
-__version__ = '$Id$'
+__version__ = '$Id: generate_user_files.py 10280 2012-06-03 10:46:36Z xqt $'
 #
 # Distributed under the terms of the MIT license.
 #

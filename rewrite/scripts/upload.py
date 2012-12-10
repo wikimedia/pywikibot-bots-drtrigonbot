@@ -23,7 +23,7 @@ and for a description.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id$'
+__version__='$Id: upload.py 10296 2012-06-04 17:02:54Z xqt $'
 #
 
 import os, sys, time

@@ -7,7 +7,7 @@ search paths so the package does not need to be installed, etc.
 """
 # (C) Pywikipedia team, 2012
 #
-__version__ = '$Id$'
+__version__ = '$Id: pwb.py 10335 2012-06-08 20:12:23Z xqt $'
 #
 # Distributed under the terms of the MIT license.
 #

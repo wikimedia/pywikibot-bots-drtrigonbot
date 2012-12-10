@@ -7,7 +7,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '$Id: version.py 10181 2012-05-05 09:39:02Z xqt $'
 
 import os
 import time

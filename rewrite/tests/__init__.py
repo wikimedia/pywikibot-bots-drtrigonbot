@@ -4,7 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '$Id: __init__.py 10370 2012-06-17 19:13:57Z valhallasw $'
 
 import os
 import pywikibot.data.api

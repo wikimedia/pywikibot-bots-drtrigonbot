@@ -69,7 +69,7 @@ or by adding a list to the given one:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '$Id: cosmetic_changes.py 10439 2012-07-04 10:33:26Z xqt $'
 #
 import sys, re
 import pywikibot

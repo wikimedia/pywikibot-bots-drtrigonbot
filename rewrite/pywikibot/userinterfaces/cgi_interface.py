@@ -3,7 +3,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '$Id: cgi_interface.py 9065 2011-03-13 14:33:42Z xqt $'
 
 import sys
 

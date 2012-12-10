@@ -7,7 +7,7 @@ Objects representing Mediawiki log entries
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '$Id: logentries.py 8028 2010-03-18 17:29:14Z russblau $'
 
 from pywikibot.exceptions import *
 import pywikibot

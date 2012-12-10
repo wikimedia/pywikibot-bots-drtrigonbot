@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id$'
+__version__ = '$Id: wowwiki_family.py 9282 2011-05-29 11:15:03Z xqt $'
 
 from pywikibot import family
 

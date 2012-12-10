@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id$'
+__version__ = '$Id: wikidata_family.py 10729 2012-11-14 21:04:15Z xqt $'
 
 from pywikibot import family
 
