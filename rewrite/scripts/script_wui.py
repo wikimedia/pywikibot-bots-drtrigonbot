@@ -44,7 +44,7 @@ Syntax example:
 #  @todo (may be queue_security needed later in order to allow other 'super-users' too...)
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
-__version__ = '$Id: script_wui.py 427 2012-12-10 20:01:27Z drtrigon $'
+__version__ = '$Id$'
 #
 
 
