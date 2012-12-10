@@ -1,0 +1,36 @@
+#!/bin/bash
+#$ -m as
+#$ -j y
+#$ -b y
+# SGE integration/interaction: https://wiki.toolserver.org/view/Job_scheduling
+# Tip from Merlissimo: use (a=reschedule or abort, s= suspended) to send mail
+# by SGE and exitcode 99 to restart the job and 100 to stop it in error state.
+
+# use this framework without installing:
+#  1.) create needed config files in place
+#      $ cd .../rewrite/
+#      $ python generate_user_files.py -dir:.
+#  2.) run scripts by using run.sh
+#      $ run.sh scripts/clean_sandbox.py
+#      $ run.sh scripts/script_wui.py
+#
+# !!! not working yet (more than 1 parameter):
+#  $ run.sh scripts/clean_sandbox.py -user
+#      export PYTHONPATH=.:./externals
+#      python scripts/clean_sandbox.py -dir:. -log -user
+#  $ run.sh scripts/script_wui.py &> /dev/null
+#      export PYTHONPATH=.:./externals
+#      python scripts/script_wui.py -dir:. -log &> /dev/null
+
+# usage e.g.: run.sh scripts/script_wui.py
+# ( see also: python pwb.py <name_of_script> <options> )
+
+# if runned on TS (e.g. qcronsub from SGE)
+if [ $SGE_CLUSTER_NAME ]
+then cd $HOME/rewrite
+fi
+
+export PYTHONPATH=.:./externals/httplib2:./externals/setuptools:./externals/simplejson
+#python $1 -dir:. -log
+python $1 -dir:. -log &> /dev/null
+
