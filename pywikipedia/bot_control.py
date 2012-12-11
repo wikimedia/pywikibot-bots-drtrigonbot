@@ -51,7 +51,7 @@ Options/parameters:
 #  sind subster.magic_words vorhanden. Um ALLES zu prüfen ist ein separater @ref subster Lauf nötig.
 #  \n(this mode uses 2 log files !!!)
 #
-#  @li Run default bot set (clean_user_sandbox, sum_disc, @ref subster, script_wui) as CRON job with output
+#  @li Run default bot set (sum_disc, @ref subster) as CRON job with output
 #  to log on server:
 #  @verbatim python bot_control.py -default -cron @endverbatim
 #  CRON (toolserver):
@@ -96,7 +96,7 @@ import logging.handlers
 
 # wikipedia-bot imports
 import pagegenerators, userlib, botlist, basic
-import clean_sandbox, sum_disc, subster, script_wui, subster_irc, catimages
+import clean_sandbox, sum_disc, subster, subster_irc, catimages
 import dtbext
 # Splitting the bot into library parts
 import wikipedia as pywikibot
@@ -119,8 +119,7 @@ infolist = [ pywikibot.__version__, pywikibot.config.__version__,     # framewor
              basic.__version__,                                       #
              dtbext.pywikibot.__version__,                            # DrTrigonBot extensions
              __version__, sum_disc.__version__, subster.__version__,  # bots
-             script_wui.__version__, subster_irc.__version__,         #
-             catimages.__version__, ]                                 #
+             subster_irc.__version__, catimages.__version__, ]        #
 
 # bots to run and control
 bot_list = { 'clean_user_sandbox': ( clean_sandbox, ['-user'], 
@@ -131,15 +130,13 @@ bot_list = { 'clean_user_sandbox': ( clean_sandbox, ['-user'],
                                      u'Compressing Discussion Summary'),
              'subster':            ( subster, [], 
                                      u'"SubsterBot"'),
-             'script_wui':         ( script_wui, [], 
-                                     u'Script WikiUserInterface (beta)'),
              'catimages':          ( catimages, ['-cat'],#, '-limit:1'], 
                                      u'Categorize Images (by content)'),
              'subster_irc':        ( subster_irc, [], 
                                      u'"SubsterBot" IRC surveillance (beta)'),
            }
 bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history',
-              'script_wui', 'catimages', 'subster', 'subster_irc' ]
+              'catimages', 'subster', 'subster_irc' ]
 
 # SGE: exit errorlevel
 error_SGE_ok      = 0    # successful termination, nothing more to do
@@ -476,26 +473,21 @@ if __name__ == "__main__":
                     'sum_disc':           False,
                     'compress_history':   False,
                     'subster':            False,
-                    'script_wui':         False,
                     'subster_irc':        False,
                     'catimages':          False,
         }
         error_ec    = error_SGE_stop
         #error_ec    = error_SGE_restart
-  
+
         if ("-all" in arg):
             do_dict.update({ 'clean_user_sandbox': True,
                              'sum_disc':           True,
                              'subster':            True,
-                             'script_wui':         True,
             })
         elif ("-default" in arg):
-            do_dict.update({ 'clean_user_sandbox': True,
+            do_dict.update({ 'clean_user_sandbox': False,
                              'sum_disc':           True,
                              'subster':            True,
-                             'script_wui':         True,
-#                             'catimages':          True,
-                             'catimages':          False,
             })
         elif ("-compress_history:[]" in arg):          # muss alleine laufen, sollte aber mit allen 
             do_dict['compress_history'] = True         # anderen kombiniert werden können (siehe 'else')...!
@@ -510,7 +502,6 @@ if __name__ == "__main__":
             do_dict.update({ 'clean_user_sandbox': ("-clean_user_sandbox" in arg),
                              'sum_disc':           ("-sum_disc" in arg),
                              'subster':            ("-subster" in arg),
-                             'script_wui':         ("-script_wui" in arg),
                              'catimages':          ("-catimages" in arg),
             })
 
