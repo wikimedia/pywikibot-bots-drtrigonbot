@@ -2115,25 +2115,26 @@ class CatImages_Default(FileData):
         # - ALWAYS -
         return (u"Categorized by DrTrigonBot", True)
 
-    # Category:BMP
-    # Category:PNG
-    # Category:JPEG
+    # (Category:BMP)
+    # (Category:PNG)
+    # (Category:JPEG)
     # Category:TIFF files
-    # (more image formats/extensions according to PIL)
+    # (may be more image formats/extensions according to PIL, e.g. SVG, ...)
     # Category:PDF files
     def _addcat_prop_general(self):
         fmt = self._info_filter['Properties'][0]['Format']
         if   u'TIFF' in fmt:
             fmt = u'TIFF images'
-        elif u'SVG' in fmt:
-            # additional to PIL (rsvg, ...)
-            # should be added as template instead of category (!)
-            fmt = u''
+        #elif u'SVG' in fmt:
+        #    # additional to PIL (rsvg, ...)
+        #    # should be added as template instead of category (!)
+        #    fmt = u''
         elif u'PDF' in fmt:
             # additional to PIL (...)
             fmt = u'PDF files'
-        elif u'OGG' in fmt:
-            # (no general catgeories available)
+        else:
+            # disable ALL categorization, except the listed exceptions above
+            # (BMP, PNG, JPEG, OGG; no general catgeory available, ...)
             fmt = u''
         # PIL: http://www.pythonware.com/library/pil/handbook/index.htm
 
