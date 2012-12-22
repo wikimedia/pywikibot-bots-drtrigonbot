@@ -30,11 +30,6 @@ Syntax example:
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-#  @todo rewrite zusammen mit diesem script auf dem TS installieren (commit to
-#        svn repo) und aktivieren (in crontab setzen wie subsetr_irc). Dann
-#        user sandbox cleaner von trunk nach rewrite wechseln durch script_wui.py
-#        (somit ist bot_control.py in rewrite ev. gar nicht nötig...!?! ;)
-#
 #  @todo Simulationen werden ausgeführt und das Resultat mit eindeutiger
 #        Id (rev-id) auf Ausgabeseite geschrieben, damit kann der Befehl
 #        (durch Angabe der Sim-Id) ausgeführt werden -> crontab (!)
@@ -48,15 +43,28 @@ __version__ = '$Id$'
 #
 
 
-import datetime
+import datetime, time
 import thread, threading
+import sys, os
+import re
 
 # http://labix.org/lunatic-python
-#import lua    # install f15 packages: 'lua', 'lunatic-python'
+try:
+    import lua                  # install f15 packages: 'lua', 'lunatic-python'
+except ImportError:
+    import dtbext._lua as lua   # TS (debian)
 import dtbext.crontab
 
 import pywikibot
 import pywikibot.botirc
+
+
+# logging of framework info (may be this should be done without importing, just opening)
+infolist = [ pywikibot.__version__, pywikibot.config.__version__,     # framework
+             pywikibot.data.api.__version__,                          #
+             pywikibot.bot.__version__, pywikibot.botirc.__version__, #
+#             clean_sandbox.__version__,                               #
+             __version__, ]                                           #
 
 bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang],
 
@@ -90,20 +98,28 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
 
         pywikibot.botirc.IRCBot.__init__(self, *arg)
 
-        self.templ = pywikibot.Page(self.site, bot_config['ConfCSSshell'])
-        self.cron  = pywikibot.Page(self.site, bot_config['ConfCSScrontab'])
+        # init environment with minimal changes (try to do as less as possible)
+        # - Lua -
+        pywikibot.output(u'** Redirecting Lua print in order to catch it')
+        lua.execute('__print = print')
+        #lua.execute('print = python.builtins().print')
+        lua.execute('print = python.globals().pywikibot.output')
 
-        self.refs  = {}
-        self.refs[self.templ.title()] = self.templ
+        # init constants
+        templ = pywikibot.Page(self.site, bot_config['ConfCSSshell'])
+        cron  = pywikibot.Page(self.site, bot_config['ConfCSScrontab'])
 
+        self.templ = templ.title()
+        self.cron  = cron.title()
+        self.refs  = { self.templ: templ,
+                       self.cron:  cron, }
+        pywikibot.output(u'** Pre-loading all relevant page contents')
+        for item in self.refs:
+            self.refs[item].get(force=True)   # load all page contents
+
+        # init background timer
+        pywikibot.output(u'** Starting crontab background timer thread')
         self.on_timer()
-
-#        # init constants
-#        self._ConfCSSconfigPage = pywikibot.Page(self.site, bot_config['ConfCSSconfig'])
-#        self._difflink = []
-#        if self._ConfCSSconfigPage.exists():
-#            exec(self._ConfCSSconfigPage.get())    # with variable: bot_config_wiki
-#            self._difflink = bot_config_wiki['difflink']
 
     def on_pubmsg(self, c, e):
         match = self.re_edit.match(e.arguments()[0])
@@ -116,6 +132,9 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         # test actual page against (template incl.) list
         page = match.group('page').decode(self.site.encoding())
         if page in self.refs:
+            pywikibot.output(u"RELOAD: %s" % page)
+            self.refs[page].get(force=True)   # re-load (refresh) page content
+        if page == self.templ:
             pywikibot.output(u"SHELL: %s" % page)
             self.do_check(page)
 
@@ -126,10 +145,9 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         self.do_check_CronJobs()
 
     def do_check_CronJobs(self):
-        # check cron/date
-        page    = self.templ
-        # (track changes of self.cron in on_pubmsg and re-load after changes only...)
-        crontab = self.cron.get(force=True)
+        # check cron/date (changes of self.refs are tracked (and reload) in on_pubmsg)
+        page    = self.refs[self.templ]
+        crontab = self.refs[self.cron].get()
         # extract 'rev' and 'timestmp' from 'crontab' page text ...
         for line in crontab.splitlines():   # hacky/ugly/cheap; already better done in trunk dtbext
             (rev, timestmp) = [item.strip() for item in line[1:].split(',')]
@@ -156,13 +174,14 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
             # has to be done according to subster in trunk with 'get_traceback' (!)
             traceback = u"[ERROR OCCURRED; here you should see here a python traceback giving more information]\n"
             wiki_logger(traceback, self.refs[page_title], rev)
+            #pywikibot.error(traceback.format_exc())    # from api.py submit
 
 # Define a function for the thread
 def main_script(page, rev=None, params=None):
     # http://opensourcehacker.com/2011/02/23/temporarily-capturing-python-logging-output-to-a-string-buffer/
     # http://docs.python.org/release/2.6/library/logging.html
     from StringIO import StringIO
-    import logging, sys
+    import logging
 
     pywikibot.output(u'--- ' * 20)
 
@@ -179,7 +198,7 @@ def main_script(page, rev=None, params=None):
 
     # all output to logging and stdout/stderr is catched BUT NOT lua output (!)
     if rev is None:
-        code = page.get(force=True)     # shell; "on demand"
+        code = page.get()               # shell; "on demand"
     else:
         code = page.getOldVersion(rev)  # crontab; scheduled
     exec( code )
@@ -202,6 +221,7 @@ def main_script(page, rev=None, params=None):
 def wiki_logger(buffer, page, rev=None):
 # (might be a problem here for TS and SGE, output string has another encoding)
 #    buffer  = buffer.decode(config.console_encoding)
+    buffer = re.sub("\03\{(.*?)\}(.*?)\03\{default\}", "\g<2>", buffer)
     if rev is None:
         rev = page.latestRevision()
     # append to page
@@ -215,7 +235,45 @@ def main():
     for arg in pywikibot.handleArgs():
         pywikibot.showHelp('script_wui')
         return
-        
+
+    # script call
+    pywikibot.output(u'SCRIPT CALL:')
+    pywikibot.output(u'  ' + u' '.join(sys.argv))
+    pywikibot.output(u'')
+
+    # logging of release/framework info
+    pywikibot.output(u'RELEASE/FRAMEWORK VERSION:')
+    for item in infolist:
+        pywikibot.output(u'  %s' % item)
+    pywikibot.output(u'')
+
+    # new release/framework revision?
+    pywikibot.output(u'LATEST RELEASE/FRAMEWORK REVISION:')
+#    getSVN_release_ver()
+#    getSVN_framework_ver()
+    pywikibot.output(u'')
+
+    # mediawiki software version?
+    pywikibot.output(u'MEDIAWIKI VERSION:')
+    pywikibot.output(u'  Actual revision: %s' % str(pywikibot.getSite().live_version()))
+    pywikibot.output(u'')
+
+#    # processing of messages on bot discussion page
+#    if pywikibot.getSite().messages():
+#        pywikibot.output(u'====== new messages on bot discussion page (last few lines) ======')
+#        messages_page  = pywikibot.Page(pywikibot.getSite(), u'User:DrTrigonBot').toggleTalkPage()
+#        messagesforbot = messages_page.get(get_redirect=True)
+#        pywikibot.output( u'\n'.join(messagesforbot.splitlines()[-10:]) )
+#        pywikibot.output(u'==================================================================')
+#        # purge/reset messages (remove this message from queue) by "viewing" it
+#        pywikibot.getSite().getUrl( os.path.join('/wiki', messages_page.urlname()) )
+
+    # modification of timezone to be in sync with wiki
+    os.environ['TZ'] = 'Europe/Amsterdam'
+    time.tzset()
+    pywikibot.output(u'Setting process TimeZone (TZ): %s' % str(time.tzname))    # ('CET', 'CEST')
+    pywikibot.output(u'')
+
     site = pywikibot.getSite()
     site.login()
     chan = '#' + site.language() + '.' + site.family.name
@@ -231,10 +289,9 @@ if __name__ == "__main__":
 
 
 comment = """
-...
-
 builtin_raw_input = __builtin__.raw_input
 __builtin__.raw_input = lambda: 'n'     # overwrite 'raw_input' to run bot non-blocking and simulation mode
+
 def block(*args, **kwargs):
     pywikibot.output(u'=== ! SIMULATION MODE; WIKI WRITE ATTEMPT BLOCKED ! ===')
     return (None, None, None)
@@ -243,22 +300,7 @@ pywikibot.Page.put = block              # overwrite 'pywikibot.Page.put'
 
 sys_argv = copy.deepcopy( sys.argv )
 #print sys.argv
-sys_stdout = sys.stdout
-sys_stderr = sys.stderr
-out = u""
-for command in self._commandlist:  # may be try with PreloadingGenerator?!
-    command = command.encode(config.console_encoding)
-    cmd = command.split(' ')
-
-    if cmd[0] not in bot_config['bot_list']: continue
-
-    pywikibot.output('\03{lightred}** Processing Command: %s\03{default}' % command)
-
-    out += u"== %s ==\n" % command
-
-...
 
 sys.argv = sys_argv
 pywikibot.Page.put = pywikibot_Page_put
 """
-
