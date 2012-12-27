@@ -44,14 +44,7 @@ import os, re, sys, copy
 import subprocess
 
 #import Image,ImageDraw
-import matplotlib
-matplotlib.rc('font', size=8)
-import matplotlib.pyplot as plt
-# http://matplotlib.sourceforge.net/api/dates_api.html?highlight=year%20out%20range#matplotlib.dates.epoch2num
-from matplotlib.dates import MonthLocator, DayLocator, DateFormatter, epoch2num
 import cStringIO
-
-import numpy
 
 
 # === panel HTML stylesheets === === ===
@@ -66,8 +59,9 @@ import ps_wikinew as style # panel-stylesheet 'wiki (new)' not CSS 2.1 compilant
 # === page HTML contents === === ===
 #
 displaystate_content = \
-"""Actual state: <img src="%(botstate_daily)s" width="15" height="15" alt="Botstate">
-                 <img src="%(botstate_cont)s" width="15" height="15" alt="Botstate"><br><br>
+"""Actual state: <img src="%(botstate_daily)s" width="15" height="15" alt="Botstate: daily">
+                 <img src="%(botstate_subster)s" width="15" height="15" alt="Botstate: subster">
+                 <img src="%(botstate_wui)s" width="15" height="15" alt="Botstate: wui"><br><br>
 Time now: %(time)s<br><br>
 
 <a href="%(loglink)s">Latest</a> bot status message log: <b>%(botlog)s</b><br><br>
@@ -352,24 +346,38 @@ def displaystate(form):
 			data['botstate'] = botstate_img['orange']
 			color = html_color['orange']
 
-	data['botstate_cont'] = botstate_img['red']
-	if irc_status()[0]:
-		data['botstate_cont'] = botstate_img['green']
-		irc_color = html_color['green']
-		irc_state_text = "OK"
+	users = irc_status()[1]
+
+	data['botstate_subster'] = botstate_img['red']
+	if ("DrTrigonBot" in users) or (":DrTrigonBot" in users):
+		data['botstate_subster'] = botstate_img['green']
+		irc_subster_color = html_color['green']
+		irc_subster_state_text = "OK"
 	else:
-		data['botstate_cont'] = botstate_img['orange']
-		irc_color = html_color['orange']
-		irc_state_text = "problem"
+		data['botstate_subster'] = botstate_img['orange']
+		irc_subster_color = html_color['orange']
+		irc_subster_state_text = "problem"
+
+	data['botstate_wui'] = botstate_img['red']
+	if ("DrTrigonBot_WUI" in users) or (":DrTrigonBot_WUI" in users):
+		data['botstate_wui'] = botstate_img['green']
+		irc_wui_color = html_color['green']
+		irc_wui_state_text = "OK"
+	else:
+		data['botstate_wui'] = botstate_img['orange']
+		irc_wui_color = html_color['orange']
+		irc_wui_state_text = "problem"
 
 	status  = "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': color, 'bot': 'daily:', 'state': state_text}
-	status += "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': irc_color, 'bot': 'cont.:', 'state': irc_state_text}
+	status += "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': irc_subster_color, 'bot': 'subster:', 'state': irc_subster_state_text}
+	status += "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': irc_wui_color, 'bot': 'wui:', 'state': irc_wui_state_text}
 
+	current.append( "logs/" )
 	data['currentlog'] = ", ".join([ '<a href="%s">%s</a>' % (os.path.join(localdir, item), item) for item in current ])
 
 	data.update({	'time':		asctime(localtime(time())),
 			'oldlog':	", ".join(files),
-			'oldlink':	r"http://toolserver.org/~drtrigon/DrTrigonBot/",
+			'oldlink':	r"../DrTrigonBot/",
 			'logstat':	sys.argv[0] + r"?action=logstat",
 			'logstatraw':	sys.argv[0] + r"?action=logstat&amp;format=plain",
 			'refresh':	'15',
@@ -433,6 +441,14 @@ def adminlogs(form):
 	return (style.admin_page % data) % data
 
 def logstat(form):
+	import matplotlib
+	matplotlib.rc('font', size=8)
+	import matplotlib.pyplot as plt
+	# http://matplotlib.sourceforge.net/api/dates_api.html?highlight=year%20out%20range#matplotlib.dates.epoch2num
+	from matplotlib.dates import MonthLocator, DayLocator, DateFormatter, epoch2num
+
+	import numpy
+
 	format = form.getvalue('format', 'html')
 
 	(localdir, files, log) = oldlogfiles(all=True)

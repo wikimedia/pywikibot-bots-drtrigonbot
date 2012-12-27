@@ -15,6 +15,7 @@
 #      $ run.sh scripts/script_wui.py
 #
 # !!! not working yet (more than 1 parameter):
+# (try using "" to capsule multiple params)
 #  $ run.sh scripts/clean_sandbox.py -user
 #      export PYTHONPATH=.:./externals
 #      python scripts/clean_sandbox.py -dir:. -log -user
@@ -25,12 +26,12 @@
 # usage e.g.: run.sh scripts/script_wui.py
 # ( see also: python pwb.py <name_of_script> <options> )
 
-# if runned on TS (e.g. qcronsub from SGE)
-if [ $SGE_CLUSTER_NAME ]
+# if runned on TS (e.g. qcronsub from SGE) or labs (set env when using cron)
+if [ $SGE_CLUSTER_NAME ] || [ $INSTANCENAME ]
 then cd $HOME/rewrite
 fi
 
 export PYTHONPATH=.:./externals/httplib2:./externals/setuptools:./externals/simplejson
-#python $1 -dir:. -log
-python $1 -dir:. -log &> /dev/null
+python $1 -dir:. -log
+#python $1 -dir:. -log &> /dev/null
 

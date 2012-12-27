@@ -57,10 +57,10 @@ page = content_type + """
 <div id="mw-panel" class="noprint">
 <div id="p-logo"><a style="background-image: 
 url(http://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Wikimedia_Community_Logo-Toolserver.svg/135px-Wikimedia_Community_Logo-Toolserver.svg.png);" 
-href="http://toolserver.org/" title="Home"></a></div>
+href="/" title="Home"></a></div>
 <div class="portal" id='p-navigation'><h5>navigation</h5><div class="body">
 <ul>
-<li><a href="https://wiki.toolserver.org/view/User:DrTrigon">Main Page</a></li>
+<li><a href="https://wiki.toolserver.org/view/User:DrTrigon">Main Page</a>, <a href="https://labsconsole.wikimedia.org/wiki/DrTrigonBot">labs</a></li>
 <li><a href="https://jira.toolserver.org/browse/DrTrigon">Bug tracker</a></li>
 <li><a href="https://fisheye.toolserver.org/browse/drtrigon">SVN repository</a></li>
 </ul>
