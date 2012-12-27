@@ -24,7 +24,7 @@ __version__='$Id$'
 
 
 #content_type = "Content-Type: text/html"
-content_type = "Content-Type: text/html; charset=UTF-8"
+content_type = "Content-Type: text/html; charset=UTF-8\n"
 
 tsnotice = "<b>%(text)s</b><br>"
 
