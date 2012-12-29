@@ -52,7 +52,7 @@ import re
 try:
     import lua                  # install f15 packages: 'lua', 'lunatic-python'
 except ImportError:
-    import dtbext._lua as lua   # TS (debian)
+    import dtbext._lua as lua   # TS/labs (debian/ubuntu)
 import dtbext.crontab
 
 import pywikibot
@@ -183,6 +183,10 @@ def main_script(page, rev=None, params=None):
     from StringIO import StringIO
     import logging
 
+#    # safety
+#    if '-simulate' not in sys.argv:
+#        sys.argv.append('-simulate')
+
     pywikibot.output(u'--- ' * 20)
 
     buffer = StringIO()
@@ -236,6 +240,24 @@ def main():
         pywikibot.showHelp('script_wui')
         return
 
+    # verbosely output version info of all involved scripts
+    output_verinfo()
+
+    site = pywikibot.getSite()
+    site.login()
+    chan = '#' + site.language() + '.' + site.family.name
+    bot = ScriptWUIBot(site, chan, site.user() + "_WUI", "irc.wikimedia.org")
+    try:
+        bot.start()
+    except:
+        bot.t.cancel()
+        raise
+
+def output_verinfo():
+    import pywikibot.comms.http
+    import subprocess
+    global __release_rev__
+
     # script call
     pywikibot.output(u'SCRIPT CALL:')
     pywikibot.output(u'  ' + u' '.join(sys.argv))
@@ -274,17 +296,12 @@ def main():
     pywikibot.output(u'Setting process TimeZone (TZ): %s' % str(time.tzname))    # ('CET', 'CEST')
     pywikibot.output(u'')
 
-    site = pywikibot.getSite()
-    site.login()
-    chan = '#' + site.language() + '.' + site.family.name
-    bot = ScriptWUIBot(site, chan, site.user() + "_WUI", "irc.wikimedia.org")
-    try:
-        bot.start()
-    except:
-        bot.t.cancel()
-        raise
-
 if __name__ == "__main__":
+#    # verbosely output version info of all involved scripts
+#    # PROBLEM: correct place, but output not logged here, thus moved to 'main()' -> improve logging!! (look e.g. at botirc.py)
+#    output_verinfo()
+
+    # run bot
     main()
 
 
@@ -299,8 +316,6 @@ pywikibot_Page_put = pywikibot.Page.put
 pywikibot.Page.put = block              # overwrite 'pywikibot.Page.put'
 
 sys_argv = copy.deepcopy( sys.argv )
-#print sys.argv
 
-sys.argv = sys_argv
 pywikibot.Page.put = pywikibot_Page_put
 """
