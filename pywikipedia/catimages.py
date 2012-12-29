@@ -1890,6 +1890,163 @@ class FileData(object):
 
         return (regs, drop)
 
+    def _detect_AudioFeatures_YAAFE(self):
+        # http://yaafe.sourceforge.net/manual/tools.html
+        # http://yaafe.sourceforge.net/manual/quickstart.html - yaafe.py
+        # ( help: yaafe.py -h / features: yaafe.py -l )
+        #
+        # compile yaafe on fedora:
+        # 1.) get and compile 'argtable2' (2-13)
+        #     1.1 download from http://argtable.sourceforge.net/
+        #     1.2 unpack and cd to directory
+        #     1.3 $ ccmake .
+        #     1.4 set: CMAKE_BUILD_TYPE = Release
+        #     1.5 press: c, g (in order to configure and generate)
+        #     1.6 $ make
+        # 2.) get and compile 'yaafe'
+        #     1.1 download from http://yaafe.sourceforge.net/
+        #     1.2 unpack and cd to directory
+        #     1.3 $ ccmake .
+        #     1.4 set: ARGTABLE2_INCLUDE_DIR = /home/ursin/Desktop/argtable2-13/src
+        #              ARGTABLE2_LIBRARY     = /home/ursin/Desktop/argtable2-13/src/libargtable2.a
+        #              ...
+        #              DL_INCLUDE_DIR        = /usr/include
+        #              DL_LIBRARY            = /usr/lib64/libdl.so
+        #              FFTW3_INCLUDE_DIR     = /usr/include
+        #              FFTW3_LIBRARY         = /usr/lib64/libfftw3.so
+        #              HDF5_HL_LIBRARY       = /usr/lib64/libhdf5_hl.so
+        #              HDF5_INCLUDE_DIR      = /usr/include
+        #              HDF5_LIBRARY          = /usr/lib64/libhdf5.so
+        #              LAPACK_LIBRARY        = /usr/lib64/liblapack.so
+        #              MATLAB_ROOT           = MATLAB_ROOT-NOTFOUND
+        #              MPG123_INCLUDE_DIR    = /usr/include
+        #              MPG123_LIBRARY        = /usr/lib64/libmpg123.so
+        #              RT_LIBRARY            = /usr/lib64/librt.so
+        #              SNDFILE_INCLUDE_DIR   = /usr/include
+        #              SNDFILE_LIBRARY       = /usr/lib64/libsndfile.so
+        #              ...
+        #              WITH_FFTW3            = ON
+        #              WITH_HDF5             = ON
+        #              WITH_LAPACK           = ON
+        #              WITH_MATLAB_MEX       = OFF
+        #              WITH_MPG123           = ON
+        #              WITH_SNDFILE          = ON
+        #              WITH_TIMERS           = ON
+        #              (use t to toggle to more advanced options)
+        #              CMAKE_CXX_FLAGS       = -fpermissive
+        #              CMAKE_C_FLAGS         = -fpermissive
+        #         (install all needed dependencies/packages into the OS also)
+        #     1.5 press: c, g (in order to configure and generate)
+        #     1.6 $ make
+        #     1.7 $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/ursin/Desktop/yaafe-v0.64/src_cpp/yaafe-python/:/home/ursin/Desktop/yaafe-v0.64/src_cpp/yaafe-io/:/home/ursin/Desktop/yaafe-v0.64/src_cpp/yaafe-core/:/home/ursin/Desktop/yaafe-v0.64/src_cpp/yaafe-components/
+        #         $ export YAAFE_PATH=/home/ursin/Desktop/yaafe-v0.64/src_python/
+        #         $ export PYTHONPATH=/home/ursin/Desktop/yaafe-v0.64/src_python
+
+        # skip file formats not supported (yet?)
+        if (self.image_mime[1] in ['ogg']):
+            return
+
+        self._info['Audio'] = []
+
+        import yaafelib as yaafe
+
+        # use WAV, OGG, MP3 (and others) audio file formats
+        #audiofile = '/home/ursin/data/09Audio_UNS/Amy MacDonald - This Is The Life (2007) - Pop/01-amy_macdonald-mr_rock_and_roll.mp3'
+        audiofile = self.image_path
+
+        yaafe.setVerbose(True)
+        #print 'Yaafe v%s'%yaafe.getYaafeVersion()
+
+        # Load important components
+        if (yaafe.loadComponentLibrary('yaafe-io')!=0):
+            pywikibot.output(u'WARNING: cannot load yaafe-io component library !')   # ! needed, else it will crash !
+
+        # Build a DataFlow object using FeaturePlan
+        fp = yaafe.FeaturePlan(sample_rate=44100, normalize=0.98, resample=False)
+        #fp.addFeature('am: AmplitudeModulation blockSize=512 stepSize=256')
+        #fp.addFeature('ac: AutoCorrelation blockSize=512 stepSize=256')
+        #fp.addFeature('cdod: ComplexDomainOnsetDetection blockSize=512 stepSize=256')
+        #fp.addFeature('erg: Energy blockSize=512 stepSize=256')
+        #fp.addFeature('e: Envelope blockSize=512 stepSize=256')
+        fp.addFeature('ess: EnvelopeShapeStatistics blockSize=512 stepSize=256')
+        #fp.addFeature('f: Frames blockSize=512 stepSize=256')
+        #fp.addFeature('lpc: LPC blockSize=512 stepSize=256')
+        #fp.addFeature('lsf: LSF blockSize=512 stepSize=256')
+        #fp.addFeature('l: Loudness blockSize=512 stepSize=256')
+        #fp.addFeature('mfcc: MFCC blockSize=512 stepSize=256')
+        ## features: AutoCorrelationPeaksIntegrator, Cepstrum, Derivate, HistogramIntegrator, SlopeIntegrator, StatisticalIntegrator
+        #fp.addFeature('mfcc_d1: MFCC blockSize=512 stepSize=256 > Derivate DOrder=1')
+        #fp.addFeature('mfcc_d2: MFCC blockSize=512 stepSize=256 > Derivate DOrder=2')
+        #fp.addFeature('mas: MagnitudeSpectrum blockSize=512 stepSize=256')
+        #fp.addFeature('mes: MelSpectrum blockSize=512 stepSize=256')
+        #fp.addFeature('obsi: OBSI blockSize=512 stepSize=256')
+        #fp.addFeature('obsir: OBSIR blockSize=512 stepSize=256')
+        #fp.addFeature('psh: PerceptualSharpness blockSize=512 stepSize=256')
+        #fp.addFeature('psp: PerceptualSpread blockSize=512 stepSize=256')
+        #fp.addFeature('scfpb: SpectralCrestFactorPerBand blockSize=512 stepSize=256')
+        #fp.addFeature('sd: SpectralDecrease blockSize=512 stepSize=256')
+        #fp.addFeature('sfa: SpectralFlatness blockSize=512 stepSize=256')
+        #fp.addFeature('sfpb: SpectralFlatnessPerBand blockSize=512 stepSize=256')
+        #fp.addFeature('sfu: SpectralFlux blockSize=512 stepSize=256')
+        #fp.addFeature('sr: SpectralRolloff blockSize=512 stepSize=256')
+        fp.addFeature('sss: SpectralShapeStatistics blockSize=512 stepSize=256')
+        #fp.addFeature('ss: SpectralSlope blockSize=512 stepSize=256')
+        #fp.addFeature('sv: SpectralVariation blockSize=512 stepSize=256')
+        fp.addFeature('tss: TemporalShapeStatistics blockSize=512 stepSize=256')
+        fp.addFeature('zcr: ZCR blockSize=512 stepSize=256')
+        df = fp.getDataFlow()
+
+        ## or load a DataFlow from dataflow file.
+        #df = DataFlow()
+        #df.load(dataflow_file)
+
+        #fp.getDataFlow().save('')
+        #print df.display()
+
+        # configure an Engine
+        engine = yaafe.Engine()
+        engine.load(df)
+        # extract features from an audio file using AudioFileProcessor
+        afp = yaafe.AudioFileProcessor()
+        #afp.setOutputFormat('csv','',{})       # ! needed, else it will crash ! (but now produces file output)
+        #afp.processFile(engine,audiofile)
+        #feats = engine.readAllOutputs()
+        ## and play with your features
+        #print feats
+
+        # extract features from an audio file and write results to csv files
+        afp.setOutputFormat('csv','output',{'Precision':'8'})
+        afp.processFile(engine,audiofile)
+        # this creates output/myaudio.wav.mfcc.csv, .mfcc_d1.csv and .mfcc_d2.csv files.
+
+        ## extract features from a numpy array
+        #audio = np.random.randn(1,100000)
+        #feats = engine.processAudio(audio)
+        ## and play with your features
+        #print feats
+
+        import csv
+        data = {}
+        for ext in ['ess', 'sss', 'tss', 'zcr']:
+            fn = 'output' + audiofile + ('.%s.csv' % ext)
+            with open(fn, 'rb') as csvfile:
+                reader = csv.reader(csvfile, delimiter=',')
+                d = [row for row in reader]
+                d = np.array(d[5:])    # cut header and convert to numpy
+                d = np.float_(d)
+                d = tuple(np.average(d, axis=0))
+                pywikibot.output(ext)
+                #if ext in ['ess', 'sss', 'tss']:
+                #    pywikibot.output(u"centroid: %s\nspread: %s\nskewness: %s\nkurtosis: %s\n" % d)
+                #elif ext in ['zcr']:
+                #    pywikibot.output(u"zero-crossing rate: %s\n" % d)
+                data[ext.upper()] = d
+            os.remove(fn)
+            # remove folder too...
+
+        self._info['Audio'] = [data]
+        return
+
 
 # all classification and categorization methods and definitions - default variation
 #  use simplest classification I can think of (self-made) and do categorization
@@ -2751,6 +2908,9 @@ class CatImagesBot(checkimages.main, CatImages_Default):
 
         # general file EXIF history information
         self._detect_History_EXIF()
+
+        # general audio feature extraction
+#        self._detect_AudioFeatures_YAAFE()
 
     def _existInformation(self, info, ignore = ['Properties', 'ColorAverage']):
         result = []

@@ -371,9 +371,9 @@ def getSVN_framework_ver():
             info = '>'
         else:
             info = '>>'
-        pywikibot.output(u'  Directory revision: %s (%s %s)' % (framework_rev, info, __framework_rev__))
+        pywikibot.output(u'  Directory revision - framework: %s (%s %s)' % (framework_rev, info, __framework_rev__))
     else:
-        pywikibot.output(u'  WARNING: could not retrieve information!')
+        pywikibot.output(u'  WARNING: could not retrieve framework information!')
 
 ## Retrieve revision number of pywikibedia framework
 #
@@ -390,9 +390,9 @@ def getSVN_release_ver():
     if match and (len(match.groups()) > 0):
         release_rev = match.groups()[-1]
         info = {True: '=', False: '>'}        
-        pywikibot.output(u'  Directory revision: %s (%s %s)' % (release_rev, info[(release_rev==__release_rev__)], __release_rev__))
+        pywikibot.output(u'  Directory revision - release:   %s (%s %s)' % (release_rev, info[(release_rev==__release_rev__)], __release_rev__))
     else:
-        pywikibot.output(u'  WARNING: could not retrieve information!')
+        pywikibot.output(u'  WARNING: could not retrieve release information!')
 
 
 ## main procedure

@@ -15,12 +15,14 @@ import pagegenerators, catlib
 import userlib
 # Splitting the bot into library parts
 import wikipedia as pywikibot
+#from pywikibot.comms import http
 
 
 # 'TESTPAGE', 'TESTPAGES', ... imported from 'test_dtbext.py'
 
 
 if __name__ == '__main__':
+    pywikibot.handleArgs()
     site = pywikibot.getSite()
 
     #a_str = r'<strong class="error">Referenz-Fehler: Einzelnachweisfehler: <code>&lt;ref&gt;</code>-Tags existieren, jedoch wurde kein <code>&lt;references&#160;/&gt;</code>-Tag gefunden.</strong>'
