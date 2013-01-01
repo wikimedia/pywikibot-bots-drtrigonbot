@@ -1,6 +1,38 @@
 # -*- coding: utf-8 -*-
 msg = {
-	# Author: Csisc
+
+
+
+
+
+	# Author: Bináris
+	'en': {
+		'ndashredir-create': u'Bot: Creating hyphenated redirect to [[%(title)s]]',
+	},	# Author: Csisc
+	'aeb': {
+		'ndashredir-create': u'Bot: إنشاء واصلة إعادة توجيه إلى  [[%(title)s]]',
+	},	# Author: Csisc
+	'aeb': {
+		'ndashredir-create': u'Bot: إنشاء واصلة إعادة توجيه إلى  [[%(title)s]]',
+	},	# Author: Csisc
+	'aeb': {
+		'ndashredir-create': u'Bot: إنشاء واصلة إعادة توجيه إلى  [[%(title)s]]',
+	},	# Author: Csisc
+	'aeb': {
+		'ndashredir-create': u'Bot: إنشاء واصلة إعادة توجيه إلى  [[%(title)s]]',
+	},	# Author: Csisc
+	'aeb': {
+		'ndashredir-create': u'Bot: إنشاء واصلة إعادة توجيه إلى  [[%(title)s]]',
+	},	# Author: Csisc
+	'aeb': {
+		'ndashredir-create': u'Bot: إنشاء واصلة إعادة توجيه إلى  [[%(title)s]]',
+	},	# Author: Csisc
+	'aeb': {
+		'ndashredir-create': u'Bot: إنشاء واصلة إعادة توجيه إلى  [[%(title)s]]',
+	},	# Author: Csisc
+	'aeb': {
+		'ndashredir-create': u'Bot: إنشاء واصلة إعادة توجيه إلى  [[%(title)s]]',
+	},	# Author: Csisc
 	'aeb': {
 		'ndashredir-create': u'Bot: إنشاء واصلة إعادة توجيه إلى  [[%(title)s]]',
 	},
@@ -8,14 +40,30 @@ msg = {
 	'af': {
 		'ndashredir-create': u'Robot: aanstuur met afbreekteken na [[%(title)s]] geskep',
 	},
+	# Author: Als-Holder
+	'als': {
+		'ndashredir-create': u'Bot: E Wyterleitig mit Bindestrich uf [[%(title)s]] aagleit',
+	},
 	# Author: DRIHEM
 	'ar': {
 		'ndashredir-create': u'Bot: إنشاء واصلة إعادة توجيه إلى  [[%(title)s]]',
 	},
-	# Author: Xuacu
 	# Author: Esbardu
+	# Author: Xuacu
 	'ast': {
 		'ndashredir-create': u'Robó: Creando redireición con guiones a [[%(title)s]]',
+	},
+	# Author: Amir a57
+	'azb': {
+		'ndashredir-create': u'روبوت: آ خت تیره دار [[%(title)s]] یؤنلن‌دیرن',
+	},
+	# Author: Haqmar
+	'ba': {
+		'ndashredir-create': u'Робот:  [[%(title)s]] битенә дефислы йүнәлтеү',
+	},
+	# Author: Jim-by
+	'be-tarask': {
+		'ndashredir-create': u'Робат: Стварэньне перанакіраваньня з дэфісам на [[%(title)s]]',
 	},
 	# Author: Jim-by
 	'be-x-old': {
@@ -24,6 +72,10 @@ msg = {
 	# Author: Fulup
 	'br': {
 		'ndashredir-create': u'Robot: o krouiñ adkasoù gant barrennigoù-stagañ war-zu [[%(title)s]]',
+	},
+	# Author: Edinwiki
+	'bs': {
+		'ndashredir-create': u'Bot: Napravljeno preusmjerenje povezano sa crticom prema [[%(title)s]]',
 	},
 	# Author: BroOk
 	'ca': {
@@ -44,12 +96,12 @@ msg = {
 	'diq': {
 		'ndashredir-create': u'Boti [[%(title)s]] ra hetanayışi melumatê vıraşt',
 	},
-	# Author: Bináris
-	'en': {
-		'ndashredir-create': u'Bot: Creating hyphenated redirect to [[%(title)s]]',
+	# Author: Blahma
+	'eo': {
+		'ndashredir-create': u'Roboto: Kreanta dividstrekan alidirektilon por [[%(title)s]]',
 	},
-	# Author: Ryo567
 	# Author: Invadinado
+	# Author: Ryo567
 	'es': {
 		'ndashredir-create': u'Bot: Creando redirecciones con guiones a «[[%(title)s]]»',
 	},
@@ -74,7 +126,7 @@ msg = {
 		'ndashredir-create': u'Bot: Creo unha redirección con guión cara a "[[%(title)s]]"',
 	},
 	# Author: Als-Holder
-	'als': {
+	'gsw': {
 		'ndashredir-create': u'Bot: E Wyterleitig mit Bindestrich uf [[%(title)s]] aagleit',
 	},
 	# Author: ערן
@@ -101,9 +153,17 @@ msg = {
 	'it': {
 		'ndashredir-create': u'Bot: Creazione di un reindirizzo con trattino a [[%(title)s]]',
 	},
+	# Author: Shirayuki
+	'ja': {
+		'ndashredir-create': u'ロボットによる: ハイフンで連結されたリダイレクトの作成 [[%(title)s]]',
+	},
 	# Author: NoiX180
 	'jv': {
 		'ndashredir-create': u'Bot: Nggawé pangalihan mawa tandha pangubung nèng [[%(title)s]]',
+	},
+	# Author: 아라
+	'ko': {
+		'ndashredir-create': u'봇: [[%(title)s]](으)로 하이픈으로 연결한 넘겨주기 만듦',
 	},
 	# Author: Purodha
 	'ksh': {
@@ -113,20 +173,32 @@ msg = {
 	'lb': {
 		'ndashredir-create': u'Bot: Viruleedunge mat \'trait-d\'union\' op [[%(title)s]] uleeën',
 	},
+	# Author: StefanusRA
+	'map-bms': {
+		'ndashredir-create': u'Bot: Nggawé pangalihan mawa tandha pangubung nèng [[%(title)s]]',
+	},
 	# Author: Jagwar
 	'mg': {
 		'ndashredir-create': u'Rôbô: famoronana fihodinana misy fitsipi-panohizana mankany amin\'ny [[%(title)s]]',
 	},
+	# Author: Luthfi94
+	'min': {
+		'ndashredir-create': u'Bot: Mambuek pangaliahan hubuang ka [[%(title)s]]',
+	},
 	# Author: Bjankuloski06
 	'mk': {
 		'ndashredir-create': u'Бот: Создава пренасочување на поим со цртичка кон [[%(title)s]]',
+	},
+	# Author: Praveenp
+	'ml': {
+		'ndashredir-create': u'യന്ത്രം: ഹൈഫൻ ചേർത്തുള്ള ഒരു തിരിച്ചുവിടൽ [[%(title)s]] എന്നതിലേക്ക് സൃഷ്ടിക്കുന്നു',
 	},
 	# Author: Anakmalaysia
 	'ms': {
 		'ndashredir-create': u'Bot: Membuat lencongan bertanda sempang ke [[%(title)s]]',
 	},
 	# Author: Danmichaelo
-	'no': {
+	'nb': {
 		'ndashredir-create': u'Bot: Oppretter omdirigering med bindestrek til [[%(title)s]]',
 	},
 	# Author: Servien
@@ -137,12 +209,16 @@ msg = {
 	'nl': {
 		'ndashredir-create': u'Robot: doorverwijzing met afbreekteken naar [[%(title)s]] aangemaakt',
 	},
+	# Author: Danmichaelo
+	'no': {
+		'ndashredir-create': u'Bot: Oppretter omdirigering med bindestrek til [[%(title)s]]',
+	},
 	# Author: BeginaFelicysym
 	'pl': {
 		'ndashredir-create': u'Bot: Tworzenie przekierowania z łącznikami do [[%(title)s]]',
 	},
-	# Author: Dragonòt
 	# Author: Borichèt
+	# Author: Dragonòt
 	'pms': {
 		'ndashredir-create': u'Trigomiro: Creassion ëd ridiression con tratin vers [[%(title)s]]',
 	},
@@ -159,8 +235,9 @@ msg = {
 		'ndashredir-create': u'Robot: Creat redirecționare cu cratimă către [[%(title)s]]',
 	},
 	# Author: Ignatus
+	# Author: Volkov
 	'ru': {
-		'ndashredir-create': u'Бот: Создание перенаправления с дефисом на [[%(title)s]]',
+		'ndashredir-create': u'бот: создание перенаправления с дефисом на [[%(title)s]]',
 	},
 	# Author: Teslaton
 	'sk': {
@@ -170,8 +247,16 @@ msg = {
 	'sl': {
 		'ndashredir-create': u'Bot: Ustvarjanje preusmeritve z vezajem na [[%(title)s]]',
 	},
+	# Author: Abshirdheere
+	'so': {
+		'ndashredir-create': u'Bot: samayn xiriir ah dib u eegis [[%(title)s]]',
+	},
 	# Author: Rancher
 	'sr': {
+		'ndashredir-create': u'Бот: направљено преусмерење појма са цртицом на [[%(title)s]]',
+	},
+	# Author: Rancher
+	'sr-ec': {
 		'ndashredir-create': u'Бот: направљено преусмерење појма са цртицом на [[%(title)s]]',
 	},
 	# Author: Rancher
@@ -189,6 +274,10 @@ msg = {
 	# Author: Гусейн
 	'tly': {
 		'ndashredir-create': u'Бот: Истиғомәти дәгиш карде сохтеј де дефиси бә [[%(title)s]]',
+	},
+	# Author: Base
+	'uk': {
+		'ndashredir-create': u'бот: створення перенаправлення з дефізом на [[%(title)s]]',
 	},
 	# Author: Alunardon90
 	'vec': {
@@ -210,6 +299,10 @@ msg = {
 	'zh': {
 		'ndashredir-create': u'机器人：创建连字符的重定向到[[%(title)s]]',
 	},
+	# Author: Yfdyh000
+	'zh-hans': {
+		'ndashredir-create': u'机器人：创建连字符的重定向到[[%(title)s]]',
+	},
 	# Author: Justincheng12345
 	'zh-hant': {
 		'ndashredir-create': u'機械人：創建連字符重定向到[[%(title)s]]',
@@ -218,4 +311,4 @@ msg = {
 	'zh-hk': {
 		'ndashredir-create': u'機械人創建連字符重定向到[[%(title)s]]',
 	},
-}
+};

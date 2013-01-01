@@ -1,6 +1,18 @@
 # -*- coding: utf-8 -*-
 msg = {
+
+
+
+
+
+	'en': {
+		'noreferences-add-tag': u'Robot: Adding missing <references /> tag',
+	},
 	# Author: Csisc
+	# Author: Xqt
+	'qqq': {
+		'noreferences-add-tag': u'Edit summary when the bot adds a missing <code><references /></code> tag to the references section and if needed the section itself.\n\nDo not translate <code><references /></code>.',
+	},	# Author: Csisc
 	'aeb': {
 		'noreferences-add-tag': u'روبوت: إضافة وسم <references /> مفقود',
 	},
@@ -8,11 +20,15 @@ msg = {
 	'af': {
 		'noreferences-add-tag': u'Robot: Voeg vermiste <references />-etikette by',
 	},
+	# Author: Als-Chlämens
+	'als': {
+		'noreferences-add-tag': u'Bötli: Due e <references /> Markierig, wo no gfäält het, yyfiege',
+	},
 	'ar': {
 		'noreferences-add-tag': u'روبوت: إضافة وسم <references /> مفقود',
 	},
-	# Author: Xuacu
 	# Author: Esbardu
+	# Author: Xuacu
 	'ast': {
 		'noreferences-add-tag': u'Robó: Amestando la etiqueta <references /> que falta',
 	},
@@ -20,8 +36,20 @@ msg = {
 	'az': {
 		'noreferences-add-tag': u'Bot: Unudulmuş <references /> etiketi əlavə olunur',
 	},
+	# Author: E THP
+	'azb': {
+		'noreferences-add-tag': u'بوت: اونودولموش <references /> ائتیکئتی علاوه اولونور',
+	},
+	# Author: Haqmar
+	'ba': {
+		'noreferences-add-tag': u'Робот: булмаған <references /> тегы өҫтәлде',
+	},
 	'be': {
 		'noreferences-add-tag': u'Robot: дабаўлены адсутнічаючы тэг <references />',
+	},
+	# Author: EugeneZelenko
+	'be-tarask': {
+		'noreferences-add-tag': u'Робат: дадаў адсутнічаючы тэг <references />',
 	},
 	# Author: EugeneZelenko
 	'be-x-old': {
@@ -70,14 +98,11 @@ msg = {
 	'el': {
 		'noreferences-add-tag': u'Ρομπότ: προσθήκη ετικέτας <references /> που δεν υπήρχε',
 	},
-	'en': {
-		'noreferences-add-tag': u'Robot: Adding missing <references /> tag',
-	},
 	'eo': {
 		'noreferences-add-tag': u'Roboto: Aldono de "<references />"',
 	},
-	# Author: Vivaelcelta
 	# Author: Invadinado
+	# Author: Vivaelcelta
 	'es': {
 		'noreferences-add-tag': u'Bot: Añadiendo etiqueta <references /> que faltaba',
 	},
@@ -114,7 +139,7 @@ msg = {
 		'noreferences-add-tag': u'Bot: Engado a etiqueta <references />, que faltaba',
 	},
 	# Author: Als-Chlämens
-	'als': {
+	'gsw': {
 		'noreferences-add-tag': u'Bötli: Due e <references /> Markierig, wo no gfäält het, yyfiege',
 	},
 	'he': {
@@ -155,8 +180,9 @@ msg = {
 	'jv': {
 		'noreferences-add-tag': u'Bot: Nambahaké tag <references /> sing ilang',
 	},
+	# Author: 아라
 	'ko': {
-		'noreferences-add-tag': u'봇: 이전에 없던 <references /> 추가',
+		'noreferences-add-tag': u'로봇: 없던 <references /> 태그 추가',
 	},
 	# Author: Purodha
 	'ksh': {
@@ -177,6 +203,10 @@ msg = {
 	'lus': {
 		'noreferences-add-tag': u'Khawlmi: <thlulâkna /> kim lo belh',
 	},
+	# Author: Papuass
+	'lv': {
+		'noreferences-add-tag': u'Robots: Pievieno trūkstošo <references/> tagu',
+	},
 	# Author: StefanusRA
 	'map-bms': {
 		'noreferences-add-tag': u'Bot: Nambahna tag <references /> sing ilang',
@@ -185,16 +215,24 @@ msg = {
 	'mg': {
 		'noreferences-add-tag': u'Rôbô : Fanampiana ny balizy <references/> izay tsy ampy',
 	},
+	# Author: Luthfi94
+	'min': {
+		'noreferences-add-tag': u'Robot: Manambahkan tag <references /> nan hilang',
+	},
 	# Author: Bjankuloski06
 	'mk': {
 		'noreferences-add-tag': u'Робот: Додава отсутна ознака <references />',
+	},
+	# Author: Praveenp
+	'ml': {
+		'noreferences-add-tag': u'യന്ത്രം: ഇല്ലാതെ പോയ <references /> ടാഗ് ചേർക്കുന്നു',
 	},
 	# Author: Diagramma Della Verita
 	'ms': {
 		'noreferences-add-tag': u'Robot: Menambah tag  <references /> yang hilang',
 	},
 	# Author: Nghtwlkr
-	'no': {
+	'nb': {
 		'noreferences-add-tag': u'Robot: Legger til manglende <references />-element',
 	},
 	# Author: Servien
@@ -209,6 +247,10 @@ msg = {
 	# Author: Njardarlogar
 	'nn': {
 		'noreferences-add-tag': u'robot: la til manglande <references />-merke',
+	},
+	# Author: Nghtwlkr
+	'no': {
+		'noreferences-add-tag': u'Robot: Legger til manglende <references />-element',
 	},
 	# Author: Xqt
 	'pdc': {
@@ -231,16 +273,13 @@ msg = {
 	'pt-br': {
 		'noreferences-add-tag': u'Bot: Adicionando tag <references />',
 	},
-	# Author: Xqt
-	'qqq': {
-		'noreferences-add-tag': u'Edit summary when the bot adds a missing <code><references /></code> tag to the references section and if needed the section itself.\n\nDo not translate <code><references /></code>.',
-	},
 	# Author: Minisarm
 	'ro': {
 		'noreferences-add-tag': u'Robot: Adăugat tagul lipsă <references />',
 	},
+	# Author: Volkov
 	'ru': {
-		'noreferences-add-tag': u'Robot: Добавлен отсутствующий тег <references />',
+		'noreferences-add-tag': u'бот добавил отсутствующий тег <references />',
 	},
 	# Author: Wizzard
 	'sk': {
@@ -250,8 +289,20 @@ msg = {
 	'sl': {
 		'noreferences-add-tag': u'Robot: Dodajanje manjkajoče oznake <references />',
 	},
+	# Author: Abshirdheere
+	'so': {
+		'noreferences-add-tag': u'Bot: Ku daris wixii <references /> lumay',
+	},
+	# Author: Euriditi
+	'sq': {
+		'noreferences-add-tag': u'Roboti: Duke shtuar etiketën <references /> që mungon',
+	},
 	# Author: Rancher
 	'sr': {
+		'noreferences-add-tag': u'Робот: додата одсутна ознака <references />',
+	},
+	# Author: Rancher
+	'sr-ec': {
 		'noreferences-add-tag': u'Робот: додата одсутна ознака <references />',
 	},
 	# Author: Rancher
@@ -269,6 +320,10 @@ msg = {
 	'ta': {
 		'noreferences-add-tag': u'தானியங்கி: <references /> குறியீடினை இணைத்தல்',
 	},
+	# Author: Nullzero
+	'th': {
+		'noreferences-add-tag': u'โรบอต: เพิ่มแท็ก <references /> ที่หายไป',
+	},
 	# Author: AnakngAraw
 	'tl': {
 		'noreferences-add-tag': u'Robot: Idinaragdag ang nawawalang tatak na <references />',
@@ -283,6 +338,10 @@ msg = {
 	},
 	# Author: Ajdar
 	'tt': {
+		'noreferences-add-tag': u'Робот: <references /> дигән булмаган тег өстәлде',
+	},
+	# Author: Ajdar
+	'tt-cyrl': {
 		'noreferences-add-tag': u'Робот: <references /> дигән булмаган тег өстәлде',
 	},
 	# Author: Dim Grits
@@ -309,6 +368,10 @@ msg = {
 	'zh': {
 		'noreferences-add-tag': u'机器人：添加缺少的<references />标签',
 	},
+	# Author: Anakmalaysia
+	'zh-hans': {
+		'noreferences-add-tag': u'机器人：添加缺少的<references />标签',
+	},
 	# Author: Breawycker
 	# Author: Justincheng12345
 	'zh-hant': {
@@ -318,4 +381,4 @@ msg = {
 	'zh-hk': {
 		'noreferences-add-tag': u'機械人添加缺少的<references/>標記',
 	},
-}
+};

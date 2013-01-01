@@ -1,6 +1,37 @@
 # -*- coding: utf-8 -*-
 msg = {
-	# Author: Csisc
+
+
+
+
+
+	'en': {
+		'unlink-unlinking': u'Robot: Unlinking "%s"',
+	},	# Author: Csisc
+	'aeb': {
+		'unlink-unlinking': u'روبوت: إزالة وصلات "%s"',
+	},	# Author: Csisc
+	'aeb': {
+		'unlink-unlinking': u'روبوت: إزالة وصلات "%s"',
+	},	# Author: Csisc
+	'aeb': {
+		'unlink-unlinking': u'روبوت: إزالة وصلات "%s"',
+	},	# Author: Csisc
+	'aeb': {
+		'unlink-unlinking': u'روبوت: إزالة وصلات "%s"',
+	},	# Author: Csisc
+	'aeb': {
+		'unlink-unlinking': u'روبوت: إزالة وصلات "%s"',
+	},	# Author: Csisc
+	'aeb': {
+		'unlink-unlinking': u'روبوت: إزالة وصلات "%s"',
+	},	# Author: Csisc
+	'aeb': {
+		'unlink-unlinking': u'روبوت: إزالة وصلات "%s"',
+	},	# Author: Csisc
+	'aeb': {
+		'unlink-unlinking': u'روبوت: إزالة وصلات "%s"',
+	},	# Author: Csisc
 	'aeb': {
 		'unlink-unlinking': u'روبوت: إزالة وصلات "%s"',
 	},
@@ -8,13 +39,29 @@ msg = {
 	'af': {
 		'unlink-unlinking': u'Robot: verwysing na "%s" verwyder',
 	},
+	# Author: Als-Holder
+	'als': {
+		'unlink-unlinking': u'Bot: „%s“ entlinkt',
+	},
 	'ar': {
 		'unlink-unlinking': u'روبوت: إزالة وصلات "%s"',
 	},
-	# Author: Xuacu
 	# Author: Esbardu
+	# Author: Xuacu
 	'ast': {
 		'unlink-unlinking': u'Robó: Desenllaciando «%s»',
+	},
+	# Author: E THP
+	'azb': {
+		'unlink-unlinking': u'بوت: " %s " باغلانتی‌سی قالدیریلدی',
+	},
+	# Author: Haqmar
+	'ba': {
+		'unlink-unlinking': u'Робот: «%s» һылтаһын юйыу',
+	},
+	# Author: EugeneZelenko
+	'be-tarask': {
+		'unlink-unlinking': u'Робат: Выдаленьне спасылак на «%s»',
 	},
 	# Author: EugeneZelenko
 	'be-x-old': {
@@ -52,8 +99,9 @@ msg = {
 	'el': {
 		'unlink-unlinking': u'Ρομπότ: Αποσύνδεση του "%s"',
 	},
-	'en': {
-		'unlink-unlinking': u'Robot: Unlinking "%s"',
+	# Author: Blahma
+	'eo': {
+		'unlink-unlinking': u'Roboto: Malliganta "%s"',
 	},
 	# Author: Armando-Martin
 	# Author: Xqt
@@ -87,7 +135,7 @@ msg = {
 		'unlink-unlinking': u'Bot: Quito a ligazón cara a "%s"',
 	},
 	# Author: Als-Holder
-	'als': {
+	'gsw': {
 		'unlink-unlinking': u'Bot: „%s“ entlinkt',
 	},
 	'he': {
@@ -119,11 +167,15 @@ msg = {
 	},
 	# Author: Shirayuki
 	'ja': {
-		'unlink-unlinking': u'ロボットによる: リンクを解除中 "%s"',
+		'unlink-unlinking': u'ロボットによる: リンクを解除中「%s」',
 	},
 	# Author: NoiX180
 	'jv': {
 		'unlink-unlinking': u'Bot: Medhot pranala "%s"',
+	},
+	# Author: 아라
+	'ko': {
+		'unlink-unlinking': u'로봇: "%s" 링크 제거 중',
 	},
 	# Author: Purodha
 	'ksh': {
@@ -136,6 +188,10 @@ msg = {
 	# Author: Ooswesthoesbes
 	'li': {
 		'unlink-unlinking': u'Bot: wös verwiezing nao "%s"',
+	},
+	# Author: Hugo.arg
+	'lt': {
+		'unlink-unlinking': u'robotas: panaikinamos nuorodos į "%s"',
 	},
 	# Author: RMizo
 	'lus': {
@@ -153,11 +209,15 @@ msg = {
 	'mk': {
 		'unlink-unlinking': u'Робот: Ја отстранува врската „%s“',
 	},
+	# Author: Praveenp
+	'ml': {
+		'unlink-unlinking': u'യന്ത്രം: "%s" കണ്ണികളിൽ നിന്നൊഴിവാക്കുന്നു',
+	},
 	# Author: Anakmalaysia
 	'ms': {
 		'unlink-unlinking': u'Robot: Membuang pautan "%s"',
 	},
-	'no': {
+	'nb': {
 		'unlink-unlinking': u'robot: fjerner lenke til "%s"',
 	},
 	# Author: Servien
@@ -168,8 +228,12 @@ msg = {
 	'nl': {
 		'unlink-unlinking': u'Robot: verwijzing naar "%s" verwijderd',
 	},
+	# Author: Njardarlogar
 	'nn': {
-		'unlink-unlinking': u'robot: fjerna lenkje til "%s"',
+		'unlink-unlinking': u'robot: fjerna lenkje til «%s»',
+	},
+	'no': {
+		'unlink-unlinking': u'robot: fjerner lenke til "%s"',
 	},
 	'pl': {
 		'unlink-unlinking': u'Robot odlinkowuje "%s"',
@@ -192,8 +256,9 @@ msg = {
 		'unlink-unlinking': u'Robot: Eliminat legături către „%s”',
 	},
 	# Author: Eleferen
+	# Author: Volkov
 	'ru': {
-		'unlink-unlinking': u'Бот: Удаление ссылки «%s»',
+		'unlink-unlinking': u'бот: удаление ссылки «%s»',
 	},
 	# Author: Teslaton
 	'sk': {
@@ -203,8 +268,16 @@ msg = {
 	'sl': {
 		'unlink-unlinking': u'Robot: Odstranjevanje povezave na »%s«',
 	},
+	# Author: Abshirdheere
+	'so': {
+		'unlink-unlinking': u'Bot: Tirtiris waxa la xiriira "%s"',
+	},
 	# Author: Rancher
 	'sr': {
+		'unlink-unlinking': u'Робот: уклоњена веза „%s“',
+	},
+	# Author: Rancher
+	'sr-ec': {
 		'unlink-unlinking': u'Робот: уклоњена веза „%s“',
 	},
 	# Author: Rancher
@@ -235,6 +308,10 @@ msg = {
 	'uk': {
 		'unlink-unlinking': u'Бот: Вилучення посилання "%s"',
 	},
+	# Author: CoderSI
+	'uz': {
+		'unlink-unlinking': u'Bot: "%s" havolasini oʻchirish',
+	},
 	# Author: Alunardon90
 	'vec': {
 		'unlink-unlinking': u'Robot: Eliminasion cołegamenti a "%s"',
@@ -247,6 +324,10 @@ msg = {
 	'zh': {
 		'unlink-unlinking': u'机器人：断开“%s”链接',
 	},
+	# Author: Yfdyh000
+	'zh-hans': {
+		'unlink-unlinking': u'机器人：断开“%s”链接',
+	},
 	# Author: Breawycker
 	'zh-hant': {
 		'unlink-unlinking': u'機器人： 斷開連結" %s "',
@@ -255,4 +336,4 @@ msg = {
 	'zh-hk': {
 		'unlink-unlinking': u'機械人取消“%s”鏈接',
 	},
-}
+};

@@ -180,9 +180,9 @@ class SubsterBot(basic.AutoBasicBot):
         self._ConfCSSpostprocPage = pywikibot.Page(self.site, bot_config['ConfCSSpostproc'])
         self._ConfCSSconfigPage   = pywikibot.Page(self.site, bot_config['ConfCSSconfig'])
         self.pagegen     = pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
-#        self._code       = self._ConfCSSpostprocPage.get()
-#        pywikibot.output(u'Imported postproc %s rev %s from %s' % \
-#          ((self._ConfCSSpostprocPage.title(asLink=True),) + self._ConfCSSpostprocPage.getVersionHistory(revCount=1)[0][:2]) )
+        self._code       = self._ConfCSSpostprocPage.get()
+        pywikibot.output(u'Imported postproc %s rev %s from %s' % \
+          ((self._ConfCSSpostprocPage.title(asLink=True),) + self._ConfCSSpostprocPage.getVersionHistory(revCount=1)[0][:2]) )
         self._flagenable = {}
         if self._ConfCSSconfigPage.exists():
             exec(self._ConfCSSconfigPage.get())    # with variable: bot_config_wiki

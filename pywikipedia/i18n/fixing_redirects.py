@@ -1,6 +1,37 @@
 # -*- coding: utf-8 -*-
 msg = {
-	# Author: Csisc
+
+
+
+
+
+	'en': {
+		'fixing_redirects-fixing': u'Bot: Fixing redirects',
+	},	# Author: Csisc
+	'aeb': {
+		'fixing_redirects-fixing': u'بوت: إصلاح التحويلات',
+	},	# Author: Csisc
+	'aeb': {
+		'fixing_redirects-fixing': u'بوت: إصلاح التحويلات',
+	},	# Author: Csisc
+	'aeb': {
+		'fixing_redirects-fixing': u'بوت: إصلاح التحويلات',
+	},	# Author: Csisc
+	'aeb': {
+		'fixing_redirects-fixing': u'بوت: إصلاح التحويلات',
+	},	# Author: Csisc
+	'aeb': {
+		'fixing_redirects-fixing': u'بوت: إصلاح التحويلات',
+	},	# Author: Csisc
+	'aeb': {
+		'fixing_redirects-fixing': u'بوت: إصلاح التحويلات',
+	},	# Author: Csisc
+	'aeb': {
+		'fixing_redirects-fixing': u'بوت: إصلاح التحويلات',
+	},	# Author: Csisc
+	'aeb': {
+		'fixing_redirects-fixing': u'بوت: إصلاح التحويلات',
+	},	# Author: Csisc
 	'aeb': {
 		'fixing_redirects-fixing': u'بوت: إصلاح التحويلات',
 	},
@@ -8,13 +39,33 @@ msg = {
 	'af': {
 		'fixing_redirects-fixing': u'Robot: aansture reggemaak',
 	},
+	# Author: Als-Holder
+	'als': {
+		'fixing_redirects-fixing': u'Bot: Umleitige repariert',
+	},
 	'ar': {
 		'fixing_redirects-fixing': u'بوت: إصلاح التحويلات',
 	},
-	# Author: Xuacu
+	# Author: Basharh
+	'arc': {
+		'fixing_redirects-fixing': u'ܪܘܒܘܛ: ܚܕܬܘܬܐ ܕܨܘ̈ܝܒܐ',
+	},
 	# Author: Esbardu
+	# Author: Xuacu
 	'ast': {
 		'fixing_redirects-fixing': u'Robó: Iguando redireiciones',
+	},
+	# Author: E THP
+	'azb': {
+		'fixing_redirects-fixing': u'بوت: ایستیقامت‌لندیرمه‌لر دوزلدیلدی',
+	},
+	# Author: Sagan
+	'ba': {
+		'fixing_redirects-fixing': u'Робот: йүнәлтеүҙәрҙе төҙәтеү',
+	},
+	# Author: Jim-by
+	'be-tarask': {
+		'fixing_redirects-fixing': u'Робат: Выпраўленьне перанакіраваньняў',
 	},
 	# Author: Jim-by
 	'be-x-old': {
@@ -40,8 +91,8 @@ msg = {
 	'cs': {
 		'fixing_redirects-fixing': u'Robot opravil přesměrování',
 	},
-	# Author: Sarrus
 	# Author: Christian List
+	# Author: Sarrus
 	'da': {
 		'fixing_redirects-fixing': u'Robot: Retter omdirigeringer',
 	},
@@ -56,9 +107,6 @@ msg = {
 	# Author: Geraki
 	'el': {
 		'fixing_redirects-fixing': u'Ρομπότ: Διόρθωση ανακατευθύνσεων',
-	},
-	'en': {
-		'fixing_redirects-fixing': u'Bot: Fixing redirects',
 	},
 	# Author: Remux
 	'eo': {
@@ -100,7 +148,7 @@ msg = {
 		'fixing_redirects-fixing': u'Bot: Arranxo a redirección',
 	},
 	# Author: Als-Holder
-	'als': {
+	'gsw': {
 		'fixing_redirects-fixing': u'Bot: Umleitige repariert',
 	},
 	'he': {
@@ -142,12 +190,24 @@ msg = {
 	'jv': {
 		'fixing_redirects-fixing': u'Bot: Mbeneraké pangalihan',
 	},
+	# Author: Akoppad
+	'kn': {
+		'fixing_redirects-fixing': u'ಬೋಟ್: ಸ್ಥಿರೀಕರಿಸುವ ಪುನರ್ನಿರ್ದೇಶನಗಳು',
+	},
+	# Author: 아라
+	'ko': {
+		'fixing_redirects-fixing': u'봇: 넘겨주기 고침',
+	},
 	# Author: Purodha
 	'ksh': {
 		'fixing_redirects-fixing': u'Bot: Ömleidong repareere.',
 	},
 	# Author: George Animal
 	'ku': {
+		'fixing_redirects-fixing': u'Bot:Beralîkirinan serast bike',
+	},
+	# Author: George Animal
+	'ku-latn': {
 		'fixing_redirects-fixing': u'Bot:Beralîkirinan serast bike',
 	},
 	# Author: Robby
@@ -157,6 +217,10 @@ msg = {
 	# Author: Ooswesthoesbes
 	'li': {
 		'fixing_redirects-fixing': u'Bot: fix redireks',
+	},
+	# Author: Hugo.arg
+	'lt': {
+		'fixing_redirects-fixing': u'robotas: Peradresavimų taisymas',
 	},
 	# Author: Papuass
 	'lv': {
@@ -170,9 +234,17 @@ msg = {
 	'mg': {
 		'fixing_redirects-fixing': u'Rôbô: fanitsiana fihodinana',
 	},
+	# Author: Luthfi94
+	'min': {
+		'fixing_redirects-fixing': u'Bot: Mamelokkan pangaliahan',
+	},
 	# Author: Bjankuloski06
 	'mk': {
 		'fixing_redirects-fixing': u'Бот: Поправа пренасочувања',
+	},
+	# Author: Praveenp
+	'ml': {
+		'fixing_redirects-fixing': u'യന്ത്രം: തിരിച്ചുവിടലുകൾ ശരിയാക്കുന്നു',
 	},
 	# Author: Anakmalaysia
 	'ms': {
@@ -182,7 +254,7 @@ msg = {
 	'mt': {
 		'fixing_redirects-fixing': u'Bot: Tiswija tar-rindirizzi',
 	},
-	'no': {
+	'nb': {
 		'fixing_redirects-fixing': u'Robot: Retter omdirigeringer',
 	},
 	# Author: Servien
@@ -195,6 +267,9 @@ msg = {
 	},
 	'nn': {
 		'fixing_redirects-fixing': u'robot: retta omdirigeringar',
+	},
+	'no': {
+		'fixing_redirects-fixing': u'Robot: Retter omdirigeringer',
 	},
 	'pl': {
 		'fixing_redirects-fixing': u'Bot: naprawa przekierowań',
@@ -217,8 +292,13 @@ msg = {
 		'fixing_redirects-fixing': u'Robot: Reparat redirecționările',
 	},
 	# Author: Eleferen
+	# Author: Volkov
 	'ru': {
-		'fixing_redirects-fixing': u'Бот: Исправление перенаправлений',
+		'fixing_redirects-fixing': u'бот: исправление перенаправлений',
+	},
+	# Author: පසිඳු කාවින්ද
+	'si': {
+		'fixing_redirects-fixing': u'රොබෝ: යළියොමු සවි කරමින්',
 	},
 	# Author: Teslaton
 	'sk': {
@@ -228,12 +308,20 @@ msg = {
 	'sl': {
 		'fixing_redirects-fixing': u'Bot: Popravljanje preusmeritev',
 	},
+	# Author: Abshirdheere
+	'so': {
+		'fixing_redirects-fixing': u'Bot: Hagaajinta rogeyaasha',
+	},
 	# Author: Euriditi
 	'sq': {
 		'fixing_redirects-fixing': u'Roboti: Duke korrigjuar ridrejtimet',
 	},
 	# Author: Rancher
 	'sr': {
+		'fixing_redirects-fixing': u'Бот: исправљена преусмерења',
+	},
+	# Author: Rancher
+	'sr-ec': {
 		'fixing_redirects-fixing': u'Бот: исправљена преусмерења',
 	},
 	# Author: Rancher
@@ -255,6 +343,10 @@ msg = {
 	'te': {
 		'fixing_redirects-fixing': u'బాటు: దారిమార్పులను సరిచేసింది',
 	},
+	# Author: Nullzero
+	'th': {
+		'fixing_redirects-fixing': u'โรบอต: แก้หน้าเปลี่ยนทาง',
+	},
 	# Author: AnakngAraw
 	'tl': {
 		'fixing_redirects-fixing': u'Bot: Kinukumpuni ang mga pagpapapunta sa iba',
@@ -270,6 +362,10 @@ msg = {
 	# Author: A1
 	'uk': {
 		'fixing_redirects-fixing': u'Бот: Виправлення перенаправлень',
+	},
+	# Author: CoderSI
+	'uz': {
+		'fixing_redirects-fixing': u'Bot: Qayta yo‘naltirishlar to‘g‘rilanishi',
 	},
 	# Author: Alunardon90
 	'vec': {
@@ -294,6 +390,10 @@ msg = {
 	'zh': {
 		'fixing_redirects-fixing': u'机器人：修正重定向',
 	},
+	# Author: Yfdyh000
+	'zh-hans': {
+		'fixing_redirects-fixing': u'机器人：修正重定向',
+	},
 	# Author: Breawycker
 	# Author: Justincheng12345
 	'zh-hant': {
@@ -303,4 +403,4 @@ msg = {
 	'zh-hk': {
 		'fixing_redirects-fixing': u'機械人修補重定向',
 	},
-}
+};

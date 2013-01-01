@@ -1,11 +1,29 @@
 # -*- coding: utf-8 -*-
 msg = {
+
+
+
+
+
+	'en': {
+		'clean_sandbox-cleaned': u'Robot: Automatically cleaned',
+	},
 	# Author: Csisc
+	'qqq': {
+		'clean_sandbox-cleaned': u'Summary message when the bot cleans sandbox',
+	},	# Author: Csisc
 	'aeb': {
 		'clean_sandbox-cleaned': u'روبوت: هذه الصفحة سيتم تفريغها تلقائيا',
 	},
+	'als': {
+		'clean_sandbox-cleaned': u'Bötli: Sandchaschte iigebnet.',
+	},
 	'ar': {
 		'clean_sandbox-cleaned': u'روبوت: هذه الصفحة سيتم تفريغها تلقائيا',
+	},
+	# Author: Basharh
+	'arc': {
+		'clean_sandbox-cleaned': u'ܪܘܒܘܛ: ܦܐܬܐ ܬܬܬܕܟܝܬ ܝܬܐܝܬ',
 	},
 	# Author: Xuacu
 	'ast': {
@@ -15,9 +33,21 @@ msg = {
 	'az': {
 		'clean_sandbox-cleaned': u'Bot: Avtomatik olaraq təmizləndi',
 	},
+	# Author: E THP
+	'azb': {
+		'clean_sandbox-cleaned': u'بوت: آوتوماتیک اولاراق تمیزلندی',
+	},
+	# Author: Haqmar
+	'ba': {
+		'clean_sandbox-cleaned': u'Робот: автоматик юйылған',
+	},
 	# Author: Mucalexx
 	'bar': {
 		'clean_sandbox-cleaned': u'Bot: Sétz d\' Spüwiesen zruck.',
+	},
+	# Author: EugeneZelenko
+	'be-tarask': {
+		'clean_sandbox-cleaned': u'Робат: аўтаматычная ачыстка',
 	},
 	# Author: EugeneZelenko
 	'be-x-old': {
@@ -67,16 +97,13 @@ msg = {
 	'el': {
 		'clean_sandbox-cleaned': u'Ρομπότ: Καθαρίστηκε αυτόματα',
 	},
-	'en': {
-		'clean_sandbox-cleaned': u'Robot: Automatically cleaned',
-	},
 	# Author: Airon90
 	'eo': {
 		'clean_sandbox-cleaned': u'Roboto: Aŭtomate viŝita',
 	},
 	# Author: Dferg
-	# Author: Xqt
 	# Author: Invadinado
+	# Author: Xqt
 	'es': {
 		'clean_sandbox-cleaned': u'Bot: Limpieza automatizada',
 	},
@@ -111,7 +138,7 @@ msg = {
 	'gl': {
 		'clean_sandbox-cleaned': u'Bot: Limpeza automática',
 	},
-	'als': {
+	'gsw': {
 		'clean_sandbox-cleaned': u'Bötli: Sandchaschte iigebnet.',
 	},
 	'he': {
@@ -151,8 +178,9 @@ msg = {
 	'jv': {
 		'clean_sandbox-cleaned': u'Bot: Diresiki sacara otomatis',
 	},
+	# Author: 아라
 	'ko': {
-		'clean_sandbox-cleaned': u'로봇: 연습장 비움',
+		'clean_sandbox-cleaned': u'로봇: 연습장을 자동으로 비움',
 	},
 	'ksh': {
 		'clean_sandbox-cleaned': u'Bot: allt Zeush fott gedunn.',
@@ -181,11 +209,15 @@ msg = {
 	'mk': {
 		'clean_sandbox-cleaned': u'Робот: Чистење на песокот',
 	},
+	# Author: Praveenp
+	'ml': {
+		'clean_sandbox-cleaned': u'യന്ത്രം: സ്വയം വൃത്തിയാക്കി',
+	},
 	# Author: Anakmalaysia
 	'ms': {
 		'clean_sandbox-cleaned': u'Robot: Dibersihkan secara automatik',
 	},
-	'no': {
+	'nb': {
 		'clean_sandbox-cleaned': u'bot: Rydder sandkassa.',
 	},
 	'nds': {
@@ -202,6 +234,9 @@ msg = {
 	# Author: Njardarlogar
 	'nn': {
 		'clean_sandbox-cleaned': u'robot: automatisk rydjing',
+	},
+	'no': {
+		'clean_sandbox-cleaned': u'bot: Rydder sandkassa.',
 	},
 	# Author: Shisir 1945
 	'or': {
@@ -224,15 +259,13 @@ msg = {
 	'pt-br': {
 		'clean_sandbox-cleaned': u'Bot: Limpeza automática',
 	},
-	'qqq': {
-		'clean_sandbox-cleaned': u'Summary message when the bot cleans sandbox',
-	},
 	# Author: Minisarm
 	'ro': {
 		'clean_sandbox-cleaned': u'Robot: Curățat automat',
 	},
+	# Author: Volkov
 	'ru': {
-		'clean_sandbox-cleaned': u'Бот: очистка песочницы',
+		'clean_sandbox-cleaned': u'бот: очистка песочницы',
 	},
 	# Author: Avicennasis
 	'sco': {
@@ -246,12 +279,20 @@ msg = {
 	'sl': {
 		'clean_sandbox-cleaned': u'Robot: Samodejno čiščenje',
 	},
+	# Author: Abshirdheere
+	'so': {
+		'clean_sandbox-cleaned': u'Bot: Bogaan iskeed ay isku tirtiri',
+	},
 	# Author: Euriditi
 	'sq': {
 		'clean_sandbox-cleaned': u'Roboti: Pastrim automatik',
 	},
 	# Author: Rancher
 	'sr': {
+		'clean_sandbox-cleaned': u'Робот: очишћен песак',
+	},
+	# Author: Rancher
+	'sr-ec': {
 		'clean_sandbox-cleaned': u'Робот: очишћен песак',
 	},
 	# Author: Rancher
@@ -288,9 +329,17 @@ msg = {
 	'tt': {
 		'clean_sandbox-cleaned': u'Робот: автоматик рәвештә чистарту',
 	},
+	# Author: Zahidulla
+	'tt-cyrl': {
+		'clean_sandbox-cleaned': u'Робот: автоматик рәвештә чистарту',
+	},
 	# Author: Тест
 	'uk': {
 		'clean_sandbox-cleaned': u'Робот: Автоматична очистка',
+	},
+	# Author: CoderSI
+	'uz': {
+		'clean_sandbox-cleaned': u'Bot: Qumloqni tozalash',
 	},
 	# Author: Alunardon90
 	# Author: GatoSelvadego
@@ -313,6 +362,10 @@ msg = {
 	'zh': {
 		'clean_sandbox-cleaned': u'机器人：自动清理',
 	},
+	# Author: Yfdyh000
+	'zh-hans': {
+		'clean_sandbox-cleaned': u'机器人：自动清理',
+	},
 	# Author: Waihorace
 	'zh-hant': {
 		'clean_sandbox-cleaned': u'機械人：自動清除',
@@ -321,4 +374,4 @@ msg = {
 	'zh-hk': {
 		'clean_sandbox-cleaned': u'機械人自動清除',
 	},
-}
+};
