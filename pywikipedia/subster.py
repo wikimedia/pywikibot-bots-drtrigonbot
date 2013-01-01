@@ -8,11 +8,38 @@ for 'postproc' example code.
 
 Look at https://wiki.toolserver.org/view/Mail how to setup mail handling. The
 following code was used in file '$HOME/.forward+subster':
---- --- --- --- --- --- --- --- --- --- 
+--- --- --- --- --- --- --- --- --- ---
 > ~/data/subster/mail_inbox
---- --- --- --- --- --- --- --- --- --- 
+--- --- --- --- --- --- --- --- --- ---
 in order to enable mail (mbox style) storage in given file for address:
 drtrigon+subster@toolserver.org
+
+Other scripts and tools related to this bot are:
+- subster_irc.py            IRC Robot
+- substersim.py             Subster simulation panel
+- subster_mail_queue.py     Subster mail queue
+
+The following parameters are supported:
+
+&params;
+
+All other parameters will be ignored.
+
+Syntax example:
+    python subster.py
+        Default operating mode.
+
+    python subster.py -lang:en
+        Run bot on another site language than configured as default. E.g. 'en'.
+
+    python subster.py -family:meta -lang:
+    python subster.py -family:wikidata -lang:repo
+        Run bot on another site family and language than configured as default.
+        E.g. 'meta' or 'wikidata'.
+
+    python subster_irc.py
+        Default operating mode for IRC Robot. The IRC bot uses this script as
+        subclass.
 """
 ## @package subster
 #  @brief   Dynamic Text Substitutions Robot
@@ -34,7 +61,7 @@ drtrigon+subster@toolserver.org
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__ = '$Id$'
+__version__ = '$Id: subster.py 10858 2013-01-01 22:40:36Z drtrigon $'
 #
 
 
@@ -50,7 +77,6 @@ import copy
 import ast
 
 import pagegenerators, basic
-import dtbext
 # Splitting the bot into library parts
 import wikipedia as pywikibot
 from pywikibot import i18n
@@ -149,15 +175,14 @@ class SubsterBot(basic.AutoBasicBot):
 
         self._debug = debug
 
-
         # init constants
         self._userListPage        = pywikibot.Page(self.site, bot_config['TemplateName'])
         self._ConfCSSpostprocPage = pywikibot.Page(self.site, bot_config['ConfCSSpostproc'])
         self._ConfCSSconfigPage   = pywikibot.Page(self.site, bot_config['ConfCSSconfig'])
         self.pagegen     = pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
-        self._code       = self._ConfCSSpostprocPage.get()
-        pywikibot.output(u'Imported postproc %s rev %s from %s' % \
-          ((self._ConfCSSpostprocPage.title(asLink=True),) + self._ConfCSSpostprocPage.getVersionHistory(revCount=1)[0][:2]) )
+#        self._code       = self._ConfCSSpostprocPage.get()
+#        pywikibot.output(u'Imported postproc %s rev %s from %s' % \
+#          ((self._ConfCSSpostprocPage.title(asLink=True),) + self._ConfCSSpostprocPage.getVersionHistory(revCount=1)[0][:2]) )
         self._flagenable = {}
         if self._ConfCSSconfigPage.exists():
             exec(self._ConfCSSconfigPage.get())    # with variable: bot_config_wiki
@@ -193,6 +218,18 @@ class SubsterBot(basic.AutoBasicBot):
             # output result to page or return directly
             if sim:
                 return substed_content
+            elif (self.site.family.name == 'wikidata'):     # DRTRIGON-130
+                # convert talk page result to wikidata(base)
+                data = self.WD_convertContent(substed_content)
+                #outpage = page.toggleTalkPage()
+                outpage = pywikibot.wikidataPage(self.site, page.toggleTalkPage().title())
+                #dic = json.loads(outpage.get())
+                dic = outpage.getentities()
+
+                # check for changes and then write/change/set values
+                summary = u'Bot: update data because of configuration on %s.' % page.title(asLink=True)
+                if not self.WD_save(outpage, dic[u'claims'], {u'p32': data}, summary):
+                    pywikibot.output(u'NOTHING TO DO!')
             else:
                 # if changed, write!
                 if (substed_content != content):
@@ -208,7 +245,7 @@ class SubsterBot(basic.AutoBasicBot):
                     if page.title() in self._flagenable:
                         flags.update( self._flagenable[page.title()] )
                     pywikibot.output(u'Flags used for writing: %s' % flags)
-                    self.save( page, substed_content, 
+                    self.save( page, substed_content,
                                (head + u' ' + msg) % {'tags':", ".join(substed_tags)},
                                **flags )
                 else:
@@ -235,10 +272,10 @@ class SubsterBot(basic.AutoBasicBot):
             substed_tags += tags
         except:
             exc_info = sys.exc_info()
-            (exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)
+            (exception_only, result) = pywikibot.gettraceback(exc_info)
             substed_content += ast.literal_eval(self._param_default['error']) %\
                                {'error': bot_config['ErrorTemplate'] %\
-                                 ( pywikibot.Timestamp.now().isoformat(' '), 
+                                 ( pywikibot.Timestamp.now().isoformat(' '),
                                    u' ' + result.replace(u'\n', u'\n ').rstrip() ) }
             substed_tags.append( u'>error:BotMagicWords<' )
 
@@ -252,11 +289,11 @@ class SubsterBot(basic.AutoBasicBot):
                 substed_tags += tags
             except:
                 exc_info = sys.exc_info()
-                (exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)
+                (exception_only, result) = pywikibot.gettraceback(exc_info)
                 substed_content += ast.literal_eval(item['error']) %\
                                    {'error': bot_config['ErrorTemplate'] %\
                                      ( item['value'],
-                                       pywikibot.Timestamp.now().isoformat(' '), 
+                                       pywikibot.Timestamp.now().isoformat(' '),
                                        u' ' + result.replace(u'\n', u'\n ').rstrip() ) }
                 substed_tags.append( u'>error:%s<' % item['value'] )
 
@@ -331,9 +368,9 @@ class SubsterBot(basic.AutoBasicBot):
             return (content, substed_tags)
         if   param['wiki']:
             if ast.literal_eval(param['expandtemplates']):  # DRTRIGON-93 (only with 'wiki')
-                external_buffer = dtbext.pywikibot.Page(self.site, param['url']).get(expandtemplates=True)
+                external_buffer = pywikibot.Page(self.site, param['url']).get(expandtemplates=True)
             else:
-                external_buffer = self.load( dtbext.pywikibot.Page(self.site, param['url']) )
+                external_buffer = self.load( pywikibot.Page(self.site, param['url']) )
         elif (param['url'][:7] == u'mail://'): # DRTRIGON-101
             param['url'] = param['url'].replace(u'{{@}}', u'@')     # e.g. nlwiki
             mbox = SubsterMailbox(pywikibot.config.datafilepath(bot_config['data_path'], bot_config['mbox_file'], ''))
@@ -399,7 +436,7 @@ class SubsterBot(basic.AutoBasicBot):
                     exec(self._code + (bot_config['CodeTemplate'] % func), scope, scope)
                     external_data = DATA[0]
                 logging.getLogger('subster').debug( external_data )
-    
+
                 # 5.) subst content
                 var_regex = self.get_var_regex(value)
                 content = var_regex.sub((self._var_regex_str%{'var':value,'cont':external_data}), content, int(param['count']))
@@ -443,6 +480,92 @@ class SubsterBot(basic.AutoBasicBot):
         pywikibot.output(u'--- ' * 15)
         pywikibot.output(u''.join(diff))
         pywikibot.output(u'--- ' * 15)
+
+    def WD_convertContent(self, substed_content):
+        """Converts the substed content to Wikidata format in order to save.
+           (1 line of wiki text is converted to 1 claim/statement)
+
+           @param substed_content: New content (with tags).
+           @type  substed_content: string
+        """
+        # DRTRIGON-130: convert talk page result to wikidata(base)
+        #res, i = {}, 0
+        res = []
+        for line in substed_content.splitlines():
+            #data = self.get_var_regex('(.*?)', '(.*?)').findall(line)
+            data = self.get_var_regex('.*?', '(.*?)').sub('\g<1>', line)
+            #if not data:
+            if data == line:
+                continue
+            #buf = []
+            #for item in data:
+            #    #print item[0], item[1]
+            #    params = { u'property':  u'p%i' % i,
+            #               u'value': item[1] }
+            #    buf.append(params)
+            #res[u'p%i' % i] = buf
+            #i += 1
+            res.append(data)
+
+        return res
+
+    def WD_save(self, outpage, dic, data, comment=None):
+        """Stores the content to Wikidata.
+
+           @param dic: Original content.
+           @type  dic: dict
+           @param data: New content.
+           @type  data: dict
+
+           Returns nothing, but stores the changed content.
+        """
+        # DRTRIGON-130: check for changes and then write/change/set values
+        changed = False
+        for prop in data:
+            pywikibot.output(u'Checking claim with %i values' % len(data[prop]))
+            for i, item in enumerate(data[prop]):
+                if (i < len(dic[prop])) and \
+                  (dic[prop][i][u'mainsnak'][u'datavalue'][u'value'] == item):
+                    pass    # same value; nothing to do
+                else:
+                    # changes; update or create claim
+                    changed = True
+                    if (i < len(dic[prop])):
+                        #print item, dic[prop][i][u'mainsnak'][u'datavalue'][u'value']
+                        pywikibot.output(u'Updating claim with value: %s' % item)
+                        outpage.setclaimvalue(dic[prop][i][u'id'], item, comment=comment)
+                    else:
+                        pywikibot.output(u'Creating new claim with value: %s' % item)
+                        outpage.createclaim(prop, item, comment=comment)
+                # search linked items and update them too
+                # VERY HACKY, HAS TO BE CONCEPTIONALLY IMPROVED:
+                # link any "key = value" pair to any other item by adding "key"
+                # to the items 'aliases' (could also use 'description' or even
+                # a redirect)
+                (key, value) = map(string.strip, item.split('='))
+                for linked in outpage.searchentities(key):
+                    outpage = pywikibot.wikidataPage(self.site, linked[u'id'])
+                    #attr = outpage.getentities()
+                    attr = linked
+                    if (u'aliases' in attr) and (key in attr[u'aliases']):
+                        pywikibot.output(u'Item %s linked to key %s ...' % (outpage.title(asLink=True), key))
+                        data = outpage.getentities()
+                        if u'claims' in data:
+                            if (data[u'claims'][u'p32'][0][u'mainsnak'][u'datavalue'][u'value'].strip() == value):
+                                pywikibot.output(u'... ok')
+                                continue
+                            changed = True
+                            pywikibot.output(u'... updating claim with value: %s' % value)
+                            outpage.setclaimvalue(data[u'claims'][u'p32'][0][u'id'], value, comment=comment)
+                        else:
+                            changed = True
+                            pywikibot.output(u'... creating new claim with value: %s' % value)
+                            outpage.createclaim(prop, value, comment=comment)
+        # speed-up by setting everything at once (in one single write attempt)
+        #outpage.editentity(data = {u'claims': data})
+        #outpage.setitem()
+
+        return changed
 
     def get_var_regex(self, var, cont='.*?'):
         """Get regex used/needed to find the tags to replace.
@@ -547,7 +670,7 @@ class SubsterMailbox(mailbox.mbox):
             if sender in unique:
                 (j, timestmp_j) = unique[sender]
 
-                if (timestmp >= timestmp_j): 
+                if (timestmp >= timestmp_j):
                     remove.append( j )
                 else:
                     remove.append( i )

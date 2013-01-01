@@ -14,7 +14,7 @@ This module allow you to use the API in a simple and easy way.
         'rvprop'    :'user|timestamp|content',
         }
 
-    print query.GetData(params, encodeTitle = False)
+    print query.GetData(params)
 
 """
 #
@@ -22,12 +22,13 @@ This module allow you to use the API in a simple and easy way.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: query.py 10624 2012-10-30 16:25:44Z xqt $'
+__version__ = '$Id: query.py 10834 2012-12-27 14:54:14Z xqt $'
 #
 
 import time
 import wikipedia as pywikibot
 import config
+from pywikibot.support import deprecate_arg
 try:
     #For Python 2.6 newer
     import json
@@ -38,7 +39,7 @@ try:
 except ImportError:
     import simplejson as json
 
-
+@deprecate_arg("encodeTitle", None)
 def GetData(params, site=None, useAPI=True, retryCount=config.maxretries,
             encodeTitle=True, sysop=False, back_response=False):
     """Get data from the query api, and convert it into a data object
@@ -105,7 +106,7 @@ def GetData(params, site=None, useAPI=True, retryCount=config.maxretries,
     postAC = [
         'edit', 'login', 'purge', 'rollback', 'delete', 'undelete', 'protect',
         'parse', 'block', 'unblock', 'move', 'emailuser','import', 'userrights',
-        'upload', 'patrol'
+        'upload', 'patrol', 'wbcreateclaim'
     ]
     if site.versionnumber() >= 18:
         postAC.append('watch')
@@ -138,7 +139,7 @@ def GetData(params, site=None, useAPI=True, retryCount=config.maxretries,
                   (('file', params['filename'].encode(site.encoding()), data['file']),),
                   site.cookies(sysop=sysop)
                   )
-            elif params['action'] in postAC:
+            elif params['action'] in postAC or params['action'][:5]=='wbset':
                 res, jsontext = site.postForm(path, params, sysop, site.cookies(sysop = sysop) )
             else:
                 if back_response:

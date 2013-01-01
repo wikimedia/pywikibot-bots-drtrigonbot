@@ -38,7 +38,7 @@ This script understands various command-line arguments:
 usage: featured.py [-interactive] [-nocache] [-top] [-after:zzzz] [-fromlang:xx,yy--zz|-fromall]
 
 """
-__version__ = '$Id: featured.py 10354 2012-06-13 10:26:56Z drtrigon $'
+__version__ = '$Id: featured.py 10831 2012-12-24 14:29:26Z xqt $'
 
 #
 # (C) Maxim Razin, 2005
@@ -476,7 +476,7 @@ def featuredWithInterwiki(fromsite, tosite, template_on_top, pType, quiet,
                         if (not interactive or
                             pywikibot.input(
                                 u'Connecting %s -> %s. Proceed? [Y/N]'
-                                % (a.title(), atrans.title())) in ['Y','y']
+                                % (a.title(), atrans.title())) in ['Y', 'y']
                             ):
                             m=re_this_iw.search(text)
                             if not m:
@@ -521,7 +521,7 @@ def featuredWithInterwiki(fromsite, tosite, template_on_top, pType, quiet,
                         if (not interactive or
                             pywikibot.input(
                                 u'Connecting %s -> %s. Proceed? [Y/N]'
-                                % (a.title(), atrans.title())) in ['Y','y']
+                                % (a.title(), atrans.title())) in ['Y', 'y']
                             ):
                             m=re_this_iw.search(text)
                             if not m:

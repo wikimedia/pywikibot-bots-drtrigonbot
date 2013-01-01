@@ -338,7 +338,7 @@ that you have to break it off, use "-continue" next time.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: interwiki.py 10659 2012-11-04 09:17:59Z xqt $'
+__version__ = '$Id: interwiki.py 10825 2012-12-23 20:18:52Z huji $'
 #
 
 import sys, copy, re, os
@@ -2334,9 +2334,11 @@ def compareLanguages(old, new, insite):
 
         mcomment += globalvar.summary
 
-        changes = {'adding':    ', '.join([fmt(new, x) for x in adding]),
-                   'removing':  ', '.join([fmt(old, x) for x in removing]),
-                   'modifying': ', '.join([fmt(new, x) for x in modifying]),
+        comma = i18n.twtranslate(insite.lang, 'interwiki-comma')
+
+        changes = {'adding':    comma.join([fmt(new, x) for x in adding]),
+                   'removing':  comma.join([fmt(old, x) for x in removing]),
+                   'modifying': comma.join([fmt(new, x) for x in modifying]),
                    'from': u'' if not useFrom else old[modifying[0]]}
 
         mcomment += i18n.twtranslate(insite.lang, commentname) % changes

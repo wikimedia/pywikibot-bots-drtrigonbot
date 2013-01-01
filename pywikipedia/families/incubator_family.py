@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: incubator_family.py 10214 2012-05-15 14:16:54Z shizhao $'
+__version__ = '$Id: incubator_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
 
 import family
 

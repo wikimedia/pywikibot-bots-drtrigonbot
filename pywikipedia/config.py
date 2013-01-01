@@ -7,7 +7,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: config.py 10632 2012-10-31 11:39:46Z xqt $'
+__version__ = '$Id: config.py 10819 2012-12-23 19:45:38Z drtrigon $'
 
 import os, re
 import sys as __sys
@@ -479,7 +479,9 @@ retry_on_fail = True
 # servers. Allows simulation runs of bots to be carried out without changing any
 # page on the server side. This setting may be overridden in user_config.py.
 actions_to_block = ['edit', 'watch', 'move', 'delete', 'undelete', 'protect',
-                    'emailuser', 'submit']    # 'submit' is for non-API
+                    'emailuser',
+                    'submit',                               # for non-API
+                    'wbcreateclaim', 'wbsetclaimvalue']     # for Wikidata
 
 # How many pages should be put to a queue in asynchroneous mode.
 # If maxsize is <= 0, the queue size is infinite.
@@ -492,12 +494,6 @@ max_queue_size = 64
 # separator settings in family files should use multiplied of this.
 # LS is a shortcut alias.
 line_separator = LS = u'\r\n'
-
-############## TEMPORARY SETTINGS ##############
-# Temporary solution for 2012 version survey, search for this key
-# in wikipedia.py
-import sys # Just for the next line, remove them together
-suppresssurvey = (sys.version >= '2.7.2')
 
 # End of configuration section
 # ============================

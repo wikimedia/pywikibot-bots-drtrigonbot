@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: omegawiki_family.py 7166 2009-08-20 22:37:32Z siebrand $'
+__version__ = '$Id: omegawiki_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
 
 import family
 

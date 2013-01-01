@@ -178,7 +178,7 @@ badword at all but can be used for some bad-nickname.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: welcome.py 10458 2012-07-21 12:28:01Z xqt $'
+__version__ = '$Id: welcome.py 10790 2012-12-12 15:02:33Z filnik $'
 #
 
 import time, re, urllib, locale
@@ -568,7 +568,7 @@ class WelcomeBot(object):
 
             com = i18n.twtranslate(self.site, 'welcome-bad_username')
             if rep_text != '':
-                rep_page.put(text_get + rep_text, comment = com, minorEdit = True)
+                rep_page.put(text_get + rep_text, comment = com, force = True, minorEdit = True)
                 showStatus(5)
                 pywikibot.output(u'Reported')
             self.BAQueue = list()

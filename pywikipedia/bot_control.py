@@ -85,7 +85,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '10687' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '10858' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.4'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -104,8 +104,7 @@ import wikipedia as pywikibot
 import pysvn  # JIRA: TS-936
 
 
-logname = pywikibot.config.datafilepath('../public_html/DrTrigonBot', '%s.log')
-#os.chdir("/home/drtrigon/pywikipedia")
+logname = pywikibot.config.datafilepath('logs', '%s.log')
 logger_tmsp = sum_disc.bot_config['logger_tmsp']
 
 error_mail_fromwiki = True                # send error mail from wiki too!
@@ -462,7 +461,7 @@ if __name__ == "__main__":
         debug.append( 'code' ) # code debugging
 
     log = None
-    logfile = logname % 'mainbot'
+    logfile = logname % ''.join(sys.argv)
     if len(arg) > 0:
         #arg = pywikibot.handleArgs()[0]
         #print sys.argv[0]    # who am I?
@@ -491,23 +490,17 @@ if __name__ == "__main__":
             })
         elif ("-compress_history:[]" in arg):          # muss alleine laufen, sollte aber mit allen 
             do_dict['compress_history'] = True         # anderen kombiniert werden können (siehe 'else')...!
-        elif ("-subster_irc" in arg):                  # muss alleine laufen...
-            do_dict['subster_irc'] = True
-            logfile = logname % "subster_irc"          # use another log than usual !!!
-            #error_ec = error_SGE_restart
-        #elif ("-subster" in arg):
-        #    do_dict['subster'] = True
-        #    logfile = logname % "subster"              # use another log than usual !!!
+        #elif ("-subster_irc" in arg):                  # muss alleine laufen...
+        #    do_dict['subster_irc'] = True
+        #    logfile = logname % "subster_irc"          # use another log than usual !!!
+        #    #error_ec = error_SGE_restart
         else:
             do_dict.update({ 'clean_user_sandbox': ("-clean_user_sandbox" in arg),
                              'sum_disc':           ("-sum_disc" in arg),
+                             'subster_irc':        ("-subster_irc" in arg),
                              'subster':            ("-subster" in arg),
                              'catimages':          ("-catimages" in arg),
             })
-
-        # hack/work-a-round for hourly runs on 'ar' not to flood mainbot logs
-        if pywikibot.default_code == 'ar':
-            logfile = logfile.replace('.log', '_ar.log')
 
         log = BotLogger(logfile, not cron)
         pywikibot.ui.stdout = sys.stdout    # patch needed for pywikibot.output

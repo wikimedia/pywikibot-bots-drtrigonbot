@@ -60,7 +60,7 @@ python blockpageschecker.py -show -protectedpages:4
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: blockpageschecker.py 9696 2011-10-30 17:02:05Z xqt $'
+__version__ = '$Id: blockpageschecker.py 10831 2012-12-24 14:29:26Z xqt $'
 #
 
 import re, webbrowser
@@ -192,7 +192,7 @@ def understandBlock(text, TTP, TSP, TSMP, TTMP, TU):
 def showQuest(site, page):
     quest = pywikibot.inputChoice(u'Do you want to open the page?',
                                   ['with browser', 'with gui', 'no'],
-                                  ['b','g','n'], 'n')
+                                  ['b', 'g', 'n'], 'n')
     pathWiki = site.family.nicepath(site.lang)
     url = 'http://%s%s%s?&redirect=no' % (pywikibot.getSite().hostname(),
                                           pathWiki, page.urlname())

@@ -7,9 +7,13 @@ Exception classes used throughout the framework.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: exceptions.py 7916 2010-02-08 10:11:36Z xqt $'
+__version__ = '$Id: exceptions.py 10763 2012-12-02 19:54:40Z drtrigon $'
 
 
+# Standard library imports
+import traceback, StringIO
+
+# Application specific imports
 import config
 
 # TODO: not certain that all of them will be needed.
@@ -120,3 +124,17 @@ class AutoblockUser(Error):
     """
 class UserActionRefuse(Error):
     pass
+
+
+#  @remarks need for Bot Error Handling; get the error tracebacks without
+#           raising the error
+def gettraceback(exc_info):
+    output = StringIO.StringIO()
+    traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], file=output)
+
+    exception_only = traceback.format_exception_only(exc_info[0], exc_info[1])
+
+    result = output.getvalue()
+    output.close()
+
+    return (exception_only, result)

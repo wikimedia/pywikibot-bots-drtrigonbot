@@ -17,7 +17,7 @@ Parameters:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: unusedfiles.py 9683 2011-10-30 10:50:42Z xqt $'
+__version__ = '$Id: unusedfiles.py 10736 2012-11-15 12:58:41Z huji $'
 #
 
 import wikipedia as pywikibot
@@ -46,7 +46,7 @@ template_to_the_image = {
     }
 template_to_the_user = {
     'en': u'\n\n{{img-sem-uso|%(title)s}}',
-    'fa': u'\n\n{{اخطار به کاربر برای تصاویر بدون استفاده|%(title)s}}--~~~~',
+    'fa': u'\n\n{{جا:اخطار به کاربر برای تصاویر بدون استفاده|%(title)s}}--~~~~',
     'it': u'\n\n{{Utente:Filbot/Immagine orfana}}',
     }
 except_text = {
@@ -93,6 +93,8 @@ def main():
     for arg in pywikibot.handleArgs():
         if arg == '-always':
             always = True
+        if arg == '-start':
+            start = True
 
     mysite = pywikibot.getSite()
     # If anything needs to be prepared, you can do it here

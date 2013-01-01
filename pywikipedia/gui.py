@@ -11,7 +11,7 @@ the contents of an article
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: gui.py 8525 2010-09-11 16:21:58Z xqt $'
+__version__='$Id: gui.py 10831 2012-12-24 14:29:26Z xqt $'
 
 from Tkinter import *
 from ScrolledText import ScrolledText
@@ -43,8 +43,9 @@ class TextEditor(ScrolledText):
                         'hilite', fgBg='bg'),
                       insertbackground=idleConf.GetHighlight(currentTheme,
                         'cursor', fgBg='fg'),
-                      width=idleConf.GetOption('main','EditorWindow','width'),
-                      height=idleConf.GetOption('main','EditorWindow','height')
+                      width=idleConf.GetOption('main', 'EditorWindow', 'width'),
+                      height=idleConf.GetOption('main', 'EditorWindow',
+                                                'height')
                     )
         fontWeight = 'normal'
         if idleConf.GetOption('main', 'EditorWindow', 'font-bold', type='bool'):

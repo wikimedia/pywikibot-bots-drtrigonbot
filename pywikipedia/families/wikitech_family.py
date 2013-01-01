@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: wikitech_family.py 8782 2010-12-20 04:46:29Z xqt $'
+__version__ = '$Id: wikitech_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
 
 import family
 

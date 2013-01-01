@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: supertux_family.py 9015 2011-02-28 17:57:55Z lcawte $'
+__version__ = '$Id: supertux_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
 
 import family
 

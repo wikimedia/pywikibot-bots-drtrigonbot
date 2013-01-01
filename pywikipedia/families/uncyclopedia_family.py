@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import config, family, urllib
 
-__version__ = '$Id: uncyclopedia_family.py 9542 2011-09-24 16:36:14Z xqt $'
+__version__ = '$Id: uncyclopedia_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
 
 #
 # The Uncyclomedia family, assorted encyclopedi.as from the Uncyclopedia series.

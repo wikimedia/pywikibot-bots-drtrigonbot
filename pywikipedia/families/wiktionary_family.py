@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wiktionary_family.py 10672 2012-11-08 07:09:37Z xqt $'
+__version__ = '$Id: wiktionary_family.py 10856 2013-01-01 10:51:33Z xqt $'
 
 # The Wikimedia family that is known as Wiktionary
 
@@ -12,19 +12,19 @@ class Family(family.Family):
 
         self.languages_by_size = [
             'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'el', 'ko', 'sv', 'tr', 'pl',
-            'ta', 'nl', 'vi', 'de', 'kn', 'fi', 'io', 'hu', 'pt', 'no', 'my',
-            'id', 'it', 'li', 'ku', 'ml', 'et', 'ja', 'es', 'fa', 'ar', 'ro',
-            'cs', 'lo', 'te', 'gl', 'eu', 'ca', 'uk', 'fj', 'br', 'bg', 'eo',
-            'hr', 'oc', 'vo', 'is', 'th', 'simple', 'scn', 'sr', 'af', 'cy',
-            'sw', 'fy', 'tl', 'zh-min-nan', 'ast', 'nn', 'he', 'ur', 'la', 'wa',
-            'da', 'hy', 'sq', 'sm', 'sl', 'hi', 'tt', 'az', 'lv', 'ka', 'pnb',
-            'lb', 'nah', 'tk', 'bs', 'hsb', 'kk', 'sk', 'ps', 'km', 'mk', 'be',
-            'ga', 'wo', 'ang', 'co', 'ms', 'gn', 'mr', 'csb', 'st', 'nds', 'ia',
-            'si', 'sh', 'sd', 'tg', 'ky', 'ug', 'kl', 'jbo', 'mn', 'an', 'zu',
-            'sa', 'gu', 'rw', 'fo', 'kw', 'gv', 'qu', 'ss', 'ie', 'mt', 'om',
-            'chr', 'roa-rup', 'iu', 'bn', 'am', 'so', 'su', 'za', 'gd', 'jv',
-            'mi', 'tpi', 'ik', 'yi', 'ln', 'or', 'uz', 'ti', 'sg', 'na', 'dv',
-            'tn', 'pa', 'ne', 'ha', 'ks', 'ay', 'ts',
+            'ta', 'nl', 'de', 'vi', 'kn', 'fi', 'io', 'ku', 'hu', 'pt', 'no',
+            'my', 'id', 'it', 'li', 'es', 'ml', 'et', 'ja', 'fa', 'ro', 'ar',
+            'te', 'cs', 'lo', 'eu', 'gl', 'ca', 'uk', 'fj', 'br', 'bg', 'eo',
+            'hr', 'oc', 'vo', 'is', 'th', 'simple', 'zh-min-nan', 'scn', 'sr',
+            'af', 'cy', 'sw', 'fy', 'tl', 'ast', 'nn', 'he', 'ur', 'ps', 'uz',
+            'wa', 'la', 'da', 'hy', 'sq', 'sm', 'sl', 'hi', 'az', 'tt', 'lv',
+            'ka', 'nah', 'lb', 'pnb', 'bs', 'tk', 'hsb', 'kk', 'sk', 'km', 'mk',
+            'be', 'ga', 'wo', 'ang', 'ms', 'co', 'gn', 'mr', 'ky', 'csb', 'st',
+            'nds', 'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'kl', 'jbo', 'mn', 'an',
+            'sa', 'zu', 'gu', 'rw', 'fo', 'kw', 'gv', 'qu', 'ss', 'ie', 'mt',
+            'om', 'chr', 'roa-rup', 'iu', 'pa', 'bn', 'am', 'so', 'su', 'za',
+            'gd', 'jv', 'mi', 'tpi', 'ik', 'or', 'yi', 'ln', 'ti', 'sg', 'na',
+            'dv', 'tn', 'ne', 'ha', 'ks', 'ay', 'ts',
         ]
 
         self.langs = dict([(lang, '%s.wiktionary.org' % lang) for lang in self.languages_by_size])
@@ -279,7 +279,7 @@ class Family(family.Family):
             'km': [u'ការពិភាក្សាអំពីWiktionary', u'Wiktionary ពិភាក្ស'],
             'kn': u'Wiktionary ಚರ್ಚೆ',
             'ko': u'위키낱말사전토론',
-            'ks': u'Wiktionary talk',
+            'ks': u'Wiktionary بَحَژ',
             'ku': [u'Gotûbêja Wîkîferhengê', u'Wîkîferheng gotûbêj', u'Wîkîferheng nîqaş'],
             'kw': [u'Kescows Wiktionary', u'Cows Wiktionary', u'Keskows Wiktionary'],
             'ky': u'Wiktionary баарлашуу',
@@ -387,6 +387,7 @@ class Family(family.Family):
             'bn': u'উইকিসরাস',
             'br': u'Stagadenn',
             'bs': u'Portal',
+            'cs': u'Příloha',
             'cy': u'Atodiad',
             'el': u'Παράρτημα',
             'en': u'Appendix',
@@ -421,6 +422,7 @@ class Family(family.Family):
             'bn': u'উইকিসরাস আলোচনা',
             'br': u'Kaozeadenn Stagadenn',
             'bs': u'Razgovor o Portalu',
+            'cs': u'Diskuse k příloze',
             'cy': u'Sgwrs Atodiad',
             'el': u'Συζήτηση παραρτήματος',
             'en': u'Appendix talk',

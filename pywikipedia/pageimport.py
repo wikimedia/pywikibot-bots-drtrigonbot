@@ -28,11 +28,11 @@ finally:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: pageimport.py 8629 2010-10-09 16:11:46Z xqt $'
+__version__ = '$Id: pageimport.py 10792 2012-12-13 01:08:33Z yurik $'
 #
 
 import urllib
-import wikipedia as pywikibot,
+import wikipedia as pywikibot
 import login, config
 
 class Importer(pywikibot.Page):

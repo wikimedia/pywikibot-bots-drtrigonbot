@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-__version__ = '$Id: battlestarwiki_family.py 9071 2011-03-13 16:50:07Z xqt $'
+__version__ = '$Id: battlestarwiki_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
 
 import family
 

@@ -1,11 +1,10 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: wikidata_family.py 10591 2012-10-20 amir $'
+__version__ = '$Id: wikidata_family.py 10846 2012-12-30 11:45:31Z xqt $'
 
 import family
 
-# The Wikidata family
-# user-config.py: usernames['wikidata']['wikidata'] = 'User name'
+# The wikidata family
 
 class Family(family.Family):
     def __init__(self):
@@ -13,13 +12,19 @@ class Family(family.Family):
         self.name = 'wikidata'
         self.langs = {
             'wikidata': 'wikidata.org',
+            'repo': 'wikidata-test-repo.wikimedia.de',
+            'client': 'wikidata-test-client.wikimedia.de',
         }
-#https://wikidata.org/w/api.php?action=query&meta=siteinfo&siprop=namespaces
+
         self.namespaces[4] = {
-            '_default': [u'Wikidata', 'Project'],
+            '_default': [u'Wikidata', u'WD', 'Project'],
+            'client': u'Wikidata-test-client',
+            'repo': u'Wikidata-test-repo',
         }
         self.namespaces[5] = {
-            '_default': [u'Wikidata talk', 'Project talk'],
+            '_default': [u'Wikidata talk', u'WT', 'Project talk'],
+            'client': u'Wikidata-test-client talk',
+            'repo': u'Wikidata-test-repo talk',
         }
         self.namespaces[120] = {
             '_default': u'Property',

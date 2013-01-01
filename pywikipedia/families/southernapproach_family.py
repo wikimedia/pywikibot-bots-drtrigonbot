@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-__version__ = '$Id: southernapproach_family.py 10502 2012-08-23 10:22:31Z xqt $'
+__version__ = '$Id: southernapproach_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
 
 import family
 

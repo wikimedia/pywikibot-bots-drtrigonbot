@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-__version__ = '$Id: piratenwiki_family.py 10572 2012-10-14 15:07:53Z xqt $'
+__version__ = '$Id: piratenwiki_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
 
 import family
 

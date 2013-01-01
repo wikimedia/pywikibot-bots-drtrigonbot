@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikisource_family.py 10672 2012-11-08 07:09:37Z xqt $'
+__version__ = '$Id: wikisource_family.py 10856 2013-01-01 10:51:33Z xqt $'
 
 # The Wikimedia family that is known as Wikisource
 
@@ -13,9 +13,9 @@ class Family(family.Family):
         self.languages_by_size = [
             'fr', 'en', 'de', 'ru', 'it', 'zh', 'pl', 'pt', 'he', 'es', 'sv',
             'fa', 'hu', 'ar', 'cs', 'ca', 'ko', 'sl', 'ro', 'fi', 'vi', 'te',
-            'sa', 'el', 'bn', 'sr', 'hr', 'th', 'hy', 'no', 'nl', 'ml', 'la',
-            'vec', 'tr', 'ja', 'yi', 'br', 'eo', 'uk', 'id', 'ta', 'mk', 'is',
-            'da', 'be', 'gu', 'li', 'et', 'mr', 'bg', 'bs', 'sah', 'az', 'gl',
+            'sa', 'el', 'sr', 'bn', 'hr', 'th', 'no', 'hy', 'nl', 'ml', 'la',
+            'vec', 'tr', 'ja', 'eo', 'br', 'yi', 'mk', 'uk', 'id', 'ta', 'is',
+            'gu', 'da', 'be', 'li', 'et', 'mr', 'bg', 'bs', 'sah', 'az', 'gl',
             'lt', 'kn', 'cy', 'sk', 'zh-min-nan', 'fo',
         ]
 
@@ -49,7 +49,7 @@ class Family(family.Family):
             'ang': u'Wicifruma',
             'ar': [u'ويكي مصدر', u'وم'],
             'az': u'VikiMənbə',
-            'be': [u'Вікікрыніцы', u'Wikisource'],
+            'be': [u'Вікікрыніцы', u'ВК'],
             'bg': u'Уикиизточник',
             'bn': [u'উইকিসংকলন', u'Wikisource'],
             'br': u'Wikimammenn',
@@ -60,7 +60,7 @@ class Family(family.Family):
             'da': u'Wikisource',
             'de': [u'Wikisource', u'WS'],
             'el': u'Βικιθήκη',
-            'en': u'Wikisource',
+            'en': [u'Wikisource', u'WS'],
             'eo': [u'Vikifontaro', u'Wikisource'],
             'es': u'Wikisource',
             'et': u'Vikitekstid',
@@ -128,7 +128,7 @@ class Family(family.Family):
             'da': [u'Wikisource diskussion', u'Wikisource-diskussion'],
             'de': u'Wikisource Diskussion',
             'el': u'Βικιθήκη συζήτηση',
-            'en': u'Wikisource talk',
+            'en': [u'Wikisource talk', u'WT'],
             'eo': u'Vikifontaro diskuto',
             'es': u'Wikisource discusión',
             'et': [u'Vikitekstide arutelu', u'Vikitekstid arutelu'],

@@ -10,7 +10,7 @@
 # You should not change code here except you want to add a new test case
 # for a function, mechanism or else.
 
-__version__ = '$Id: test_wikipedia.py 10309 2012-06-07 23:01:11Z drtrigon $'
+__version__ = '$Id: test_wikipedia.py 10702 2012-11-11 12:48:19Z xqt $'
 
 import unittest
 import test_pywiki
@@ -42,7 +42,7 @@ u'Wikipedia:WikiProjekt Bremen/Beobachtungsliste',  # bugzilla:32753
 u'Diskussion:Wirtschaft Chiles',
 u'Benutzer Diskussion:Ausgangskontrolle',
 u'Benutzer Diskussion:Amnesty.tina',
-u'Diskussion:Chicagoer Schule',
+#u'Diskussion:Chicagoer Schule',                    # [ DELETED ]
 #u'Wikipedia Diskussion:Hausaufgabenhilfe',         # [ DELETED ]
 u'Benutzer Diskussion:Niemot',
 u'Benutzer Diskussion:Computer356',
@@ -124,7 +124,7 @@ u'Wikipedia Diskussion:Meinungsbilder/Gestaltung von Signaturen',
 u'Benutzer Diskussion:JvB1953',
 u'Benutzer Diskussion:J.-H. Janßen',
 u'Benutzer Diskussion:Xqt/Archiv/2009-1',
-u'Hilfe Diskussion:Weiterleitung/Archiv/001',
+u'Hilfe Diskussion:Weiterleitung/Archiv/1',
 u'Benutzer Diskussion:Raymond/Archiv 2006-2',
 u'Wikipedia Diskussion:Projektneuheiten/Archiv/2009',
 u'Vorlage Diskussion:Erledigt',
@@ -154,7 +154,7 @@ u'Diskussion:Stimmkreis Nürnberg-Süd',
 u'Diskussion:Geschichte der Sozialversicherung in Deutschland',
 u'Diskussion:Josef Kappius',
 u'Diskussion:Bibra (Adelsgeschlecht)',
-u'Diskussion:Stimmkreis Regensburg-Land-Ost',
+#u'Diskussion:Stimmkreis Regensburg-Land-Ost',      # [ DELETED ] 
 u'Diskussion:Volkmar Kretkowski',
 u'Diskussion:KS Cracovia',
 u'Diskussion:Livingston (Izabal)',

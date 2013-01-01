@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-__version__ = '$Id: lyricwiki_family.py 9069 2011-03-13 16:19:29Z xqt $'
+__version__ = '$Id: lyricwiki_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
 
 import family
 

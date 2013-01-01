@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: wikia_family.py 9439 2011-08-19 13:02:42Z lcawte $'
+__version__ = '$Id: wikia_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
 
 import family
 

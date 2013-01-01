@@ -2,7 +2,7 @@
 # -*- coding: utf-8  -*-
 
 """Unit tests for query.py"""
-__version__ = '$Id: test_query.py 10309 2012-06-07 23:01:11Z drtrigon $'
+__version__ = '$Id: test_query.py 10699 2012-11-11 12:09:49Z xqt $'
 
 import unittest
 import tests.test_pywiki
@@ -137,18 +137,19 @@ class PyWikiQueryTestCase(tests.test_pywiki.PyWikiTestCase):
             'rvprop': ['ids', 'timestamp', 'user'],
             'rvdir': 'newer',
             'rvlimit': 1,
-            'titles': [catlib.Category(self.site, u'Category:Categories')],
+            'titles': [catlib.Category(self.site,
+                                       u'Category:Wikipedia categories')],
         }
-        expectedresult = {u'pages': {u'794823':
+        expectedresult = {u'pages': {u'35505592':
         {
             u'ns': 14,
-            u'pageid': 794823,
+            u'pageid': 35505592,
             u'revisions': [{
-                u'revid': 4494485,
-                u'user': u'SEWilco',
-                u'timestamp': u'2004-07-07T18:45:50Z',
+                u'revid': 487491561,
+                u'user': u'Cydebot',
+                u'timestamp': u'2012-04-15T12:17:16Z',
             }],
-            u'title': u'Category:Categories',
+            u'title': u'Category:Wikipedia categories',
         },
         }}
         self.assertEqualQueryResult(params, expectedresult)

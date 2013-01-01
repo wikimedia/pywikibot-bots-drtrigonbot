@@ -7,11 +7,11 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: i18n.py 10578 2012-10-14 17:39:04Z xqt $'
+__version__ = '$Id: i18n.py 10715 2012-11-13 20:56:05Z valhallasw $'
 
 import re, sys
 import locale
-from pywikibot import Error
+from pywikibot.exceptions import Error
 import wikipedia as pywikibot
 import config
 

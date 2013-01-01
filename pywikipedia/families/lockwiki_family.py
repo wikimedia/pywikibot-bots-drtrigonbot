@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: lockwiki_family.py 8799 2010-12-26 12:27:05Z xqt $'
+__version__ = '$Id: lockwiki_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
 
 import family
 

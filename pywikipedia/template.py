@@ -103,7 +103,7 @@ pages:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: template.py 9692 2011-10-30 15:03:29Z xqt $'
+__version__='$Id: template.py 10824 2012-12-23 20:10:55Z huji $'
 #
 import re, sys, string
 import wikipedia as pywikibot
@@ -213,9 +213,11 @@ class TemplateRobot:
             self.addedCat = catlib.Category(
                 site, u'%s:%s' % (site.namespace(14), self.addedCat))
 
+	comma = self.summary = i18n.twtranslate(site, 'template-comma')
+
         # get edit summary message if it's empty
         if (self.editSummary==''):
-            Param = {'list': (', ').join(self.templates.keys()),
+            Param = {'list': comma.join(self.templates.keys()),
                      'num' : len(self.templates)}
             if self.remove:
                 self.editSummary = i18n.twntranslate(

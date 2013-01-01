@@ -21,7 +21,7 @@ and the bot will only work on that single page.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: basic.py 10358 2012-06-13 12:29:02Z drtrigon $'
+__version__ = '$Id: basic.py 10820 2012-12-23 19:49:48Z huji $'
 #
 
 import re
@@ -127,7 +127,7 @@ class BasicBot:
                         % (page.title()))
                 except pywikibot.SpamfilterError, error:
                     pywikibot.output(
-u'Cannot change %s because of spam blacklist entry %s'
+                        u'Cannot change %s because of spam blacklist entry %s'
                         % (page.title(), error.url))
                 else:
                     return True

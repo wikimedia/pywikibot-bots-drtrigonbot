@@ -18,7 +18,7 @@ These parameters are supported to specify which pages titles to print:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: pagegenerators.py 10574 2012-10-14 16:48:33Z xqt $'
+__version__='$Id: pagegenerators.py 10715 2012-11-13 20:56:05Z valhallasw $'
 
 import re
 import sys
@@ -28,7 +28,8 @@ import urllib, urllib2, time
 import traceback
 import wikipedia as pywikibot
 import config
-from pywikibot import deprecate_arg, i18n
+from pywikibot import i18n
+from pywikibot.support import deprecate_arg
 import date, catlib, userlib, query
 
 parameterHelp = u"""\

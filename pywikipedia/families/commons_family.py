@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: commons_family.py 10642 2012-11-01 14:13:43Z xqt $'
+__version__ = '$Id: commons_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
 
 import family
 
@@ -76,6 +76,9 @@ class Family(family.Family):
 
     def dbName(self, code):
         return 'commonswiki_p'
+
+    def shared_image_repository(self, code):
+        return ('commons', 'commons')
 
     if family.config.SSL_connection:
 

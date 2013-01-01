@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: wikitravel_shared_family.py 7087 2009-07-24 16:36:55Z alexsh $'
+__version__ = '$Id: wikitravel_shared_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
 
 import family
 

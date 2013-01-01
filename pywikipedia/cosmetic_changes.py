@@ -57,7 +57,7 @@ your user-config.py:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: cosmetic_changes.py 10452 2012-07-09 13:18:08Z xqt $'
+__version__ = '$Id: cosmetic_changes.py 10837 2012-12-29 02:34:17Z amir $'
 #
 import sys, re
 import wikipedia as pywikibot
@@ -82,7 +82,7 @@ msg_interwiki = {
     'fr' : u'<!-- Autres langues -->',
     'nn' : (u'<!--interwiki (no, sv, da first; then other languages alphabetically by name)-->',
             u'(<!-- ?interwiki \(no(?:/nb)?, ?sv, ?da first; then other languages alphabetically by name\) ?-->)')
-}    
+}
 
 # This is from interwiki.py;
 # move it to family file and implement global instances
@@ -736,6 +736,8 @@ class CosmeticChangesToolkit:
         namespaces = list(self.site.namespace(6, all=True))
         pattern = re.compile(u'\[\[(' + '|'.join(namespaces) + '):.+?\.\w+? *(\|((\[\[.*?\]\])|.)*)?\]\]',
                              re.UNICODE)
+        #not to let bot edits in latin content
+        exceptions.append(re.compile(u"[A-Za-z\d]+? *?\"*? *?, *?[A-Za-z\d]+?"))
         exceptions.append(pattern)
         text = pywikibot.replaceExcept(text, u',', u'،', exceptions)
         if self.site.lang=='ckb':

@@ -11,7 +11,7 @@ and return a unicode string.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: textlib.py 10634 2012-10-31 16:58:50Z xqt $'
+__version__ = '$Id: textlib.py 10817 2012-12-23 17:58:14Z amir $'
 
 
 import wikipedia as pywikibot
@@ -29,7 +29,6 @@ def unescape(s):
     s = s.replace("&quot;", '"')
     s = s.replace("&amp;", "&") # Must be last
     return s
-
 
 def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                   allowoverlap=False, marker = '', site = None):

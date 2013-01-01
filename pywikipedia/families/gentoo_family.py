@@ -2,7 +2,7 @@
 
 import family
 
-__version__ = '$Id: gentoo_family.py 10502 2012-08-23 10:22:31Z xqt $'
+__version__ = '$Id: gentoo_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
 
 # An inofficial Gentoo wiki project.
 # Ask for permission at http://gentoo-wiki.com/Help:Bots before running a bot.

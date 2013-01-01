@@ -26,7 +26,7 @@ All other parameters will be regarded as part of the title of a single page,
 and the bot will only work on that single page.
 
 If neither a page title nor a page generator is given, it takes all pages from
-the default maintenance category. 
+the default maintenance category.
 
 It is strongly recommended not to run this script over the entire article
 namespace (using the -start) parameter, as that would consume too much
@@ -34,10 +34,10 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 
-__version__='$Id: noreferences.py 10561 2012-10-13 06:02:40Z amir $'
+__version__='$Id: noreferences.py 10765 2012-12-06 08:58:32Z xqt $'
 
 import re, sys
-import wikipedia as pywikibot
+import pywikibot
 from pywikibot import i18n
 import pagegenerators, catlib
 import editarticle
@@ -324,6 +324,7 @@ referencesTemplates = {
     'wikipedia': {
         'ar': [u'Reflist', u'ثبت المراجع', u'قائمة المراجع'],
         'be': [u'Зноскі', u'Примечания', u'Reflist', u'Спіс заўваг', u'Заўвагі'],
+        'be-x-old': [u'Зноскі'],
         'da': [u'Reflist'],
         'dsb':[u'Referency'],
         'en': [u'Reflist', u'Refs', u'FootnotesSmall', u'Reference',
@@ -674,7 +675,6 @@ def main():
         except:
             pass
         else:
-            import catlib
             if not namespaces:
                 namespaces = [0]
             cat = catlib.Category(site, "%s:%s" % (site.category_namespace(),

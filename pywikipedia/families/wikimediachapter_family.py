@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__version__ = '$Id: wikimediachapter_family.py 10510 2012-08-30 20:40:38Z xqt $'
+__version__ = '$Id: wikimediachapter_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
 
 # The wikis of Chapters of the Wikimedia Foundation living at a xy.wikimedia.org url
 

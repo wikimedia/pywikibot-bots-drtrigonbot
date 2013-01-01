@@ -24,7 +24,7 @@ The following command line parameters are supported:
                 wps : Work on all wikipedia's
 
 """
-__version__ = '$Id: imagerecat.py 10664 2012-11-05 20:57:05Z multichill $'
+__version__ = '$Id: imagerecat.py 10831 2012-12-24 14:29:26Z xqt $'
 #
 #  (C) Multichill 2008-2011
 #  (C) Pywikipedia bot team, 2008-2011
@@ -167,12 +167,12 @@ def getCommonshelperCats(imagepage):
         if (matches.group('catnum') > 0):
             cats = matches.group('cats').splitlines()
             for cat in cats:
-                commonshelperCats.append(cat.replace('_',' '))
+                commonshelperCats.append(cat.replace('_', ' '))
                 pywikibot.output(u'category : ' + cat)
         if (matches.group('galnum') > 0):
             gals = matches.group('gals').splitlines()
             for gal in gals:
-                galleries.append(gal.replace('_',' '))
+                galleries.append(gal.replace('_', ' '))
                 pywikibot.output(u'gallery : ' + gal)
     commonshelperCats = list(set(commonshelperCats))
     galleries = list(set(galleries))
@@ -352,7 +352,6 @@ def filterCountries(categories):
                         result.append(subcategory.title(withNamespace=False))
     return list(set(result))
 
-
 def filterParents(categories):
     ''' Remove all parent categories from the set to prevent overcategorization.
 
@@ -360,7 +359,7 @@ def filterParents(categories):
     result = []
     toFilter = u''
     for cat in categories:
-        cat = cat.replace('_',' ')
+        cat = cat.replace('_', ' ')
         toFilter = toFilter + "[[Category:" + cat + "]]\n"
     parameters = urllib.urlencode({'source' : toFilter.encode('utf-8'),
                                    'bot' : '1'})

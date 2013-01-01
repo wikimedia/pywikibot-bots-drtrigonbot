@@ -18,11 +18,11 @@ Please refer to delinker.txt for full documentation.
 #
 # (C) Kyle/Orgullomoore, 2006-2007
 # (C) Siebrand Mazeland, 2006-2007
-# (C) Bryan Tong Minh, 2007-2008
+# (C) Bryan Tong Minh, 2007-2008, 2012
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: delinker.py 9053 2011-03-13 12:24:49Z xqt $'
+__version__ = '$Id: delinker.py 10830 2012-12-24 13:50:34Z btongminh $'
 # This script requires MySQLdb and simplejson. Tested with:
 # * Python 2.4.4, MySQLdb 1.2.1_p, simplejson 1.3
 # * Python 2.5, MySQLdb 1.2.2, simplejson 1.5 (recommended)
@@ -478,7 +478,8 @@ class CheckUsage(threadpool.Thread):
                 use_autoconn = True,
                 http_callback = wait_callback,
                 mysql_callback = wait_callback,
-                mysql_host_suffix = '-fast')
+                mysql_host_suffix = '-fast',
+                no_db = config['global'] == 'live')
         else:
             self.CheckUsage = checkusage.CheckUsage(sys.maxint,
                 http_callback = wait_callback, no_db = True)
@@ -508,7 +509,10 @@ class CheckUsage(threadpool.Thread):
 
 
         if self.CommonsDelinker.config['global']:
-            usage = self.CheckUsage.get_usage(image)
+            if self.CommonsDelinker.config['global'] == 'live':
+                usage = self.CheckUsage.get_globalusage(self.site, image, True)
+            else:
+                usage = self.CheckUsage.get_usage(image)
             usage_domains = {}
 
             count = 0
@@ -681,6 +685,14 @@ class CommonsDelinker(object):
                 config.sysopnames = dict([(fam, {}) for fam in config.sysopnames.keys()])
 
         self.last_check = time.time()
+        if 'deletion_log_store' in self.config:
+            last_check = int(open(self.config['deletion_log_store'], 'r').read())
+            if (last_check > self.last_check) or (self.last_check - last_check) > \
+                    self.config.get('max_session_restore_time', 3600):
+                output(u'Not restoring last session; delta: %i' % (self.last_check - last_check))
+            else:
+                self.last_check = last_check
+                output(u'Restoring last session ended at %i' % self.last_check)
 
         #if 'bot' in self.site.userGroups:
         #    self.log_limit = '5000'
@@ -849,6 +861,8 @@ class CommonsDelinker(object):
         self.database.commit()
 
     def start(self):
+        start_time = time.time()
+        
         # Gracefully exit all threads on SIG_INT or SIG_TERM
         threadpool.catch_signals()
 
@@ -871,8 +885,28 @@ class CommonsDelinker(object):
                     self.read_deletion_log()
             if self.config.get('enable_replacer', False):
                 self.read_replacement_log()
-
+            
+            if 'max_runtime' in self.config:
+                if (self.config['max_runtime'] + start_time) < time.time():
+                    output(u'Maximum run time exceeded; trying to shutdown')
+                    while not (self.CheckUsages.is_idle() and
+                               self.Delinkers.is_idle() and
+                               self.Loggers.is_idle()):
+                        time.sleep(self.config['timeout'])
+                    
+                    self.CheckUsages.exit()
+                    self.Delinkers.exit()
+                    self.Loggers.exit()
+                    output(u'All work done; exiting')
+                    break
+                    
             time.sleep(self.config['timeout'])
+            
+        # Store the last time the deletion log was checked
+        if 'deletion_log_store' in self.config:
+            open(self.config['deletion_log_store'], 'w').write(str(self.last_check))
+            output(u'Storing session end at %i' % self.last_check)
+
 
     def thread_died(self):
         # Obsolete

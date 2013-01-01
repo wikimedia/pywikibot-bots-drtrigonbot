@@ -85,7 +85,7 @@ right parameter.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: checkimages.py 10258 2012-05-27 10:12:41Z xqt $'
+__version__ = '$Id: checkimages.py 10789 2012-12-12 14:58:47Z filnik $'
 #
 
 import re, time, urllib, urllib2, os, locale, sys, datetime
@@ -1134,7 +1134,7 @@ class main:
             # Adding the log
             if addings:
                 rep_text = rep_text % image_to_report # Adding the name of the image in the report if not done already
-            another_page.put(text_get + rep_text, comment = com, minorEdit = False)
+            another_page.put(text_get + rep_text, comment = com, force = True, minorEdit = False)
             pywikibot.output(u"...Reported...")
             reported = True
         return reported

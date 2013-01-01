@@ -50,7 +50,7 @@ TODO:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: commonscat.py 10533 2012-09-17 11:24:22Z mfarag $'
+__version__ = '$Id: commonscat.py 10850 2012-12-30 15:20:57Z xqt $'
 #
 
 import wikipedia as pywikibot
@@ -89,15 +89,18 @@ commonscatTemplates = {
                             u'Commonscat-inline']),
     'et' : (u'Commonsi kategooria', [u'Commonscat', u'Commonskat', u'Commons cat', u'Commons category']),
     'eu' : (u'Commonskat', [u'Commonscat']),
-    'fa' : (u'ویکی‌انبار-رده', [u'Commonscat', u'Commons cat',
-                           u'انبار رده', u'Commons category',u'انبار-رده',u'جعبه پیوند به پروژه‌های خواهر',u'در پروژه‌های خواهر',u'پروژه‌های خواهر']),
+    'fa' : (u'ویکی‌انبار-رده', [u'Commonscat', u'Commons cat', u'انبار رده',
+                               u'Commons category', u'انبار-رده',
+                               u'جعبه پیوند به پروژه‌های خواهر',
+                               u'در پروژه‌های خواهر', u'پروژه‌های خواهر']),
     'fr' : (u'Commonscat', [u'CommonsCat', u'Commons cat',
                             u'Commons category']),
     'frp' : (u'Commonscat', [u'CommonsCat']),
     'ga' : (u'Catcómhaoin', [u'Commonscat']),
     'hi' : (u'Commonscat', [u'Commons2', u'Commons cat', u'Commons category']),
     'hu' : (u'Commonskat', [u'Közvagyonkat']),
-    'hy' : (u'Commons cat', [u'Commonscat']),
+    'hy' : (u'Վիքիպահեստ կատեգորիա', [u'Commonscat', u'Commons cat',
+                                       u'Commons category']),
     'id' : (u'Commonscat', [u'Commons cat', u'Commons2',
                             u'CommonsCat', u'Commons category']),
     'is' : (u'CommonsCat', [u'Commonscat']),
@@ -138,53 +141,54 @@ commonscatTemplates = {
 }
 
 ignoreTemplates = {
-    'af' : [u'commons'],
-    'ar' : [u'تحويلة تصنيف', u'كومنز', u'كومونز', u'Commons'],
-    'be-x-old' : [u'Commons'],
-    'cs' : [u'Commons', u'Sestřičky', u'Sisterlinks'],
-    'da' : [u'Commons', u'Commons left', u'Commons2', u'Commonsbilleder',
-            u'Commonskat', u'Commonscat2', u'GalleriCommons', u'Søsterlinks'],
-    'de' : [u'Commons', u'ZhSZV', u'Bauwerk-stil-kategorien',
-            u'Bauwerk-funktion-kategorien', u'KsPuB',
-            u'Kategoriesystem Augsburg-Infoleiste'],
-    'en' : [u'Category redirect', u'Commons', u'Commonscat1A', u'Commoncats',
-            u'Commonscat4Ra',
-            u'Sisterlinks', u'Sisterlinkswp', u'Sister project links',
-            u'Tracking category', u'Template category', u'Wikipedia category'],
-    'eo' : [u'Commons',
-            (u'Projekto/box', 'commons='),
-            (u'Projekto', 'commons='),
-            (u'Projektoj', 'commons='),
-            (u'Projektoj', 'commonscat=')],
-    'es' : [u'Commons', u'IprCommonscat'],
-    'eu' : [u'Commons'],
-    'fa' : [u'Commons', u'ویکی‌انبار',
-	    u'Category redirect',u'رده بهتر',
-            u'جعبه پیوند به پروژه‌های خواهر',u'در پروژه‌های خواهر',u'پروژه‌های خواهر'],
-    'fi' : [u'Commonscat-rivi', u'Commons-rivi', u'Commons'],
-    'fr' : [u'Commons', u'Commons-inline', (u'Autres projets', 'commons=')],
-    'fy' : [u'Commons', u'CommonsLyts'],
-    'hr' : [u'Commons', (u'WProjekti', 'commonscat=')],
-    'is' : [u'Systurverkefni', u'Commons'],
-    'it' : [(u'Ip', 'commons='), (u'Interprogetto', 'commons=')],
-    'ja' : [u'CommonscatS', u'SisterlinksN', u'Interwikicat'],
-    'ms' : [u'Commons', u'Sisterlinks', u'Commons cat show2'],
-    'nds-nl' : [u'Commons'],
-    'nl' : [u'Commons', u'Commonsklein', u'Commonscatklein', u'Catbeg',
-            u'Catsjab', u'Catwiki'],
-    'om' : [u'Commons'],
-    'pt' : [u'Correlatos'],
+    'af': [u'commons'],
+    'ar': [u'تحويلة تصنيف', u'كومنز', u'كومونز', u'Commons'],
+    'be-x-old' : [u'Commons', u'Commons category'],
+    'cs': [u'Commons', u'Sestřičky', u'Sisterlinks'],
+    'da': [u'Commons', u'Commons left', u'Commons2', u'Commonsbilleder',
+           u'Commonskat', u'Commonscat2', u'GalleriCommons', u'Søsterlinks'],
+    'de': [u'Commons', u'ZhSZV', u'Bauwerk-stil-kategorien',
+           u'Bauwerk-funktion-kategorien', u'KsPuB',
+           u'Kategoriesystem Augsburg-Infoleiste'],
+    'en': [u'Category redirect', u'Commons', u'Commonscat1A', u'Commoncats',
+           u'Commonscat4Ra',
+           u'Sisterlinks', u'Sisterlinkswp', u'Sister project links',
+           u'Tracking category', u'Template category', u'Wikipedia category'],
+    'eo': [u'Commons',
+           (u'Projekto/box', 'commons='),
+           (u'Projekto', 'commons='),
+           (u'Projektoj', 'commons='),
+           (u'Projektoj', 'commonscat=')],
+    'es': [u'Commons', u'IprCommonscat'],
+    'eu': [u'Commons'],
+    'fa': [u'Commons', u'ویکی‌انبار',
+           u'Category redirect',u'رده بهتر',
+           u'جعبه پیوند به پروژه‌های خواهر',u'در پروژه‌های خواهر',u'پروژه‌های خواهر'],
+    'fi': [u'Commonscat-rivi', u'Commons-rivi', u'Commons'],
+    'fr': [u'Commons', u'Commons-inline', (u'Autres projets', 'commons=')],
+    'fy': [u'Commons', u'CommonsLyts'],
+    'hr': [u'Commons', (u'WProjekti', 'commonscat=')],
+    'is': [u'Systurverkefni', u'Commons'],
+    'it': [(u'Ip', 'commons='), (u'Interprogetto', 'commons=')],
+    'ja': [u'CommonscatS', u'SisterlinksN', u'Interwikicat'],
+    'ms': [u'Commons', u'Sisterlinks', u'Commons cat show2'],
+    'nds-nl': [u'Commons'],
+    'nl': [u'Commons', u'Commonsklein', u'Commonscatklein', u'Catbeg',
+           u'Catsjab', u'Catwiki'],
+    'om': [u'Commons'],
+    'pt': [u'Correlatos'],
     'simple': [u'Sisterlinks'],
-    'ru' : [u'Навигация', u'Навигация для категорий'],
-    'tt' : [u'Навигация'],
-    'zh' : [u'Category redirect', u'cr', u'Commons',
-            u'Sisterlinks', u'Sisterlinkswp',
-            u'Tracking category', u'Trackingcatu',
-            u'Template category', u'Wikipedia category'
-            u'分类重定向', u'追蹤分類', u'共享資源', u'追蹤分類'],
+    'ru': [u'Навигация', u'Навигация для категорий', u'КПР', u'КБР'],
+    'tt': [u'Навигация'],
+    'zh': [u'Category redirect', u'cr', u'Commons',
+           u'Sisterlinks', u'Sisterlinkswp',
+           u'Tracking category', u'Trackingcatu',
+           u'Template category', u'Wikipedia category'
+           u'分类重定向', u'追蹤分類', u'共享資源', u'追蹤分類'],
 }
 
 msg_change = {
+    'be-x-old': u'Робат: зьмяніў шаблён [[:Commons:Category:%(oldcat)s|%(oldcat)s]] на [[:Commons:Category:%(newcat)s|%(newcat)s]]',
     'cs': u'Robot změnil šablonu Commonscat z [[:Commons:Category:%(oldcat)s|%(oldcat)s]] na [[:Commons:Category:%(newcat)s|%(newcat)s]]',
     'da': u'Robot: Ændrer commonscat link fra [[:Commons:Category:%(oldcat)s|%(oldcat)s]] til [[:Commons:Category:%(newcat)s|%(newcat)s]]',
     'de': u'Bot: Ändere commonscat link von [[:Commons:Category:%(oldcat)s|%(oldcat)s]] zu [[:Commons:Category:%(newcat)s|%(newcat)s]]',
@@ -316,7 +320,7 @@ u'Cannot change %s because of spam blacklist entry %s'
                 else:
                     for (inPageTemplate, param) in templatesWithParams:
                         if inPageTemplate == template[0] \
-                           and template[1] in param[0].replace(' ',''):
+                           and template[1] in param[0].replace(' ', ''):
                             return True
         return False
 

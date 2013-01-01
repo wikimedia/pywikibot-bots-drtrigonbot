@@ -40,7 +40,7 @@ NOTE: Only use either -sql or -file or -page, but don't mix them.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: standardize_notes.py 9042 2011-03-13 10:14:47Z xqt $'
+__version__ = '$Id: standardize_notes.py 10792 2012-12-13 01:08:33Z yurik $'
 #
 # 2005-07-15: Find name of section containing citations: doFindRefSection().
 #             (SEWilco)
@@ -1126,8 +1126,7 @@ def main():
         return
     if (len(commandline_replacements) == 2):
         replacements[commandline_replacements[0]] = commandline_replacements[1]
-        editSummary = pywikibot.translate(pywikibot.getSite(), msg)
-        % ' (-' + commandline_replacements[0] + ' +' + commandline_replacements[1] + ')'
+        editSummary = pywikibot.translate(pywikibot.getSite(), msg) % ' (-' + commandline_replacements[0] + ' +' + commandline_replacements[1] + ')'
     else:
         change = ''
         default_summary_message =  pywikibot.translate(pywikibot.getSite(), msg) % change

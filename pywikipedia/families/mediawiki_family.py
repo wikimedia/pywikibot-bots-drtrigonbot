@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: mediawiki_family.py 10514 2012-09-04 08:59:10Z xqt $'
+__version__ = '$Id: mediawiki_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
 
 import family
 

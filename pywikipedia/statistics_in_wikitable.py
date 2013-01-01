@@ -12,7 +12,7 @@ The following parameters are supported:
         If not existing yet, it is created.
         If existing, it is updated.
 """
-__version__ = '$Id: statistics_in_wikitable.py 9042 2011-03-13 10:14:47Z xqt $'
+__version__ = '$Id: statistics_in_wikitable.py 10709 2012-11-11 18:23:35Z xqt $'
 #
 import time
 import wikipedia as pywikibot
@@ -62,7 +62,7 @@ class StatisticsBot:
         }
         pywikibot.output("\nQuerying api for json-formatted data...")
         try:
-            data = query.GetData(params,self.site, encodeTitle = False)
+            data = query.GetData(params,self.site)
         except:
             url = self.site.protocol() + '://' + self.site.hostname() + self.site.api_address()
             pywikibot.output("The query has failed. Have you check the API? Cookies are working?")

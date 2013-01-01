@@ -5,12 +5,14 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: family.py 10680 2012-11-08 14:05:25Z xqt $'
+__version__='$Id: family.py 10843 2012-12-30 10:25:06Z xqt $'
 
-import config
 import re
 import urllib
 from datetime import timedelta, datetime
+
+import config
+import wikipedia as pywikibot
 
 # Parent class for all wiki families
 
@@ -186,6 +188,7 @@ class Family:
                 'ko': u'미디어',
                 'koi': u'Медиа',
                 'krc': u'Медиа',
+                'ks': u'میڈیا',
                 'ksh': [u'Medie', u'Medium', u'Meedije', u'Meedijum'],
                 'ku': u'Medya',
                 'kv': u'Медиа',
@@ -246,7 +249,7 @@ class Family:
                 'th': u'สื่อ',
                 'tl': u'Midya',
                 'tlh': u'Doch',
-                'tr': u'Medya',
+                'tr': [u'Ortam', u'Medya'],
                 'tt': u'Медиа',
                 'ty': u'Média',
                 'udm': u'Медиа',
@@ -285,7 +288,7 @@ class Family:
                 'av': u'Служебная',
                 'ay': u'Especial',
                 'az': u'Xüsusi',
-                'ba': u'Ярҙамсы',
+                'ba': [u'Махсус', u'Ярҙамсы'],
                 'bar': u'Spezial',
                 'bat-smg': [u'Specēlos', u'Specialus'],
                 'bcl': u'Espesyal',
@@ -369,6 +372,7 @@ class Family:
                 'ko': [u'특수기능', u'특'],
                 'koi': u'Служебная',
                 'krc': u'Къуллукъ',
+                'ks': u'خاص',
                 'ksh': [u'Extra', u'Spezial', u'Shpezjal'],
                 'ku': u'Taybet',
                 'kv': [u'Отсасян', u'Служебная'],
@@ -586,6 +590,7 @@ class Family:
                 'ko': u'토론',
                 'koi': u'Обсуждение',
                 'krc': u'Сюзюу',
+                'ks': u'بَحَژ',
                 'ksh': u'Klaaf',
                 'ku': [u'Gotûbêj', u'Nîqaş'],
                 'kv': [u'Сёрнитанiн', u'Обсуждение'],
@@ -761,7 +766,7 @@ class Family:
                 'fi': u'Käyttäjä',
                 'fiu-vro': u'Pruukja',
                 'fo': u'Brúkari',
-                'fr':  u'Utilisateur',
+                'fr': u'Utilisateur',
                 'frp': [u'Utilisator', u'Usanciér'],
                 'frr': [u'Benutzer', u'Benutzerin'],
                 'fur': u'Utent',
@@ -805,6 +810,7 @@ class Family:
                 'ko': u'사용자',
                 'koi': [u'Участник', u'Участница'],
                 'krc': u'Къошулуучу',
+                'ks': u'رُکُن',
                 'ksh': [u'Metmaacher', u'Medmaacher', u'Metmaacherin', u'Medmaacherin', u'Metmaacheren', u'Medmaacheren', u'Benutzer', u'Benutzerin'],
                 'ku': u'Bikarhêner',
                 'kv': [u'Пырысь', u'Участник', u'Участница'],
@@ -1023,6 +1029,7 @@ class Family:
                 'ko': u'사용자토론',
                 'koi': [u'Обсуждение участника', u'Обсуждение участницы'],
                 'krc': u'Къошулуучуну сюзюу',
+                'ks': u'رُکُن بَحَژ',
                 'ksh': [u'Metmaacher Klaaf', u'Medmaacher Klaaf', u'Benutzer Diskussion', u'Benutzerin Diskussion'],
                 'ku': [u'Gotûbêja bikarhêner', u'Bikarhêner nîqaş'],
                 'kv': [u'Пырыськӧд сёрнитанiн', u'Обсуждение участника', u'Обсуждение участницы'],
@@ -1249,6 +1256,7 @@ class Family:
                 'ko': [u'파일', u'그림'],
                 'koi': [u'Файл', u'Изображение'],
                 'krc': [u'Файл', u'Изображение'],
+                'ks': u'فَیِل',
                 'ksh': [u'Datei', u'Beld', u'Belld'],
                 'ku': u'Wêne',
                 'kv': u'Файл',
@@ -1470,6 +1478,7 @@ class Family:
                 'ko': u'파일토론',
                 'koi': [u'Обсуждение файла', u'Обсуждение изображения'],
                 'krc': [u'Файлны сюзюу', u'Обсуждение изображения'],
+                'ks': u'فَیِل بَحَژ',
                 'ksh': [u'Dateie Klaaf', u'Belder Klaaf', u'Bellder Klaaf'],
                 'ku': [u'Gotûbêja wêneyî', u'Wêne nîqaş'],
                 'kv': [u'Файл донъялӧм', u'Обсуждение файла'],
@@ -1622,6 +1631,7 @@ class Family:
                 'km': [u'មេឌាវិគី', u'មីឌាវិគី'],
                 'kn': u'ಮೀಡಿಯವಿಕಿ',
                 'ko': u'미디어위키',
+                'ks': u'میڈیاوکی',
                 'ksh': [u'MediaWiki', u'MedijaWikki'],
                 'kv': u'МедиаВики',
                 'lad': u'MedyaViki',
@@ -1764,6 +1774,7 @@ class Family:
                 'ko': [u'미디어위키토론', u'MediaWiki토론'],
                 'koi': u'Обсуждение MediaWiki',
                 'krc': u'MediaWiki-ни сюзюу',
+                'ks': u'میڈیاوکی بَحَژ',
                 'ksh': [u'MediaWiki Klaaf', u'MedijaWikki Klaaf'],
                 'ku': [u'Gotûbêja MediaWiki', u'MediaWiki nîqaş'],
                 'kv': [u'МедиаВики донъялӧм', u'Обсуждение MediaWiki'],
@@ -2023,7 +2034,7 @@ class Family:
                 'nv': u'Bee álnééhí',
                 'oc': u'Modèl',
                 'or': [u'ଛାଞ୍ଚ', u'ଟେଁପଲେଟ', u'ଟେମ୍ପଲେଟ'],
-                'os': u'Шаблон',
+                'os': [u'Хуызæг', u'Шаблон'],
                 'pa': [u'ਫਰਮਾ', u'ਨਮੂਨਾ'],
                 'pcd': u'Modèle',
                 'pdc': [u'Moddel', u'Vorlage'],
@@ -2238,7 +2249,7 @@ class Family:
                 'nv': u'Bee álnééhí baa yáshtiʼ',
                 'oc': [u'Discussion Modèl', u'Discutida Modèl'],
                 'or': [u'ଛାଞ୍ଚ ଆଲୋଚନା', u'ଟେଁପଲେଟ ଆଲୋଚନା', u'ଟେମ୍ପଲେଟ ଆଲୋଚନା'],
-                'os': [u'Шаблоны тæрхон', u'Шаблоны тыххæй дискусси'],
+                'os': [u'Хуызæджы тæрхон', u'Шаблоны тæрхон', u'Шаблоны тыххæй дискусси'],
                 'pa': [u'ਫਰਮਾ ਗੱਲ-ਬਾਤ', u'ਨਮੂਨਾ ਚਰਚਾ'],
                 'pcd': [u'Discussion modèle', u'Discussion Modèle'],
                 'pdc': [u'Moddel Dischbedutt', u'Vorlage Diskussion'],
@@ -2413,6 +2424,7 @@ class Family:
                 'ko': u'도움말',
                 'koi': u'Справка',
                 'krc': u'Болушлукъ',
+                'ks': u'پَلزُن',
                 'ksh': [u'Hölp', u'Hülp'],
                 'ku': u'Alîkarî',
                 'kv': u'Справка',
@@ -2633,6 +2645,7 @@ class Family:
                 'ko': u'도움말토론',
                 'koi': u'Обсуждение справки',
                 'krc': u'Болушлукъну сюзюу',
+                'ks': u'پَلزُن بَحَژ',
                 'ksh': [u'Hölp Klaaf', u'Hülp Klaaf'],
                 'ku': [u'Gotûbêja alîkariyê', u'Alîkarî nîqaş'],
                 'kv': u'Обсуждение справки',
@@ -2853,6 +2866,7 @@ class Family:
                 'ko': u'분류',
                 'koi': u'Категория',
                 'krc': u'Категория',
+                'ks': u'زٲژ',
                 'ksh': [u'Saachjrupp', u'Sachjrop', u'Saachjrop', u'Saachjropp', u'Kattejori', u'Kategorie', u'Katejori'],
                 'ku': u'Kategorî',
                 'kv': u'Категория',
@@ -3074,6 +3088,7 @@ class Family:
                 'ko': u'분류토론',
                 'koi': u'Обсуждение категории',
                 'krc': u'Категорияны сюзюу',
+                'ks': u'زٲژ بَحَژ',
                 'ksh': [u'Saachjruppe Klaaf', u'Sachjrop Klaaf', u'Saachjroppe Klaaf', u'Saachjrupp Klaaf', u'Kattejori Klaaf', u'Kattejorije Klaaf', u'Kategorie Klaaf', u'Katejorije Klaaf'],
                 'ku': [u'Gotûbêja kategoriyê', u'Kategorî nîqaş'],
                 'kv': u'Обсуждение категории',
@@ -3662,6 +3677,9 @@ class Family:
             '_default': []
         }
 
+        # A list of languages that use hard (instead of soft) category redirects
+        self.use_hard_category_redirects = []
+
         # A list of disambiguation template names in different languages
         self.disambiguationTemplates = {
             '_default': []
@@ -3833,7 +3851,6 @@ class Family:
     @property
     def iwkeys(self):
         if self.interwiki_forward:
-            import wikipedia as pywikibot
             return pywikibot.Family(self.interwiki_forward).langs.keys()
         return self.langs.keys()
 
@@ -3855,8 +3872,8 @@ class Family:
             return self.linktrails[fallback]
         else:
             raise KeyError(
-                "ERROR: linktrail in language %s unknown"
-                % code)
+                "ERROR: linktrail in language %(language_code)s unknown"
+                % {'language_code': code})
 
     def namespace(self, code, ns_number, fallback = '_default', all = False):
         if not self.isDefinedNS(ns_number):
@@ -4076,7 +4093,7 @@ class Family:
         """Return MediaWiki version number as a string."""
         # Don't use this, use versionnumber() instead. This only exists
         # to not break family files.
-        return '1.21wmf3'
+        return '1.21wmf6'
 
     def versionnumber(self, code, version=None):
         """Return an int identifying MediaWiki version.
@@ -4331,6 +4348,10 @@ class Family:
 
     def shared_image_repository(self, code):
         """Return the shared image repository, if any."""
+        return (None, None)
+
+    def shared_data_repository(self, code):
+        """Return the shared wikidata repository, if any."""
         return (None, None)
 
     def server_time(self, code):

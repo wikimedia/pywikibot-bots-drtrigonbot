@@ -6,7 +6,7 @@ import family, config
 # Translation used on all wikitravels for the 'article' text.
 # A language not mentioned here is not known by the robot
 
-__version__ = '$Id: wikitravel_family.py 9986 2012-03-10 17:46:47Z xqt $'
+__version__ = '$Id: wikitravel_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
 
 class Family(family.Family):
     def __init__(self):

@@ -13,7 +13,7 @@ Library to work with category pages on Wikipedia
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: catlib.py 10062 2012-03-30 12:45:34Z xqt $'
+__version__ = '$Id: catlib.py 10709 2012-11-11 18:23:35Z xqt $'
 #
 import re, time, urllib, query
 import wikipedia
@@ -675,7 +675,7 @@ def categoryAllElementsAPI(CatName, cmlimit = 5000, categories_parsed = [], site
         'cmtitle'   :CatName,
         }
 
-    data = query.GetData(params, site, encodeTitle = False)
+    data = query.GetData(params, site)
     categories_parsed.append(CatName)
     try:
         members = data['query']['categorymembers']

@@ -16,11 +16,11 @@ options -file, -ref, -links, ...
 #
 # This script based on disambredir.py and solve_disambiguation.py
 #
-# (C) Pywikipedia team, 2004-2011
+# (C) Pywikipedia team, 2004-2012
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: fixing_redirects.py 9809 2011-12-17 14:03:05Z xqt $'
+__version__='$Id: fixing_redirects.py 10848 2012-12-30 14:12:30Z xqt $'
 #
 import re, sys
 import wikipedia as pywikibot
@@ -152,12 +152,10 @@ def workon(page):
     try:
         text = page.get()
     except pywikibot.IsRedirectPage:
-        pywikibot.output(u'%s is a redirect page. Skipping'
-                         % page.title(asLink=True))
+        pywikibot.output(u'%s is a redirect page. Skipping' % page)
         return
     except pywikibot.NoPage:
-        pywikibot.output(u'%s does not exist. Skipping'
-                         % page.title(asLink=True))
+        pywikibot.output(u'%s does not exist. Skipping' % page)
         return
     pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
                      % page.title())
@@ -171,17 +169,27 @@ def workon(page):
     for page2 in links:
         try:
             target = page2.getRedirectTarget()
-        except (pywikibot.Error,pywikibot.SectionError):
+        except pywikibot.NoPage:
+            gen = s.logpages(number=1, mode='move', title=page2.title(),
+                             dump=True)
+            try:
+                lastmove = gen.next()['move']
+            except StopIteration:
+                continue
+            target = pywikibot.Page(mysite, lastmove['new_title'])
+        except (pywikibot.Error, pywikibot.SectionError):
+            continue
+        # no fix to user namespaces
+        if target.namespace() in [0, 1] and not page2.namespace() in [0, 1]:
             continue
         text = treat(text, page2, target)
     if text != page.get():
         comment = i18n.twtranslate(mysite, 'fixing_redirects-fixing')
-        pywikibot.showDiff(page.get() ,text)
+        pywikibot.showDiff(page.get(), text)
         try:
             page.put(text, comment)
         except (pywikibot.Error):
-            pywikibot.output('Error: unable to put %s'
-                             % page.title(asLink=True))
+            pywikibot.output('Error: unable to put %s' % page)
 
 def main():
     featured = False

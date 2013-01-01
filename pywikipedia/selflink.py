@@ -30,7 +30,7 @@ and the bot will only work on that single page.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: selflink.py 9146 2011-04-06 16:04:58Z xqt $'
+__version__='$Id: selflink.py 10753 2012-12-01 07:39:18Z xqt $'
 #
 
 import re, sys
@@ -49,6 +49,7 @@ docuReplacements = {
 # in fixes.py.
 msg = {
     'ar':u'روبوت: إزالة وصلات ذاتية',
+    'be-x-old':u'Робат: выдаленьне аўтаспасылкі',
     'cs':u'Robot odstranil odkaz na název článku',
     'da':u'Bot: fjerner selvreference',
     'de':u'Bot: Entferne Selbstlinks',
