@@ -2,12 +2,36 @@
 msg = {
 
 
+
+
+
 	'en': {
 		'delete-from-category': u'Robot: Deleting all pages from category %(page)s',
 		'delete-from-file': u'Robot: Deleting a list of files.',
 		'delete-images': u'Robot: Deleting all images on page %(page)s',
 		'delete-linked-pages': u'Robot: Deleting all pages linked from %(page)s',
 		'delete-referring-pages': u'Robot: Deleting all pages referring from %(page)s',
+	},	# Author: Csisc
+	'aeb': {
+		'delete-images': u'روبوت -حذف كل الصور في الصفحة %(page)s',
+		'delete-referring-pages': u'روبوت - حذف كل الصفحات الراجعة من %(page)s',
+		'delete-from-category': u'روبوت - حذف كل الصفحات من التصنيف %(page)s',
+		'delete-from-file': u'بوت: حذف قائمة من الملفات.',
+		'delete-linked-pages': u'روبوت - حذف كل الصفحات الموصولة من %(page)s',
+	},	# Author: Csisc
+	'aeb': {
+		'delete-images': u'روبوت -حذف كل الصور في الصفحة %(page)s',
+		'delete-referring-pages': u'روبوت - حذف كل الصفحات الراجعة من %(page)s',
+		'delete-from-category': u'روبوت - حذف كل الصفحات من التصنيف %(page)s',
+		'delete-from-file': u'بوت: حذف قائمة من الملفات.',
+		'delete-linked-pages': u'روبوت - حذف كل الصفحات الموصولة من %(page)s',
+	},	# Author: Csisc
+	'aeb': {
+		'delete-images': u'روبوت -حذف كل الصور في الصفحة %(page)s',
+		'delete-referring-pages': u'روبوت - حذف كل الصفحات الراجعة من %(page)s',
+		'delete-from-category': u'روبوت - حذف كل الصفحات من التصنيف %(page)s',
+		'delete-from-file': u'بوت: حذف قائمة من الملفات.',
+		'delete-linked-pages': u'روبوت - حذف كل الصفحات الموصولة من %(page)s',
 	},	# Author: Csisc
 	'aeb': {
 		'delete-images': u'روبوت -حذف كل الصور في الصفحة %(page)s',
@@ -70,6 +94,10 @@ msg = {
 		'delete-from-file': u'بوت: حذف قائمة من الملفات.',
 		'delete-linked-pages': u'روبوت - حذف كل الصفحات الموصولة من %(page)s',
 	},
+	# Author: Basharh
+	'arc': {
+		'delete-from-file': u'ܪܘܒܘܛ: ܫܝܦܐ ܕܡܟܬܒܘܬܐ ܕܠܦܦ̈ܐ',
+	},
 	# Author: Esbardu
 	# Author: Xuacu
 	'ast': {
@@ -92,7 +120,17 @@ msg = {
 	'azb': {
 		'delete-images': u'بوت: %(page)s صحیفه‌‌سینده‌کی بوتون شکیل‌لر سیلینیر',
 		'delete-referring-pages': u'بوت: %(page)s صحیفه‌‌سینه کئچید وئرن بوتون صحیفه‌‌لر سیلینیر',
+		'delete-from-category': u'بوت: %(page)s بؤلمه‌سینه عاید بوتون صحیفه‌‌لر سیلینیر',
 		'delete-from-file': u'بوت: فايللارین سیياهیسی سیلینیر.',
+		'delete-linked-pages': u'بوت: %(page)s صحیفه‌‌سیندن کئچید وئرن بوتون صحیفه‌‌لر سیلینیر',
+	},
+	# Author: Haqmar
+	'ba': {
+		'delete-images': u'Робот: %(page)s битендәге бөтә рәсемдәрҙе юйыу',
+		'delete-referring-pages': u'Робот:  %(page)s битенә ҡағылышлы бар биттәрҙе юйыу',
+		'delete-from-category': u'Робот: %(page)s категорияһындағы бөтә биттәрҙе юйыу',
+		'delete-from-file': u'Робот: файлдар исемлеген юйыу',
+		'delete-linked-pages': u'Робот: %(page)s бите менән бәйле бөтә биттәрҙе юйыу',
 	},
 	# Author: EugeneZelenko
 	'be-tarask': {
@@ -181,11 +219,14 @@ msg = {
 		'delete-from-file': u'Ρομπότ: Διαγραφή μια λίστας αρχείων.',
 		'delete-linked-pages': u'Ρομπότ: Διαγραφή όλων των σελίδων που συνδέονται από την %(page)s',
 	},
+	# Author: Blahma
 	# Author: Remux
 	'eo': {
 		'delete-images': u'Roboto: Forigante ĉiujn bildojn ĉe la paĝo %(page)s',
+		'delete-referring-pages': u'Roboto: Forigante ĉiujn paĝojn ligantajn al %(page)s',
 		'delete-from-category': u'Roboto: Forigante ĉiujn paĝojn de la kategorio %(page)s',
 		'delete-from-file': u'Roboto: Forigante liston da dosieroj',
+		'delete-linked-pages': u'Roboto: Forigante ĉiujn paĝojn ligatajn el %(page)s',
 	},
 	# Author: Invadinado
 	# Author: Vivaelcelta
@@ -329,7 +370,7 @@ msg = {
 	'ja': {
 		'delete-images': u'ロボットによる: ページ「%(page)s」上の画像をすべて削除',
 		'delete-referring-pages': u'ロボットによる: 「%(page)s」を参照しているページをすべて削除',
-		'delete-from-category': u'ロボットによる: カテゴリー「%(page)s」にあるページをすべて削除',
+		'delete-from-category': u'ロボットによる: カテゴリ「%(page)s」にあるページをすべて削除',
 		'delete-from-file': u'ロボットによる: ファイルのリストを削除',
 		'delete-linked-pages': u'ロボットによる: 「%(page)s」からリンクされているページをすべて削除',
 	},
@@ -340,6 +381,22 @@ msg = {
 		'delete-from-category': u'Bot: Mbusak kabèh kaca saka katégori %(page)s',
 		'delete-from-file': u'Bot: Mbusak daptar berkas.',
 		'delete-linked-pages': u'Bot: Mbusak kabèh kaca sing kaubung saka %(page)s',
+	},
+	# Author: Akoppad
+	'kn': {
+		'delete-images': u'ರೋಬೋಟ್: ಪುಟ %(ಪುಟ)ಗಳ  ಎಲ್ಲಾ ಚಿತ್ರಗಳನ್ನು ಅಳಿಸಲಾಗುತ್ತಿದೆ',
+		'delete-referring-pages': u'ರೋಬೋಟ್: % (ಪುಟ)ಗಳಲ್ಲಿರು ಎಲ್ಲಾ ಚಿತ್ರಗಳನ್ನು ಅಳಿಸಲಾಗುತ್ತಿದೆ',
+		'delete-from-category': u'ರೋಬೋಟ್: % (ಪುಟ) ಗಳ ವರ್ಗದಲ್ಲಿರು ಎಲ್ಲಾ ಚಿತ್ರಗಳನ್ನು ಅಳಿಸಲಾಗುತ್ತಿದೆ',
+		'delete-from-file': u'ರೋಬೋಟ್: ಕಡತಗಳ ಪಟ್ಟಿಯನ್ನು ಅಳಿಸಲಾಗುತ್ತಿದೆ.',
+		'delete-linked-pages': u'ರೋಬೋಟ್:% (ಪುಟ) ಗೆ ಸಂಬಂದ ಪಟ್ಟ  ಎಲ್ಲ ಲಿಂಕ್ ಎಲ್ಲಾ ಪುಟಗಳನ್ನು ಅಳಿಸಲಾಗುತ್ತಿದೆ',
+	},
+	# Author: 아라
+	'ko': {
+		'delete-images': u'로봇: %(page)s 문서에 모든 그림 삭제',
+		'delete-referring-pages': u'로봇: %(page)s에서 참고하는 모든 문서 삭제',
+		'delete-from-category': u'로봇: %(page)s 분류에 있는 모든 문서 삭제',
+		'delete-from-file': u'로봇: 파일의 목록을 삭제합니다.',
+		'delete-linked-pages': u'로봇: %(page)s에 연결한 모든 문서 삭제',
 	},
 	# Author: Purodha
 	'ksh': {
@@ -402,6 +459,14 @@ msg = {
 		'delete-from-category': u'Робот: Бришење на сите страници од категоријата %(page)s',
 		'delete-from-file': u'Робот: Бришење на список на сите податотеки.',
 		'delete-linked-pages': u'Робот: бришење на сите страници што водат од %(page)s',
+	},
+	# Author: Praveenp
+	'ml': {
+		'delete-images': u'യന്ത്രം: %(page)s താളിലെ എല്ലാ ചിത്രങ്ങളും മായ്ക്കുന്നു',
+		'delete-referring-pages': u'യന്ത്രം: %(page)s എന്ന താളിൽ സൂചിപ്പിക്കുന്ന എല്ലാ താളുകളും മായ്ക്കുന്നു',
+		'delete-from-category': u'യന്ത്രം: %(page)s എന്ന വർഗ്ഗത്തിലെ എല്ലാ താളുകളും മായ്ക്കുന്നു',
+		'delete-from-file': u'യന്ത്രം: പട്ടികയിലെ പ്രമാണങ്ങൾ മായ്ക്കുന്നു',
+		'delete-linked-pages': u'യന്ത്രം: %(page)s എന്ന താളിൽ നിന്ന് കണ്ണി ചേർത്തിട്ടുള്ള എല്ലാ താളുകളും മായ്ക്കുന്നു',
 	},
 	# Author: Anakmalaysia
 	'ms': {
@@ -522,6 +587,14 @@ msg = {
 		'delete-from-file': u'Robot: Brisanje seznama datotek.',
 		'delete-linked-pages': u'Robot: Brisanje vseh strani, na katere se povezuje %(page)s',
 	},
+	# Author: Abshirdheere
+	'so': {
+		'delete-images': u'Bot: Tirtiris dhamaan sawirada bogga %(page)s',
+		'delete-referring-pages': u'Bot: tirtirista dhamaan bogogga la xiriira %(page)s',
+		'delete-from-category': u'Bot: ka tirtiris Qaybta dhamaan bogagga   %(page)s',
+		'delete-from-file': u'Robot: Ka tirtiris liska  file lasha.',
+		'delete-linked-pages': u'Robot: tirtiris dhamaan bogogga web ka %(page)s',
+	},
 	# Author: Euriditi
 	'sq': {
 		'delete-images': u'Roboti: Duke fshirë të gjitha figurat në faqen %(page)s',
@@ -580,6 +653,13 @@ msg = {
 		'delete-from-category': u'தானியங்கி: %(page)s பகுப்பில் உள்ள அனைத்து பக்கங்களும் நீக்கப்படுகின்றன',
 		'delete-from-file': u'தானியங்கி: ஒரு பட்டியலிலுள்ள கோப்புகள் நீக்கப்படுகின்றன.',
 		'delete-linked-pages': u'தானியங்கி:%(page)s பக்கத்துடன் இணைக்கப்பட்டுள்ள அனைத்து பக்கங்களும் நீக்கப்படுகின்றன',
+	},
+	# Author: Nullzero
+	'th': {
+		'delete-images': u'โรบอต: ลบรูปภาพทั้งหมดจากหน้า %(page)s',
+		'delete-referring-pages': u'โรบอต: ลบหน้าทั้งหมดที่ลิงก์ไป %(page)s',
+		'delete-from-category': u'โรบอต: ลบหน้าทั้งหมดจากหมวดหมู่ %(page)s',
+		'delete-linked-pages': u'โรบอต: ลบหน้าทั้งหมดที่ลิงก์จาก %(page)s',
 	},
 	# Author: AnakngAraw
 	'tl': {

@@ -5,12 +5,12 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: family.py 10767 2012-12-06 09:07:42Z xqt $'
+__version__ = '$Id: family.py 10843 2012-12-30 10:25:06Z xqt $'
 
-import config2 as config
 import logging
 import re
 import urllib
+import config2 as config
 
 import pywikibot
 
@@ -547,6 +547,9 @@ class Family:
             '_default': []
         }
 
+        # A list of languages that use hard (instead of soft) category redirects
+        self.use_hard_category_redirects = []
+
         # A list of disambiguation template names in different languages
         self.disambiguationTemplates = {
             '_default': []
@@ -823,7 +826,7 @@ class Family:
         """Return MediaWiki version number as a string."""
         # Don't use this, use versionnumber() instead. This only exists
         # to not break family files.
-        return '1.21wmf5'
+        return '1.21wmf6'
 
     def versionnumber(self, code):
         """Return an int identifying MediaWiki version.

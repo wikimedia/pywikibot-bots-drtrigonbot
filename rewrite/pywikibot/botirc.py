@@ -11,7 +11,7 @@ http://python-irclib.sourceforge.net/
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
+__version__ = '$Id: botirc.py 10839 2012-12-29 13:16:16Z drtrigon $'
 
 # Note: the intention is to develop this module (at some point) into a Bot
 # class definition that can be subclassed to create new, functional bot
@@ -97,7 +97,7 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
                 return
         except pywikibot.IsRedirectPage:
                 return
-        print entry[0], name
+        pywikibot.output(str(( entry[0], name )))
 
     def on_dccmsg(self, c, e):
         pass

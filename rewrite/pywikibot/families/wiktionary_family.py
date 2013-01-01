@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 from pywikibot import family
 
-__version__ = '$Id: wiktionary_family.py 10771 2012-12-08 13:45:00Z xqt $'
+__version__ = '$Id: wiktionary_family.py 10855 2013-01-01 10:51:02Z xqt $'
 
 # The Wikimedia family that is known as Wiktionary
 
@@ -13,17 +13,17 @@ class Family(family.Family):
         self.languages_by_size = [
             'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'el', 'ko', 'sv', 'tr', 'pl',
             'ta', 'nl', 'de', 'vi', 'kn', 'fi', 'io', 'ku', 'hu', 'pt', 'no',
-            'my', 'id', 'it', 'li', 'ml', 'es', 'et', 'ja', 'fa', 'ro', 'ar',
-            'cs', 'te', 'lo', 'eu', 'gl', 'ca', 'uk', 'fj', 'br', 'bg', 'eo',
-            'hr', 'oc', 'vo', 'is', 'th', 'simple', 'scn', 'zh-min-nan', 'sr',
-            'af', 'cy', 'sw', 'fy', 'tl', 'ast', 'nn', 'he', 'ur', 'wa', 'la',
-            'ps', 'da', 'hy', 'sq', 'sm', 'sl', 'hi', 'az', 'tt', 'lv', 'ka',
-            'lb', 'nah', 'pnb', 'bs', 'tk', 'hsb', 'kk', 'sk', 'km', 'mk', 'be',
-            'ga', 'wo', 'ang', 'ms', 'co', 'gn', 'mr', 'csb', 'ky', 'st', 'nds',
-            'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'kl', 'jbo', 'mn', 'an', 'zu',
-            'sa', 'gu', 'rw', 'fo', 'kw', 'gv', 'qu', 'ss', 'ie', 'mt', 'om',
-            'chr', 'roa-rup', 'iu', 'bn', 'am', 'so', 'pa', 'su', 'za', 'gd',
-            'mi', 'jv', 'tpi', 'ik', 'or', 'yi', 'ln', 'uz', 'ti', 'sg', 'na',
+            'my', 'id', 'it', 'li', 'es', 'ml', 'et', 'ja', 'fa', 'ro', 'ar',
+            'te', 'cs', 'lo', 'eu', 'gl', 'ca', 'uk', 'fj', 'br', 'bg', 'eo',
+            'hr', 'oc', 'vo', 'is', 'th', 'simple', 'zh-min-nan', 'scn', 'sr',
+            'af', 'cy', 'sw', 'fy', 'tl', 'ast', 'nn', 'he', 'ur', 'ps', 'uz',
+            'wa', 'la', 'da', 'hy', 'sq', 'sm', 'sl', 'hi', 'az', 'tt', 'lv',
+            'ka', 'nah', 'lb', 'pnb', 'bs', 'tk', 'hsb', 'kk', 'sk', 'km', 'mk',
+            'be', 'ga', 'wo', 'ang', 'ms', 'co', 'gn', 'mr', 'ky', 'csb', 'st',
+            'nds', 'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'kl', 'jbo', 'mn', 'an',
+            'sa', 'zu', 'gu', 'rw', 'fo', 'kw', 'gv', 'qu', 'ss', 'ie', 'mt',
+            'om', 'chr', 'roa-rup', 'iu', 'pa', 'bn', 'am', 'so', 'su', 'za',
+            'gd', 'jv', 'mi', 'tpi', 'ik', 'or', 'yi', 'ln', 'ti', 'sg', 'na',
             'dv', 'tn', 'ne', 'ha', 'ks', 'ay', 'ts',
         ]
 

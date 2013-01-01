@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 from pywikibot import family
 
-__version__ = '$Id: wikibooks_family.py 10771 2012-12-08 13:45:00Z xqt $'
+__version__ = '$Id: wikibooks_family.py 10855 2013-01-01 10:51:02Z xqt $'
 
 # The Wikimedia family that is known as Wikibooks
 
@@ -13,11 +13,11 @@ class Family(family.Family):
         self.languages_by_size = [
             'en', 'de', 'fr', 'hu', 'ja', 'pt', 'it', 'nl', 'pl', 'es', 'vi',
             'he', 'sq', 'ca', 'fi', 'id', 'ru', 'cs', 'zh', 'hr', 'sv', 'tr',
-            'th', 'da', 'no', 'gl', 'fa', 'sr', 'ta', 'ko', 'ar', 'tl', 'mk',
-            'is', 'tt', 'lt', 'ka', 'az', 'eo', 'ro', 'uk', 'bg', 'el', 'hy',
+            'th', 'da', 'no', 'gl', 'fa', 'ta', 'sr', 'ko', 'ar', 'tl', 'mk',
+            'ro', 'is', 'tt', 'lt', 'ka', 'az', 'eo', 'uk', 'bg', 'el', 'hy',
             'sl', 'sk', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'et', 'ur', 'mr',
             'bn', 'ms', 'hi', 'ml', 'oc', 'kk', 'eu', 'fy', 'ie', 'ne', 'te',
-            'sa', 'af', 'tg', 'pa', 'bs', 'ky', 'mg', 'be', 'zh-min-nan', 'cy',
+            'sa', 'af', 'tg', 'ky', 'bs', 'pa', 'mg', 'be', 'zh-min-nan', 'cy',
             'ku', 'uz',
         ]
 

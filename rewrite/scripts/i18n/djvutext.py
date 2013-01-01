@@ -2,6 +2,9 @@
 msg = {
 
 
+
+
+
 	'en': {
 		'djvutext-creating': u'Robot: Creating page with text extracted from DjVu',
 	},
@@ -24,6 +27,14 @@ msg = {
 	# Author: Xuacu
 	'ast': {
 		'djvutext-creating': u'Robó: Creando una páxina con testu sacáu de DjVu',
+	},
+	# Author: E THP
+	'azb': {
+		'djvutext-creating': u'بوت: دژاوو چیخاریلان متنی صحیفه‌‌يه علاوه‌‌ ائتدی',
+	},
+	# Author: Haqmar
+	'ba': {
+		'djvutext-creating': u'Робот: DjVu-нан алынған текст булған бит төҙөү',
 	},
 	# Author: Jim-by
 	'be-tarask': {
@@ -149,6 +160,14 @@ msg = {
 	'jv': {
 		'djvutext-creating': u'Bot: Nggawé kaca saka teks sing dijupuk saka DjVu',
 	},
+	# Author: Akoppad
+	'kn': {
+		'djvutext-creating': u'ರೋಬೋಟ್: DjVu ಯಿಂದ ಹೊರತೆಗೆದ ಪಠ್ಯದಿಂದ  ರಚಿಸಲಾದ ಪುಟ',
+	},
+	# Author: 아라
+	'ko': {
+		'djvutext-creating': u'로봇: DjVu에서 추출한 문장으로 문서를 만듦',
+	},
 	# Author: Purodha
 	'ksh': {
 		'djvutext-creating': u'Bot: Donn en Sigg aanlääje, woh Täx drobb es, dä uss em <i lang=en">DjVu</i> eruß jetrocke wood.',
@@ -176,6 +195,10 @@ msg = {
 	# Author: Bjankuloski06
 	'mk': {
 		'djvutext-creating': u'Робот: Создава страница со текст изваден од DjVu',
+	},
+	# Author: Praveenp
+	'ml': {
+		'djvutext-creating': u'യന്ത്രം: ഡെജാവുവിൽ (DjVu) നിന്ന് എടുത്ത എഴുത്ത് ഉപയോഗിച്ച് താൾ സൃഷ്ടിക്കുന്നു',
 	},
 	# Author: Anakmalaysia
 	'ms': {
@@ -233,6 +256,10 @@ msg = {
 	# Author: Dbc334
 	'sl': {
 		'djvutext-creating': u'Robot: Ustvarjanje strani z besedilom, izvlečenim iz DjVu',
+	},
+	# Author: Abshirdheere
+	'so': {
+		'djvutext-creating': u'Bot: Samayn bog qoraal ah ee ka soo baxa DjVu',
 	},
 	# Author: Euriditi
 	'sq': {

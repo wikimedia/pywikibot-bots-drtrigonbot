@@ -7,7 +7,7 @@ Interface functions to Mediawiki's api.php
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: api.py 10603 2012-10-23 15:32:52Z russblau $'
+__version__ = '$Id: api.py 10787 2012-12-11 22:13:15Z russblau $'
 
 from UserDict import DictMixin
 from datetime import datetime, timedelta
@@ -844,7 +844,7 @@ class LogEntryListGenerator(ListGenerator):
     Like ListGenerator, but specialized for listaction="logevents" :
     yields LogEntry objects instead of dicts.
     """
-    def __init__(self, logtype, **kwargs):
+    def __init__(self, logtype=None, **kwargs):
         ListGenerator.__init__(self, "logevents", **kwargs)
 
         import logentries

@@ -2,6 +2,9 @@
 msg = {
 
 
+
+
+
 	'en': {
 		'replace-replacing': u'Robot: Automated text replacement %(description)s',
 	},
@@ -33,6 +36,14 @@ msg = {
 	# Author: Khutuck
 	'az': {
 		'replace-replacing': u'Bot: Avtomatik mətn dəyişdirmə %(description)s',
+	},
+	# Author: Amir a57
+	'azb': {
+		'replace-replacing': u'بوت: آوتوماتیک متن دییشدیرمه %(description)s',
+	},
+	# Author: Sagan
+	'ba': {
+		'replace-replacing': u'Робот: %(description)s текстын автоматик рәүештә алыштырыу',
 	},
 	# Author: Mucalexx
 	'bar': {
@@ -194,8 +205,9 @@ msg = {
 		'replace-replacing': u'Бот: Мәтінді өздікті алмастырды: %(description)s',
 	},
 	# Author: Cwt96
+	# Author: 아라
 	'ko': {
-		'replace-replacing': u'봇: 자동 텍스트 교체 %(description)s',
+		'replace-replacing': u'로봇: 자동으로 텍스트 교체 %(description)s',
 	},
 	'ksh': {
 		'replace-replacing': u'Bot: hät outomatesch Täx jetuusch: %(description)s',
@@ -243,6 +255,10 @@ msg = {
 	# Author: Rancher
 	'mk': {
 		'replace-replacing': u'Робот: Автоматизирана замена на текст %(description)s',
+	},
+	# Author: Praveenp
+	'ml': {
+		'replace-replacing': u'യന്ത്രം: സ്വയം പ്രവർത്തിത എഴുത്ത് മാറ്റിച്ചേർക്കലുകൾ %(description)s',
 	},
 	# Author: Kurniasan
 	'ms': {
@@ -327,6 +343,10 @@ msg = {
 	'sl': {
 		'replace-replacing': u'Bot: Samodejna zamenjava besedila %(description)s',
 	},
+	# Author: Abshirdheere
+	'so': {
+		'replace-replacing': u'Bot: Qoraallo la isku badalay %(description)s',
+	},
 	# Author: Vinie007
 	'sq': {
 		'replace-replacing': u'Bot: Automated text replacement %(description)s',
@@ -349,6 +369,10 @@ msg = {
 	# Author: செல்வா
 	'ta': {
 		'replace-replacing': u'தானியங்கி:  தானியக்கமாய் உரை மாற்றம் %(description)s',
+	},
+	# Author: Nullzero
+	'th': {
+		'replace-replacing': u'โรบอต: แทนที่ข้อความโดยอัตโนมัติ %(description)s',
 	},
 	# Author: AnakngAraw
 	'tl': {

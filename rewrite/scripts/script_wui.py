@@ -40,6 +40,9 @@ Syntax example:
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
 __version__ = '$Id$'
+__framework_rev__ = '10858' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__release_ver__   = '1.4'   # increase minor (1.x) at re-merges with framework
+__release_rev__   = '%i'
 #
 
 
@@ -271,8 +274,28 @@ def output_verinfo():
 
     # new release/framework revision?
     pywikibot.output(u'LATEST RELEASE/FRAMEWORK REVISION:')
-#    getSVN_release_ver()
-#    getSVN_framework_ver()
+    # local release revision?
+    rel = subprocess.Popen("svn info", stdout=subprocess.PIPE, shell=True).stdout.readlines()[5].split()[1]
+    __release_rev__ = __release_rev__ % int(rel)
+    cmp_ver = lambda a, b: {-1: '<', 0: '~', 1: '>'}[cmp((a-b)//100, 0)]
+    # release revision?
+    buf = pywikibot.comms.http.request(pywikibot.getSite(), 'http://svn.toolserver.org/svnroot/drtrigon/')
+    match = re.search('<title>drtrigon - Revision (.*?): /</title>', buf)
+    if match and (len(match.groups()) > 0):
+        release_rev = int(match.groups()[-1])
+        pywikibot.output(u'  Directory revision - release:   %s (%s %s)' %\
+                         (release_rev, cmp_ver(release_rev, int(__release_rev__)), __release_rev__))
+    else:
+        pywikibot.output(u'  WARNING: could not retrieve release information!')
+    # framework revision?
+    buf = pywikibot.comms.http.request(pywikibot.getSite(), 'http://svn.wikimedia.org/viewvc/pywikipedia/trunk/pywikipedia/')
+    match = re.search('<td>Directory revision:</td>\n<td><a (.*?)>(.*?)</a> \(of <a (.*?)>(.*?)</a>\)</td>', buf)
+    if match and (len(match.groups()) > 0):
+        framework_rev = int(match.groups()[-1])
+        pywikibot.output(u'  Directory revision - framework: %s (%s %s)' %\
+                         (framework_rev, cmp_ver(framework_rev, int(__framework_rev__)), __framework_rev__))
+    else:
+        pywikibot.output(u'  WARNING: could not retrieve framework information!')
     pywikibot.output(u'')
 
     # mediawiki software version?
