@@ -251,6 +251,9 @@ def logging_statistics(logfiles, exclude):
 		buffer += f.read(-1).strip().splitlines()
 		f.close()
 
+	if not buffer:
+		return None
+
 	# statistics (like mentioned in 'logging.statistics')
 	mcount    = { 'debug': 0, 'warning': 0, 'info': 0, 'error': 0, 'critical': 0, 'unknown': 0, }
 	mqueue    = { 'debug': [], 'warning': [], 'info': [], 'error': [], 'critical': [], 'unknown': [], }
@@ -343,9 +346,14 @@ def displaystate(form):
 	files = [item for key, value in files for item in value]	# flatten
 
 	stat = logging_statistics(current, botcontinuous)
-	data['botlog']      = stat['lastmessage']
-	data['messages']    = "\n".join(stat['messages'])
-	data['successfull'] = "%s of %s" % (stat['ecount']['end'], stat['ecount']['start'])
+	if stat is None:
+		data['botlog']      = 'n/a'
+		data['messages']    = 'n/a'
+		data['successfull'] = "n/a"
+	else:
+		data['botlog']      = stat['lastmessage']
+		data['messages']    = "\n".join(stat['messages'])
+		data['successfull'] = "%s of %s" % (stat['ecount']['end'], stat['ecount']['start'])
 	lastrun = max([os.stat(os.path.join(localdir, item)).st_mtime for item in files]+[0])
 	botmsg = data['botlog'].strip()
 
