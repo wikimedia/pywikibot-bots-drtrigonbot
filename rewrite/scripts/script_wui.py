@@ -275,7 +275,7 @@ def output_verinfo():
     # new release/framework revision?
     pywikibot.output(u'LATEST RELEASE/FRAMEWORK REVISION:')
     # local release revision?
-    rel = subprocess.Popen("svn info", stdout=subprocess.PIPE, shell=True).stdout.readlines()[5].split()[1]
+    rel = subprocess.Popen("svn info", stdout=subprocess.PIPE, shell=True).stdout.readlines()[4].split()[1]
     __release_rev__ = __release_rev__ % int(rel)
     cmp_ver = lambda a, b: {-1: '<', 0: '~', 1: '>'}[cmp((a-b)//100, 0)]
     # release revision?
