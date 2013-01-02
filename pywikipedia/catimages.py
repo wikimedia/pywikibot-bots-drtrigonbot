@@ -3201,7 +3201,7 @@ def checkbot():
         mainClass.setParameters(imageName, timestamp, uploader) # Setting the image for the main class
         try:
             mainClass.downloadImage()
-        except pywikibot.exceptions.NoPage:
+        except pywikibot.NoPage:
             continue
         except KeyError:
             pywikibot.output(u"ERROR: was not able to process page %s!!!\n" %\
@@ -3271,7 +3271,7 @@ def trainbot(generator, mainClass, image_old_namespace, image_namespace):
             mainClass.setParameters(imageName, timestamp, uploader) # Setting the image for the main class
             try:
                 mainClass.downloadImage()
-            except pywikibot.exceptions.NoPage:
+            except pywikibot.NoPage:
                 continue
             except KeyError:
                 pywikibot.output(u"ERROR: was not able to process page %s!!!\n" %\
