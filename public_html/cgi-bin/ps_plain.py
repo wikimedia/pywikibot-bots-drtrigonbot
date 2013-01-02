@@ -55,6 +55,12 @@ page = content_type + """
 
 admin_page = content_type + _minimal_page
 
+debug_page = content_type + _minimal_page % { 'title': 'DEBUG PAGE',
+                                              'refresh': '',
+                                              'tsnotice': '',
+                                              'content': '%s',
+                                              'footer': '', }
+
 
 # === footer HTML codes === === ===
 #

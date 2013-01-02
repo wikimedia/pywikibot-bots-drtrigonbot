@@ -64,7 +64,7 @@ displaystate_content = \
                  <img src="%(botstate_wui)s" width="15" height="15" alt="Botstate: wui"><br><br>
 Time now: %(time)s<br><br>
 
-<a href="%(loglink)s">Latest</a> bot status message log: <b>%(botlog)s</b><br><br>
+Latest gathered bot status message log: <b>%(botlog)s</b><br><br>
 Successfully finished bot runs: <b>%(successfull)s</b><br><br>
 Current log files: %(currentlog)s<br>
 <a href="%(oldlink)s">Old log</a> files: <i>%(oldlog)s</i><br><br>
@@ -76,7 +76,14 @@ logstat_content = \
 """<small><a href="%(backlink)s">back</a></small><br>
 Evaluated data period from %(start_date)s to %(end_date)s.<br>
 <br>
-Filter: %(filter)s<br>
+<form action="panel.py">
+  <input type="hidden" name="action" value="logstat">
+  Filter:
+  <select name="filter" size="1">
+    %(filter_options)s
+  </select>
+  <input type="submit" value=" OK ">
+</form>
 <br>
 <h2>Runs (started, ended, difference, history compression)</h2>
 <a href="%(graphlink-ecount)s"><img src="%(graphlink-ecount)s" alt=""></a>
@@ -137,31 +144,46 @@ html_color = {	'green':	'#00ff00',
 #
 bottimeout = 24
 botdonemsg = 'DONE'
+botcontinuous = ['trunk/bot_control.py-subster_irc-cron.log', 'rewrite/script_wui-bot.log']
 
 # use classic 're' since 'pyparsing' does not work with unicode
 regex   = re.compile(r'(?P<timestamp>[\d-]+\s[\d:,]+)\s(?P<file>\S+)\s*(?P<level>\S+)\s*(?P<message>.*)')#, re.U)
 timefmt = "%Y-%m-%d %H:%M:%S,%f"
+datefmt = "%Y-%m-%d"
 
 localdir = os.path.dirname(os.path.join('..','DrTrigonBot','.'))
 
 
 # === functions === === ===
 #
-def oldlogfiles(all=False):
-	files = os.listdir( localdir )
-	archive, current = [], []
+def oldlogfiles(all=False, exclude=['commands.log', 'throttle.log']):
+#	files  = os.listdir( localdir )
+	files  = [os.path.join('trunk', item) for item in os.listdir( os.path.join(localdir, 'trunk') )]
+	files += [os.path.join('rewrite', item) for item in os.listdir( os.path.join(localdir, 'rewrite') )]
+	archive, current = {}, []
+	files.sort()
 	for item in files:
 		info = item.split('.')
-		if   (len(info) == 2):
+		bn = os.path.basename(item)
+		if (len(info) < 2) or (bn[1:] == info[-1]) or (bn in exclude):
+			continue
+		ext = info[-1].lower()
+		if ext == 'log':
 			current.append( item )
-			if all: archive.append( item )
-		elif (len(info) == 3):
-			archive.append( item )
+			if all:
+				e = strftime(datefmt)
+				archive[e] = archive.get(e, []) + [item]
+		else:
+			archive[ext] = archive.get(ext, []) + [item]
 
-	archive.sort()
+	# sort dict archive and list current
+	keys, arch = archive.keys(), []
+	keys.sort()
+	for k in keys:
+		arch.append( (k, archive[k]) )
 	current.sort()
 
-	return (localdir, archive, current)
+	return (localdir, arch, current)
 
 # http://www.scipy.org/Cookbook/Matplotlib/Using_MatPlotLib_in_a_CGI_script
 def show_onwebpage(plt):
@@ -216,10 +238,18 @@ def irc_status():
 	return ((botname in users) or
 		(":"+botname in users), users)
 
-def logging_statistics(logfile):
-	f = open(logfile, "r")
-	buffer = f.read(-1).strip().split("\n")
-	f.close()
+def logging_statistics(logfiles, exclude):
+	buffer = []
+	for file in logfiles:
+# skip rewrite logs for the moment
+		if 'rewrite' in file:	# cheat (since trunk and rewrite have different formats)
+			continue	#  "
+		if file in exclude:
+			continue
+		f = open(os.path.join(localdir, file), "r")
+		#buffer += f.read(-1).strip().split("\n")
+		buffer += f.read(-1).strip().splitlines()
+		f.close()
 
 	# statistics (like mentioned in 'logging.statistics')
 	mcount    = { 'debug': 0, 'warning': 0, 'info': 0, 'error': 0, 'critical': 0, 'unknown': 0, }
@@ -310,27 +340,20 @@ def displaystate(form):
 	data = {}
 
 	(localdir, files, current) = oldlogfiles()
-	data['loglink'] = os.path.join(localdir, 'mainbot.log')
+	files = [item for key, value in files for item in value]	# flatten
 
-	b = file(data['loglink'], "r")
-	d = b.readlines()
-	b.close()
-
-	d.reverse()
-
-	stat = logging_statistics(data['loglink'])
+	stat = logging_statistics(current, botcontinuous)
 	data['botlog']      = stat['lastmessage']
 	data['messages']    = "\n".join(stat['messages'])
 	data['successfull'] = "%s of %s" % (stat['ecount']['end'], stat['ecount']['start'])
-
-	lastrun = (time() - os.stat(data['loglink']).st_mtime)
+	lastrun = max([os.stat(os.path.join(localdir, item)).st_mtime for item in files]+[0])
 	botmsg = data['botlog'].strip()
 
 	data['botstate_daily'] = botstate_img['red']
 	color = html_color['red']
 	state_text = "n/a"
-	if (lastrun <= (bottimeout*60*60)):
-		if   (botmsg == botdonemsg):
+	if lastrun and ((lastrun-time()) <= (bottimeout*60*60)):
+		if   (botmsg == botdonemsg) and not (stat['ecount']['end'] - stat['ecount']['start']):
 			data['botstate_daily'] = botstate_img['green']
 			color = html_color['green']
 			state_text = "OK"
@@ -338,10 +361,6 @@ def displaystate(form):
 			data['botstate_daily'] = botstate_img['orange']
 			color = html_color['orange']
 			state_text = "problem"
-		elif (lastrun <= 5*60):  # during run is also green (thus: lastrun <= 5*60)
-			data['botstate_daily'] = botstate_img['green']
-			color = html_color['green']
-			state_text = "running"
 		else:
 			data['botstate'] = botstate_img['orange']
 			color = html_color['orange']
@@ -372,14 +391,13 @@ def displaystate(form):
 	status += "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': irc_subster_color, 'bot': 'subster:', 'state': irc_subster_state_text}
 	status += "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': irc_wui_color, 'bot': 'wui:', 'state': irc_wui_state_text}
 
-	current.append( "logs/" )
 	data['currentlog'] = ", ".join([ '<a href="%s">%s</a>' % (os.path.join(localdir, item), item) for item in current ])
 
 	data.update({	'time':		asctime(localtime(time())),
 			'oldlog':	", ".join(files),
 			'oldlink':	r"../DrTrigonBot/",
-			'logstat':	sys.argv[0] + r"?action=logstat",
-			'logstatraw':	sys.argv[0] + r"?action=logstat&amp;format=plain",
+			'logstat':	os.path.basename(sys.argv[0]) + r"?action=logstat",
+			'logstatraw':	os.path.basename(sys.argv[0]) + r"?action=logstat&amp;format=plain",
 			'refresh':	'15',
 			'title':	'DrTrigonBot status panel',
 			'tsnotice': 	style.print_tsnotice(),
@@ -394,13 +412,15 @@ def adminlogs(form):
 	data = {}
 
 	(localdir, files, current) = oldlogfiles()
+	files = [item for key, value in files for item in value]	# flatten
+	files.sort()
 
 	filelist = form.getvalue('filelist', [])
 	if type(filelist) == type(''): filelist = [filelist]
 
 	current.insert(0, 'ALL')
 	filt = form.getvalue('filter', current[0])
-	filt = '' if filt == 'ALL' else filt
+	filt = ('' if filt == 'ALL' else filt)
 	data['filter_options'] = "<option>%s</option>" % ("</option><option>".join(current))
 	data['filter_options'] = data['filter_options'].replace("<option>%s</option>" % filt,
 	                                                        "<option selected>%s</option>" % filt)
@@ -424,7 +444,7 @@ def adminlogs(form):
 	checkbox_tmpl = '<input type="checkbox" name="filelist" value="%(datei)s">%(datei)s<br>'
 
 	# get directory size (but is not stable)
-	du = subprocess.Popen(["du", localdir, "-h"], stdout=subprocess.PIPE)
+	du = subprocess.Popen(["du", "-hL", localdir], stdout=subprocess.PIPE)
 	du = du.communicate()[0].split()
 	size = du[du.index('../DrTrigonBot')-1]
 
@@ -449,26 +469,29 @@ def logstat(form):
 
 	import numpy
 
+	data = {'histcomp_count':	0, 
+		'messages':		'', }
+
 	format = form.getvalue('format', 'html')
+
+	# filter: '' (all), 'default', 'subster', 'subster_irc', 'catimages'
+	# (similar to the one used in adminlogs)
+	current = ['ALL', 'default', 'subster', 'catimages',]# 'subster_irc', 'script_wui']
+	filt = form.getvalue('filter', current[0])
+	filt = ('' if filt == 'ALL' else filt)
+	data['filter_options'] = "<option>%s</option>" % ("</option><option>".join(current))
+	data['filter_options'] = data['filter_options'].replace("<option>%s</option>" % filt,
+	                                                        "<option selected>%s</option>" % filt)
 
 	(localdir, files, log) = oldlogfiles(all=True)
 
-	filter  = 'mainbot.log'
-	datefmt = "%Y-%m-%d"
-
-	data = {'histcomp_count':	0, 
-		'messages':		'',
-		'filter':		filter + " (fix)",  }
-
 	stat = {}
-	for item in files:
-		if filter not in item: continue
-		last = item	# a little bit hacky but needed for plot below
-
-		logfile = os.path.join(localdir, item)
-		if len(item.split('.')) == 2:
-			item += "." + strftime(datefmt)
-		stat[item] = logging_statistics(logfile)
+	for date, item in files:
+		logfiles = [f for f in item if filt in f]
+		if not logfiles:
+			continue
+		last = date	# a little bit hacky but needed for plot below
+		stat[date] = logging_statistics(logfiles, botcontinuous)
 
 	d = {'mcount': [], 'ecount': [], 'uptimes': []}
 	keys = stat.keys()
@@ -488,8 +511,8 @@ def logstat(form):
 		end   = numpy.array(stat[item]['etiming']['end'])
 		start = numpy.array(stat[item]['etiming']['start'])
 		if end.shape == start.shape:
-			runtime = end-start-7200		# -2*60*60 because of time jump during 'set TZ'
-			if runtime.min() < 0:			# DST or not; e.g. ('CET', 'CEST')
+			runtime = end-start-7200			# -2*60*60 because of time jump during 'set TZ'
+			if runtime.any() and (runtime.min() < 0):	# DST or not; e.g. ('CET', 'CEST')
 				runtime += 3600
 			d['uptimes'].append( list(runtime) )
 		else:
@@ -502,16 +525,17 @@ def logstat(form):
 	d['mcount'][:,0] = epoch2num(d['mcount'][:,0])
 	d['ecount'][:,0] = epoch2num(d['ecount'][:,0])
 
+        plotlink = os.path.basename(sys.argv[0]) + (r"?action=logstat&amp;filter=%s" % filt)
 	data.update({
 		'run_diff':		"</td><td>".join( map(str, d['ecount'][:,4]-d['ecount'][:,1]) ),
 		'start_count':		"</td><td>".join( map(str, d['ecount'][:,4]) ),
 		'end_count':		"</td><td>".join( map(str, d['ecount'][:,1]) ),
 		'uptimes':		"</td><td>".join( map(str, d['uptimes']) ),
-		'graphlink-mcount':	sys.argv[0] + r"?action=logstat&amp;format=graph-mcount",
-		'graphlink-mcount-i':	sys.argv[0] + r"?action=logstat&amp;format=graph-mcount-i",
-		'graphlink-ecount':	sys.argv[0] + r"?action=logstat&amp;format=graph-ecount",
-		'graphlink-ecount-sed':	sys.argv[0] + r"?action=logstat&amp;format=graph-ecount-sed",
-		'backlink':		sys.argv[0],
+		'graphlink-mcount':	plotlink + r"&amp;format=graph-mcount",
+		'graphlink-mcount-i':	plotlink + r"&amp;format=graph-mcount-i",
+		'graphlink-ecount':	plotlink + r"&amp;format=graph-ecount",
+		'graphlink-ecount-sed':	plotlink + r"&amp;format=graph-ecount-sed",
+		'backlink':		os.path.basename(sys.argv[0]),
 	})
 
 	# plot graphs output
