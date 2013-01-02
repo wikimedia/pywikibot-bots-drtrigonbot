@@ -461,7 +461,7 @@ if __name__ == "__main__":
         debug.append( 'code' ) # code debugging
 
     log = None
-    logfile = logname % ''.join(sys.argv)
+    logfile = logname % ''.join([os.path.basename(sys.argv[0])]+sys.argv[1:])
     if len(arg) > 0:
         #arg = pywikibot.handleArgs()[0]
         #print sys.argv[0]    # who am I?
