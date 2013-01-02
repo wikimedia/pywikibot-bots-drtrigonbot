@@ -239,8 +239,15 @@ def irc_status():
 		(":"+botname in users), users)
 
 def logging_statistics(logfiles, exclude):
+	# chronological sort
+	logfiles = dict([(os.stat(os.path.join(localdir, item)).st_mtime, item) for item in logfiles])
+	keys = logfiles.keys()
+	keys.sort()
+
 	buffer = []
-	for file in logfiles:
+	#for file in logfiles:
+	for k in keys:
+		file = logfiles[k]
 # skip rewrite logs for the moment
 		if 'rewrite' in file:	# cheat (since trunk and rewrite have different formats)
 			continue	#  "
