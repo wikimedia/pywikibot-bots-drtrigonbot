@@ -64,7 +64,7 @@ displaystate_content = \
                  <img src="%(botstate_wui)s" width="15" height="15" alt="Botstate: wui"><br><br>
 Time now: %(time)s<br><br>
 
-Latest gathered bot status message log: <b>%(botlog)s</b><br><br>
+%(loglink)s gathered bot status message log: <b>%(botlog)s</b><br><br>
 Successfully finished bot runs: <b>%(successfull)s</b><br><br>
 Current log files: %(currentlog)s<br>
 <a href="%(oldlink)s">Old log</a> files: <i>%(oldlog)s</i><br><br>
@@ -259,7 +259,7 @@ def logging_statistics(logfiles, exclude):
 		f.close()
 
 	if not buffer:
-		return None
+		return None, None
 
 	# statistics (like mentioned in 'logging.statistics')
 	mcount    = { 'debug': 0, 'warning': 0, 'info': 0, 'error': 0, 'critical': 0, 'unknown': 0, }
@@ -341,7 +341,7 @@ def logging_statistics(logfiles, exclude):
 	# last message
 	stats['lastmessage'] = regex.match(buffer[-1]).groupdict()['message'].strip()
 
-	return stats
+	return (stats, logfiles[keys[-1]])
 
 
 # === CGI/HTML page view user interfaces === === ===
@@ -352,15 +352,17 @@ def displaystate(form):
 	(localdir, files, current) = oldlogfiles()
 	files = [item for key, value in files for item in value]	# flatten
 
-	stat = logging_statistics(current, botcontinuous)
+	stat, recent = logging_statistics(current, botcontinuous)
 	if stat is None:
 		data['botlog']      = 'n/a'
 		data['messages']    = 'n/a'
 		data['successfull'] = "n/a"
+		data['loglink']     = 'Latest'
 	else:
 		data['botlog']      = stat['lastmessage']
 		data['messages']    = "\n".join(stat['messages'])
 		data['successfull'] = "%s of %s" % (stat['ecount']['end'], stat['ecount']['start'])
+		data['loglink']     = '<a href="%s">Latest</a>' % os.path.join(localdir, recent)
 	lastrun = max([os.stat(os.path.join(localdir, item)).st_mtime for item in files]+[0])
 	botmsg = data['botlog'].strip()
 
@@ -506,7 +508,7 @@ def logstat(form):
 		if not logfiles:
 			continue
 		last = date	# a little bit hacky but needed for plot below
-		stat[date] = logging_statistics(logfiles, botcontinuous)
+		stat[date], recent = logging_statistics(logfiles, botcontinuous)
 
 	d = {'mcount': [], 'ecount': [], 'uptimes': []}
 	keys = stat.keys()
