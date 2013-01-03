@@ -379,7 +379,7 @@ def displaystate(form):
 			color = html_color['orange']
 			state_text = "problem"
 		else:
-			data['botstate'] = botstate_img['orange']
+			data['botstate_daily'] = botstate_img['orange']
 			color = html_color['orange']
 
 	users = irc_status()[1]
