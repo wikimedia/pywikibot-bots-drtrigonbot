@@ -304,6 +304,14 @@ class BotLogger:
         logger.addHandler(fh)
         if console: logger.addHandler(ch)
 
+        # patch for Issue 8117: TimedRotatingFileHandler doesn't rotate log file at startup.
+        # (applies to python2.6 only)
+        if os.path.exists(filename):
+            rotfile = filename + '.' + time.strftime("%Y-%m-%d", time.gmtime(os.stat(filename).st_mtime))
+            if (time.gmtime(os.stat(filename).st_mtime).tm_yday < time.gmtime().tm_yday) and \
+              (not os.path.exists(rotfile)):
+                logger.handlers[0].doRollover()
+
         logger = logging.getLogger('bot_control')
         self.stdlog = BotLoggerObject(logger, color=False)
         self.errlog = BotLoggerObject(logger, color=False, err=False)
@@ -333,6 +341,10 @@ class BotLoggerObject:
         else:
             self._func = self._logger.info
     def write(self, string):
+        # (patch for Issue 8117)
+        #if logging.getLogger().handlers[0].rolloverAt <= time.time():
+        #    #logging.getLogger().handlers[0].rolloverAt += 24*60*60
+        #    logging.getLogger().handlers[0].doRollover()
         if (string == '\n') and (self._last != '\n'): # patch for direct \n flush and
             self._last = string                       # r10043 upstream
             return                                    # (behaviour is still strange)
