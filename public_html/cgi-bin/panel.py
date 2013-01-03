@@ -240,7 +240,7 @@ def irc_status():
 
 def logging_statistics(logfiles, exclude):
 	# chronological sort
-	logfiles = dict([(os.stat(os.path.join(localdir, item)).st_mtime, item) for item in logfiles])
+	logfiles = dict([(os.stat(os.path.join(localdir, item)).st_mtime, item) for item in logfiles if item not in exclude])
 	keys = logfiles.keys()
 	keys.sort()
 
@@ -251,8 +251,8 @@ def logging_statistics(logfiles, exclude):
 # skip rewrite logs for the moment
 		if 'rewrite' in file:	# cheat (since trunk and rewrite have different formats)
 			continue	#  "
-		if file in exclude:
-			continue
+		#if file in exclude:
+		#	continue
 		f = open(os.path.join(localdir, file), "r")
 		#buffer += f.read(-1).strip().split("\n")
 		buffer += f.read(-1).strip().splitlines()
@@ -675,4 +675,5 @@ form = cgi.FieldStorage()
 
 # operational mode
 action = form.getvalue('action', 'displaystate')
-print locals()[action](form)
+#print locals()[action](form)
+print style.change_logo(locals()[action](form), os.environ)    # labs patch
