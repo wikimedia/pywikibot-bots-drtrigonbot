@@ -240,7 +240,9 @@ def irc_status():
 
 def logging_statistics(logfiles, exclude):
 	# chronological sort
-	logfiles = dict([(os.stat(os.path.join(localdir, item)).st_mtime, item) for item in logfiles if item not in exclude])
+	logfiles = dict([ (os.stat(os.path.join(localdir, item)).st_mtime, item) \
+                     for item in logfiles \
+                     if (item not in exclude) and (os.path.splitext(item)[0] not in exclude) ])
 	keys = logfiles.keys()
 	keys.sort()
 
@@ -404,7 +406,8 @@ def displaystate(form):
 		irc_wui_color = html_color['orange']
 		irc_wui_state_text = "problem"
 
-	status  = "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': color, 'bot': 'daily:', 'state': state_text}
+	status  = "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': color, 'bot': 'regular:', 'state': state_text}
+	status += "<tr><td></td><td></td></tr>\n"    # separator (cheap)
 	status += "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': irc_subster_color, 'bot': 'subster:', 'state': irc_subster_state_text}
 	status += "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': irc_wui_color, 'bot': 'wui:', 'state': irc_wui_state_text}
 
@@ -505,10 +508,13 @@ def logstat(form):
 	stat = {}
 	for date, item in files:
 		logfiles = [f for f in item if filt in f]
-		if not logfiles:
+		#if not logfiles:
+		#	continue
+		s, recent = logging_statistics(logfiles, botcontinuous)
+		if s is None:	# includes 'if not logfiles'
 			continue
 		last = date	# a little bit hacky but needed for plot below
-		stat[date], recent = logging_statistics(logfiles, botcontinuous)
+		stat[date] = s
 
 	d = {'mcount': [], 'ecount': [], 'uptimes': []}
 	keys = stat.keys()
@@ -613,15 +619,15 @@ def logstat(form):
 		ax_size = [0.125, 0.15, 
 			1-0.1-0.05, 1-0.15-0.05]
 		ax = fig.add_axes(ax_size)
-		p1 = ax.step(d[:,0], d[:,1], marker='x', where='mid')
-		p2 = ax.step(d[:,0], d[:,2], marker='x', where='mid')
-		p3 = ax.step(d[:,0], d[:,3], marker='x', where='mid')
-		p4 = ax.step(d[:,0], d[:,4], marker='x', where='mid')
-		p5 = ax.step(d[:,0], d[:,5], marker='x', where='mid')
-		p6 = ax.step(d[:,0], d[:,6], marker='x', where='mid')
+		p1 = ax.step(d[:,0], d[:,1], where='mid')#, marker='x')
+		p2 = ax.step(d[:,0], d[:,2], where='mid')#, marker='x')
+		p3 = ax.step(d[:,0], d[:,3], where='mid')#, marker='x')
+		p4 = ax.step(d[:,0], d[:,4], where='mid')#, marker='x')
+		p5 = ax.step(d[:,0], d[:,5], where='mid')#, marker='x')
+		p6 = ax.step(d[:,0], d[:,6], where='mid')#, marker='x')
 		plt.legend([p1, p2, p3, p4, p5, p6], stat[last]['ecount'].keys(), loc='upper left', bbox_to_anchor=[-0.15, 1.0], ncol=2, prop={'size':8})
 		plt.grid(True, which='both')
-		plt.ylim(ymax=10)
+		#plt.ylim(ymax=10)
 		# format the ticks
 		ax.xaxis.set_major_locator(MonthLocator())
 		ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
