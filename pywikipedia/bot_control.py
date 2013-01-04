@@ -157,6 +157,16 @@ debug.append( 'write2hist' )  # write history (operational mode)
 #                 (consider using -verbose also)
 
 
+## @since   r95/r454 (MOVED from dtbext_exceptions.py)
+#  @remarks need for Bot Error Handling; to prevent bot errors to stop
+#           execution of other bots
+class BotError(pywikibot.Error):
+	def __init__(self, value):
+		self.value = value
+	def __str__(self):
+		return repr(self.value)
+
+
 ## Bot Error Handling; to prevent bot errors to stop execution of other bots
 #
 class BotErrorHandler:
@@ -168,8 +178,8 @@ class BotErrorHandler:
     def raise_exceptions(self, log=None):
         self.list_exceptions(log=log)
         if self.error_buffer:
-            #raise dtbext.pywikibot.BotError('Exception(s) occured in Bot')
-            pywikibot.output( u'\nDONE with BotError: ' + str(dtbext.pywikibot.BotError('Exception(s) occured in Bot')) )
+            #raise BotError('Exception(s) occured in Bot')
+            pywikibot.output( u'\nDONE with BotError: ' + str(BotError('Exception(s) occured in Bot')) )
             exitcode = self.error_ec
         else:
             pywikibot.output( u'\nDONE' )
@@ -240,7 +250,7 @@ class BotErrorHandler:
         logging.getLogger('bot_control').warning(u'emergency mail could not be sent!')
 
     def gettraceback(self, exc_info):
-        (exception_only, result) = dtbext.pywikibot.gettraceback(exc_info)
+        (exception_only, result) = pywikibot.gettraceback(exc_info)
         if ('KeyboardInterrupt\n' not in exception_only):
             error = (exc_info[0], exc_info[1], result)
             self.error_buffer.append( error )

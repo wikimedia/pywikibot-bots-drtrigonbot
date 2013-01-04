@@ -27,7 +27,7 @@ __version__ = '$Id$'
 # Standard library imports
 pass
 # Splitting the bot into library parts
-from dtbext_pywikibot import *
+pass
 
 # Application specific imports
 import wikipedia as pywikibot
