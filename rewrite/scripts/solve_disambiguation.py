@@ -75,7 +75,7 @@ To complete a move of a page, one can use:
 # (C) WikiWichtel, 2004
 # (C) Pywikipedia team, 2003-2009
 #
-__version__='$Id: solve_disambiguation.py 10404 2012-06-21 18:19:05Z russblau $'
+__version__='$Id: solve_disambiguation.py 10873 2013-01-04 14:22:17Z xqt $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -249,6 +249,14 @@ ignore_title = {
         ],
         'fy': [
             u'Wikipedy:Fangnet',
+        ],
+        'hu': [
+            #hu:Wikipédia:Kocsmafal (egyéb)#Hol nem kell egyértelműsíteni?
+            #2012-02-08
+            u'Wikipédia:(?!Sportműhely/Eddigi cikkeink).*',
+            u'.*\(egyértelműsítő lap\)$',
+            u'.*[Vv]ita:.*',
+            u'Szerkesztő:[^/]+$',
         ],
         'ia': [
             u'Categoria:Disambiguation',

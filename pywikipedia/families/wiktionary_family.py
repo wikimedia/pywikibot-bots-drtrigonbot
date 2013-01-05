@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wiktionary_family.py 10856 2013-01-01 10:51:33Z xqt $'
+__version__ = '$Id: wiktionary_family.py 10868 2013-01-04 08:58:26Z xqt $'
 
 # The Wikimedia family that is known as Wiktionary
 
@@ -16,14 +16,14 @@ class Family(family.Family):
             'my', 'id', 'it', 'li', 'es', 'ml', 'et', 'ja', 'fa', 'ro', 'ar',
             'te', 'cs', 'lo', 'eu', 'gl', 'ca', 'uk', 'fj', 'br', 'bg', 'eo',
             'hr', 'oc', 'vo', 'is', 'th', 'simple', 'zh-min-nan', 'scn', 'sr',
-            'af', 'cy', 'sw', 'fy', 'tl', 'ast', 'nn', 'he', 'ur', 'ps', 'uz',
-            'wa', 'la', 'da', 'hy', 'sq', 'sm', 'sl', 'hi', 'az', 'tt', 'lv',
-            'ka', 'nah', 'lb', 'pnb', 'bs', 'tk', 'hsb', 'kk', 'sk', 'km', 'mk',
-            'be', 'ga', 'wo', 'ang', 'ms', 'co', 'gn', 'mr', 'ky', 'csb', 'st',
-            'nds', 'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'kl', 'jbo', 'mn', 'an',
-            'sa', 'zu', 'gu', 'rw', 'fo', 'kw', 'gv', 'qu', 'ss', 'ie', 'mt',
-            'om', 'chr', 'roa-rup', 'iu', 'pa', 'bn', 'am', 'so', 'su', 'za',
-            'gd', 'jv', 'mi', 'tpi', 'ik', 'or', 'yi', 'ln', 'ti', 'sg', 'na',
+            'jv', 'af', 'cy', 'sw', 'fy', 'tl', 'ast', 'nn', 'ps', 'he', 'ur',
+            'uz', 'wa', 'la', 'da', 'hy', 'sq', 'sm', 'sl', 'hi', 'az', 'tt',
+            'lv', 'ka', 'nah', 'lb', 'pnb', 'bs', 'tk', 'hsb', 'kk', 'sk', 'km',
+            'mk', 'be', 'ga', 'wo', 'ang', 'ms', 'co', 'ky', 'gn', 'mr', 'csb',
+            'st', 'nds', 'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'kl', 'jbo', 'mn',
+            'an', 'sa', 'zu', 'gu', 'rw', 'fo', 'kw', 'gv', 'qu', 'ss', 'ie',
+            'mt', 'om', 'chr', 'roa-rup', 'iu', 'pa', 'bn', 'am', 'so', 'su',
+            'za', 'gd', 'mi', 'tpi', 'ik', 'or', 'yi', 'ln', 'ti', 'sg', 'na',
             'dv', 'tn', 'ne', 'ha', 'ks', 'ay', 'ts',
         ]
 

@@ -32,12 +32,12 @@ Furthermore, the following command line parameters are supported:
 #
 # (C) Leonardo Gregianin, 2006
 # (C) Andreas J. Schwab, 2007
-# (C) Pywikipedia bot team, 2006-2011
+# (C) Pywikipedia bot team, 2006-2013
 #
 # Distributed under the terms of the MIT license.
 #
 
-__version__='$Id: movepages.py 9692 2011-10-30 15:03:29Z xqt $'
+__version__='$Id: movepages.py 10864 2013-01-03 09:19:32Z xqt $'
 
 import sys, re
 import wikipedia as pywikibot
@@ -50,34 +50,13 @@ docuReplacements = {
     '&params;':     pagegenerators.parameterHelp,
 }
 
-summary={
-    'ar': u'روبوت: نقل الصفحة',
-    'cs': u'Robot přesunul stránku',
-    'de': u'Bot: Seite verschoben',
-    'el': u'Μετακίνηση σελίδων με bot',
-    'en': u'Bot: Moved page',
-    'fa': u'ربات: صفحه منتقل شد',
-    'fi': u'Botti siirsi sivun',
-    'fr': u'Bot: Page renommée',
-    'frr':u'Bot: Sidj fersköwen',
-    'ja': u'ロボットによる: ページの移動',
-    'he': u'בוט: מעביר דף',
-    'nl': u'Bot: paginanaam gewijzigd',
-    'nn': u'robot: flytta sida',
-    'pl': u'Przeniesienie artykułu przez robota',
-    'pt': u'Bot: Página movida',
-    'ru': u'Переименование страницы при помощи робота',
-    'uk': u'Робот:перейменування сторінки',
-    'zh': u'機器人:移動頁面',
-}
-
 
 class MovePagesBot:
     def __init__(self, generator, addprefix, noredirect, always, skipredirects,
                  summary):
         self.generator = generator
         self.addprefix = addprefix
-        self.noredirect = noredirect
+        self.leaveRedirect = not noredirect
         self.always = always
         self.skipredirects = skipredirects
         self.summary = summary
@@ -91,7 +70,7 @@ class MovePagesBot:
                              % (page.title(asLink=True),
                                 newPageTitle))
             page.move(newPageTitle, msg, throttle=True,
-                      leaveRedirect=self.noredirect)
+                      leaveRedirect=self.leaveRedirect)
         except pywikibot.NoPage:
             pywikibot.output(u'Page %s does not exist!' % page.title())
         except pywikibot.IsRedirectPage:
@@ -233,7 +212,7 @@ def main():
     prefix = None
     oldName = None
     newName = None
-    noredirect = True
+    noredirect = False
     always = False
     skipredirects = False
     summary = None
@@ -262,7 +241,7 @@ def main():
                 pywikibot.output(
                     u'WARNING: file %s contains odd number of links' % filename)
         elif arg == '-noredirect':
-            noredirect = False
+            noredirect = True
         elif arg == '-always':
             always = True
         elif arg == '-skipredirects':

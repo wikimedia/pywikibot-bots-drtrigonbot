@@ -34,7 +34,7 @@ Lists all the category pages that transclude {{cfd}} and {{cfdu}}.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: templatecount.py 10777 2012-12-10 14:06:38Z xqt $'
+__version__ = '$Id: templatecount.py 10859 2013-01-03 07:38:28Z xqt $'
 
 import re, sys, string
 import datetime
@@ -49,7 +49,7 @@ templates = ['ref', 'note', 'ref label', 'note label', 'reflist']
 class TemplateCountRobot:
 
     @staticmethod
-    def countTemplates(templates, namespace):
+    def countTemplates(templates, namespaces):
         mysite = pywikibot.getSite()
         total = 0
         # The names of the templates are the keys, and the numbers of

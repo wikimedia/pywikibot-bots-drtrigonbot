@@ -73,7 +73,7 @@ Syntax example:
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__ = '$Id: sum_disc.py 10682 2012-11-10 16:10:58Z drtrigon $'
+__version__ = '$Id: sum_disc.py 10874 2013-01-05 20:21:39Z drtrigon $'
 #
 
 

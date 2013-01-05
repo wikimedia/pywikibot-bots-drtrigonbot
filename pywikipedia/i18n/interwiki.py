@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
 msg = {
-
-
-
-
-
 	'en': {
 		'interwiki-adding': u'Robot: Adding %(adding)s',
 		'interwiki-adding-modifying': u'Robot: Adding %(adding)s; modifying %(modifying)s',
@@ -14,7 +9,6 @@ msg = {
 		'interwiki-modifying-from': u'Robot: Modifying %(from)s to %(modifying)s',
 		'interwiki-removing': u'Robot: Removing %(removing)s',
 		'interwiki-removing-modifying': u'Robot: Removing %(removing)s; modifying %(modifying)s',
-		'interwiki-comma': u', ',
 	},
 	# Author: Csisc
 	# Author: Shirayuki
@@ -22,14 +16,14 @@ msg = {
 	'qqq': {
 		'interwiki-modifying': u'Edit summary when the bot modifies interwiki(s).\n* %(modifying)s - either an interwiki link or a comma-separated list of language codes',
 		'interwiki-adding-modifying': u'Edit summary when the bot adds and modifies interwiki(s).\n* %(adding)s - either an interwiki link or a comma-separated list of language codes\n* %(modifying)s - either an interwiki link or a comma-separated list of language codes',
-		'interwiki-comma': u'Localized comma character with a trailing space',
 		'interwiki-adding-removing': u'Edit summary when the bot adds and removes interwiki(s).\n* %(adding)s - either an interwiki link or a comma-separated list of language codes\n* %(removing)s - either an interwiki link or a comma-separated list of language codes',
 		'interwiki-adding-removing-modifying': u'Edit summary when the bot adds, removes and modifies interwiki(s).\n* %(adding)s - either an interwiki link or a comma-separated list of language codes\n* %(removing)s - either an interwiki link or a comma-separated list of language codes\n* %(modifying)s - either an interwiki link or a comma-separated list of language codes',
 		'interwiki-adding': u'Edit summary when the bot adds interwiki(s).\n* %(adding)s is either an interwiki link or a comma-separated list of language codes',
 		'interwiki-removing': u'Edit summary when the bot removes interwiki(s).\n* %(removing)s - either an interwiki link or a comma-separated list of language codes',
 		'interwiki-removing-modifying': u'Edit summary when the bot removes and modifies interwiki(s).\n* %(removing)s - either an interwiki link or a comma-separated list of language codes\n* %(modifying)s - either an interwiki link or a comma-separated list of language codes',
 		'interwiki-modifying-from': u'Edit summary when the bot modifies one interwiki link.\n* %(from)s - an interwiki link which is modified to %(modifying)s interwiki link\n* %(modifying)s - an interwiki link',
-	},	# Author: Csisc
+	},
+	# Author: Csisc
 	'aeb': {
 		'interwiki-modifying': u'روبوت تعديل: %(modifying)s',
 		'interwiki-adding-modifying': u'روبوت إضافة: %(adding)s تعديل: %(modifying)s',

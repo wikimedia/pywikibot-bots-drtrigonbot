@@ -26,7 +26,7 @@ All other parameters will be regarded as part of the title of a single page,
 and the bot will only work on that single page.
 
 If neither a page title nor a page generator is given, it takes all pages from
-the default maintenance category. 
+the default maintenance category.
 
 It is strongly recommended not to run this script over the entire article
 namespace (using the -start) parameter, as that would consume too much
@@ -34,7 +34,7 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 
-__version__='$Id: noreferences.py 10754 2012-12-01 07:43:04Z xqt $'
+__version__='$Id: noreferences.py 10873 2013-01-04 14:22:17Z xqt $'
 
 import re, sys
 import pywikibot

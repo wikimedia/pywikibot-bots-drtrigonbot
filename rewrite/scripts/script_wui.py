@@ -40,7 +40,7 @@ Syntax example:
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
 __version__ = '$Id$'
-__framework_rev__ = '10858' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '10874' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.4'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -48,7 +48,7 @@ __release_rev__   = '%i'
 
 import datetime, time
 import thread, threading
-import sys, os
+import sys, os, traceback
 import re
 
 # http://labix.org/lunatic-python
@@ -172,12 +172,15 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         try:
             thread.start_new_thread( main_script, (self.refs[page_title], rev, params) )
         except:
-            pywikibot.output(u"WARNING: unable to start thread")
+            #pywikibot.output(u"WARNING: unable to start thread")
+            pywikibot.warning(u"Unable to start thread")
 
-            # has to be done according to subster in trunk with 'get_traceback' (!)
-            traceback = u"[ERROR OCCURRED; here you should see here a python traceback giving more information]\n"
-            wiki_logger(traceback, self.refs[page_title], rev)
-            #pywikibot.error(traceback.format_exc())    # from api.py submit
+            # (done according to subster in trunk and submit in rewrite/.../data/api.py)
+            #exc_info = sys.exc_info()
+            #tb = traceback.format_exception(exc_info[0], exc_info[1], exc_info[2])
+            tb = traceback.format_exc()
+            pywikibot.error(tb)    # secure traceback print (from api.py submit)
+            wiki_logger(tb, self.refs[page_title], rev)
 
 # Define a function for the thread
 def main_script(page, rev=None, params=None):

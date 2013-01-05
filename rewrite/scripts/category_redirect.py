@@ -16,7 +16,7 @@ are taken into account.
 #
 # (C) Pywikipedia team, 2008-2011
 #
-__version__ = '$Id: category_redirect.py 10404 2012-06-21 18:19:05Z russblau $'
+__version__ = '$Id: category_redirect.py 10873 2013-01-04 14:22:17Z xqt $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -60,6 +60,7 @@ class CategoryRedirectBot(object):
                 'no': "Kategori:Wikipedia omdirigertekategorier",
                 'pl': "Kategoria:Przekierowania kategorii",
                 'pt': "Categoria:!Redirecionamentos de categorias",
+                'ru': "Категория:Википедия:Категории-дубликаты",
                 'simple': "Category:Category redirects",
                 'vi': u"Thể loại:Thể loại đổi hướng",
                 'zh': u"Category:已重定向的分类",

@@ -4,9 +4,9 @@ Program to add uncat template to images without categories at commons.
 See imagerecat.py (still working on that one) to add these images to categories.
 
 """
-__version__ = '$Id: imageuncat.py 10710 2012-11-11 18:24:24Z xqt $'
+__version__ = '$Id: imageuncat.py 10873 2013-01-04 14:22:17Z xqt $'
 #
-#  (C) Multichill 2008
+# (C) Multichill 2008
 #
 # Distributed under the terms of the MIT license.
 #

@@ -334,11 +334,11 @@ that you have to break it off, use "-continue" next time.
 # (C) Daniel Herding, 2004
 # (C) Yuri Astrakhan, 2005-2006
 # (C) xqt, 2009-2012
-# (C) Pywikipedia bot team, 2007-2012
+# (C) Pywikipedia bot team, 2007-2013
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: interwiki.py 10825 2012-12-23 20:18:52Z huji $'
+__version__ = '$Id: interwiki.py 10872 2013-01-04 13:40:24Z xqt $'
 #
 
 import sys, copy, re, os
@@ -423,7 +423,11 @@ moved_links = {
     'pt' : ([u'documentação', u'/doc'],  u'/doc'),
     'ro' : (u'documentaţie',  u'/doc'),
     'ru' : (u'doc',           u'/doc'),
-    'simple': ('documentation', u'/doc'),
+    'simple': ([u'documentation',
+                u'template documentation',
+                u'template doc',
+                u'doc',
+                u'documentation, template'], u'/doc'),
     'sv' : (u'dokumentation', u'/dok'),
     'uk' : ([u'документація',
              u'doc',
@@ -2334,11 +2338,9 @@ def compareLanguages(old, new, insite):
 
         mcomment += globalvar.summary
 
-        comma = i18n.twtranslate(insite.lang, 'interwiki-comma')
-
-        changes = {'adding':    comma.join([fmt(new, x) for x in adding]),
-                   'removing':  comma.join([fmt(old, x) for x in removing]),
-                   'modifying': comma.join([fmt(new, x) for x in modifying]),
+        changes = {'adding':    ', '.join([fmt(new, x) for x in adding]),
+                   'removing':  ', '.join([fmt(old, x) for x in removing]),
+                   'modifying': ', '.join([fmt(new, x) for x in modifying]),
                    'from': u'' if not useFrom else old[modifying[0]]}
 
         mcomment += i18n.twtranslate(insite.lang, commentname) % changes

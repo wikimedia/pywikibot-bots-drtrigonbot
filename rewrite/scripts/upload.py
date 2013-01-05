@@ -23,7 +23,7 @@ and for a description.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: upload.py 10296 2012-06-04 17:02:54Z xqt $'
+__version__='$Id: upload.py 10873 2013-01-04 14:22:17Z xqt $'
 #
 
 import os, sys, time
@@ -140,7 +140,8 @@ class UploadRobot:
             # FIXME: these 2 belong somewhere else, presumably in family
             forbidden = '/' # to be extended
             allowed_formats = (u'gif', u'jpg', u'jpeg', u'mid', u'midi',
-                               u'ogg', u'png', u'svg', u'xcf', u'djvu')
+                               u'ogg', u'png', u'svg', u'xcf', u'djvu',
+                               u'ogv', u'oga', u'tif', u'tiff')
             # ask until it's valid
             while True:
                 newfn = pywikibot.input(
