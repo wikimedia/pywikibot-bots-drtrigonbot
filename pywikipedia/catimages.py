@@ -581,8 +581,11 @@ class FileData(object):
             #    cv2.line(color_dst, line[0], line[1], cv.CV_RGB(255, 0, 0), 3, 8)
 
         # circles
-        #circles = cv2.HoughCircles(src, cv.CV_HOUGH_GRADIENT, 2, src.shape[0]/4)#, 200, 100 )
-        circles = cv2.HoughCircles(src, cv.CV_HOUGH_GRADIENT, 2, src.shape[0]/4, param2=200)
+        try:
+            #circles = cv2.HoughCircles(src, cv.CV_HOUGH_GRADIENT, 2, src.shape[0]/4)#, 200, 100 )
+            circles = cv2.HoughCircles(src, cv.CV_HOUGH_GRADIENT, 2, src.shape[0]/4, param2=200)
+        except cv2.error:
+            circles = None
         if (circles is not None) and len(circles):
             circles = circles[0]
             data['Circles'] = len(circles)
