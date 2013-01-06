@@ -450,7 +450,7 @@ class FileData(object):
         #                  padding=Size(), scale0=1.05, group_threshold=2)
         enable_recovery()   # enable recovery from hard crash
         found = list(hog.detectMultiScale(img, 0.25, (8,8), (32,32), 1.05, 2))
-        disable_recovery()  # enable recovery from hard crash
+        disable_recovery()  # disable since everything worked out fine
 
         # people haar/cascaded classifier
         # use 'haarcascade_fullbody.xml', ... also (like face detection)
@@ -1368,7 +1368,9 @@ class FileData(object):
         smallImg = img.resize( (int(img.size[0]/scale), int(img.size[1]/scale)) )
         img = smallImg
 
+        enable_recovery()   # enable recovery from hard crash
         res = dm_read.decode(img.size[0], img.size[1], buffer(img.tostring()))
+        disable_recovery()  # disable since everything worked out fine
         #print res
 
         result = []
