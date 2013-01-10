@@ -66,11 +66,11 @@ Options/parameters:
 #
 #  @li Run @ref subster bot only as CRON job with output to own log not to disturb the output of 
 #  'panel.py' (run stand-alone to catch failed other runs):
-#  @verbatim python bot_control.py -subster -no_magic_words -cron @endverbatim
+#  @verbatim python bot_control.py -subster -cron @endverbatim
 #  CRON (toolserver):
 #  @verbatim # m h  dom mon dow   command
-#  0 */12 * * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -subster -no_magic_words -cron
-#  0 14 * * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -subster -no_magic_words -cron @endverbatim
+#  0 */12 * * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -subster -cron
+#  0 14 * * * nice -n +15 python /home/drtrigon/pywikipedia/bot_control.py -subster -cron @endverbatim
 #  @attention
 #  (this mode uses another log than usual !!!)
 #
@@ -90,9 +90,8 @@ __release_ver__   = '1.4'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
 
-import sys, os, re, time, traceback
-import logging
-import logging.handlers
+import sys, os, re, time, traceback, shelve
+import logging, logging.handlers
 
 # wikipedia-bot imports
 import pagegenerators, userlib, botlist, basic
@@ -451,25 +450,32 @@ def main():
     time.tzset()
     pywikibot.output(u'\nSetting process TimeZone (TZ): %s' % str(time.tzname))    # ('CET', 'CEST')
 
+    d = shelve.open('cache/state_bots')
+    d['bot_control'] = {'release_ver':      __release_ver__ + '.' + __release_rev__,
+                        'framework_ver':    __framework_rev__,
+                        '(runningsubbots)': bot_order,
+                       }
+    d.close()
+
     for bot_name in bot_order:
         (bot_module, bot_argv, bot_desc) = bot_list[bot_name]
 
-        bot = BotController(bot_module,
-                            bot_argv,
-                            bot_desc,
-                            do_dict[bot_name],
-                            error )
+        bot = BotController( bot_module,
+                             bot_argv,
+                             bot_desc,
+                             do_dict[bot_name],
+                             error )
 
-        # magic words for subster, look also at 'subster.py' (should be strings, but not needed)
-        #if bot.desc == u'"SubsterBot"':
-        if (bot_name == 'subster') and (not no_magic_words):
-            bot.bot.magic_words = {'BOTerror':          str(bool(error.error_buffer)),
-                                   'BOTerrortraceback': str([item[2] for item in error.error_buffer]),
-                                   'BOTrelease_ver':    __release_ver__ + '.' + __release_rev__,
-                                   'BOTframework_ver':  __framework_rev__,
-                                   'BOTrunningsubbots': bot_order,
-                                  }
         bot.trigger()
+
+        # "magic words"/status_bots for subster, look also at 'subster.py'
+        # (should be strings, but not needed)
+        d = shelve.open('cache/state_bots')
+        d[bot_name] = {'error':     str(bool(error.error_buffer)),
+                       'traceback': str([item[2] for item in error.error_buffer]),
+                       'timestamp': pywikibot.Timestamp.now().isoformat(' '),
+                      }
+        d.close()
 
     return
 
@@ -524,8 +530,6 @@ if __name__ == "__main__":
         log = BotLogger(logfile, not cron)
         pywikibot.ui.stdout = sys.stdout    # patch needed for pywikibot.output
         pywikibot.ui.stderr = sys.stderr    # (look at terminal_iterface_base.py)
-
-        no_magic_words = ("-no_magic_words" in arg)
 
         error = BotErrorHandler(error_ec)
     else:
