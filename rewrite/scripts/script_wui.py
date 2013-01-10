@@ -40,7 +40,7 @@ Syntax example:
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
 __version__ = '$Id$'
-__framework_rev__ = '10875' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '10878' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.4'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -224,7 +224,7 @@ def main_script(page, rev=None, params=None):
 
     pywikibot.output(u'--- ' * 20)
 
-    pywikibot.output(u'environment: garbage; %s / memory; %s / members: %s' % (gc.collect(), resource.getrusage(resource.RUSAGE_SELF).ru_maxrss, len(dir())))
+    pywikibot.output(u'environment: garbage; %s / memory; %s / members; %s' % (gc.collect(), resource.getrusage(resource.RUSAGE_SELF).ru_maxrss, len(dir())))
     # 'len(dir())' is equivalent to 'len(inspect.getmembers(__main__))'
 
     # append result to output page

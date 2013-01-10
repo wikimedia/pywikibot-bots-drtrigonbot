@@ -61,7 +61,7 @@ Syntax example:
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__ = '$Id: subster.py 10874 2013-01-05 20:21:39Z drtrigon $'
+__version__ = '$Id: subster.py 10878 2013-01-10 16:33:29Z drtrigon $'
 #
 
 
@@ -317,7 +317,7 @@ class SubsterBot(basic.AutoBasicBot):
         # (security: check url not to point to a local file on the server,
         #  e.g. 'file://' - same as used in xsalt.py)
         secure = False
-        for item in [u'http://', u'https://', u'mail://', u'file://cache/state_bots']:
+        for item in [u'http://', u'https://', u'mail://', u'local://']:
             secure = secure or (param['url'][:len(item)] == item)
         param['wiki'] = ast.literal_eval(param['wiki'])
         param['zip']  = ast.literal_eval(param['zip'])
@@ -328,15 +328,18 @@ class SubsterBot(basic.AutoBasicBot):
                 external_buffer = pywikibot.Page(self.site, param['url']).get(expandtemplates=True)
             else:
                 external_buffer = self.load( pywikibot.Page(self.site, param['url']) )
-        elif (param['url'][:7] == u'mail://'): # DRTRIGON-101
+        elif (param['url'][:7] == u'mail://'):              # DRTRIGON-101
             param['url'] = param['url'].replace(u'{{@}}', u'@')     # e.g. nlwiki
             mbox = SubsterMailbox(pywikibot.config.datafilepath(bot_config['data_path'], bot_config['mbox_file'], ''))
             external_buffer = mbox.find_data(param['url'])
             mbox.close()
-        elif (param['url'] == u'file://cache/state_bots'):
-            d = shelve.open('cache/state_bots')
-            external_buffer = pprint.pformat(d)
-            d.close()
+        elif (param['url'][:8] == u'local://'):             # DRTRIGON-131
+            if (param['url'][8:] == u'cache/state_bots'):
+                d = shelve.open('cache/state_bots')     # filename hard-coded
+                external_buffer = pprint.pformat(d)
+                d.close()
+            else:
+                external_buffer = u'n/a'
         elif param['zip']:
             external_buffer = urllib.urlopen(param['url']).read()
             # issue with r355: http://de.wikipedia.org/w/index.php?title=Vorlage:Infobox_Kreditinstitut/DatenDE&oldid=105472739

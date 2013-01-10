@@ -25,7 +25,7 @@ http://python-irclib.sourceforge.net/
 #
 #  Distributed under the terms of the LGPL license.
 #
-__version__ = '$Id: subster_irc.py 10765 2012-12-06 08:58:32Z xqt $'
+__version__ = '$Id: subster_irc.py 10878 2013-01-10 16:33:29Z drtrigon $'
 #
 
 import wikipedia as pywikibot
@@ -41,10 +41,6 @@ bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.fami
 
             'ConfCSSconfig':    u'User:DrTrigon/DrTrigonBot/subster-config.css',
 }
-
-## used/defined magic words, look also at bot_control
-#  use, for example: '\<!--SUBSTER-BOTerror--\>\<!--SUBSTER-BOTerror--\>'
-magic_words = {} # no magic word substitution (for empty dict)
 
 # debug tools
 # (look at 'bot_control.py' and 'subster.py' for more info)
@@ -151,8 +147,7 @@ def main_subster(page, params=None):
     del bot
 
 def main():
-    subster.magic_words = magic_words
-    subster.debug       = debug
+    subster.debug = debug
     site = pywikibot.getSite()
     site.forceLogin()
     chan = '#' + site.language() + '.' + site.family.name
