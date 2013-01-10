@@ -372,9 +372,9 @@ class BotLoggerObject:
 
 ## Retrieve revision number of pywikibedia framework
 #
-def getSVN_framework_ver():
+def getSVN_framework_ver(site):
     # framework revision?
-    buf = pywikibot.getSite().getUrl( 'http://svn.wikimedia.org/viewvc/pywikipedia/trunk/pywikipedia/', no_hostname = True, retry = False )
+    buf = site.getUrl( 'http://svn.wikimedia.org/viewvc/pywikipedia/trunk/pywikipedia/', no_hostname = True, retry = False )
     match = re.search('<td>Directory revision:</td>\n<td><a (.*?)>(.*?)</a> \(of <a (.*?)>(.*?)</a>\)</td>', buf)
     if match and (len(match.groups()) > 0):
         framework_rev   = int(match.groups()[-1])
@@ -395,7 +395,7 @@ def getSVN_framework_ver():
 
 ## Retrieve revision number of pywikibedia framework
 #
-def getSVN_release_ver():
+def getSVN_release_ver(site):
     global __release_rev__
     # local release revision?
     client = pysvn.Client()
@@ -403,7 +403,7 @@ def getSVN_release_ver():
     rel = max( [item[1]['rev'].number for item in client.info2('.')] )
     __release_rev__ = __release_rev__ % rel
     # release revision?
-    buf = pywikibot.getSite().getUrl( 'http://svn.toolserver.org/svnroot/drtrigon/', no_hostname = True, retry = False )
+    buf = site.getUrl( 'http://svn.toolserver.org/svnroot/drtrigon/', no_hostname = True, retry = False )
     match = re.search('<title>drtrigon - Revision (.*?): /</title>', buf)
     if match and (len(match.groups()) > 0):
         release_rev = match.groups()[-1]
@@ -429,22 +429,23 @@ def main():
 
     # new release/framework revision?
     pywikibot.output(u'\nLATEST RELEASE/FRAMEWORK REVISION:')
-    getSVN_release_ver()
-    getSVN_framework_ver()
+    site = pywikibot.getSite()
+    getSVN_release_ver(site)
+    getSVN_framework_ver(site)
 
     # mediawiki software version?
     pywikibot.output(u'\nMEDIAWIKI VERSION:')
-    pywikibot.output(u'  Actual revision: %s' % str(pywikibot.getSite().live_version()))
+    pywikibot.output(u'  Actual revision: %s' % str(site.live_version()))
 
     # processing of messages on bot discussion page
-    if pywikibot.getSite().messages():
+    if site.messages():
         pywikibot.output(u'====== new messages on bot discussion page (last few lines) ======')
-        messages_page  = pywikibot.Page(pywikibot.getSite(), u'User:DrTrigonBot').toggleTalkPage()
+        messages_page  = pywikibot.Page(site, u'User:DrTrigonBot').toggleTalkPage()
         messagesforbot = messages_page.get(get_redirect=True)
         pywikibot.output( u'\n'.join(messagesforbot.splitlines()[-10:]) )
         pywikibot.output(u'==================================================================')
         # purge/reset messages (remove this message from queue) by "viewing" it
-        pywikibot.getSite().getUrl( os.path.join('/wiki', messages_page.urlname()) )
+        site.getUrl( os.path.join('/wiki', messages_page.urlname()) )
 
     # modification of timezone to be in sync with wiki
     os.environ['TZ'] = 'Europe/Amsterdam'
@@ -468,13 +469,14 @@ def main():
                              error )
 
         if bot.trigger():
+            name = '%s-%s-%s' % (bot_name, site.family.name, site.lang)
             # "magic words"/status_bots for subster, look also at 'subster.py'
             # (should be strings, but not needed)
             d = shelve.open(pywikibot.config.datafilepath('cache', 'state_bots'))
-            d[bot_name] = {'error':     str(bool(error.error_buffer)),
-                           'traceback': str([item[2] for item in error.error_buffer]),
-                           'timestamp': pywikibot.Timestamp.now().isoformat(' '),
-                          }
+            d[name] = {'error':     str(bool(error.error_buffer)),
+                       'traceback': str([item[2] for item in error.error_buffer]),
+                       'timestamp': pywikibot.Timestamp.now().isoformat(' '),
+                      }
             d.close()
 
     return
