@@ -272,6 +272,7 @@ class BotController:
             self.run()
         else:
             self.skip()
+        return self.run_bot
 
     def skip(self):
         pywikibot.output(u'\nSKIPPING: ' + self.desc)
@@ -466,16 +467,15 @@ def main():
                              do_dict[bot_name],
                              error )
 
-        bot.trigger()
-
-        # "magic words"/status_bots for subster, look also at 'subster.py'
-        # (should be strings, but not needed)
-        d = shelve.open(pywikibot.config.datafilepath('cache', 'state_bots'))
-        d[bot_name] = {'error':     str(bool(error.error_buffer)),
-                       'traceback': str([item[2] for item in error.error_buffer]),
-                       'timestamp': pywikibot.Timestamp.now().isoformat(' '),
-                      }
-        d.close()
+        if bot.trigger():
+            # "magic words"/status_bots for subster, look also at 'subster.py'
+            # (should be strings, but not needed)
+            d = shelve.open(pywikibot.config.datafilepath('cache', 'state_bots'))
+            d[bot_name] = {'error':     str(bool(error.error_buffer)),
+                           'traceback': str([item[2] for item in error.error_buffer]),
+                           'timestamp': pywikibot.Timestamp.now().isoformat(' '),
+                          }
+            d.close()
 
     return
 
