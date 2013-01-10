@@ -469,13 +469,13 @@ def main():
                              error )
 
         if bot.trigger():
-            name = '%s-%s-%s' % (bot_name, site.family.name, site.lang)
+            name = str('%s-%s-%s' % (bot_name, site.family.name, site.lang))
             # "magic words"/status_bots for subster, look also at 'subster.py'
             # (should be strings, but not needed)
             d = shelve.open(pywikibot.config.datafilepath('cache', 'state_bots'))
             d[name] = {'error':     str(bool(error.error_buffer)),
                        'traceback': str([item[2] for item in error.error_buffer]),
-                       'timestamp': pywikibot.Timestamp.now().isoformat(' '),
+                       'timestamp': str(pywikibot.Timestamp.now().isoformat(' ')),
                       }
             d.close()
 
