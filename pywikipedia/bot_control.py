@@ -85,7 +85,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '10879' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '10880' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.4'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -99,8 +99,7 @@ import clean_sandbox, sum_disc, subster, subster_irc, catimages
 import dtbext
 # Splitting the bot into library parts
 import wikipedia as pywikibot
-
-import pysvn  # JIRA: TS-936
+import version  # JIRA: DRTRIGON-131
 
 
 logname = pywikibot.config.datafilepath('logs', '%s.log')
@@ -373,12 +372,10 @@ class BotLoggerObject:
 ## Retrieve revision number of pywikibedia framework
 #
 def getSVN_framework_ver(site):
-    # framework revision?
-    buf = site.getUrl( 'http://svn.wikimedia.org/viewvc/pywikipedia/trunk/pywikipedia/', no_hostname = True, retry = False )
-    match = re.search('<td>Directory revision:</td>\n<td><a (.*?)>(.*?)</a> \(of <a (.*?)>(.*?)</a>\)</td>', buf)
-    if match and (len(match.groups()) > 0):
-        framework_rev   = int(match.groups()[-1])
-        __framework_rev = int(__framework_rev__)
+    __framework_rev = int(__framework_rev__)
+    match = version.getversion_onlinerepo()
+    if match:
+        framework_rev = int(match)
         if   framework_rev <  __framework_rev:
             info = '<'
         elif framework_rev == __framework_rev:
@@ -397,16 +394,10 @@ def getSVN_framework_ver(site):
 #
 def getSVN_release_ver(site):
     global __release_rev__
-    # local release revision?
-    client = pysvn.Client()
-    #client.info2('.', revision=pysvn.Revision( pysvn.opt_revision_kind.head ))
-    rel = max( [item[1]['rev'].number for item in client.info2('.')] )
-    __release_rev__ = __release_rev__ % rel
-    # release revision?
-    buf = site.getUrl( 'http://svn.toolserver.org/svnroot/drtrigon/', no_hostname = True, retry = False )
-    match = re.search('<title>drtrigon - Revision (.*?): /</title>', buf)
-    if match and (len(match.groups()) > 0):
-        release_rev = match.groups()[-1]
+    __release_rev__ %= version.getversion_svn(pywikibot.config.datafilepath('..'))[1]
+    match = version.getversion_onlinerepo('http://svn.toolserver.org/svnroot/drtrigon/')
+    if match:
+        release_rev = match
         info = {True: '=', False: '>'}        
         pywikibot.output(u'  Directory revision - release:   %s (%s %s)' % (release_rev, info[(release_rev==__release_rev__)], __release_rev__))
     else:
