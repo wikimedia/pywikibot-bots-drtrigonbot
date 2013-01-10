@@ -394,7 +394,7 @@ def getSVN_framework_ver(site):
 #
 def getSVN_release_ver(site):
     global __release_rev__
-    __release_rev__ %= version.getversion_svn(pywikibot.config.datafilepath('..'))[1]
+    __release_rev__ %= int(version.getversion_svn(pywikibot.config.datafilepath('..'))[1])
     match = version.getversion_onlinerepo('http://svn.toolserver.org/svnroot/drtrigon/')
     if match:
         release_rev = match
