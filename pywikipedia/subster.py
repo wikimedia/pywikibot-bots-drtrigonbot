@@ -61,7 +61,7 @@ Syntax example:
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__ = '$Id: subster.py 10878 2013-01-10 16:33:29Z drtrigon $'
+__version__ = '$Id: subster.py 10879 2013-01-10 17:09:15Z drtrigon $'
 #
 
 
@@ -335,7 +335,8 @@ class SubsterBot(basic.AutoBasicBot):
             mbox.close()
         elif (param['url'][:8] == u'local://'):             # DRTRIGON-131
             if (param['url'][8:] == u'cache/state_bots'):
-                d = shelve.open('cache/state_bots')     # filename hard-coded
+                # filename hard-coded
+                d = shelve.open(pywikibot.config.datafilepath('cache', 'state_bots'))
                 external_buffer = pprint.pformat(d)
                 d.close()
             else:

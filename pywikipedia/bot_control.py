@@ -85,7 +85,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '10878' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '10879' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.4'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -450,7 +450,7 @@ def main():
     time.tzset()
     pywikibot.output(u'\nSetting process TimeZone (TZ): %s' % str(time.tzname))    # ('CET', 'CEST')
 
-    d = shelve.open('cache/state_bots')
+    d = shelve.open(pywikibot.config.datafilepath('cache', 'state_bots'))
     d['bot_control'] = {'release_ver':      __release_ver__ + '.' + __release_rev__,
                         'framework_ver':    __framework_rev__,
                         '(runningsubbots)': bot_order,
@@ -470,7 +470,7 @@ def main():
 
         # "magic words"/status_bots for subster, look also at 'subster.py'
         # (should be strings, but not needed)
-        d = shelve.open('cache/state_bots')
+        d = shelve.open(pywikibot.config.datafilepath('cache', 'state_bots'))
         d[bot_name] = {'error':     str(bool(error.error_buffer)),
                        'traceback': str([item[2] for item in error.error_buffer]),
                        'timestamp': pywikibot.Timestamp.now().isoformat(' '),
