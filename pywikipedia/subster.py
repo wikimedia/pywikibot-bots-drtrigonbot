@@ -61,7 +61,7 @@ Syntax example:
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__ = '$Id: subster.py 10879 2013-01-10 17:09:15Z drtrigon $'
+__version__ = '$Id: subster.py 10888 2013-01-11 22:29:36Z drtrigon $'
 #
 
 

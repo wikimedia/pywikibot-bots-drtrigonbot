@@ -40,7 +40,7 @@ Syntax example:
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
 __version__ = '$Id$'
-__framework_rev__ = '10880' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '10888' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.4'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -136,6 +136,7 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         page = match.group('page').decode(self.site.encoding())
         if page in self.refs:
             pywikibot.output(u"RELOAD: %s" % page)
+            # TODO: security; first check if page is protected, reject any data if not !!!
             self.refs[page].get(force=True)   # re-load (refresh) page content
         if page == self.templ:
             pywikibot.output(u"SHELL: %s" % page)

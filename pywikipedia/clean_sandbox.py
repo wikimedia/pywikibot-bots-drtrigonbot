@@ -31,7 +31,7 @@ This script understands the following command-line arguments:
 # (C) Wikipedian, 2006-2007
 # (C) Andre Engels, 2007
 # (C) Siebrand Mazeland, 2007
-# (C) xqt, 2009
+# (C) xqt, 2009-2013
 # (C) Dr. Trigon, 2011-2012
 #
 # DrTrigonBot: http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
@@ -40,7 +40,7 @@ This script understands the following command-line arguments:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: clean_sandbox.py 10606 2012-10-24 12:46:39Z amir $'
+__version__ = '$Id: clean_sandbox.py 10882 2013-01-11 08:29:42Z xqt $'
 #
 
 import time
@@ -87,7 +87,7 @@ sandboxTitle = {
     'als':u'Project:Sandchaschte',
     'ar': u'Project:ملعب',
     'az': u'Vikipediya:Qaralama dəftəri',
-    'bar':u'Project:Spielwiese',
+    'bar':u'Project:Spuiwiesn',
     'cs': u'Project:Pískoviště',
     'da': u'Project:Sandkassen',
     'de': u'Project:Spielwiese',

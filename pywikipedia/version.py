@@ -7,7 +7,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: version.py 10880 2013-01-10 21:11:31Z drtrigon $'
+__version__ = '$Id: version.py 10887 2013-01-11 22:18:43Z drtrigon $'
 
 import os
 import time
@@ -21,7 +21,14 @@ class ParseError(Exception):
     """ Parsing went wrong """
 
 def getversion():
-    return '%(tag)s (r%(rev)s, %(date)s)' % getversiondict()
+    data = getversiondict()
+    try:
+        rev2 = int(getversion_onlinerepo())
+        rev1 = int(data['rev'].split()[0])
+        data['cmp_ver'] = 'OUTDATED' if cmp_ver(rev1, rev2)=='<' else 'ok'
+    except ParseError:
+        data['cmp_ver'] = 'n/a'
+    return '%(tag)s (r%(rev)s, %(date)s, %(cmp_ver)s)' % data
 
 def getversiondict():
     global cache
@@ -103,6 +110,10 @@ def getversion_onlinerepo(repo=None):
     except:
         raise ParseError
     return rev
+
+## Simple version comparison
+#
+cmp_ver = lambda a, b, tol=1: {-1: '<', 0: '~', 1: '>'}[cmp((a-b)//tol, 0)]
 
 if __name__ == '__main__':
     print 'Pywikipedia %s' % getversion()

@@ -36,7 +36,7 @@ See [[:en:User:DumZiBoT/refLinks]] for more information on the bot.
 #
 # Distributed under the terms of the GPL
 #
-__version__ = '$Id: reflinks.py 9239 2011-05-11 14:45:55Z xqt $'
+__version__ = '$Id: reflinks.py 10881 2013-01-11 07:07:54Z xqt $'
 #
 
 import sys, re, urllib2, httplib, socket, codecs, ftplib
@@ -59,6 +59,7 @@ stopPage = {'fr':u'Utilisateur:DumZiBoT/EditezCettePagePourMeStopper',
             'hu':'User:Damibot/EditThisPageToStopMe',
             'en':u'User:DumZiBoT/EditThisPageToStopMe',
             'pl':u'Wikipedysta:MastiBot/EditThisPageToStopMe',
+            'ru':'User:LankLinkBot/EditThisPageToStopMe',
             'zh':u'User:Sz-iwbot',
 }
 
