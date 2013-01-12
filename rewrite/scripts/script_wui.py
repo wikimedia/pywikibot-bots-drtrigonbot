@@ -119,7 +119,7 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         pywikibot.output(u'** Pre-loading all relevant page contents')
         for item in self.refs:
             # security; first check if page is protected, reject any data if not
-            if os.path.splitext(self.refs[item].title()) not in ['.css', '.js']:
+            if os.path.splitext(self.refs[item].title().lower())[1] not in ['.css', '.js']:
                 raise pywikibot.UserActionRefuse(u'Page %s is not secure, e.g. semi-protected!' % self.refs[item])
             self.refs[item].get(force=True)   # load all page contents
 
