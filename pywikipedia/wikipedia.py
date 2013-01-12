@@ -118,7 +118,7 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 10895 2013-01-12 16:17:54Z drtrigon $'
+__version__ = '$Id: wikipedia.py 10899 2013-01-12 23:27:08Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -8754,13 +8754,14 @@ def log(text):
         # remove all color markup
         plaintext = colorTagR.sub('', text)
         # save the text in a logfile (will be written in utf-8)
-        type = plaintext.split(':')
-        func = 'info'
-        if len(type) > 1:
-            func = type[0].strip().lower()
-            if func not in ['debug', 'warning', 'error', 'critical', 'info']:
-                func = 'info'
-        getattr(logger, func)(plaintext.rstrip().lstrip('\n'))
+        for line in plaintext.splitlines():
+            type = line.split(':')
+            func = 'info'
+            if len(type) > 1:
+                func = type[0].strip().lower()
+                if func not in ['debug', 'warning', 'error', 'critical', 'info']:
+                    func = 'info'
+            getattr(logger, func)(line.rstrip())
 
 output_lock = threading.Lock()
 input_lock = threading.Lock()
