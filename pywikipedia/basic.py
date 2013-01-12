@@ -21,7 +21,7 @@ and the bot will only work on that single page.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: basic.py 10820 2012-12-23 19:49:48Z huji $'
+__version__ = '$Id: basic.py 10898 2013-01-12 22:50:19Z drtrigon $'
 #
 
 import re
@@ -156,7 +156,7 @@ class AutoBasicBot(BasicBot):
                 # Save the page
                 page.put(text, comment=comment, minorEdit=minorEdit, botflag=botflag)
             except pywikibot.LockedPage:
-                pywikibot.output(u"\03{lightblue}Page %s is locked; skipping.\03{default}" % page.aslink())
+                pywikibot.output(u"\03{lightblue}Page %s is locked; skipping.\03{default}" % page.title(asLink=True))
             except pywikibot.EditConflict:
                 pywikibot.output(u'\03{lightblue}Skipping %s because of edit conflict\03{default}' % (page.title()))
             except pywikibot.SpamfilterError, error:

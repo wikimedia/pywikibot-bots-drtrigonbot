@@ -91,7 +91,7 @@ This will move all pages in the category US to the category United States.
 # (C) xqt, 2009-2012
 # (C) Pywikipedia team, 2008-2012
 #
-__version__ = '$Id: category.py 10268 2012-06-02 20:07:26Z xqt $'
+__version__ = '$Id: category.py 10897 2013-01-12 18:51:22Z multichill $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -401,16 +401,17 @@ class CategoryMoveRobot:
         site = pywikibot.getSite()
         newCat = catlib.Category(site, self.newCatTitle)
         # set edit summary message
-        if not self.editSummary:
-            self.editSummary = i18n.twtranslate(site, 'category-changing') \
-                               % {'oldcat':self.oldCat.title(),
-                                  'newcat':newCat.title()}
 
         if self.useSummaryForDeletion and self.editSummary:
             reason = self.editSummary
         else:
-            reason = i18n.twtranslate(site, deletion_reason_move) \
+            reason = i18n.twtranslate(site, 'category-was-moved') \
                      % {'newcat': self.newCatTitle, 'title': self.newCatTitle}
+            
+        if not self.editSummary:
+            self.editSummary = i18n.twtranslate(site, 'category-changing') \
+                               % {'oldcat':self.oldCat.title(),
+                                  'newcat':newCat.title()}
 
         # Copy the category contents to the new category page
         copied = False

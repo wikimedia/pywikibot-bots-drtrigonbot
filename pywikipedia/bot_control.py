@@ -85,7 +85,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '10888' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '10898' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.4'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -289,40 +289,19 @@ class BotController:
 
 ## Bot Output Redirecting And Logging; to assure all output is logged into file
 #
-#  @todo try to merge/combine with 'log' from 'user-config.py' and use this
-#        mechnism alread implemented upstream
-#        \n[ JIRA: ticket? ]
 #  @todo consider using 'rrdtool' to improve logging (and logging_statistics as
 #        well as creating graphs in panel.py - may be with 'bottle' as webserver)
 #  @see  http://segfault.in/2010/03/python-rrdtool-tutorial/
 class BotLogger:
-    def __init__(self, filename, console=True):
-        # http://docs.python.org/howto/logging-cookbook.html#logging-to-multiple-destinations
-        logger = logging.getLogger()    # root logger
-        logger.setLevel(logging.DEBUG)
-        # create file handler which logs even debug messages
-        fh = logging.handlers.TimedRotatingFileHandler(filename, when='midnight', utc=False)#, encoding='bz2-codec')
-        fh.setLevel(logging.DEBUG if ('code' in debug) else logging.INFO)
+    def __init__(self, console=True):
+        logger = logging.getLogger('bot_control')
         # create console handler with a higher log level
         ch = logging.StreamHandler()
         ch.setLevel(logging.INFO)
-        # create formatter and add it to the handlers
-        formatter = logging.Formatter('%(asctime)s %(name)-20s %(levelname)-8s %(message)s')
-        #ch.setFormatter(formatter)
-        fh.setFormatter(formatter)
-        # add the handlers to logger
-        logger.addHandler(fh)
-        if console: logger.addHandler(ch)
+        #ch.setFormatter( logging.getLogger().handlers[0].formatter )
+        if console:
+            logger.addHandler(ch)
 
-        # patch for Issue 8117: TimedRotatingFileHandler doesn't rotate log file at startup.
-        # applies to python2.6 only, solution from python2.7 source:
-        # http://hg.python.org/cpython-fullhistory/diff/a566e53f106d/Lib/logging/handlers.py
-        if os.path.exists(filename):
-            t = os.stat(filename).st_mtime
-            logger.handlers[0].rolloverAt = logger.handlers[0].computeRollover(t)
-        # now trigger logger.handlers[0].emit() or logger.handlers[0].doRollover()
-
-        logger = logging.getLogger('bot_control')
         self.stdlog = BotLoggerObject(logger, color=False)
         self.errlog = BotLoggerObject(logger, color=False, err=False)
 
@@ -331,7 +310,7 @@ class BotLogger:
 
     def close(self):
         (sys.stdout, sys.stderr)   = (self.stdout, self.stderr)
-        
+
         logging.shutdown()
 
 # regarding the "patch" with "still strange behaviour" below, consider:
@@ -346,10 +325,7 @@ class BotLoggerObject:
         self._logger = logger
         self._color  = color
         self._last   = ''
-        if err:
-            self._func = self._logger.error
-        else:
-            self._func = self._logger.info
+        self._err    = err
     def write(self, string):
         if (string == '\n') and (self._last != '\n'): # patch for direct \n flush and
             self._last = string                       # r10043 upstream
@@ -359,10 +335,10 @@ class BotLoggerObject:
             string = self._REGEX_boc.sub('', string)  # make more readable
             string = self._REGEX_eoc.sub('', string)  #
         for string in self._REGEX_eol.split(string.rstrip()):
-            if 'WARNING:' in string:
-                self._logger.warning(string)
+            if self._err:
+                self._logger.critical('[stderr] ' + string)
             else:
-                self._func(string)
+                self._logger.critical('[stdout] ' + string)
     def close(self):
         pass
     def flush(self):
@@ -376,16 +352,7 @@ def getSVN_framework_ver(site):
     match = version.getversion_onlinerepo()
     if match:
         framework_rev = int(match)
-        if   framework_rev <  __framework_rev:
-            info = '<'
-        elif framework_rev == __framework_rev:
-            info = '='
-        elif framework_rev <= (__framework_rev + 100):
-            info = '~'
-        elif framework_rev <= (__framework_rev + 500):
-            info = '>'
-        else:
-            info = '>>'
+        info = version.cmp_ver(framework_rev, __framework_rev, 100)
         pywikibot.output(u'  Directory revision - framework: %s (%s %s)' % (framework_rev, info, __framework_rev__))
     else:
         pywikibot.output(u'  WARNING: could not retrieve framework information!')
@@ -397,9 +364,9 @@ def getSVN_release_ver(site):
     __release_rev__ %= int(version.getversion_svn(pywikibot.config.datafilepath('..'))[1])
     match = version.getversion_onlinerepo('http://svn.toolserver.org/svnroot/drtrigon/')
     if match:
-        release_rev = match
-        info = {True: '=', False: '>'}        
-        pywikibot.output(u'  Directory revision - release:   %s (%s %s)' % (release_rev, info[(release_rev==__release_rev__)], __release_rev__))
+        release_rev = int(match)
+        info = version.cmp_ver(release_rev, int(__release_rev__))
+        pywikibot.output(u'  Directory revision - release:   %s (%s %s)' % (release_rev, info, __release_rev__))
     else:
         pywikibot.output(u'  WARNING: could not retrieve release information!')
 
@@ -520,15 +487,18 @@ if __name__ == "__main__":
                              'catimages':          ("-catimages" in arg),
             })
 
-        log = BotLogger(logfile, not cron)
-        pywikibot.ui.stdout = sys.stdout    # patch needed for pywikibot.output
-        pywikibot.ui.stderr = sys.stderr    # (look at terminal_iterface_base.py)
+        # may be use "log = ['*']" in 'user-config.py' instead
+        pywikibot.setLogfileStatus(True, logfile)   # set '-log' to catch all
+        log = BotLogger(not cron)                   # handle stdout and stderr
+        if cron:
+            # suppress console output
+            pywikibot.ui.stdout = open(os.devnull, 'w')
+            pywikibot.ui.stderr = open(os.devnull, 'w')
 
         error = BotErrorHandler(error_ec)
     else:
-        log = BotLogger(logfile)
-        pywikibot.ui.stdout = sys.stdout    # patch needed for pywikibot.output
-        pywikibot.ui.stderr = sys.stderr    # (look at terminal_iterface_base.py)
+        pywikibot.setLogfileStatus(True, logfile)   # set '-log' to catch all
+        log = BotLogger()                           # handle stdout and stderr
 
         choice = pywikibot.inputChoice('Do you want to compress the histories?', ['Yes', 'No'], ['y', 'n'])
         if choice == 'y':

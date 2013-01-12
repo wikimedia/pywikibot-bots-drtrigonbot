@@ -61,7 +61,7 @@ Syntax example:
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__ = '$Id: subster.py 10888 2013-01-11 22:29:36Z drtrigon $'
+__version__ = '$Id: subster.py 10892 2013-01-12 11:53:40Z drtrigon $'
 #
 
 
@@ -175,9 +175,11 @@ class SubsterBot(basic.AutoBasicBot):
         self._ConfCSSpostprocPage = pywikibot.Page(self.site, bot_config['ConfCSSpostproc'])
         self._ConfCSSconfigPage   = pywikibot.Page(self.site, bot_config['ConfCSSconfig'])
         self.pagegen     = pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
-        self._code       = self._ConfCSSpostprocPage.get()
-        pywikibot.output(u'Imported postproc %s rev %s from %s' % \
-          ((self._ConfCSSpostprocPage.title(asLink=True),) + self._ConfCSSpostprocPage.getVersionHistory(revCount=1)[0][:2]) )
+        if not ((self.site.family.name == 'wikidata') and (self.site.lang == 'repo')):
+            # DRTRIGON-130; skip this for test-repo
+            self._code       = self._ConfCSSpostprocPage.get()
+            pywikibot.output(u'Imported postproc %s rev %s from %s' % \
+              ((self._ConfCSSpostprocPage.title(asLink=True),) + self._ConfCSSpostprocPage.getVersionHistory(revCount=1)[0][:2]) )
         self._flagenable = {}
         if self._ConfCSSconfigPage.exists():
             exec(self._ConfCSSconfigPage.get())    # with variable: bot_config_wiki

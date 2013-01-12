@@ -7,7 +7,7 @@ User-interface related functions for building bots
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: bot.py 10778 2012-12-10 14:37:29Z xqt $'
+__version__ = '$Id: bot.py 10896 2013-01-12 16:22:03Z drtrigon $'
 
 # Note: the intention is to develop this module (at some point) into a Bot
 # class definition that can be subclassed to create new, functional bot
@@ -595,11 +595,11 @@ Global arguments available for all bots:
 
 -log:xyz          Enable the logfile, using 'xyz' as the filename.
 
+-nolog            Disable the logfile (if it is enabled by default).
+
 -maxlag           Sets a new maxlag parameter to a number of seconds. Defer bot
                   edits during periods of database server lag. Default is set by
                   config.py
-
--nolog            Disable the logfile (if it is enabled by default).
 
 -debug:item       Enable the logfile and include extensive debugging data
 -debug            for component "item" (for all components if the second form
@@ -610,6 +610,10 @@ Global arguments available for all bots:
 
 -verbose          Have the bot provide additional console output that may be
 -v                useful in debugging.
+
+-simulate         Disables writing to the server. Useful for testing and
+                  debugging of new code (if given, doesn't do any real
+                  changes, but only shows what would have been changed).
 
 ''' % modname
     try:

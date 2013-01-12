@@ -40,7 +40,7 @@ Syntax example:
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
 __version__ = '$Id$'
-__framework_rev__ = '10888' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '10898' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.4'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -118,6 +118,9 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
                        self.cron:  cron, }
         pywikibot.output(u'** Pre-loading all relevant page contents')
         for item in self.refs:
+            # security; first check if page is protected, reject any data if not
+            if os.path.splitext(self.refs[item].title()) not in ['.css', '.js']:
+                raise pywikibot.UserActionRefuse(u'Page %s is not secure, e.g. semi-protected!' % self.refs[item])
             self.refs[item].get(force=True)   # load all page contents
 
         # init background timer
@@ -136,7 +139,6 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         page = match.group('page').decode(self.site.encoding())
         if page in self.refs:
             pywikibot.output(u"RELOAD: %s" % page)
-            # TODO: security; first check if page is protected, reject any data if not !!!
             self.refs[page].get(force=True)   # re-load (refresh) page content
         if page == self.templ:
             pywikibot.output(u"SHELL: %s" % page)
@@ -285,7 +287,7 @@ def output_verinfo():
     # local release revision?
     rel = subprocess.Popen("svn info", stdout=subprocess.PIPE, shell=True).stdout.readlines()[-7].split()[1]
     __release_rev__ = __release_rev__ % int(rel)
-    cmp_ver = lambda a, b: {-1: '<', 0: '~', 1: '>'}[cmp((a-b)//100, 0)]
+    cmp_ver = lambda a, b, tol=1: {-1: '<', 0: '~', 1: '>'}[cmp((a-b)//tol, 0)]
     # release revision?
     buf = pywikibot.comms.http.request(pywikibot.getSite(), 'http://svn.toolserver.org/svnroot/drtrigon/')
     match = re.search('- Revision (.*?):', buf)
@@ -301,7 +303,7 @@ def output_verinfo():
     if match and (len(match.groups()) > 0):
         framework_rev = int(match.groups()[-1])
         pywikibot.output(u'  Directory revision - framework: %s (%s %s)' %\
-                         (framework_rev, cmp_ver(framework_rev, int(__framework_rev__)), __framework_rev__))
+                         (framework_rev, cmp_ver(framework_rev, int(__framework_rev__), 100), __framework_rev__))
     else:
         pywikibot.output(u'  WARNING: could not retrieve framework information!')
     pywikibot.output(u'')

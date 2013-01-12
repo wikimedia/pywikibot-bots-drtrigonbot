@@ -118,7 +118,7 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 10858 2013-01-01 22:40:36Z drtrigon $'
+__version__ = '$Id: wikipedia.py 10895 2013-01-12 16:17:54Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -137,6 +137,7 @@ import unicodedata
 import xmlreader
 from BeautifulSoup import BeautifulSoup, BeautifulStoneSoup, SoupStrainer
 import weakref
+import logging, logging.handlers
 # Splitting the bot into library parts
 from pywikibot.support import *
 import config, login, query, version
@@ -8505,6 +8506,8 @@ def handleArgs(*args):
             setLogfileStatus(True)
         elif arg.startswith('-log:'):
             setLogfileStatus(True, arg[5:])
+        elif arg.startswith('-loghandler:'):
+            config.loghandler = arg[12:]
         elif arg == '-nolog':
             setLogfileStatus(False)
         elif arg in ['-verbose', '-v']:
@@ -8585,17 +8588,21 @@ Global arguments available for all bots:
 
 -help             Show this help text.
 
+-loghandler:xyz   Choose a value for 'xyz' from 'TRFH' (TimedRotatingFile-
+                  Handler) or 'RFH' (RotatingFileHandler). Has to be defined
+                  before '-log' on command line.
+
 -log              Enable the logfile, using the default filename
                   "%s.log"
                   Logs will be stored in the logs subdirectory.
 
 -log:xyz          Enable the logfile, using 'xyz' as the filename.
 
+-nolog            Disable the logfile (if it is enabled by default).
+
 -maxlag           Sets a new maxlag parameter to a number of seconds. Defer bot
                   edits during periods of database server lag. Default is set by
                   config.py
-
--nolog            Disable the logfile (if it is enabled by default).
 
 -putthrottle:n    Set the minimum time (in seconds) the bot will wait between
 -pt:n             saving pages.
@@ -8645,7 +8652,7 @@ if unicode_error:
 
 default_family = config.family
 default_code = config.mylang
-logfile = None
+logger = None
 # Check
 
 # if the default family+wiki is a non-public one,
@@ -8680,21 +8687,62 @@ def writeToCommandLogFile():
     commandLogFile.close()
 
 def setLogfileStatus(enabled, logname = None):
-    global logfile
+    # NOTE-1: disable 'fh.setFormatter(formatter)' below in order to get "old"
+    #         logging format (without additional info)
+    # NOTE-2: enable 'logger.addHandler(ch)' below in order output to console
+    #         also (e.g. for simplifying 'pywikibot.output')
+    global logger
     if enabled:
         if not logname:
             logname = '%s.log' % calledModuleName()
+            if pywikibot.throttle.pid > 1:
+                logname = '%s.%s.log' % (calledModuleName(), pywikibot.throttle.pid)
         logfn = config.datafilepath('logs', logname)
-        try:
-            logfile = codecs.open(logfn, 'a', 'utf-8')
-        except IOError:
-            logfile = codecs.open(logfn, 'w', 'utf-8')
+
+        logger = logging.getLogger()    # root logger
+        if logger.handlers:             # init just once (if re-called)
+            logger = logging.getLogger('pywikibot')
+            return
+        logger.setLevel(logging.DEBUG)
+        # create file handler which logs even debug messages
+        if config.loghandler.upper() == 'TRFH':
+            fh = logging.handlers.TimedRotatingFileHandler(logfn,
+                                                           when='midnight',
+                                                           utc=False,
+                                                           #encoding='bz2-codec')
+                                                           encoding='utf-8')
+            # patch for "Issue 8117: TimedRotatingFileHandler doesn't rotate log
+            # file at startup."
+            # applies to python2.6 only, solution filched from python2.7 source:
+            # http://hg.python.org/cpython-fullhistory/diff/a566e53f106d/Lib/logging/handlers.py
+            if os.path.exists(logfn):
+                t = os.stat(logfn).st_mtime
+                fh.rolloverAt = fh.computeRollover(t)
+        elif config.loghandler.upper() == 'RFH':
+            fh = logging.handlers.RotatingFileHandler(filename=logfn,
+                                           maxBytes=1024 * config.logfilesize,
+                                           backupCount=config.logfilecount,
+                                           encoding='utf-8')
+        #fh.setLevel(logging.DEBUG if debug else logging.INFO)
+        fh.setLevel(logging.DEBUG)
+        # create console handler with a higher log level
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        # create formatter and add it to the handlers
+        formatter = logging.Formatter(
+                    fmt='%(asctime)s %(name)18s: %(levelname)-8s %(message)s',
+                    datefmt="%Y-%m-%d %H:%M:%S"
+                    )
+        fh.setFormatter(formatter)
+        #ch.setFormatter(formatter)
+        # add the handlers to logger
+        logger.addHandler(fh)           # output to logfile
+        #logger.addHandler(ch)           # output to terminal/shell console
+
+        logger = logging.getLogger('pywikibot')
     else:
         # disable the log file
-        logfile = None
-
-if '*' in config.log or calledModuleName() in config.log:
-    setLogfileStatus(True)
+        logger = None
 
 writeToCommandLogFile()
 
@@ -8702,12 +8750,17 @@ colorTagR = re.compile('\03{.*?}', re.UNICODE)
 
 def log(text):
     """Write the given text to the logfile."""
-    if logfile:
+    if logger:
         # remove all color markup
         plaintext = colorTagR.sub('', text)
         # save the text in a logfile (will be written in utf-8)
-        logfile.write(plaintext)
-        logfile.flush()
+        type = plaintext.split(':')
+        func = 'info'
+        if len(type) > 1:
+            func = type[0].strip().lower()
+            if func not in ['debug', 'warning', 'error', 'critical', 'info']:
+                func = 'info'
+        getattr(logger, func)(plaintext.rstrip().lstrip('\n'))
 
 output_lock = threading.Lock()
 input_lock = threading.Lock()
@@ -9012,6 +9065,9 @@ MyURLopener.addheaders = [('User-agent', useragent)]
 
 import pywikibot
 pywikibot.__dict__.update(locals())
+
+if '*' in config.log or calledModuleName() in config.log:
+    setLogfileStatus(True)
 
 if __name__ == '__main__':
     import doctest
