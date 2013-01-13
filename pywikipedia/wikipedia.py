@@ -118,7 +118,7 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 10899 2013-01-12 23:27:08Z drtrigon $'
+__version__ = '$Id: wikipedia.py 10900 2013-01-13 11:04:58Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -8705,7 +8705,12 @@ def setLogfileStatus(enabled, logname = None):
             return
         logger.setLevel(logging.DEBUG)
         # create file handler which logs even debug messages
-        if config.loghandler.upper() == 'TRFH':
+        if config.loghandler.upper() == 'RFH':
+            fh = logging.handlers.RotatingFileHandler(filename=logfn,
+                                           maxBytes=1024 * config.logfilesize,
+                                           backupCount=config.logfilecount,
+                                           encoding='utf-8')
+        else:
             fh = logging.handlers.TimedRotatingFileHandler(logfn,
                                                            when='midnight',
                                                            utc=False,
@@ -8718,13 +8723,7 @@ def setLogfileStatus(enabled, logname = None):
             if os.path.exists(logfn):
                 t = os.stat(logfn).st_mtime
                 fh.rolloverAt = fh.computeRollover(t)
-        elif config.loghandler.upper() == 'RFH':
-            fh = logging.handlers.RotatingFileHandler(filename=logfn,
-                                           maxBytes=1024 * config.logfilesize,
-                                           backupCount=config.logfilecount,
-                                           encoding='utf-8')
-        #fh.setLevel(logging.DEBUG if debug else logging.INFO)
-        fh.setLevel(logging.DEBUG)
+        fh.setLevel(logging.DEBUG if debug else logging.INFO)
         # create console handler with a higher log level
         ch = logging.StreamHandler()
         ch.setLevel(logging.INFO)
