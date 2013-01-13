@@ -147,9 +147,10 @@ botdonemsg = 'DONE'
 botcontinuous = ['trunk/bot_control.py-subster_irc-cron.log', 'rewrite/script_wui-bot.log']
 
 # use classic 're' since 'pyparsing' does not work with unicode
-regex   = re.compile(r'(?P<timestamp>[\d-]+\s[\d:,]+)\s(?P<file>\S+)\s*(?P<level>\S+)\s*(?P<message>.*)')#, re.U)
-timefmt = "%Y-%m-%d %H:%M:%S,%f"
-datefmt = "%Y-%m-%d"
+regex    = re.compile(r'(?P<timestamp>[\d-]+\s[\d:,]+)\s+(?P<file>\S+)\s+(?P<level>\S+)\s+(?P<message>.*)')#, re.U)
+timefmt  = "%Y-%m-%d %H:%M:%S,%f"
+timefmt2 = "%Y-%m-%d %H:%M:%S"
+datefmt  = "%Y-%m-%d"
 
 localdir = os.path.dirname(os.path.join('..','DrTrigonBot','.'))
 
@@ -297,7 +298,7 @@ def logging_statistics(logfiles, exclude):
 			log[0][event].append( log[1] )
 		return
 
-	timeepoch = lambda t: mktime(datetime.datetime.strptime(t, timefmt).timetuple())
+	timeepoch = lambda t: mktime(datetime.datetime.strptime(t, (timefmt if ',' in t else timefmt2)).timetuple())
 
 	#How many requests are being handled per second, how much of various resources are 
 
@@ -325,8 +326,8 @@ def logging_statistics(logfiles, exclude):
 	# evaluate statistics
 	stats = {'mcount': mcount, 'mqueue': mqueue, 'ecount': ecount, 'resources': resources}
 	# (in use, how long we've been up.)
-	start = datetime.datetime.strptime(etiming['mainstart'][0], timefmt)
-	end   = datetime.datetime.strptime(etiming['mainend'][0], timefmt)
+	start = datetime.datetime.strptime(etiming['mainstart'][0], (timefmt if ',' in etiming['mainstart'][0] else timefmt2))
+	end   = datetime.datetime.strptime(etiming['mainend'][0], (timefmt if ',' in etiming['mainend'][0] else timefmt2))
 	stats['uptime'] = (end - start).seconds
 	stats['mainstart'] = timeepoch(etiming['mainstart'][0])
 	stats['mainend']   = timeepoch(etiming['mainend'][0])
