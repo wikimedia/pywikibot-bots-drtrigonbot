@@ -118,7 +118,7 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 10900 2013-01-13 11:04:58Z drtrigon $'
+__version__ = '$Id: wikipedia.py 10904 2013-01-13 15:22:45Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -140,7 +140,8 @@ import weakref
 import logging, logging.handlers
 # Splitting the bot into library parts
 from pywikibot.support import *
-import config, login, query, version
+import config, login, query
+from pywikibot import version
 
 # Check Unicode support (is this a wide or narrow python build?)
 # See http://www.python.org/doc/peps/pep-0261/

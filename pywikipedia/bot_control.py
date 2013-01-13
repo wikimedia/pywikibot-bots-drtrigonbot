@@ -85,7 +85,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '10900' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '10908' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.4'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -94,42 +94,38 @@ import sys, os, re, time, traceback, shelve
 import logging, logging.handlers
 
 # wikipedia-bot imports
-import pagegenerators, userlib, botlist, basic
-import clean_sandbox, sum_disc, subster, subster_irc, catimages
-import dtbext
+import userlib
 # Splitting the bot into library parts
+from pywikibot import version   # JIRA: DRTRIGON-131
 import wikipedia as pywikibot
-import version  # JIRA: DRTRIGON-131
 
 
 logname = pywikibot.config.datafilepath('logs', '%s.log')
-logger_tmsp = sum_disc.bot_config['logger_tmsp']
 
 error_mail_fromwiki = True                # send error mail from wiki too!
 error_mail          = (u'DrTrigon', u'Bot ERROR')    # error mail via wiki mail interface instead of CRON job
 
 
 # logging of framework info
-infolist = [ pywikibot.__version__, pywikibot.config.__version__,     # framework
-             pywikibot.query.__version__, pagegenerators.__version__, #
-             botlist.__version__, clean_sandbox.__version__,          #
-             basic.__version__,                                       #
-             dtbext.pywikibot.__version__,                            # DrTrigonBot extensions
-             __version__, sum_disc.__version__, subster.__version__,  # bots
-             subster_irc.__version__, catimages.__version__, ]        #
+infolist = [ 'wikipedia.py', 'config.py', 'query.py',       # framework
+             'pagegenerators.py', 'botlist.py',             #
+             'clean_sandbox.py', 'basic.py',                #
+             'dtbext/dtbext_wikipedia.py',                  # DrTrigonBot ext.
+             __version__, 'sum_disc.py', 'subster.py',      # bots
+             'subster_irc.py', 'catimages.py', ]            #
 
 # bots to run and control
-bot_list = { 'clean_user_sandbox': ( clean_sandbox, ['-user'], 
+bot_list = { 'clean_user_sandbox': ( 'clean_sandbox', ['-user'], 
                                      u'Clean Userspace Sandboxes' ),
-             'sum_disc':           ( sum_disc, [], 
+             'sum_disc':           ( 'sum_disc', [], 
                                      u'Discussion Summary'),
-             'compress_history':   ( sum_disc, ['-compress_history:[]'], 
+             'compress_history':   ( 'sum_disc', ['-compress_history:[]'], 
                                      u'Compressing Discussion Summary'),
-             'subster':            ( subster, [], 
+             'subster':            ( 'subster', [], 
                                      u'"SubsterBot"'),
-             'catimages':          ( catimages, ['-cat'],#, '-limit:1'], 
+             'catimages':          ( 'catimages', ['-cat'],#, '-limit:1'], 
                                      u'Categorize Images (by content)'),
-             'subster_irc':        ( subster_irc, [], 
+             'subster_irc':        ( 'subster_irc', [], 
                                      u'"SubsterBot" IRC surveillance (beta)'),
            }
 bot_order = [ 'clean_user_sandbox', 'sum_disc', 'compress_history',
@@ -268,6 +264,7 @@ class BotController:
 
     def trigger(self):
         if self.run_bot:
+            self.bot = __import__(self.bot)     # import if runned only (!)
             self.run()
         else:
             self.skip()
@@ -383,7 +380,9 @@ def main():
 
     # logging of release/framework info
     pywikibot.output(u'\nRELEASE/FRAMEWORK VERSION:')
-    for item in infolist: pywikibot.output(u'  %s' % item)
+    for item in infolist:
+        ver = version.getfileversion(item)
+        pywikibot.output(u'  %s' % (item if ver is None else ver))
 
     # new release/framework revision?
     pywikibot.output(u'\nLATEST RELEASE/FRAMEWORK REVISION:')
@@ -508,6 +507,7 @@ if __name__ == "__main__":
                     user = re.findall(u'sum_disc-%s-%s-(.*?).dat' % (u'wikipedia', u'de'), item)[0]
 
                     sys.argv.append( repr(u'-compress_history:%s' % user) )
+                    import sum_disc
                     sum_disc.main()
                     del sys.argv[1]
 

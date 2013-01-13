@@ -38,9 +38,20 @@ Syntax example:
 #  @todo Bei jeder Botbearbeitung wird der Name des Auftraggebers vermerkt
 #  @todo (may be queue_security needed later in order to allow other 'super-users' too...)
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+#  Writing code in Wikipedia:
+#
+#  # patches to keep code running
+#  builtin_raw_input = __builtin__.raw_input
+#  __builtin__.raw_input = lambda: 'n'     # overwrite 'raw_input' to run bot non-blocking and simulation mode
+#
+#  # backup sys.argv; depreciated: if possible manipulate pywikibot.config instead
+#  sys_argv = copy.deepcopy( sys.argv )
+#
+#  ...
+# --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
 __version__ = '$Id$'
-__framework_rev__ = '10900' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '10908' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.4'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -60,14 +71,15 @@ import dtbext.crontab
 
 import pywikibot
 import pywikibot.botirc
+from pywikibot import version
 
 
 # logging of framework info (may be this should be done without importing, just opening)
-infolist = [ pywikibot.__version__, pywikibot.config.__version__,     # framework
-             pywikibot.data.api.__version__,                          #
-             pywikibot.bot.__version__, pywikibot.botirc.__version__, #
-#             clean_sandbox.__version__,                               #
-             __version__, ]                                           #
+infolist = [ 'pywikibot/__init__.py', 'pywikibot/config2.py',   # framework
+             'pywikibot/data/api.py',                           #
+             'pywikibot/bot.py', 'pywikibot/botirc.py',         #
+             __version__,                                       #
+             'scripts/clean_sandbox.py', ]                      #
 
 bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang],
 
@@ -90,9 +102,7 @@ bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.fami
         # (at the moment none, but consider e.g. '-always' or allow it with '-simulate' only!)
 }
 
-## debug tools
-## (look at 'bot_control.py' and 'subster.py' for more info)
-#debug = []
+__simulate = True
 
 
 class ScriptWUIBot(pywikibot.botirc.IRCBot):
@@ -131,7 +141,7 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         match = self.re_edit.match(e.arguments()[0])
         if not match:
             return
-#        print match.groups(), match.group('page'), match.group('user')
+        #print match.groups(), match.group('page'), match.group('user')
         user = match.group('user').decode(self.site.encoding())
         if user == bot_config['BotName']:
             return
@@ -192,9 +202,8 @@ def main_script(page, rev=None, params=None):
     from StringIO import StringIO
     import logging
 
-#    # safety
-#    if '-simulate' not in sys.argv:
-#        sys.argv.append('-simulate')
+    # safety; default mode is safe (no writing)
+    pywikibot.config.simulate = True
 
     pywikibot.output(u'--- ' * 20)
 
@@ -227,7 +236,10 @@ def main_script(page, rev=None, params=None):
 
     pywikibot.output(u'--- ' * 20)
 
-    pywikibot.output(u'environment: garbage; %s / memory; %s / members; %s' % (gc.collect(), resource.getrusage(resource.RUSAGE_SELF).ru_maxrss, len(dir())))
+    # safety; restore settings
+    pywikibot.config.simulate = __simulate
+
+    pywikibot.output(u'environment: garbage; %s / memory; %s / members; %s' % (gc.collect(), resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*resource.getpagesize(), len(dir())))
     # 'len(dir())' is equivalent to 'len(inspect.getmembers(__main__))'
 
     # append result to output page
@@ -235,22 +247,26 @@ def main_script(page, rev=None, params=None):
         wiki_logger(buffer.getvalue(), page, rev)
 
 def wiki_logger(buffer, page, rev=None):
-# (might be a problem here for TS and SGE, output string has another encoding)
-#    buffer  = buffer.decode(config.console_encoding)
+    # (might be a problem here for TS and SGE, output string has another encoding)
+    #buffer  = buffer.decode(config.console_encoding)
     buffer = re.sub("\03\{(.*?)\}(.*?)\03\{default\}", "\g<2>", buffer)
     if rev is None:
         rev = page.latestRevision()
     # append to page
     outpage = pywikibot.Page(pywikibot.getSite(), bot_config['ConfCSSoutput'])
     text = outpage.get()
-    # vvv permalink is VERY CHEAP/UGLY/HACKY and has to be done better !!!!!!!! vvv
+# TODO: vvv permalink is VERY CHEAP/UGLY/HACKY and has to be done better !!!!!!!! vvv
     outpage.put(text + u"\n== Simulation vom %s mit [http://de.wikipedia.org/w/index.php?title=%s&oldid=%s code:%s] ==\n<pre>\n%s</pre>\n\n" % (pywikibot.Timestamp.now().isoformat(' '), bot_config['ConfCSSshell'], rev, rev, buffer))
 #                comment = pywikibot.translate(self.site.lang, bot_config['msg']))
 
 def main():
+    global __simulate
+
     for arg in pywikibot.handleArgs():
         pywikibot.showHelp('script_wui')
         return
+
+    __simulate = pywikibot.config.simulate
 
     # verbosely output version info of all involved scripts
     output_verinfo()
@@ -266,8 +282,6 @@ def main():
         raise
 
 def output_verinfo():
-    import pywikibot.comms.http
-    import subprocess
     global __release_rev__
 
     # script call
@@ -278,32 +292,28 @@ def output_verinfo():
     # logging of release/framework info
     pywikibot.output(u'RELEASE/FRAMEWORK VERSION:')
     for item in infolist:
-        pywikibot.output(u'  %s' % item)
+        ver = version.getfileversion(item)
+        pywikibot.output(u'  %s' % (item if ver is None else ver))
     pywikibot.output(u'')
 
-    # JIRA: DRTRIGON-131 -> TODO; create pywikibot/version.py with some funcs!
-    # new release/framework revision?
+    # new release/framework revision? (JIRA: DRTRIGON-131)
     pywikibot.output(u'LATEST RELEASE/FRAMEWORK REVISION:')
     # local release revision?
-    rel = subprocess.Popen("svn info", stdout=subprocess.PIPE, shell=True).stdout.readlines()[-7].split()[1]
-    __release_rev__ = __release_rev__ % int(rel)
-    cmp_ver = lambda a, b, tol=1: {-1: '<', 0: '~', 1: '>'}[cmp((a-b)//tol, 0)]
-    # release revision?
-    buf = pywikibot.comms.http.request(pywikibot.getSite(), 'http://svn.toolserver.org/svnroot/drtrigon/')
-    match = re.search('- Revision (.*?):', buf)
-    if match and (len(match.groups()) > 0):
-        release_rev = int(match.groups()[-1])
-        pywikibot.output(u'  Directory revision - release:   %s (%s %s)' %\
-                         (release_rev, cmp_ver(release_rev, int(__release_rev__)), __release_rev__))
+    __release_rev__ %= int(version.getversion_svn(pywikibot.config.datafilepath('.'))[1])
+    match = version.getversion_onlinerepo('http://svn.toolserver.org/svnroot/drtrigon/')
+    if match:
+        release_rev = int(match)
+        info = version.cmp_ver(release_rev, int(__release_rev__))
+        pywikibot.output(u'  Directory revision - release:   %s (%s %s)' % (release_rev, info, __release_rev__))
     else:
         pywikibot.output(u'  WARNING: could not retrieve release information!')
     # framework revision?
-    buf = pywikibot.comms.http.request(pywikibot.getSite(), 'http://svn.wikimedia.org/svnroot/pywikipedia/trunk/pywikipedia/')
-    match = re.search('- Revision (.*?):', buf)
-    if match and (len(match.groups()) > 0):
-        framework_rev = int(match.groups()[-1])
-        pywikibot.output(u'  Directory revision - framework: %s (%s %s)' %\
-                         (framework_rev, cmp_ver(framework_rev, int(__framework_rev__), 100), __framework_rev__))
+    __framework_rev = int(__framework_rev__)
+    match = version.getversion_onlinerepo()
+    if match:
+        framework_rev = int(match)
+        info = version.cmp_ver(framework_rev, __framework_rev, 100)
+        pywikibot.output(u'  Directory revision - framework: %s (%s %s)' % (framework_rev, info, __framework_rev__))
     else:
         pywikibot.output(u'  WARNING: could not retrieve framework information!')
     pywikibot.output(u'')
@@ -336,19 +346,3 @@ if __name__ == "__main__":
 
     # run bot
     main()
-
-
-comment = """
-builtin_raw_input = __builtin__.raw_input
-__builtin__.raw_input = lambda: 'n'     # overwrite 'raw_input' to run bot non-blocking and simulation mode
-
-def block(*args, **kwargs):
-    pywikibot.output(u'=== ! SIMULATION MODE; WIKI WRITE ATTEMPT BLOCKED ! ===')
-    return (None, None, None)
-pywikibot_Page_put = pywikibot.Page.put
-pywikibot.Page.put = block              # overwrite 'pywikibot.Page.put'
-
-sys_argv = copy.deepcopy( sys.argv )
-
-pywikibot.Page.put = pywikibot_Page_put
-"""
