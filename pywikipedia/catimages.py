@@ -2443,8 +2443,8 @@ class CatImages_SVM(CatImages_Default):
 
 
 # Image by content categorization derived from 'checkimages.py'.
-class CatImagesBot(checkimages.main, CatImages_Default):
-#class CatImagesBot(checkimages.main, CatImages_SVM):
+class CatImagesBot(checkimages.checkImagesBot, CatImages_Default):
+#class CatImagesBot(checkimages.checkImagesBot, CatImages_SVM):
 #    def __init__(self, site, logFulNumber = 25000, sendemailActive = False,
 #                 duplicatesReport = False, logFullError = True): pass
 #    def setParameters(self, imageName, timestamp, uploader): pass
