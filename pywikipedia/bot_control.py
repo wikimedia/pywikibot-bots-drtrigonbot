@@ -488,7 +488,7 @@ if __name__ == "__main__":
 
         # may be use "log = ['*']" in 'user-config.py' instead
         pywikibot.setLogfileStatus(True, logfile)   # set '-log' to catch all
-        logging.getLogger().captureWarnings(True)
+        #logging.captureWarnings(True)              # (introduced in py2.7)
         log = BotLogger(not cron)                   # handle stdout and stderr
         if cron:
             # suppress console output
@@ -498,7 +498,7 @@ if __name__ == "__main__":
         error = BotErrorHandler(error_ec)
     else:
         pywikibot.setLogfileStatus(True, logfile)   # set '-log' to catch all
-        logging.getLogger().captureWarnings(True)
+        #logging.captureWarnings(True)              # (introduced in py2.7)
         log = BotLogger()                           # handle stdout and stderr
 
         choice = pywikibot.inputChoice('Do you want to compress the histories?', ['Yes', 'No'], ['y', 'n'])
