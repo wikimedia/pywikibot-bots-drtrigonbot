@@ -1036,10 +1036,10 @@ class FileData(object):
             #dispImg.paste(smallImg, mask)
             #dispImg.show()
             if (len(h) == 256):
-                print "gray scale image, try to fix..."
+                pywikibot.output(u"gray scale image, try to fix...")
                 h = h*3
             if (len(h) == 256*4):
-                print "4-ch. image, try to fix (exclude transparency)..."
+                pywikibot.output(u"4-ch. image, try to fix (exclude transparency)...")
                 h = h[0:(256*3)]
             hist.append( (h, coverage, (center, bbox)) )
         
@@ -1233,7 +1233,8 @@ class FileData(object):
 
         os.chdir(curdir)
 
-        print data
+        #print data
+        pywikibot.output(data)
  
     def _detect_EmbeddedText_poppler(self):
         # may be also: http://www.reportlab.com/software/opensource/rl-toolkit/
@@ -1573,7 +1574,7 @@ class FileData(object):
             if set(['FacesDetected', 'Face1Position']).issubset(found):
                 i = 1
                 if 'FaceOrientation' in res:
-                    print res['FaceOrientation']    # for rotation 'rot'
+                    pywikibot.output(res['FaceOrientation'])    # for rotation 'rot'
                 # 'crop' for 'casio' omitted here...
                 aspect = float(height)/width
                 if (aspect <= 3./4):
@@ -1593,7 +1594,7 @@ class FileData(object):
                     #(x2, y2) = (x1+buf[3]*sx, y1+buf[2]*sy)
                     data.append({ 'Position': (x1, y1, x2, y2) })
                     if ('RecognizedFace%iName'%i) in res:
-                        print res['RecognizedFace%iName'%i], res['RecognizedFace%iAge'%i]
+                        pywikibot.output(str((res['RecognizedFace%iName'%i], res['RecognizedFace%iAge'%i])))
                     i += 1
         elif 'fujifilm' in make:
             # UNTESTED: 'fujifilm'
@@ -1604,7 +1605,7 @@ class FileData(object):
                     data.append({ 'Position': [buf[i*4]*sx,   buf[i*4+1]*sy, 
                                                buf[i*4+2]*sx, buf[i*4+3]*sy] })
                     if ('Face%iName'%i) in res:
-                        print res['Face%iName'%i], res['Face%iCategory'%i], res['Face%iBirthday'%i]
+                        pywikibot.output(str((res['Face%iName'%i], res['Face%iCategory'%i], res['Face%iBirthday'%i])))
         elif 'olympus' in make:
             # UNTESTED: 'olympus'
             if set(['FacesDetected', 'FaceDetectArea']).issubset(found):
@@ -2662,9 +2663,9 @@ class CatImagesBot(checkimages.main, CatImages_Default):
         for i, cat in enumerate(self._result_guess):
             content += u"\n<!--DrTrigonBot-guess-- [[Category:%s]] -->" % cat
 
-        print u"--- " * 20
-        print content
-        print u"--- " * 20
+        pywikibot.output(u"--- " * 20)
+        pywikibot.output(content)
+        pywikibot.output(u"--- " * 20)
         pywikibot.put_throttle()
         self.image.put( content, comment="bot automatic categorization; adding %s" % u", ".join(tags),
                                  botflag=False )
@@ -3313,14 +3314,14 @@ def trainbot(generator, mainClass, image_old_namespace, image_namespace):
     #cols = trainset.shape[1]
     #print trainset
     x, y = trainset[:, :(cols-1)], trainset[:, (cols-1)].astype(np.int) # x: (observations x attributes) matrix, y: classes (1: setosa, 2: versicolor, 3: virginica)
-    print x.shape
-    print y.shape
+    pywikibot.output(x.shape)
+    pywikibot.output(y.shape)
     
     # Dimensionality reduction by Principal Component Analysis (PCA)
     pca = mlpy.PCA() # new PCA instance
     pca.learn(x) # learn from data
     z = pca.transform(x, k=2) # embed x into the k=2 dimensional subspace
-    print z.shape
+    pywikibot.output(z.shape)
     
     plt.set_cmap(plt.cm.Paired)
     fig1 = plt.figure(1)

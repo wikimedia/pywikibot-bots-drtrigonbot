@@ -85,7 +85,7 @@ Options/parameters:
 #  @verbatim python sum_disc.py @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '10910' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '10921' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.4'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -488,6 +488,7 @@ if __name__ == "__main__":
 
         # may be use "log = ['*']" in 'user-config.py' instead
         pywikibot.setLogfileStatus(True, logfile)   # set '-log' to catch all
+        logging.getLogger().captureWarnings(True)
         log = BotLogger(not cron)                   # handle stdout and stderr
         if cron:
             # suppress console output
@@ -497,6 +498,7 @@ if __name__ == "__main__":
         error = BotErrorHandler(error_ec)
     else:
         pywikibot.setLogfileStatus(True, logfile)   # set '-log' to catch all
+        logging.getLogger().captureWarnings(True)
         log = BotLogger()                           # handle stdout and stderr
 
         choice = pywikibot.inputChoice('Do you want to compress the histories?', ['Yes', 'No'], ['y', 'n'])
