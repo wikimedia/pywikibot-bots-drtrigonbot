@@ -338,7 +338,7 @@ that you have to break it off, use "-continue" next time.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: interwiki.py 10872 2013-01-04 13:40:24Z xqt $'
+__version__ = '$Id: interwiki.py 10927 2013-01-15 08:11:23Z xqt $'
 #
 
 import sys, copy, re, os
@@ -1714,9 +1714,10 @@ u'NOTE: number of edits are restricted at %s'
                                     % page.site.sitename())
 
                 # if we have an account for this site
-                if site.family.name in config.usernames \
-                   and site.lang in config.usernames[site.family.name] \
-                   and smallWikiAllowed:
+                if site.family.name in config.usernames and \
+                   site.lang in config.usernames[site.family.name] and \
+                   smallWikiAllowed and \
+                   not site.has_transcluded_data:
                     # Try to do the changes
                     try:
                         if self.replaceLinks(page, new, bot):

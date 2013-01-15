@@ -118,7 +118,7 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 10921 2013-01-14 18:57:41Z drtrigon $'
+__version__ = '$Id: wikipedia.py 10932 2013-01-15 18:04:46Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -6240,7 +6240,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
             text = unicode(text, charset, errors = 'strict')
         except UnicodeDecodeError, e:
             if verbose:
-                output(e)
+                output(u'%s' %e)
             output(u'ERROR: Invalid characters found on %s://%s%s, replaced by \\ufffd.'
                    % (self.protocol(), self.hostname(), address))
             # We use error='replace' in case of bad encoding.
@@ -8164,9 +8164,9 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
         """Return a tuple of image repositories used by this site."""
         return self.family.shared_image_repository(self.lang)
 
-    def shared_data_repository(self):
+    def shared_data_repository(self, transcluded=False):
         """Return a tuple of image repositories used by this site."""
-        return self.family.shared_image_repository(self.lang)
+        return self.family.shared_data_repository(self.lang, transcluded)
 
     @property
     def has_image_repository(self):
@@ -8178,6 +8178,12 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
     def has_data_repository(self):
         """Return True if site has a shared image repository like wikidata"""
         code, fam = self.shared_data_repository()
+        return bool(code or fam)
+
+    @property
+    def has_transcluded_data(self):
+        """Return True if site has a shared image repository like wikidata"""
+        code, fam = self.shared_data_repository(True)
         return bool(code or fam)
 
     def image_repository(self):
@@ -8716,29 +8722,22 @@ def setLogfileStatus(enabled, logname = None):
                                            backupCount=config.logfilecount,
                                            encoding='utf-8')
         else:
-            try:
-                fh = logging.handlers.TimedRotatingFileHandler(logfn,
-                                                           when='midnight',
-                                                           utc=False,
-                                                           #encoding='bz2-codec')
-                                                           encoding='utf-8')
-            except TypeError:
-                # For Python 2.5
-                fh = logging.handlers.TimedRotatingFileHandler(logfn,
-                                                           when='midnight',
-                                                           #encoding='bz2-codec')
-                                                           encoding='utf-8')
+            ver = int( '%02i%02i' % (sys.version_info.major,
+                                     sys.version_info.minor) )
+            kwargs = {     'when': 'midnight',
+                       #'encoding': 'bz2-codec')
+                       'encoding': 'utf-8' }
+            if ver > int('0205'):
+                # For Python > 2.5 (added in version 2.6)
+                kwargs['utc'] = True
+            fh = logging.handlers.TimedRotatingFileHandler(logfn, **kwargs)
             # patch for "Issue 8117: TimedRotatingFileHandler doesn't rotate log
             # file at startup."
             # applies to python2.6 only, solution filched from python2.7 source:
             # http://hg.python.org/cpython-fullhistory/diff/a566e53f106d/Lib/logging/handlers.py
-            if os.path.exists(logfn):
+            if os.path.exists(logfn) and (ver == int('0206')):
                 t = os.stat(logfn).st_mtime
-                try:
-                    fh.rolloverAt = fh.computeRollover(t)
-                except AttributeError:
-                    # Python 2.5 does not have it
-                    pass
+                fh.rolloverAt = fh.computeRollover(t)
 
         fh.setLevel(logging.DEBUG if debug else logging.INFO)
         # create console handler with a higher log level
@@ -8747,8 +8746,8 @@ def setLogfileStatus(enabled, logname = None):
         # create formatter and add it to the handlers (using LogRecord attributes)
         formatter = logging.Formatter(
                     fmt='%(asctime)s %(name)18s: %(levelname)-8s %(message)s',
-#                    fmt="%(asctime)s %(filename)18s, %(lineno)4s "
-#                        "in %(funcName)18s: %(levelname)-8s %(message)s",
+                    #fmt="%(asctime)s %(filename)18s, %(lineno)4s "
+                    #    "in %(funcName)18s: %(levelname)-8s %(message)s",
                     datefmt="%Y-%m-%d %H:%M:%S"
                     )
         fh.setFormatter(formatter)

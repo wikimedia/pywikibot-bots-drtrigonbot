@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: family.py 10843 2012-12-30 10:25:06Z xqt $'
+__version__ = '$Id: family.py 10929 2013-01-15 15:24:23Z xqt $'
 
 import logging
 import re
@@ -826,7 +826,7 @@ class Family:
         """Return MediaWiki version number as a string."""
         # Don't use this, use versionnumber() instead. This only exists
         # to not break family files.
-        return '1.21wmf6'
+        return '1.21wmf7'
 
     def versionnumber(self, code):
         """Return an int identifying MediaWiki version.

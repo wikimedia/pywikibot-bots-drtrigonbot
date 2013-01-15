@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikipedia_family.py 10884 2013-01-11 11:58:49Z xqt $'
+__version__ = '$Id: wikipedia_family.py 10925 2013-01-15 07:52:11Z xqt $'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 
@@ -1543,8 +1543,11 @@ class Family(family.Family):
     def shared_image_repository(self, code):
         return ('commons', 'commons')
 
-    def shared_data_repository(self, code):
-        return ('wikidata', 'wikidata')
+    def shared_data_repository(self, code, transcluded=False):
+        if not transcluded or code in ['hu']:
+            return ('wikidata', 'wikidata')            
+        else:
+            return (None, None)
 
     if family.config.SSL_connection:
 
