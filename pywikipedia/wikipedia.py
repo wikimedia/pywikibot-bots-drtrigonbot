@@ -118,7 +118,7 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 10932 2013-01-15 18:04:46Z drtrigon $'
+__version__ = '$Id: wikipedia.py 10933 2013-01-15 18:34:04Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -8722,8 +8722,7 @@ def setLogfileStatus(enabled, logname = None):
                                            backupCount=config.logfilecount,
                                            encoding='utf-8')
         else:
-            ver = int( '%02i%02i' % (sys.version_info.major,
-                                     sys.version_info.minor) )
+            ver = int( '%02i%02i' % tuple(sys.version_info)[:2] )
             kwargs = {     'when': 'midnight',
                        #'encoding': 'bz2-codec')
                        'encoding': 'utf-8' }
@@ -8738,7 +8737,6 @@ def setLogfileStatus(enabled, logname = None):
             if os.path.exists(logfn) and (ver == int('0206')):
                 t = os.stat(logfn).st_mtime
                 fh.rolloverAt = fh.computeRollover(t)
-
         fh.setLevel(logging.DEBUG if debug else logging.INFO)
         # create console handler with a higher log level
         ch = logging.StreamHandler()
