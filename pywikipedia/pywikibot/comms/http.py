@@ -16,7 +16,7 @@ This module is responsible for
 # Distributed under the terms of the MIT license.
 #
 
-__version__ = '$Id: http.py 10930 2013-01-15 17:17:46Z drtrigon $'
+__version__ = '$Id: http.py 10934 2013-01-15 21:07:16Z drtrigon $'
 
 import urllib2
 
@@ -212,7 +212,7 @@ u"WARNING: Could not open '%s'. Maybe the server or\n your connection is down. R
         text = unicode(text, charset, errors = 'strict')
     except UnicodeDecodeError, e:
         if verbose:
-            output(u'%s' %e)
+            pywikibot.output(u'%s' %e)
         if no_hostname:
             pywikibot.output(u'ERROR: Invalid characters found on %s, replaced by \\ufffd.' % uri)
         else:

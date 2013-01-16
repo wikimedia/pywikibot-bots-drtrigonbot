@@ -8,7 +8,7 @@ on the same topic in different languages).
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: site.py 10851 2012-12-30 16:51:15Z xqt $'
+__version__ = '$Id: site.py 10940 2013-01-16 17:38:19Z drtrigon $'
 
 import pywikibot
 from pywikibot import deprecate_arg
@@ -1109,7 +1109,10 @@ class APISite(BaseSite):
         version numbers and any other text contained in the version.
 
         """
+        exp = config.API_config_expiry      # expire immediately to get
+        config.API_config_expiry = 0        # 'live' (!) version data
         versionstring = self.siteinfo['generator']
+        config.API_config_expiry = exp
         m = re.match(r"^MediaWiki ([0-9]+)\.([0-9]+)(.*)$", versionstring)
         if m:
             return (int(m.group(1)), int(m.group(2)), m.group(3))

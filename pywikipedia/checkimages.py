@@ -86,7 +86,7 @@ right parameter.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: checkimages.py 10922 2013-01-15 06:55:34Z xqt $'
+__version__ = '$Id: checkimages.py 10936 2013-01-16 15:12:32Z huji $'
 #
 
 import re, time, urllib, urllib2, os, locale, sys, datetime
@@ -469,7 +469,7 @@ category_with_licenses = {
     'ar': 'تصنيف:قوالب حقوق الصور',
     'de': 'Kategorie:Vorlage:Lizenz für Bilder',
     'en': 'Category:Wikipedia image copyright templates',
-    'fa': u'رده:برچسب‌های حق تکثیر نگاره',
+    'fa': u'رده:الگوهای حق تکثیر پرونده',
     'ga': 'Catagóir:Clibeanna cóipchirt d\'íomhánna',
     'it': 'Categoria:Template Licenze copyright',
     'ja': 'Category:画像の著作権表示テンプレート',
