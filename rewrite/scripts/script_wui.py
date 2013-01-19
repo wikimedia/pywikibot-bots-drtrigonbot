@@ -321,6 +321,7 @@ def output_verinfo():
     # mediawiki software version?
     pywikibot.output(u'MEDIAWIKI VERSION:')
     pywikibot.output(u'  Actual revision: %s' % str(pywikibot.getSite().live_version()))
+    #pywikibot.output(u'  Actual revision: %s' % str(pywikibot.getSite().live_version(force=True)))
     pywikibot.output(u'')
 
 #    # processing of messages on bot discussion page
