@@ -88,7 +88,6 @@ function switch_mode () {
     document.SubsterBotForm.value.disabled = false;
     document.SubsterBotForm.count.disabled = false;
     document.SubsterBotForm.postproc.disabled = false;
-    document.SubsterBotForm.wiki.disabled = false;
     document.SubsterBotForm.expandtemplates.disabled = false;
     document.SubsterBotForm.beautifulsoup.disabled = true;
     document.SubsterBotForm.simple.disabled = true;
@@ -97,7 +96,6 @@ function switch_mode () {
     document.SubsterBotForm.value.disabled = false;
     document.SubsterBotForm.count.disabled = true;
     document.SubsterBotForm.postproc.disabled = true;
-    document.SubsterBotForm.wiki.disabled = true;
     document.SubsterBotForm.expandtemplates.disabled = true;
     document.SubsterBotForm.beautifulsoup.disabled = false;
     document.SubsterBotForm.simple.disabled = true;
@@ -106,7 +104,6 @@ function switch_mode () {
     document.SubsterBotForm.value.disabled = false;
     document.SubsterBotForm.count.disabled = false;
     document.SubsterBotForm.postproc.disabled = false;
-    document.SubsterBotForm.wiki.disabled = false;
     document.SubsterBotForm.expandtemplates.disabled = false;
     document.SubsterBotForm.beautifulsoup.disabled = false;
     document.SubsterBotForm.simple.disabled = false;
@@ -148,11 +145,6 @@ Simulation:
         <td>postproc</td>
         <td>=</td>
         <td><input name="postproc" type="text" size="60" maxlength="200" value="%(postproc)s"></td>
-      </tr>
-      <tr>
-        <td>wiki</td>
-        <td>=</td>
-        <td><input name="wiki" type="text" size="60" maxlength="200" value="%(wiki)s"></td>
       </tr>
       <tr>
         <td>expandtemplates</td>
@@ -206,7 +198,7 @@ sim_param_default = {	'value': 	'val',
 			'action':	'',
 			'content':	'<!--SUBSTER-val--><!--SUBSTER-val-->',
 			'add_params':	'{}', }
-timeout = 30		# 30-sec. max. delay for url request
+timeout = 60		# xx-sec. max. delay for url request
 
 
 # from 'runbotrun.py'
