@@ -1,11 +1,11 @@
 # -*- coding: utf-8  -*-
 
 #
-# (C) Pywikipedia bot team, 2004-2012
+# (C) Pywikipedia bot team, 2004-2013
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: family.py 10929 2013-01-15 15:24:23Z xqt $'
+__version__ = '$Id: family.py 11014 2013-01-29 08:38:24Z xqt $'
 
 import logging
 import re
@@ -16,11 +16,13 @@ import pywikibot
 
 logger = logging.getLogger("pywiki.wiki.family")
 
-# Parent class for all wiki families
 
-class Family:
+# Parent class for all wiki families
+class Family(object):
     def __init__(self):
-        self.name = None
+        if not hasattr(self, 'name'):
+            self.name = None
+
         # For interwiki sorting order see
         # http://meta.wikimedia.org/wiki/Interwiki_sorting_order
 
@@ -103,6 +105,8 @@ class Family:
         self.fyinterwiki.sort(fycomp)
 
         self.langs = {}
+
+        self.namespacesWithSubpage = [2] + range(1, 16, 2)
 
         # letters that can follow a wikilink and are regarded as part of
         # this link
@@ -826,7 +830,8 @@ class Family:
         """Return MediaWiki version number as a string."""
         # Don't use this, use versionnumber() instead. This only exists
         # to not break family files.
-        return '1.21wmf7'
+        # Here we return the latest mw release for downloading
+        return '1.20wmf2'
 
     def versionnumber(self, code):
         """Return an int identifying MediaWiki version.
@@ -886,7 +891,7 @@ class Family:
         """Return the shared image repository, if any."""
         return (None, None)
 
-    def shared_data_repository(self, code):
+    def shared_data_repository(self, code, transcluded=False):
         """Return the shared wikidata repository, if any."""
         return (None, None)
 
@@ -910,3 +915,28 @@ class Family:
         """Does a conversion on the text to insert on the wiki
         i.e. Esperanto X-conversion """
         return putText
+
+
+# Parent class for all wikimedia families
+class WikimediaFamily(Family):
+    def __init__(self):
+        super(WikimediaFamily, self).__init__()
+
+        self.namespacesWithSubpage.extend([4, 12])
+
+        # CentralAuth cross avaliable projects.
+        self.cross_projects = [
+            'commons', 'incubator', 'mediawiki', 'meta', 'species', 'test',
+            'wikibooks', 'wikidata', 'wikinews', 'wikipedia', 'wikiquote',
+            'wikisource', 'wikiversity', 'wiktionary',
+        ]
+
+    def version(self, code):
+        """Return Wikimedia projects version number as a string."""
+        # Don't use this, use versionnumber() instead. This only exists
+        # to not break family files.
+        return '1.21wmf7'
+
+    def shared_image_repository(self, code):
+        return ('commons', 'commons')
+

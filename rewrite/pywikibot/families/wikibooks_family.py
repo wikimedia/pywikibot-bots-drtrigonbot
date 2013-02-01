@@ -1,27 +1,28 @@
 # -*- coding: utf-8  -*-
 from pywikibot import family
 
-__version__ = '$Id: wikibooks_family.py 10870 2013-01-04 09:01:18Z xqt $'
+__version__ = '$Id: wikibooks_family.py 11006 2013-01-27 14:20:10Z xqt $'
 
 # The Wikimedia family that is known as Wikibooks
 
-class Family(family.Family):
+class Family(family.WikimediaFamily):
     def __init__(self):
-        family.Family.__init__(self)
+        super(Family, self).__init__()
         self.name = 'wikibooks'
 
         self.languages_by_size = [
             'en', 'de', 'fr', 'hu', 'ja', 'pt', 'it', 'nl', 'pl', 'es', 'vi',
             'he', 'sq', 'ca', 'fi', 'id', 'ru', 'cs', 'zh', 'hr', 'sv', 'tr',
-            'th', 'da', 'no', 'gl', 'fa', 'ta', 'sr', 'ko', 'ar', 'tl', 'mk',
+            'da', 'th', 'no', 'gl', 'fa', 'ko', 'sr', 'ta', 'ar', 'tl', 'mk',
             'ro', 'is', 'tt', 'lt', 'ka', 'az', 'uk', 'eo', 'bg', 'el', 'hy',
             'sl', 'sk', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'et', 'ur', 'mr',
-            'bn', 'ms', 'hi', 'ml', 'oc', 'kk', 'eu', 'fy', 'ie', 'ne', 'te',
+            'ms', 'bn', 'hi', 'ml', 'oc', 'kk', 'eu', 'fy', 'ie', 'ne', 'te',
             'sa', 'af', 'tg', 'ky', 'bs', 'pa', 'mg', 'be', 'zh-min-nan', 'cy',
             'ku', 'uz',
         ]
 
-        self.langs = dict([(lang, '%s.wikibooks.org' % lang) for lang in self.languages_by_size])
+        self.langs = dict([(lang, '%s.wikibooks.org' % lang)
+                           for lang in self.languages_by_size])
 
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
@@ -103,6 +104,3 @@ class Family(family.Family):
             'zh-cn': 'zh',
             'zu': None, # https://bugzilla.wikimedia.org/show_bug.cgi?id=25425
         }
-
-    def shared_image_repository(self, code):
-        return ('commons', 'commons')

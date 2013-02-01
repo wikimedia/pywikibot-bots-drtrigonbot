@@ -51,7 +51,7 @@ Syntax example:
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
 __version__ = '$Id$'
-__framework_rev__ = '10940' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '11022' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.5'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -103,6 +103,7 @@ bot_config = {    'BotName':    pywikibot.config.usernames[pywikibot.config.fami
 }
 
 __simulate = True
+__sys_argv = []
 
 
 class ScriptWUIBot(pywikibot.botirc.IRCBot):
@@ -238,6 +239,7 @@ def main_script(page, rev=None, params=None):
 
     # safety; restore settings
     pywikibot.config.simulate = __simulate
+    sys.argv = __sys_argv
 
     pywikibot.output(u'environment: garbage; %s / memory; %s / members; %s' % (gc.collect(), resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*resource.getpagesize(), len(dir())))
     # 'len(dir())' is equivalent to 'len(inspect.getmembers(__main__))'
@@ -260,13 +262,14 @@ def wiki_logger(buffer, page, rev=None):
 #                comment = pywikibot.translate(self.site.lang, bot_config['msg']))
 
 def main():
-    global __simulate
+    global __simulate, __sys_argv
 
     for arg in pywikibot.handleArgs():
         pywikibot.showHelp('script_wui')
         return
 
     __simulate = pywikibot.config.simulate
+    __sys_argv = sys.argv
 
     # verbosely output version info of all involved scripts
     output_verinfo()

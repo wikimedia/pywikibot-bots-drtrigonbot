@@ -1,47 +1,48 @@
 # -*- coding: utf-8  -*-
 from pywikibot import family
 
-__version__ = '$Id: wikipedia_family.py 10925 2013-01-15 07:52:11Z xqt $'
+__version__ = '$Id: wikipedia_family.py 11017 2013-01-30 23:33:58Z xqt $'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 
-class Family(family.Family):
+class Family(family.WikimediaFamily):
     def __init__(self):
-        family.Family.__init__(self)
+        super(Family, self).__init__()
         self.name = 'wikipedia'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'nl', 'it', 'ru', 'es', 'pl', 'ja', 'pt', 'zh',
-            'sv', 'vi', 'uk', 'ca', 'no', 'fi', 'cs', 'fa', 'hu', 'ko', 'ro',
+            'en', 'de', 'fr', 'nl', 'it', 'es', 'ru', 'pl', 'ja', 'pt', 'zh',
+            'sv', 'vi', 'uk', 'ca', 'no', 'fi', 'fa', 'cs', 'hu', 'ko', 'ro',
             'id', 'ar', 'tr', 'kk', 'sk', 'sr', 'eo', 'da', 'ms', 'lt', 'eu',
-            'bg', 'he', 'sl', 'vo', 'hr', 'war', 'et', 'hi', 'gl', 'nn', 'az',
-            'simple', 'la', 'el', 'th', 'sh', 'oc', 'uz', 'new', 'mk', 'ka',
-            'tl', 'pms', 'be', 'ht', 'te', 'ta', 'be-x-old', 'lv', 'br', 'sq',
-            'ceb', 'hy', 'jv', 'mg', 'cy', 'mr', 'lb', 'is', 'bs', 'my', 'yo',
-            'an', 'lmo', 'ml', 'pnb', 'fy', 'af', 'roa-rup', 'ba', 'bn', 'bpy',
-            'sw', 'io', 'scn', 'ur', 'ne', 'gu', 'ky', 'zh-yue', 'nds', 'ku',
-            'ast', 'ga', 'qu', 'su', 'tt', 'cv', 'ia', 'nap', 'bat-smg', 'als',
-            'map-bms', 'wa', 'sco', 'am', 'kn', 'ckb', 'bug', 'gd', 'hif', 'tg',
-            'mzn', 'zh-min-nan', 'yi', 'vec', 'arz', 'roa-tara', 'nah', 'os',
-            'mn', 'sa', 'sah', 'pam', 'diq', 'hsb', 'li', 'si', 'mi', 'se',
-            'co', 'gan', 'bar', 'bo', 'glk', 'ilo', 'fo', 'bcl', 'mrj',
-            'fiu-vro', 'nds-nl', 'wuu', 'pa', 'rue', 'tk', 'ps', 'vls', 'gv',
-            'xmf', 'pag', 'dv', 'kv', 'zea', 'nrm', 'koi', 'km', 'rm', 'or',
-            'lad', 'csb', 'udm', 'lij', 'fur', 'mhr', 'frr', 'mt', 'ug',
-            'zh-classical', 'sc', 'pi', 'vep', 'bh', 'nov', 'ksh', 'so', 'stq',
-            'ang', 'ay', 'kw', 'nv', 'hak', 'pcd', 'frp', 'gn', 'ext', 'szl',
-            'gag', 'ie', 'ln', 'as', 'eml', 'xal', 'haw', 'pfl', 'pdc', 'rw',
-            'krc', 'crh', 'ace', 'to', 'ce', 'kl', 'arc', 'dsb', 'myv', 'bjn',
-            'pap', 'sn', 'lez', 'kab', 'tpi', 'lbe', 'jbo', 'mdf', 'wo', 'bxr',
-            'av', 'srn', 'cbk-zam', 'mwl', 'ty', 'lo', 'kbd', 'ab', 'tet',
-            'ltg', 'na', 'kg', 'ig', 'nso', 'za', 'kaa', 'zu', 'chy', 'rmy',
-            'cu', 'tn', 'chr', 'got', 'cdo', 'sm', 'bi', 'bm', 'iu', 'pih',
-            'pnt', 'sd', 'ss', 'ki', 'ee', 'ha', 'om', 'fj', 'ti', 'ts', 'ks',
-            've', 'sg', 'rn', 'cr', 'ak', 'tum', 'lg', 'dz', 'ny', 'ik', 'ch',
+            'bg', 'he', 'sl', 'vo', 'hr', 'war', 'et', 'hi', 'gl', 'nn',
+            'simple', 'az', 'la', 'el', 'uz', 'th', 'sh', 'oc', 'new', 'ka',
+            'mk', 'ceb', 'tl', 'pms', 'be', 'ht', 'ta', 'te', 'be-x-old', 'lv',
+            'br', 'sq', 'hy', 'jv', 'mg', 'cy', 'mr', 'lb', 'is', 'bs', 'my',
+            'yo', 'an', 'ml', 'lmo', 'fy', 'pnb', 'af', 'ba', 'bn', 'roa-rup',
+            'bpy', 'sw', 'io', 'ky', 'scn', 'ur', 'ne', 'gu', 'zh-yue', 'nds',
+            'ku', 'ast', 'ga', 'qu', 'su', 'tt', 'cv', 'ia', 'nap', 'bat-smg',
+            'als', 'map-bms', 'sco', 'bug', 'wa', 'ckb', 'am', 'kn', 'gd',
+            'hif', 'tg', 'mzn', 'zh-min-nan', 'yi', 'vec', 'arz', 'roa-tara',
+            'nah', 'os', 'sah', 'sa', 'mn', 'pam', 'hsb', 'li', 'se', 'si',
+            'mi', 'diq', 'co', 'bar', 'gan', 'bo', 'ilo', 'glk', 'fo', 'rue',
+            'bcl', 'pa', 'fiu-vro', 'mrj', 'nds-nl', 'wuu', 'ps', 'tk', 'vls',
+            'gv', 'xmf', 'pag', 'dv', 'kv', 'zea', 'nrm', 'km', 'koi', 'rm',
+            'or', 'mhr', 'lad', 'csb', 'udm', 'lij', 'fur', 'frr', 'ug',
+            'zh-classical', 'vep', 'sc', 'pi', 'mt', 'bh', 'ksh', 'nov', 'so',
+            'stq', 'ang', 'ay', 'kw', 'nv', 'hak', 'pcd', 'frp', 'ext', 'gn',
+            'szl', 'gag', 'as', 'ie', 'ln', 'eml', 'xal', 'haw', 'pfl', 'pdc',
+            'rw', 'krc', 'crh', 'ace', 'to', 'ce', 'kl', 'arc', 'dsb', 'myv',
+            'bjn', 'sn', 'lez', 'pap', 'kab', 'tpi', 'lbe', 'bxr', 'jbo', 'mdf',
+            'wo', 'av', 'srn', 'cbk-zam', 'mwl', 'ty', 'kbd', 'lo', 'ab', 'tet',
+            'ltg', 'na', 'kg', 'ig', 'nso', 'kaa', 'za', 'zu', 'chy', 'rmy',
+            'cu', 'tn', 'chr', 'bi', 'got', 'cdo', 'sm', 'bm', 'iu', 'pih',
+            'pnt', 'ss', 'sd', 'ki', 'ee', 'ha', 'om', 'fj', 'ti', 'ts', 'ks',
+            'sg', 've', 'rn', 'dz', 'cr', 'ak', 'tum', 'lg', 'ny', 'ik', 'ch',
             'ff', 'st', 'tw', 'xh',
         ]
 
-        self.langs = dict([(lang, '%s.wikipedia.org' % lang) for lang in self.languages_by_size])
+        self.langs = dict([(lang, '%s.wikipedia.org' % lang)
+                           for lang in self.languages_by_size])
 
 
         self.category_redirect_templates = {
@@ -53,13 +54,10 @@ class Family(family.Family):
             'cs': (u'Zastaralá kategorie',),
             'da': (u'Kategoriomdirigering',),
             'en': (u'Category redirect',
-                   u'Category redirect3',
+                   u'Category Redirect',
                    u"Categoryredirect",
-                   u'CR',
                    u'Catredirect',
-                   u'Cat redirect',
-                   u'Catredir',
-                   u'Seecat',),
+                   u'Cat redirect',),
             'es': (u'Categoría redirigida',),
             'eu': (u'Kategoria redirect',),
             'fa': (u'رده بهتر',
@@ -256,13 +254,6 @@ class Family(family.Family):
             'test',
         ]
 
-        # CentralAuth cross avaliable projects.
-        self.cross_projects = [
-            'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews',
-            'wikiversity', 'meta', 'mediawiki', 'test', 'incubator', 'commons',
-            'species', 'wikivoyage',
-        ]
-
         # Global bot allowed languages on
         # http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
@@ -377,6 +368,7 @@ class Family(family.Family):
             'mo': 'ro', # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wikipedia
             'mus': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Muscogee_Wikipedia
             'nan': 'zh-min-nan',
+            'nl_nds': 'nl-nds', # miss-spelling
             'nb': 'no',
             'ng': None, #(not reachable) http://meta.wikimedia.org/wiki/Inactive_wikis
             'jp': 'ja',
@@ -577,11 +569,8 @@ class Family(family.Family):
             return 'utf-8', 'iso-8859-1'
         return self.code2encoding(code),
 
-    def shared_image_repository(self, code):
-        return ('commons', 'commons')
-
     def shared_data_repository(self, code, transcluded=False):
-        if not transcluded or code in ['hu']:
+        if not transcluded or code in ['he', 'hu', 'it']:
             return ('wikidata', 'wikidata')            
         else:
             return (None, None)

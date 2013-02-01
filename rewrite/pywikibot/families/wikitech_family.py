@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: wikitech_family.py 8789 2010-12-22 22:51:50Z xqt $'
+__version__ = '$Id: wikitech_family.py 10993 2013-01-27 12:38:06Z xqt $'
 
 from pywikibot import family
 
@@ -9,14 +9,14 @@ from pywikibot import family
 class Family(family.Family):
 
     def __init__(self):
-        family.Family.__init__(self)
+        super(Family, self).__init__()
         self.name = 'wikitech'
         self.langs = {
             'en': 'wikitech.wikimedia.org',
         }
 
     def version(self, code):
-        return '1.16wmf4'
+        return '1.19wmf2'
 
     def scriptpath(self, code):
         return ''

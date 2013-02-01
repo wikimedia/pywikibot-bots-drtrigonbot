@@ -118,7 +118,7 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 10933 2013-01-15 18:34:04Z drtrigon $'
+__version__ = '$Id: wikipedia.py 11015 2013-01-30 18:45:16Z amir $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -138,6 +138,15 @@ import xmlreader
 from BeautifulSoup import BeautifulSoup, BeautifulStoneSoup, SoupStrainer
 import weakref
 import logging, logging.handlers
+try:
+    #For Python 2.6 newer
+    import json
+    if not hasattr(json, 'loads'):
+        # 'json' can also be the name in for
+        # http://pypi.python.org/pypi/python-json
+        raise ImportError
+except ImportError:
+    import simplejson as json
 # Splitting the bot into library parts
 from pywikibot.support import *
 import config, login, query
@@ -360,7 +369,7 @@ class Page(object):
                             otherlang = 'en'
                         else:
                             otherlang = self._site.lang
-                        familyName = self._site.family.get_known_families(site = self._site)[lowerNs]
+                        familyName = self._site.family.get_known_families(site=self._site)[lowerNs]
                         if familyName in ['commons', 'meta']:
                             otherlang = familyName
                         try:
@@ -1979,10 +1988,6 @@ not supported by PyWikipediaBot!"""
                 raise LockedPage(
                     u'Not allowed to edit %s because of a restricting template'
                     % self.title(asLink=True))
-            elif self.comment() and username in self.comment():
-                raise LockedPage(
-                    u'Not allowed to edit %s because last edit maybe reverted'
-                    % self.title(asLink=True))
             elif self.site().has_api() and self.namespace() == 2 \
                  and (self.title().endswith('.css') or \
                       self.title().endswith('.js')):
@@ -2712,6 +2717,14 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
         for match in Rlink.finditer(thistxt):
             title = match.group('title')
             title = title.replace("_", " ").strip(" ")
+            if self.namespace() in self.site.family.namespacesWithSubpage:
+                # convert relative link to absolute link
+                if title.startswith(".."):
+                    parts = self.title().split('/')
+                    parts.pop()
+                    title = u'/'.join(parts) + title[2:]
+                elif title.startswith("/"):
+                    title = u'%s/%s' % (self.title(), title[1:])
             if title.startswith("#"):
                 # this is an internal section link
                 continue
@@ -3460,7 +3473,8 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
                  output(u'Cannot delete page %s - marking the page for deletion instead:' % self.title(asLink=True))
                  # Note: Parameters to {{delete}}, and their meanings, vary from one Wikipedia to another.
                  # If you want or need to use them, you must be careful not to break others. Else don't.
-                 self.put(u'{{delete|bot=yes}}\n%s --~~~~\n----\n\n%s' % (reason, text), comment = reason)
+                 # FIXME: Make some sort of configuration setting to keep track of the templates in different wiki's
+                 self.put(u'{{speedydelete|1=%s --~~~~|bot=yes}}\n\n%s' % (reason, text), comment = reason)
                  return
              else:
                  raise
@@ -4039,7 +4053,7 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
         return (u'purged' in r)
 
 
-class wikidataPage(Page):
+class DataPage(Page):
     """A subclass of Page representing a page on wikidata.
 
     Supports the same interface as Page, with the following added methods:
@@ -4053,11 +4067,18 @@ class wikidataPage(Page):
     searchentities   : Search for entities
 
     """
-    def __init__(self, site, *args, **kwargs):
-        if isinstance(site, basestring):
-            site = getSite(site)
-        self._originSite = site
-        Page.__init__(self, site, *args, **kwargs)
+    def __init__(self, source, title=None, *args, **kwargs):
+        if isinstance(source, basestring):
+            source = getSite(source)
+        elif isinstance(source, Page):
+            title = source.title()
+            source = source.site
+        self._originSite = source
+        self._originTitle = title
+        source = self._originSite.data_repository()
+        Page.__init__(self, source, title, *args, **kwargs)
+        if not self._originSite is source:
+            self._title = None
 
     def setitem(self, summary=None, watchArticle=False, minorEdit=True,
                 newPage=False, token=None, newToken=False, sysop=False,
@@ -4080,15 +4101,15 @@ class wikidataPage(Page):
         retry_delay = 1
         dblagged = False
         params = {
-            'title': self.title(),
+            'title': self._originTitle,
             'summary': self._encodeArg(summary, 'summary'),
         }
         params['site'] = self._originSite.dbName().split('_')[0]
-        params['action'] = u'wbset' + items['type']
         params['format'] = 'jsonfm'
         if items['type'] == u'item':
-            params['data'] = u'{"labels":{"%(label)s":{"language":"%(label)s","value":"%(value)s"}}}' \
-                             % {'label': items['label'], 'value': items['value']}
+            params['value'] = items['value']
+            params['language'] = items['label']
+            items['type'] = u'label'
         elif items['type'] == u'description':
             params['value'] = items['value']
             params['language'] = items['language']
@@ -4098,6 +4119,7 @@ class wikidataPage(Page):
         else:
             raise NotImplementedError(
                 u'Wikidata action type "%s" is unknown' % items['type'])
+        params['action'] = u'wbset' + items['type']
         if token:
             params['token'] = token
         else:
@@ -4228,20 +4250,21 @@ class wikidataPage(Page):
         return
 
     def getentity(self,force=False, get_redirect=False, throttle=True,
-            sysop=False, change_edit_time=True):
+                  sysop=False, change_edit_time=True):
         """Returns items of a entity in a dictionary
         """
         params = {
             'action': 'query',
-            'titles': self.title(),
+            'titles': self._originTitle,
             'prop': ['revisions', 'info'],
-            'rvprop': ['content', 'ids', 'flags', 'timestamp', 'user', 'comment', 'size'],
+            'rvprop': ['content', 'ids', 'flags', 'timestamp', 'user',
+                       'comment', 'size'],
             'rvlimit': 1,
             'inprop': ['protection', 'subjectid'],
         }
         params1=params.copy()
-        params['action']='wbgetentities'
-        params['sites']='enwiki'
+        params['action'] = 'wbgetentities'
+        params['sites'] = self._originSite.dbName().split('_')[0]
         del params['prop']
         del params['rvprop']
         del params['rvlimit']
@@ -4249,11 +4272,11 @@ class wikidataPage(Page):
         textareaFound = False
         # retrying loop is done by query.GetData
         data = query.GetData(params, self.site(), sysop=sysop)
-        data['query']={'pages':data['entities']}
+        data['query'] = {'pages': data['entities']}
         for pageid in data['entities'].keys():
-            if pageid=="-1":
+            if pageid == "-1":
                 continue #Means the page does not exist
-            params1['titles']=pageid
+            params1['titles'] = pageid
             ndata=query.GetData(params1, self.site(), sysop=sysop)
             data['entities'].update(ndata['query']['pages'])
             data['query']['pages'].update(data['entities'])
@@ -4265,7 +4288,8 @@ class wikidataPage(Page):
         if data['query']['pages'].keys()[0] == "-1":
             if 'missing' in pageInfo:
                 raise NoPage(self.site(), unicode(self),
-"Page does not exist. In rare cases, if you are certain the page does exist, look into overriding family.RversionTab")
+"Page does not exist. In rare cases, if you are certain the page does exist, "
+                             "look into overriding family.RversionTab")
             elif 'invalid' in pageInfo:
                 raise BadTitle('BadTitle: %s' % self)
         elif 'revisions' in pageInfo: #valid Title
@@ -4330,7 +4354,9 @@ class wikidataPage(Page):
                 self._getexception
             except AttributeError:
                 raise SectionError # Page has no section by this name
-        return pagetext
+        self._contents = json.loads(pagetext)
+        self._title = self._contents['entity']
+        return self._contents
 
     def getentities(self, sysop=False):
         """API module to get the data for multiple Wikibase entities.
@@ -4349,10 +4375,10 @@ class wikidataPage(Page):
         pageInfo = entities
         if 'missing' in pageInfo:
             raise NoPage(self.site(), unicode(self),
-"Page does not exist. In rare cases, if you are certain the page does exist, look into overriding family.RversionTab")
+"Page does not exist. In rare cases, if you are certain the page does exist, "
+                         "look into overriding family.RversionTab")
         elif 'invalid' in pageInfo:
             raise BadTitle('BadTitle: %s' % self)
-
         return entities
 
     def searchentities(self, search, sysop=False):
@@ -4381,6 +4407,32 @@ class wikidataPage(Page):
             raise BadTitle('BadTitle: %s' % self)
 
         return search
+
+    def get(self, *args, **kwargs):
+        if not hasattr(self, '_contents'):
+            if self._title is None:
+                self.getentity(*args, **kwargs)
+            else:
+                pagetext = super(DataPage, self).get(*args, **kwargs)
+                self._contents = json.loads(pagetext)
+        return self._contents
+
+    def isEmpty(self):
+        return not self.exists()
+
+    def interwiki(self):
+        """Return a list of interwiki links from data repository.
+
+        The return value is a list of Page objects for each of the
+        interwiki links.
+
+        """
+        links = self.get()['links']
+        self._interwiki = [Page(code.replace('wiki', ''), links[code])
+                           for code in links]
+        return self._interwiki
+
+wikidataPage = DataPage #keep compatible
 
 
 class ImagePage(Page):
@@ -6851,7 +6903,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
         # offset in hours from now
         elif offset and offset > 0:
             start = Timestamp.utcnow() - datetime.timedelta(0, offset*3600)
-            params['lestart'] = str(start) 
+            params['lestart'] = str(start)
         if end:
             params['leend'] = end
         if tag and self.versionnumber() >= 16: # tag support from mw:r58399
@@ -6860,6 +6912,10 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
         nbresults = 0
         while True:
             result = query.GetData(params, self)
+            if 'error' in result and result.get('error').get('code')==u'leparam_title':
+                output('%(info)s' % result.get('error'))
+                raise BadTitle
+            # FIXME: Throw proper exceptions instead of "Error"
             if 'error' in result or 'warnings' in result:
                 output('%s' % result)
                 raise Error

@@ -50,7 +50,7 @@ TODO:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: commonscat.py 10850 2012-12-30 15:20:57Z xqt $'
+__version__ = '$Id: commonscat.py 10954 2013-01-19 12:57:37Z multichill $'
 #
 
 import wikipedia as pywikibot
@@ -501,14 +501,30 @@ u'Cannot change %s because of spam blacklist entry %s'
         if pywikibot.verbose:
             pywikibot.output("getCommonscat: " + name )
         try:
+            commonsSite = pywikibot.getSite("commons", "commons")
             #This can throw a pywikibot.BadTitle
-            commonsPage = pywikibot.Page(pywikibot.getSite("commons", "commons"),
-                                         "Category:" + name)
+            commonsPage = pywikibot.Page(commonsSite, "Category:" + name)
 
             if not commonsPage.exists():
-                if pywikibot.verbose:
-                    pywikibot.output(u"getCommonscat: The category doesnt exist.")
-                return u''
+                logpages = commonsSite.logpages(mode='delete', title=commonsPage.title())
+                try:
+                    logitem = logpages.next()
+                    (logpage, loguser, logtimestamp, logcomment) = logitem
+                    # Some logic to extract the target page.
+                    regex = u'moved to \[\[\:?Category:(?P<newcat1>[^\|\}]+)(\|[^\}]+)?\]\]|Robot: Changing Category:(.+) to Category:(?P<newcat2>.+)'
+                    m = re.search(regex, logcomment)
+                    if m:
+                        if m.group('newcat1'):
+                            return self.checkCommonscatLink(m.group('newcat1'))
+                        elif m.group('newcat2'):
+                            return self.checkCommonscatLink(m.group('newcat2'))
+                    else:
+                        pywikibot.output(u'getCommonscat: Deleted by %s. Couldn\'t find move target in \" %s \"' % (loguser, logcomment))
+                        return u''
+                except StopIteration:
+                    if pywikibot.verbose:
+                        pywikibot.output(u"getCommonscat: The category doesnt exist and nothing found in the deletion log.")
+                    return u''
             elif commonsPage.isRedirectPage():
                 if pywikibot.verbose:
                     pywikibot.output(u"getCommonscat: The category is a redirect")

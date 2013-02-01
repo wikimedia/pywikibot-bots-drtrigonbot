@@ -1,13 +1,13 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiversity_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
+__version__ = '$Id: wikiversity_family.py 11009 2013-01-27 14:45:08Z xqt $'
 
 # The Wikimedia family that is known as Wikiversity
 
-class Family(family.Family):
+class Family(family.WikimediaFamily):
     def __init__(self):
-        family.Family.__init__(self)
+        super(Family, self).__init__()
         self.name = 'wikiversity'
 
         self.languages_by_size = [
@@ -15,7 +15,8 @@ class Family(family.Family):
             'el', 'sv', 'sl', 'ja',
         ]
 
-        self.langs = dict([(lang, '%s.wikiversity.org' % lang) for lang in self.languages_by_size])
+        self.langs = dict([(lang, '%s.wikiversity.org' % lang)
+                           for lang in self.languages_by_size])
 
         # Override defaults
 
@@ -25,7 +26,7 @@ class Family(family.Family):
         # You only need to enter translations that differ from _default.
         self.namespaces[4] = {
             '_default': self.namespaces[4]['_default'],
-            'ar': [u'ويكي الجامعة', u'وج'],
+            'ar': [u'ويكي الجامعة', u'وج', u'Wikiversity'],
             'beta': u'Wikiversity',
             'cs': [u'Wikiverzita', u'WV', u'Wikiversity'],
             'de': u'Wikiversity',
@@ -139,20 +140,5 @@ class Family(family.Family):
             'ja': u'Transwiki‐ノート',
         }
 
-        # CentralAuth cross avaliable projects.
-        self.cross_projects = [
-            'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews',
-            'wikiversity', 'meta', 'mediawiki', 'test', 'incubator', 'commons',
-            'species',
-        ]
-
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = ['ja',]
-
-    def shared_image_repository(self, code):
-        return ('commons', 'commons')
-
-    if family.config.SSL_connection:
-
-        def protocol(self, code):
-            return 'https'

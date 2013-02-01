@@ -1,14 +1,14 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: commons_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
+__version__ = '$Id: commons_family.py 11009 2013-01-27 14:45:08Z xqt $'
 
 import family
 
 # The Wikimedia Commons family
 
-class Family(family.Family):
+class Family(family.WikimediaFamily):
     def __init__(self):
-        family.Family.__init__(self)
+        super(Family, self).__init__()
         self.name = 'commons'
         self.langs = {
             'commons': 'commons.wikimedia.org',
@@ -69,18 +69,6 @@ class Family(family.Family):
         self.disambcatname = {
             'commons':  u'Disambiguation'
         }
-        self.cross_projects = [
-            'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews', 'wikiversity',
-            'meta', 'mediawiki', 'test', 'incubator', 'species',
-        ]
 
     def dbName(self, code):
         return 'commonswiki_p'
-
-    def shared_image_repository(self, code):
-        return ('commons', 'commons')
-
-    if family.config.SSL_connection:
-
-        def protocol(self, code):
-            return 'https'

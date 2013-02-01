@@ -1,41 +1,34 @@
 # -*- coding: utf-8  -*-
 from pywikibot import family
 
-__version__ = '$Id: wiktionary_family.py 10870 2013-01-04 09:01:18Z xqt $'
+__version__ = '$Id: wiktionary_family.py 11006 2013-01-27 14:20:10Z xqt $'
 
 # The Wikimedia family that is known as Wiktionary
 
-class Family(family.Family):
+class Family(family.WikimediaFamily):
     def __init__(self):
-        family.Family.__init__(self)
+        super(Family, self).__init__()
         self.name = 'wiktionary'
 
         self.languages_by_size = [
             'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'el', 'ko', 'sv', 'tr', 'pl',
-            'ta', 'nl', 'de', 'vi', 'kn', 'fi', 'io', 'ku', 'hu', 'pt', 'no',
-            'my', 'id', 'it', 'li', 'es', 'ml', 'et', 'ja', 'fa', 'ro', 'ar',
-            'te', 'cs', 'lo', 'eu', 'gl', 'ca', 'uk', 'fj', 'br', 'bg', 'eo',
-            'hr', 'oc', 'vo', 'is', 'th', 'simple', 'zh-min-nan', 'scn', 'sr',
-            'jv', 'af', 'cy', 'sw', 'fy', 'tl', 'ast', 'nn', 'ps', 'he', 'ur',
+            'ta', 'nl', 'de', 'kn', 'vi', 'fi', 'io', 'ku', 'hu', 'pt', 'ml',
+            'no', 'my', 'id', 'it', 'li', 'es', 'et', 'ja', 'fa', 'te', 'ro',
+            'ar', 'cs', 'jv', 'eu', 'lo', 'gl', 'ca', 'uk', 'fj', 'br', 'bg',
+            'eo', 'hr', 'oc', 'vo', 'is', 'th', 'simple', 'zh-min-nan', 'scn',
+            'cy', 'sr', 'af', 'sw', 'ast', 'fy', 'tl', 'ps', 'nn', 'he', 'ur',
             'uz', 'wa', 'la', 'da', 'hy', 'sq', 'sm', 'sl', 'hi', 'az', 'tt',
-            'lv', 'ka', 'nah', 'lb', 'pnb', 'bs', 'tk', 'hsb', 'kk', 'sk', 'km',
-            'mk', 'be', 'ga', 'wo', 'ang', 'ms', 'co', 'ky', 'gn', 'mr', 'csb',
-            'st', 'nds', 'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'kl', 'jbo', 'mn',
+            'nah', 'pnb', 'ka', 'lv', 'lb', 'bs', 'tk', 'hsb', 'kk', 'sk', 'km',
+            'mk', 'be', 'ga', 'wo', 'ang', 'ky', 'ms', 'co', 'gn', 'mr', 'csb',
+            'st', 'nds', 'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'kl', 'mn', 'jbo',
             'an', 'sa', 'zu', 'gu', 'rw', 'fo', 'kw', 'gv', 'qu', 'ss', 'ie',
             'mt', 'om', 'chr', 'roa-rup', 'iu', 'pa', 'bn', 'am', 'so', 'su',
             'za', 'gd', 'mi', 'tpi', 'ik', 'or', 'yi', 'ln', 'ti', 'sg', 'na',
             'dv', 'tn', 'ne', 'ha', 'ks', 'ay', 'ts',
         ]
 
-        self.langs = dict([(lang, '%s.wiktionary.org' % lang) for lang in self.languages_by_size])
-
-
-        # CentralAuth cross avaliable projects.
-        self.cross_projects = [
-            'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews',
-            'wikiversity', 'meta', 'mediawiki', 'test', 'incubator', 'commons',
-            'species',
-        ]
+        self.langs = dict([(lang, '%s.wiktionary.org' % lang)
+                           for lang in self.languages_by_size])
 
         # Global bot allowed languages on
         # http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
@@ -133,6 +126,3 @@ class Family(family.Family):
         self.interwiki_on_one_line = ['pl']
 
         self.interwiki_attop = ['pl']
-
-    def shared_image_repository(self, code):
-        return ('commons', 'commons')

@@ -8,7 +8,6 @@ msg = {
 		'pywikibot-enter-new-text': u'Please enter the new text:',
 		'pywikibot-enter-page-processing': u'Which page should be processed?',
 		'pywikibot-enter-xml-filename': u'Please enter the XML dump\'s filename:',
-		'comma-separator': ', ',
 	},
 	# Author: Als-Holder
 	# Author: TTMTT
@@ -20,7 +19,6 @@ msg = {
 		'pywikibot-enter-new-text': u'Message displayed to the bot owner to enter the new text.',
 		'pywikibot-enter-category-name': u'Message displayed to the bot owner to enter the category name.',
 		'pywikibot-enter-finished-browser': u'Message displayed to the bot owner to press Enter button when browser edits are finished.',
-		'comma-separator': 'Localized comma character with a trailing space',
 	},
 	# Author: TTMTT
 	# Author: Zanatos
@@ -42,6 +40,16 @@ msg = {
 		'pywikibot-enter-new-text': u'Escribi\'l testu nuevu:',
 		'pywikibot-enter-category-name': u'Escribi\'l nome de categoría:',
 		'pywikibot-enter-finished-browser': u'Calca la tecla Intro cuando acabes nel navegador.',
+	},
+	# Author: AZISS
+	'az': {
+		'pywikibot-enter-xml-filename': u'Zəhmət olmasa, XML damp faylının adını daxil edin:',
+		'pywikibot-enter-page-processing': u'Hansı səhifə emal edilməlidir?',
+		'pywikibot-enter-file-links-processing': u'Şəkillərin hansı səhifəsinin istinadlarını emal etmək lazımdır?',
+		'pywikibot-enter-namespace-number': u'Zəhmət olmasa, ad sahəsinin nömrəsini daxil edin:',
+		'pywikibot-enter-new-text': u'Zəhmət olmasa, yeni mətni daxil edin:',
+		'pywikibot-enter-category-name': u'Zəhmət olmasa, kateqoriyanın adını daxil edin:',
+		'pywikibot-enter-finished-browser': u'Brauzerdə işinizi bitirdikdən sonra Enter düyməsinə basın.',
 	},
 	# Author: Amir a57
 	# Author: E THP
@@ -192,7 +200,6 @@ msg = {
 		'pywikibot-enter-new-text': u'لطفاً متن جدید را وارد کنید:',
 		'pywikibot-enter-category-name': u'لطفاً نام رده را وارد کنید:',
 		'pywikibot-enter-finished-browser': u'هنگامی که در مرورگر پایان یافت دکمهٔ اینتر را بفشارید.',
-		'comma-separator': '، ',
 	},
 	# Author: Nedergard
 	# Author: VezonThunder

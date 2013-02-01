@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
-__version__ = '$Id: wikivoyage_family.py 10865 2013-01-04 08:38:05Z xqt $'
+__version__ = '$Id: wikivoyage_family.py 11009 2013-01-27 14:45:08Z xqt $'
 
 # The new wikivoyage family that is hosted at wikimedia
 
 import family
 
-class Family(family.Family):
+class Family(family.WikimediaFamily):
     def __init__(self):
-        family.Family.__init__(self)
+        super(Family, self).__init__()
         self.name = 'wikivoyage'
         self.languages_by_size = [
             'de', 'en', 'fr', 'it', 'nl', 'ru', 'sv', 'pt', 'es',
@@ -80,23 +80,3 @@ class Family(family.Family):
             'de': u'Nachrichten Diskussion',
             'it': u'Discussioni notizie',
         }
-
-        self.cross_projects = [
-            'wikipedia', 'wiktionary', 'wikibooks', 'wikiquote', 'wikisource',
-            'wikinews', 'wikiversity', 'meta', 'mediawiki', 'test', 'incubator',
-            'commons', 'species',
-        ]
-
-    def scriptpath(self, code):
-        return u'/w'
-
-    def shared_image_repository(self, code):
-        return ('commons', 'commons')
-
-    def shared_data_repository(self, code):
-        return ('wikidata', 'wikidata')
-
-    if family.config.SSL_connection:
-
-        def protocol(self, code):
-            return 'https'

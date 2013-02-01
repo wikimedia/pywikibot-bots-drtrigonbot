@@ -1,26 +1,27 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiquote_family.py 10868 2013-01-04 08:58:26Z xqt $'
+__version__ = '$Id: wikiquote_family.py 11009 2013-01-27 14:45:08Z xqt $'
 
 # The Wikimedia family that is known as Wikiquote
 
-class Family(family.Family):
+class Family(family.WikimediaFamily):
     def __init__(self):
-        family.Family.__init__(self)
+        super(Family, self).__init__()
         self.name = 'wikiquote'
 
         self.languages_by_size = [
             'en', 'pl', 'it', 'ru', 'fr', 'de', 'pt', 'es', 'sk', 'cs', 'bg',
-            'bs', 'tr', 'sl', 'he', 'lt', 'eo', 'el', 'uk', 'zh', 'id', 'fa',
-            'hu', 'fi', 'sv', 'li', 'nl', 'no', 'ca', 'nn', 'ja', 'az', 'hr',
-            'hy', 'ar', 'et', 'ml', 'ko', 'cy', 'ka', 'gl', 'sr', 'ro', 'ku',
+            'bs', 'tr', 'sl', 'he', 'lt', 'eo', 'uk', 'el', 'zh', 'id', 'fa',
+            'hu', 'fi', 'sv', 'li', 'nl', 'ca', 'no', 'nn', 'hr', 'ja', 'az',
+            'hy', 'ar', 'et', 'ko', 'ml', 'cy', 'ka', 'gl', 'sr', 'ro', 'ku',
             'th', 'te', 'is', 'eu', 'da', 'af', 'vi', 'sq', 'ta', 'hi', 'la',
             'br', 'be', 'mr', 'uz', 'ur', 'zh-min-nan', 'gu', 'su', 'kn', 'wo',
             'ky', 'am',
         ]
 
-        self.langs = dict([(lang, '%s.wikiquote.org' % lang) for lang in self.languages_by_size])
+        self.langs = dict([(lang, '%s.wikiquote.org' % lang)
+                           for lang in self.languages_by_size])
 
         # Override defaults
         self.namespaces[10]['zh'] = [u'Template', u'模板', u'样板', u'樣板']
@@ -88,14 +89,14 @@ class Family(family.Family):
             'ka': [u'ვიკიციტატა', u'Wikiquote'],
             'kk': u'Уикидәйек',
             'kn': u'Wikiquote',
-            'ko': [u'위키인용집', u'인'],
+            'ko': [u'위키인용집', u'인', u'Wikiquote'],
             'ku': u'Wikiquote',
             'ky': u'Wikiquote',
             'la': [u'Vicicitatio', u'Wikiquote'],
             'lb': u'Wikiquote',
             'li': u'Wikiquote',
             'lt': u'Wikiquote',
-            'ml': [u'വിക്കിചൊല്ലുകൾ', u'വിക്കി ചൊല്ലുകൾ'],
+            'ml': [u'വിക്കിചൊല്ലുകൾ', u'വിക്കി ചൊല്ലുകൾ', u'Wikiquote'],
             'mr': u'Wikiquote',
             'nl': u'Wikiquote',
             'nn': u'Wikiquote',
@@ -114,7 +115,7 @@ class Family(family.Family):
             'te': u'Wikiquote',
             'th': [u'วิกิคำคม', u'Wikiquote'],
             'tr': [u'Vikisöz', u'Wikiquote'],
-            'uk': [u'Вікіцитати', u'ВЦ'],
+            'uk': [u'Вікіцитати', u'ВЦ', u'Wikiquote'],
             'ur': [u'وکی اقتباسات', u'Wikiquote'],
             'uz': [u'Vikiiqtibos', u'Wikiquote'],
             'vi': u'Wikiquote',
@@ -211,6 +212,7 @@ class Family(family.Family):
             'fr': u'Portail',
             'he': u'פורטל',
             'li': u'Portaol',
+            'sk': u'Deň',
             'zh': u'Transwiki',
         }
 
@@ -219,6 +221,7 @@ class Family(family.Family):
             'fr': u'Discussion Portail',
             'he': u'שיחת פורטל',
             'li': u'Euverlèk portaol',
+            'sk': u'Diskusia ku dňu',
             'zh': u'Transwiki talk',
         }
 
@@ -267,13 +270,6 @@ class Family(family.Family):
             'hu', 'hy', 'id', 'is', 'it', 'ja', 'ka', 'kn', 'ku', 'la', 'li',
             'lt', 'ml', 'nl', 'nn', 'no', 'pt', 'ro', 'ru', 'sk', 'sl', 'sq',
             'sr', 'su', 'sv', 'te', 'tr', 'uk', 'uz', 'vi', 'zh', 'zh-min-nan',
-        ]
-
-        # CentralAuth cross avaliable projects.
-        self.cross_projects = [
-            'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews',
-            'wikiversity', 'meta', 'mediawiki', 'test', 'incubator', 'commons',
-            'species',
         ]
 
         # Which languages have a special order for putting interlanguage links,
@@ -334,11 +330,3 @@ class Family(family.Family):
         if code == 'ru':
             return 'utf-8', 'iso8859-5'
         return self.code2encoding(code),
-
-    def shared_image_repository(self, code):
-        return ('commons', 'commons')
-
-    if family.config.SSL_connection:
-
-        def protocol(self, code):
-            return 'https'

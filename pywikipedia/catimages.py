@@ -130,14 +130,8 @@ tmpl_FileContentsByBot = u"""}}
 tmpl_available_spec = []    # auto-generated
 
 
-# global variables
-class Global(object):
-    # default environment settings
-    # Command line configurable parameters
-#    limit = 80               # How many images to check?
-#    untagged = False         # Use the untagged generator
-#    sendemailActive = False  # Use the send-email
-    useGuesses = True        # Use guesses which are less reliable than true searches
+# global
+useGuesses = True        # Use guesses which are less reliable than true searches
 
 
 # all detection and recognition methods - bindings to other classes, modules and libs
@@ -2447,7 +2441,7 @@ class CatImagesBot(checkimages.checkImagesBot, CatImages_Default):
 #class CatImagesBot(checkimages.checkImagesBot, CatImages_SVM):
 #    def __init__(self, site, logFulNumber = 25000, sendemailActive = False,
 #                 duplicatesReport = False, logFullError = True): pass
-#    def setParameters(self, imageName, timestamp, uploader): pass
+#    def setParameters(self, imageName): pass
 
     # or may be '__init__' ... ???
     def load_licenses(self):
@@ -2621,7 +2615,7 @@ class CatImagesBot(checkimages.checkImagesBot, CatImages_Default):
         self._result_add = list(set(self._result_add))
 
         # categorization: use guesses for unreliable classification (rel = 0.1)
-        if not gbv.useGuesses:
+        if not useGuesses:
             return self._result_check
         for item in self._funcs['guess']:
             (cat, rel) = getattr(self, item)()
@@ -3064,15 +3058,15 @@ class CatImagesBot(checkimages.checkImagesBot, CatImages_Default):
 #        return {'Classify': []}
 
 
-gbv = Global()
-
-def checkbot():
+def main():
     """ Main function """
+    global useGuesses
     # Command line configurable parameters
     limit = 150 # How many images to check?
     untagged = False # Use the untagged generator
     sendemailActive = False # Use the send-email
     train = False
+    generator = None
 
     # default
     if len(sys.argv) < 2:
@@ -3122,7 +3116,7 @@ def checkbot():
 #            elif len(arg) > 9:
 #                projectUntagged = str(arg[10:])
         elif arg == '-noguesses':
-            gbv.useGuesses = False
+            useGuesses = False
         elif arg.startswith('-single'):
             if len(arg) > 7:
                 pageName = unicode(arg[8:])
@@ -3135,9 +3129,7 @@ def checkbot():
             generator = None
 
     # Understand if the generator is present or not.
-    try:
-        generator
-    except:
+    if not generator:
         pywikibot.output(u'no generator defined... EXIT.')
         sys.exit()
             
@@ -3154,22 +3146,21 @@ def checkbot():
         return
 
     # Defing the Main Class.
-    mainClass = CatImagesBot(site, sendemailActive = sendemailActive,
-                     duplicatesReport = False, logFullError = False)
+    Bot = CatImagesBot(site, sendemailActive = sendemailActive,
+                       duplicatesReport = False, logFullError = False)
     # Untagged is True? Let's take that generator
     if untagged == True:
-        generator =  mainClass.untaggedGenerator(projectUntagged, limit)
+        generator =  Bot.untaggedGenerator(projectUntagged, limit)
     # Ok, We (should) have a generator, so let's go on.
     # Take the additional settings for the Project
-    mainClass.takesettings()
+    Bot.takesettings()
 
     # do classifier training on good (homgenous) commons categories
     if train:
-        trainbot(generator, mainClass, image_old_namespace, image_namespace)
+        trainbot(generator, Bot, image_old_namespace, image_namespace)
         return
 
     # Not the main, but the most important loop.
-    #parsed = False
     outresult = []
     for image in generator:
         if firstPageTitle:
@@ -3193,8 +3184,6 @@ def checkbot():
 
             continue
 
-        timestamp = None
-        uploader = None
         comment = None # useless, also this, let it here for further developments
         try:
             imageName = image.title().split(image_namespace)[1] # Deleting the namespace (useless here)
@@ -3204,9 +3193,9 @@ def checkbot():
             except IndexError:
                 pywikibot.output(u"%s is not a file, skipping..." % image.title())
                 continue
-        mainClass.setParameters(imageName, timestamp, uploader) # Setting the image for the main class
+        Bot.setParameters(imageName) # Setting the image for the main class
         try:
-            mainClass.downloadImage()
+            Bot.downloadImage()
         except pywikibot.NoPage:
             continue
         except KeyError:
@@ -3216,10 +3205,10 @@ def checkbot():
         except IOError, err:
             pywikibot.output(u"WARNING: %s, skipped..." % err)
             continue
-        resultCheck = mainClass.checkStep()
+        resultCheck = Bot.checkStep()
         tagged = False
         try:
-            (tagged, ret) = mainClass.report()
+            (tagged, ret) = Bot.report()
             if ret:
                 outresult.append( ret )
         except AttributeError:
@@ -3247,25 +3236,21 @@ def checkbot():
             posfile.write( u"\n".join(outresult) )
             posfile.close()
 
-main = checkbot
-
 # http://scipy-lectures.github.com/advanced/scikit-learn/index.html
 # http://mlpy.sourceforge.net/docs/3.5/index.html
 # http://docs.opencv.org/modules/ml/doc/ml.html
 # train pyml (svm), opencv BoW and haarcascade classifiers
 # choose a good and meaningful featureset from extracted (better than actual one)
-def trainbot(generator, mainClass, image_old_namespace, image_namespace):
+def trainbot(generator, Bot, image_old_namespace, image_namespace):
     # IT LOOKS LIKE (MAY BE) scikit-learn IS BETTER AND HAS MORE OPTIONS THAN pyml ... ?!!!
 
     # gather training dataset from wiki commons categories
     trainset = []
-    for i, catName in enumerate(mainClass.trained_cat):
+    for i, catName in enumerate(Bot.trained_cat):
         catSelected = catlib.Category(pywikibot.getSite(), 'Category:%s' % catName)
         generator = pagegenerators.CategorizedPageGenerator(catSelected)
 
         for image in generator:
-            timestamp = None
-            uploader = None
             try:
                 imageName = image.title().split(image_namespace)[1] # Deleting the namespace (useless here)
             except IndexError:# Namespace image not found, that's not an image! Let's skip...
@@ -3274,9 +3259,9 @@ def trainbot(generator, mainClass, image_old_namespace, image_namespace):
                 except IndexError:
                     pywikibot.output(u"%s is not a file, skipping..." % image.title())
                     continue
-            mainClass.setParameters(imageName, timestamp, uploader) # Setting the image for the main class
+            Bot.setParameters(imageName) # Setting the image for the main class
             try:
-                mainClass.downloadImage()
+                Bot.downloadImage()
             except pywikibot.NoPage:
                 continue
             except KeyError:
@@ -3288,16 +3273,16 @@ def trainbot(generator, mainClass, image_old_namespace, image_namespace):
                 continue
     
             # gather all features (information) related to current image
-            mainClass._info = {}
-            mainClass.gatherFeatures()
+            Bot._info = {}
+            Bot.gatherFeatures()
     
             # create classifier feature set
             # !!!currently number of detected features is used only -> lots of room for improvements!!!
             # choose a good and meaningful featureset from extracted (better than actual one)
             features = []
-            for key in sorted(mainClass._info):
+            for key in sorted(Bot._info):
                 #print key, len(self._info[key]), self._info[key]
-                features.append( len(mainClass._info[key]) )
+                features.append( len(Bot._info[key]) )
             features.append( i+1 )      # category id (returned by predictor later)
             #print features
             trainset.append( features )
@@ -3377,8 +3362,7 @@ if __name__ == "__main__":
     if sys.exc_info()[0]:   # re-raise ImportError
         raise               #
     try:
-        checkbot()
-        #main()
+        main()
     finally:
         final = datetime.datetime.strptime(str(datetime.datetime.utcnow()).split('.')[0], "%Y-%m-%d %H:%M:%S") #timezones are UTC
         delta = final - old

@@ -103,12 +103,13 @@ pages:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: template.py 10939 2013-01-16 15:48:29Z huji $'
+__version__='$Id: template.py 10963 2013-01-20 20:56:04Z xqt $'
 #
 import re, sys, string
 import wikipedia as pywikibot
 from pywikibot import i18n
-import config, pagegenerators, catlib
+import config, catlib
+import pagegenerators as pg
 import replace
 
 def UserEditFilterGenerator(generator, username, timestamp=None, skip=False):
@@ -213,7 +214,7 @@ class TemplateRobot:
             self.addedCat = catlib.Category(
                 site, u'%s:%s' % (site.namespace(14), self.addedCat))
 
-	comma = self.summary = i18n.twtranslate(site, 'comma-separator')
+        comma = self.summary = site.mediawiki_message('comma-separator')
 
         # get edit summary message if it's empty
         if (self.editSummary==''):
@@ -282,11 +283,10 @@ def main(*args):
     templates = {}
     subst = False
     remove = False
-    namespaces = []
     editSummary = ''
     addedCat = ''
     acceptAll = False
-    genFactory = pagegenerators.GeneratorFactory()
+    genFactory = pg.GeneratorFactory()
     # If xmlfilename is None, references will be loaded from the live wiki.
     xmlfilename = None
     user = None
@@ -340,23 +340,25 @@ u'Unless using solely -subst or -remove, you must give an even number of templat
     oldTemplates = []
     ns = pywikibot.getSite().template_namespace()
     for templateName in templates.keys():
-        oldTemplate = pywikibot.Page(pywikibot.getSite(), templateName, defaultNamespace=10)
+        oldTemplate = pywikibot.Page(pywikibot.getSite(), templateName,
+                                     defaultNamespace=10)
         oldTemplates.append(oldTemplate)
 
     if xmlfilename:
         gen = XmlDumpTemplatePageGenerator(oldTemplates, xmlfilename)
+    elif user:
+        gen = UserEditFilterGenerator(gen, user, timestamp, skip)
     else:
         gen = genFactory.getCombinedGenerator()
     if not gen:
-        gens = []
-        gens = [pagegenerators.ReferringPageGenerator(
-                    t, onlyTemplateInclusion=True) for t in oldTemplates]
-        gen = pagegenerators.CombinedPageGenerator(gens)
-        gen = pagegenerators.DuplicateFilterPageGenerator(gen)
+        gens = [pg.ReferringPageGenerator(t, onlyTemplateInclusion=True)
+                for t in oldTemplates]
+        gen = pg.CombinedPageGenerator(gens)
+        gen = pg.NamespaceFilterPageGenerator(gen,
+                                              map(int, genFactory.namespaces))
+        gen = pg.DuplicateFilterPageGenerator(gen)
 
-    if user:
-        gen = UserEditFilterGenerator(gen, user, timestamp, skip)
-    preloadingGen = pagegenerators.PreloadingGenerator(gen)
+    preloadingGen = pg.PreloadingGenerator(gen)
 
     bot = TemplateRobot(preloadingGen, templates, subst, remove, editSummary,
                         acceptAll, addedCat)

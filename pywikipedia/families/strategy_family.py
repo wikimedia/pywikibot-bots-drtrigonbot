@@ -1,14 +1,14 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: strategy_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
+__version__ = '$Id: strategy_family.py 11009 2013-01-27 14:45:08Z xqt $'
 
 import family, config
 
 # The Wikimedia Strategy family
 
-class Family(family.Family):
+class Family(family.WikimediaFamily):
     def __init__(self):
-        family.Family.__init__(self)
+        super(Family, self).__init__()
         self.name = 'strategy'
         self.langs = {
             'strategy': 'strategy.wikimedia.org',
@@ -31,11 +31,3 @@ class Family(family.Family):
 
     def dbName(self, code):
         return 'strategywiki_p'
-
-    def shared_image_repository(self, code):
-        return ('commons', 'commons')
-
-    if config.SSL_connection:
-
-        def protocol(self, code):
-            return 'https'

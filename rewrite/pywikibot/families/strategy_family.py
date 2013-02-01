@@ -1,14 +1,14 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: strategy_family.py 9577 2011-10-03 14:53:28Z xqt $'
+__version__ = '$Id: strategy_family.py 10993 2013-01-27 12:38:06Z xqt $'
 
 from pywikibot import family
 
 # The Wikimedia Strategy family
 
-class Family(family.Family):
+class Family(family.WikimediaFamily):
     def __init__(self):
-        family.Family.__init__(self)
+        super(Family, self).__init__()
         self.name = 'strategy'
         self.langs = {
             'strategy': 'strategy.wikimedia.org',
@@ -17,9 +17,6 @@ class Family(family.Family):
 
     def dbName(self, code):
         return 'strategywiki_p'
-
-    def shared_image_repository(self, code):
-        return ('commons', 'commons')
 
     def ssl_pathprefix(self, code):
         return "/wikipedia/strategy"

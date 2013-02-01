@@ -1,26 +1,26 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikisource_family.py 10867 2013-01-04 08:57:57Z xqt $'
+__version__ = '$Id: wikisource_family.py 11009 2013-01-27 14:45:08Z xqt $'
 
 # The Wikimedia family that is known as Wikisource
 
-class Family(family.Family):
+class Family(family.WikimediaFamily):
     def __init__(self):
-        family.Family.__init__(self)
+        super(Family, self).__init__()
         self.name = 'wikisource'
 
         self.languages_by_size = [
             'fr', 'en', 'de', 'ru', 'it', 'zh', 'pl', 'pt', 'he', 'es', 'sv',
             'fa', 'hu', 'ar', 'cs', 'ca', 'ko', 'sl', 'ro', 'fi', 'vi', 'te',
             'sa', 'el', 'sr', 'bn', 'hr', 'th', 'no', 'hy', 'nl', 'ml', 'la',
-            'vec', 'tr', 'ja', 'eo', 'br', 'yi', 'mk', 'uk', 'ta', 'id', 'gu',
+            'vec', 'ja', 'tr', 'eo', 'br', 'yi', 'mk', 'uk', 'gu', 'ta', 'id',
             'is', 'da', 'be', 'li', 'et', 'mr', 'bg', 'bs', 'sah', 'az', 'gl',
-            'lt', 'kn', 'cy', 'sk', 'zh-min-nan', 'fo', 'as',
+            'lt', 'kn', 'cy', 'sk', 'zh-min-nan', 'fo',
         ]
 
-        for lang in self.languages_by_size:
-            self.langs[lang] = '%s.wikisource.org' % lang
+        self.langs = dict([(lang, '%s.wikisource.org' % lang)
+                           for lang in self.languages_by_size])
         self.langs['-'] = 'wikisource.org'
 
         # Override defaults
@@ -47,34 +47,35 @@ class Family(family.Family):
             '_default': self.namespaces[4]['_default'],
             '-': u'Wikisource',
             'ang': u'Wicifruma',
-            'ar': [u'ويكي مصدر', u'وم'],
-            'az': u'VikiMənbə',
-            'be': [u'Вікікрыніцы', u'ВК'],
-            'bg': u'Уикиизточник',
+            'ar': [u'ويكي مصدر', u'وم', u'Wikisource'],
+            'as': u'ৱিকিউৎস',
+            'az': [u'VikiMənbə', u'Wikisource'],
+            'be': [u'Вікікрыніцы', u'ВК', u'Wikisource'],
+            'bg': [u'Уикиизточник', u'Wikisource'],
             'bn': [u'উইকিসংকলন', u'Wikisource'],
-            'br': u'Wikimammenn',
+            'br': [u'Wikimammenn', u'Wikisource'],
             'bs': [u'Wikizvor', u'Wikisource'],
-            'ca': u'Viquitexts',
+            'ca': [u'Viquitexts', u'Wikisource'],
             'cs': [u'Wikizdroje', u'WS', u'WZ', u'Wikisource'],
             'cy': [u'Wicitestun', u'Wikisource'],
             'da': u'Wikisource',
             'de': [u'Wikisource', u'WS'],
-            'el': u'Βικιθήκη',
+            'el': [u'Βικιθήκη', u'Wikisource'],
             'en': [u'Wikisource', u'WS'],
             'eo': [u'Vikifontaro', u'Wikisource'],
             'es': u'Wikisource',
-            'et': u'Vikitekstid',
-            'fa': [u'ویکی‌نبشته', u'ون'],
+            'et': [u'Vikitekstid', u'Wikisource'],
+            'fa': [u'ویکی‌نبشته', u'ون', u'Wikisource'],
             'fi': [u'Wikiaineisto', u'Wikisource'],
             'fo': [u'Wikiheimild', u'Wikisource'],
             'fr': u'Wikisource',
             'gl': u'Wikisource',
             'gu': [u'વિકિસ્રોત', u'Wikisource'],
-            'he': u'ויקיטקסט',
-            'hr': u'Wikizvor',
+            'he': [u'ויקיטקסט', u'Wikisource'],
+            'hr': [u'Wikizvor', u'Wikisource'],
             'ht': u'Wikisòrs',
-            'hu': u'Wikiforrás',
-            'hy': u'Վիքիդարան',
+            'hu': [u'Wikiforrás', u'Wikisource'],
+            'hy': [u'Վիքիդարան', u'Wikisource'],
             'id': u'Wikisource',
             'is': [u'Wikiheimild', u'Wikisource'],
             'it': u'Wikisource',
@@ -86,28 +87,28 @@ class Family(family.Family):
             'lt': [u'Vikišaltiniai', u'Wikisource'],
             'mk': u'Wikisource',
             'ml': [u'വിക്കിഗ്രന്ഥശാല', u'Wikisource', u'WS'],
-            'mr': u'विकिस्रोत',
+            'mr': [u'विकिस्रोत', u'Wikisource'],
             'nb': u'Wikikilden',
             'nl': u'Wikisource',
-            'no': u'Wikikilden',
-            'pl': [u'Wikiźródła', u'WS'],
+            'no': [u'Wikikilden', u'Wikisource'],
+            'pl': [u'Wikiźródła', u'WS', u'Wikisource'],
             'pt': u'Wikisource',
             'ro': u'Wikisource',
-            'ru': u'Викитека',
+            'ru': [u'Викитека', u'Wikisource'],
             'sa': u'Wikisource',
             'sah': [u'Бикитиэкэ', u'Wikisource'],
             'sk': u'Wikisource',
-            'sl': u'Wikivir',
+            'sl': [u'Wikivir', u'Wikisource'],
             'sr': [u'Викизворник', u'Wikisource'],
             'sv': u'Wikisource',
             'ta': [u'விக்கிமூலம்', u'Wikisource', u'விக்கிபீடியா'],
             'te': u'Wikisource',
             'th': [u'วิกิซอร์ซ', u'Wikisource'],
-            'tr': u'VikiKaynak',
+            'tr': [u'Vikikaynak', u'VikiKaynak', u'Wikisource'],
             'uk': [u'Wikisource', u'ВД'],
             'vec': u'Wikisource',
             'vi': u'Wikisource',
-            'yi': [u'װיקיביבליאָטעק', u'וויקיביבליאטעק'],
+            'yi': [u'װיקיביבליאָטעק', u'וויקיביבליאטעק', u'Wikisource'],
             'zh': u'Wikisource',
             'zh-min-nan': u'Wikisource',
         }
@@ -116,6 +117,7 @@ class Family(family.Family):
             '-': u'Wikisource talk',
             'ang': u'Wicifruma talk',
             'ar': [u'نقاش ويكي مصدر', u'نو'],
+            'as': [u'ৱিকিউ স বাৰ্তা', u'ৱিকিউৎস वार्ता', u'ৱিকিউৎস বার্তা'],
             'az': u'VikiMənbə müzakirəsi',
             'be': [u'Размовы пра Вікікрыніцы', u'Вікікрыніцы размовы'],
             'bg': u'Уикиизточник беседа',
@@ -171,7 +173,7 @@ class Family(family.Family):
             'ta': [u'விக்கிமூலம் பேச்சு', u'விக்கிபீடியா பேச்சு'],
             'te': u'Wikisource చర్చ',
             'th': u'คุยเรื่องวิกิซอร์ซ',
-            'tr': u'VikiKaynak tartışma',
+            'tr': [u'Vikikaynak tartışma', u'Oluşturuluyor VikiKaynak tartışma'],
             'uk': u'Обговорення Wikisource',
             'vec': u'Discussion Wikisource',
             'vi': u'Thảo luận Wikisource',
@@ -337,6 +339,7 @@ class Family(family.Family):
         self.namespaces[104] = {
             '-': u'Page',
             'ar': u'صفحة',
+            'as': u'পৃষ্ঠা',
             'be': u'Старонка',
             'bn': u'পাতা',
             'br': [u'Oberour', u'Author'],
@@ -380,6 +383,7 @@ class Family(family.Family):
         self.namespaces[105] = {
             '-': u'Page talk',
             'ar': u'نقاش الصفحة',
+            'as': u'পৃষ্ঠা আলোচনা',
             'be': u'Размовы пра старонку',
             'bn': u'পাতা আলাপ',
             'br': [u'Kaozeadenn oberour', u'Author talk'],
@@ -423,6 +427,7 @@ class Family(family.Family):
         self.namespaces[106] = {
             '-': u'Index',
             'ar': u'فهرس',
+            'as': u'সূচী',
             'be': u'Індэкс',
             'bn': u'প্রবেশদ্বার',
             'ca': u'Autor',
@@ -459,6 +464,7 @@ class Family(family.Family):
         self.namespaces[107] = {
             '-': u'Index talk',
             'ar': u'نقاش الفهرس',
+            'as': u'সূচী আলোচনা',
             'be': u'Размовы пра індэкс',
             'bn': u'প্রবেশদ্বার আলাপ',
             'ca': u'Autor Discussió',
@@ -535,13 +541,6 @@ class Family(family.Family):
             'fr': u'Discussion Livre',
             'he': u'שיחת מפתח',
         }
-
-        # CentralAuth cross avaliable projects.
-        self.cross_projects = [
-            'wiktionary', 'wikibooks', 'wikiquote', 'wikisource', 'wikinews',
-            'wikiversity', 'meta', 'mediawiki', 'test', 'incubator', 'commons',
-            'species',
-        ]
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
@@ -636,11 +635,3 @@ class Family(family.Family):
         self.crossnamespace[106] = {
             'sv': self.authornamespaces,
         }
-
-    def shared_image_repository(self, code):
-        return ('commons', 'commons')
-
-    if family.config.SSL_connection:
-
-        def protocol(self, code):
-            return 'https'
