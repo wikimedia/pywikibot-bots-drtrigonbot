@@ -3264,8 +3264,9 @@ def trainbot(generator, Bot, image_old_namespace, image_namespace):
                 Bot.downloadImage()
             except pywikibot.NoPage:
                 continue
-            except KeyError:
-                pywikibot.output(u"ERROR: was not able to process page %s!!!\n" %\
+            except Exception, e:
+                pywikibot.output(u"ERROR: %s" % e)
+                pywikibot.output(u"ERROR: was not able to process page %s !!!\n" %\
                                  image.title(asLink=True))
                 continue
             except IOError, err:

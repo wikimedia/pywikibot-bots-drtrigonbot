@@ -118,7 +118,7 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 11025 2013-02-02 12:34:53Z drtrigon $'
+__version__ = '$Id: wikipedia.py 11026 2013-02-02 13:08:58Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -8195,7 +8195,10 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
             # 2nd try is for mw >=1.17wmf1
             versionlist.append(lambda: htmldata.body.table.findAll(
                                        'td')[1].contents[0] )
-            # 3rd uses family file which is not live
+            # 3rd try is for mw >=1.21
+            versionlist.append(lambda: htmldata.body.table.findAll(
+                                       'td')[1].contents[0].contents[0] )
+            # 4th uses family file which is not live
             versionlist.append(lambda: self.family.version(self.lang) )
             for versionfunc in versionlist:
                 try:
