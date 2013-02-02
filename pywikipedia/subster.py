@@ -61,7 +61,7 @@ Syntax example:
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__ = '$Id: subster.py 11022 2013-02-01 20:12:01Z drtrigon $'
+__version__ = '$Id: subster.py 11023 2013-02-02 11:29:35Z drtrigon $'
 #
 
 
@@ -354,19 +354,19 @@ class SubsterBot(basic.AutoBasicBot):
         secure = False
         for item in [u'http://', u'https://', u'mail://', u'local://', u'wiki://']:
             secure = secure or (param['url'][:len(item)] == item)
-        param['zip']  = ast.literal_eval(param['zip'])
+        param['zip'] = ast.literal_eval(param['zip'])
         if not secure:
             return (content, substed_tags, metadata)
         if   (param['url'][:7] == u'wiki://'):
-            param['url'] = param['url'][7:].strip('[]')     # enable wiki-links
+            url = param['url'][7:].strip('[]')              # enable wiki-links
             if ast.literal_eval(param['expandtemplates']):  # DRTRIGON-93 (only with 'wiki://')
-                external_buffer = pywikibot.Page(self.site, param['url']).get(expandtemplates=True)
+                external_buffer = pywikibot.Page(self.site, url).get(expandtemplates=True)
             else:
-                external_buffer = self.load( pywikibot.Page(self.site, param['url']) )
+                external_buffer = self.load( pywikibot.Page(self.site, url) )
         elif (param['url'][:7] == u'mail://'):              # DRTRIGON-101
-            param['url'] = param['url'].replace(u'{{@}}', u'@')     # e.g. nlwiki
+            url = param['url'].replace(u'{{@}}', u'@')     # e.g. nlwiki
             mbox = SubsterMailbox(pywikibot.config.datafilepath(bot_config['data_path'], bot_config['mbox_file'], ''))
-            external_buffer = mbox.find_data(param['url'])
+            external_buffer = mbox.find_data(url)
             mbox.close()
         elif (param['url'][:8] == u'local://'):             # DRTRIGON-131
             if (param['url'][8:] == u'cache/state_bots'):

@@ -195,6 +195,7 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
             tb = traceback.format_exc()
             pywikibot.error(tb)    # secure traceback print (from api.py submit)
             wiki_logger(tb, self.refs[page_title], rev)
+            # TODO: is this error handling here needed at all??!?
 
 # Define a function for the thread
 def main_script(page, rev=None, params=None):
@@ -224,7 +225,14 @@ def main_script(page, rev=None, params=None):
         code = page.get()               # shell; "on demand"
     else:
         code = page.getOldVersion(rev)  # crontab; scheduled
-    exec( code )
+    try:
+        exec( code )
+    except:
+        # (done according to subster in trunk and submit in rewrite/.../data/api.py)
+        #exc_info = sys.exc_info()
+        #tb = traceback.format_exception(exc_info[0], exc_info[1], exc_info[2])
+        tb = traceback.format_exc()
+        pywikibot.error(tb)    # secure traceback print (from api.py submit)
 
     sys.stdout = sys.__stdout__
     sys.stderr = sys.__stderr__
@@ -323,8 +331,7 @@ def output_verinfo():
 
     # mediawiki software version?
     pywikibot.output(u'MEDIAWIKI VERSION:')
-    pywikibot.output(u'  Actual revision: %s' % str(pywikibot.getSite().live_version()))
-    #pywikibot.output(u'  Actual revision: %s' % str(pywikibot.getSite().live_version(force=True)))
+    pywikibot.output(u'  Actual revision: %s' % str(pywikibot.getSite().live_version(force=True)))
     pywikibot.output(u'')
 
 #    # processing of messages on bot discussion page
