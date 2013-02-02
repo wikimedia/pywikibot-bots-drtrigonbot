@@ -99,6 +99,6 @@ def change_logo(content, environ):
     # labs patch: adopt logo for labs server instead of TS (default)
     TS   = 'http://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Wikimedia_Community_Logo-Toolserver.svg/135px-Wikimedia_Community_Logo-Toolserver.svg.png'
     labs = 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Wikimedia_labs_logo.svg/135px-Wikimedia_labs_logo.svg.png'
-    if not (environ['HTTP_HOST'] == 'toolserver.org'):
+    if ('HTTP_HOST' in environ) and (not (environ['HTTP_HOST'] == 'toolserver.org')):
         content = content.replace(TS, labs)
     return content

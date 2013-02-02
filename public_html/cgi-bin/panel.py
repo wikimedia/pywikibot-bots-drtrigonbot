@@ -108,7 +108,8 @@ Important messages (everything except INFO):<br>
 <p style="white-space:pre-wrap;">%(messages)s</p>"""
 
 adminlogs_content = \
-"""Log file count: %(logcount)s<br>
+"""<img src="../DrTrigonBot/metrics-monthly.png"><br>
+Log file count: %(logcount)s<br>
 <p>%(message)s</p>
 <form action="panel.py">
   <input type="hidden" name="action" value="adminlogs">
@@ -347,6 +348,160 @@ def logging_statistics(logfiles, exclude):
 	return (stats, logfiles[keys[-1]])
 
 
+# === SHELL/CRON interfaces === === ===
+#
+def maintain_stats(init=False):
+    # http://supportex.net/2011/09/rrd-python/
+    # (https://jira.toolserver.org/browse/DRTRIGON-74)
+    global localdir    # why is this needed here? nowhere else needed...?!?!!
+
+    import platform, numpy, rrdtool    # for statistics '-stats'
+
+    #rrd_fn = os.path.join(localdir, "stats-01-%s.rrd" % platform.platform())
+    rrd_fn = os.path.join(localdir, "stats-01-%s.rrd" % platform.system())
+
+    if init:
+        ret = rrdtool.create(rrd_fn, "--step", "86400", "--start", '0',
+         "DS:sum_start:GAUGE:144000:U:U",
+         "DS:sum_end:GAUGE:144000:U:U",
+         "DS:sum_diff:GAUGE:144000:U:U",
+         "DS:bot_histcomp:GAUGE:144000:U:U",
+         "DS:bot_sum_disc:GAUGE:144000:U:U",
+         "DS:bot_subster:GAUGE:144000:U:U",
+         "DS:bot_catimages:GAUGE:144000:U:U",
+         "DS:bot_uptime_histcomp:GAUGE:144000:U:U",
+         "DS:bot_uptime_sum_disc:GAUGE:144000:U:U",
+         "DS:bot_uptime_subster:GAUGE:144000:U:U",
+         "DS:bot_uptime_catimages:GAUGE:144000:U:U",
+         "DS:msg_unknown:GAUGE:144000:U:U",
+         "DS:msg_info:GAUGE:144000:U:U",
+         "DS:msg_warning:GAUGE:144000:U:U",
+         "DS:msg_error:GAUGE:144000:U:U",
+         "DS:msg_critical:GAUGE:144000:U:U",
+         "DS:msg_debug:GAUGE:144000:U:U",
+         "DS:metric1:GAUGE:144000:U:U",
+         "DS:metric2:GAUGE:144000:U:U",
+         "DS:metric3:GAUGE:144000:U:U",
+         "DS:metric4:GAUGE:144000:U:U",
+         "DS:metric5:GAUGE:144000:U:U",
+         "DS:sum_diff_inter:COMPUTE:sum_start,sum_end,-",
+	 # (number of logfiles, quota, ...)
+         "RRA:AVERAGE:0.5:1:600",
+         "RRA:AVERAGE:0.5:6:700",
+         "RRA:AVERAGE:0.5:24:775",
+         "RRA:AVERAGE:0.5:288:797",
+         "RRA:MIN:0.5:1:600",
+         "RRA:MIN:0.5:6:700",
+         "RRA:MIN:0.5:24:775",
+         "RRA:MIN:0.5:444:797",
+         "RRA:MAX:0.5:1:600",
+         "RRA:MAX:0.5:6:700",
+         "RRA:MAX:0.5:24:775",
+         "RRA:MAX:0.5:444:797",
+         "RRA:LAST:0.5:1:600",
+         "RRA:LAST:0.5:6:700",
+         "RRA:LAST:0.5:24:775",
+         "RRA:LAST:0.5:444:797")
+    else:
+	(localdir, files, current) = oldlogfiles()
+        stat, recent = logging_statistics(current, botcontinuous)
+#        for item in current:
+#            stat, recent = logging_statistics([item], botcontinuous)
+#            if stat is None:
+#                continue
+#            end, start = numpy.array(stat['etiming']['end']), numpy.array(stat['etiming']['start'])
+#            shape = min(end.shape[0], start.shape[0])
+#            runtime = end[:shape]-start[:shape]-7200	# -2*60*60 because of time jump during 'set TZ'
+#            if runtime.any() and (runtime.min() < 0):	# DST or not; e.g. ('CET', 'CEST')
+#                runtime += 3600
+#            uptime = numpy.array(runtime).sum()
+
+        (bot_uptime_histcomp, bot_uptime_sum_disc, bot_uptime_subster, bot_uptime_catimages) = (0, 0, 0, 0)
+        (metric1, metric2, metric3, metric4, metric5) = (0, 0, 0, 0, 0)
+        val = (ecount['start'], ecount['end'],  (ecount['start']-ecount['end']),
+               ecount['histcomp'], ecount['sum_disc'], ecount['subster'], ecount['catimages'],
+               bot_uptime_histcomp, bot_uptime_sum_disc, bot_uptime_subster, bot_uptime_catimages,
+               mcount['unknown'], mcount['info'], mcount['warning'], mcount['error'], mcount['critical'], mcount['debug'],
+               metric1, metric2, metric3, metric4, metric5,)
+
+        # update
+        ret = rrdtool.update(rrd_fn, ('N' + (':%s'*22)) % val);
+
+        # show
+        #for sched in ['hourly', 'daily', 'weekly', 'monthly']:
+        for sched in ['daily', 'weekly', 'monthly']:
+            fn  = "/home/drtrigon/public_html/DrTrigonBot/test-%s.png" % (sched)
+#            ret = rrdtool.graph( fn, "--start", "-1%s" %(sched[0]), "--vertical-label=Num",
+#                 '--watermark=DrTrigonBot.TS',
+#                 "-w 800",
+#                 "DEF:m1_num=%s:metric1:AVERAGE" % rrd_fn,
+#                 "DEF:m2_num=%s:metric2:AVERAGE" % rrd_fn,
+#                 "LINE1:m1_num#0000FF:metric1\\r",
+#                 "LINE2:m2_num#00FF00:metric2\\r",
+#                 "GPRINT:m1_num:AVERAGE:Avg m1\: %6.0lf ",
+#                 "GPRINT:m1_num:MAX:Max m1\: %6.0lf \\r",
+#                 "GPRINT:m2_num:AVERAGE:Avg m2\: %6.0lf ",
+#                 "GPRINT:m2_num:MAX:Max m2\: %6.0lf \\r")
+            ret = rrdtool.graph( fn, "--start", "-1%s" %(sched[0]), "--vertical-label=Num",
+                 '--watermark=DrTrigonBot.TS',
+                 "DEF:end_num=%s:sum_end:AVERAGE" % rrd_fn,
+                 "DEF:start_num=%s:sum_start:AVERAGE" % rrd_fn,
+                 "DEF:histcomp_num=%s:bot_histcomp:AVERAGE" % rrd_fn,
+                 "DEF:subster_num=%s:bot_subster:AVERAGE" % rrd_fn,
+                 "DEF:sum_disc_num=%s:bot_sum_disc:AVERAGE" % rrd_fn,
+                 "DEF:catimages_num=%s:bot_catimages:AVERAGE" % rrd_fn,
+                 "LINE1:end_num#0000FF:end\\r",
+                 "LINE2:start_num#00FF00:start\\r",
+                 "LINE3:histcomp_num#00FF00:histcomp\\r",
+                 "LINE4:subster_num#00FF00:subster\\r",
+                 "LINE5:sum_disc_num#00FF00:sum_disc\\r",
+                 "LINE6:catimages_num#00FF00:catimages\\r",
+                 "GPRINT:end_num:AVERAGE:Avg end\: %6.0lf ",
+                 "GPRINT:end_num:MAX:Max end\: %6.0lf \\r",
+                 "GPRINT:start_num:AVERAGE:Avg start\: %6.0lf ",
+                 "GPRINT:start_num:MAX:Max start\: %6.0lf \\r")
+#            ret = rrdtool.graph( fn, "--start", "-1%s" %(sched[0]), "--vertical-label=Num",
+#                 '--watermark=DrTrigonBot.TS',
+#                 "DEF:end_num=%s:sum_end:AVERAGE" % rrd_fn,
+#                 "DEF:diff_num=%s:sum_diff:AVERAGE" % rrd_fn,
+#                 "DEF:diff_intern_num=%s:sum_diff_inter:AVERAGE" % rrd_fn,
+#                 "LINE1:end_num#0000FF:successful\\r",
+#                 "LINE2:diff_num#00FF00:runs_failed\\r",
+#                 "LINE3:diff_intern_num#00FF00:runs_failed_i\\r",
+#                 "GPRINT:end_num:AVERAGE:Avg end\: %6.0lf ",
+#                 "GPRINT:end_num:MAX:Max end\: %6.0lf \\r")
+#            ret = rrdtool.graph( fn, "--start", "-1%s" %(sched[0]), "--vertical-label=Num",
+#                 '--watermark=DrTrigonBot.TS',
+#                 "DEF:unknown_num=%s:msg_unknown:AVERAGE" % rrd_fn,
+#                 "DEF:warning_num=%s:msg_warning:AVERAGE" % rrd_fn,
+#                 "DEF:error_num=%s:msg_error:AVERAGE" % rrd_fn,
+#                 "DEF:critical_num=%s:msg_critical:AVERAGE" % rrd_fn,
+#                 "DEF:debug_num=%s:msg_debug:AVERAGE" % rrd_fn,
+#                 "LINE1:unknown_num#0000FF:unknown\\r",
+#                 "LINE2:warning_num#00FF00:warning\\r",
+#                 "LINE3:error_num#00FF00:error\\r",
+#                 "LINE4:critical_num#00FF00:critical\\r",
+#                 "LINE5:debug_num#00FF00:debug\\r",
+#                 "GPRINT:warning_num:AVERAGE:Avg warning\: %6.0lf ",
+#                 "GPRINT:warning_num:MAX:Max warning\: %6.0lf \\r")
+#            ret = rrdtool.graph( fn, "--start", "-1%s" %(sched[0]), "--vertical-label=Num",
+#                 '--watermark=DrTrigonBot.TS',
+#                 "DEF:info_num=%s:msg_info:AVERAGE" % rrd_fn,
+#                 "LINE1:info_num#0000FF:info\\r",
+#                 "GPRINT:info_num:AVERAGE:Avg info\: %6.0lf ",
+#                 "GPRINT:info_num:MAX:Max info\: %6.0lf \\r")
+
+#        print rrdtool.fetch(rrd_fn, 'AVERAGE')[2]
+
+# * add rrdtool graphs for comparison to statistics page, later remove matplotlib
+# * get all data on statistics page from rrdtool.fetch, thus replace text output below graphs
+#   through links to mainpages but containing history (old days/logs) 
+#   -> mainpage has to be capable to process and show old data
+#   -> mainpage does always gather actual data and NOT use rrdtool.fetch (and thus can also 
+#      process text data like messages)
+# * setup cron job at midnight in order to gather and update rrdtool data and graphs
+
+
 # === CGI/HTML page view user interfaces === === ===
 #
 def displaystate(form):
@@ -461,6 +616,7 @@ def adminlogs(form):
 		data['message'].append( '%i log file(s) deleted.' % (len(filelist)-len(data['message'])) )
 		data['message'] = '<br>\n'.join(data['message'])
 		(localdir, files, current) = oldlogfiles()
+		files = [item for key, value in files for item in value]	# flatten
 
 	checkbox_tmpl = '<input type="checkbox" name="filelist" value="%(datei)s">%(datei)s<br>'
 
@@ -487,6 +643,8 @@ def logstat(form):
 	import matplotlib.pyplot as plt
 	# http://matplotlib.sourceforge.net/api/dates_api.html?highlight=year%20out%20range#matplotlib.dates.epoch2num
 	from matplotlib.dates import MonthLocator, DayLocator, DateFormatter, epoch2num
+
+#	import platform, rrdtool	# for statistics '-stats'
 
 	import numpy
 
@@ -678,9 +836,15 @@ def logstat(form):
 
 # === Main procedure entry point === === ===
 #
-form = cgi.FieldStorage()
+if __name__ == '__main__':
+    if   '-init_stats' in sys.argv:
+        maintain_stats(init=True)
+    elif '-stats' in sys.argv:
+        maintain_stats()
+    else:
+        form = cgi.FieldStorage()
 
-# operational mode
-action = form.getvalue('action', 'displaystate')
-#print locals()[action](form)
-print style.change_logo(locals()[action](form), os.environ)    # labs patch
+        # operational mode
+        action = form.getvalue('action', 'displaystate')
+        #print locals()[action](form)
+        print style.change_logo(locals()[action](form), os.environ)    # labs patch
