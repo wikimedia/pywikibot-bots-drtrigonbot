@@ -16,7 +16,7 @@ are taken into account.
 #
 # (C) Pywikipedia team, 2008-2011
 #
-__version__ = '$Id: category_redirect.py 10873 2013-01-04 14:22:17Z xqt $'
+__version__ = '$Id: category_redirect.py 11024 2013-02-02 12:34:01Z drtrigon $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -220,12 +220,8 @@ class CategoryRedirectBot(object):
         rotate_revid = history[-1][0]
         # append permalink
         log_text = log_text + (
-            "\n\n'''[%s://%s%s/index.php?title=%s&oldid=%s Older logs]'''"
-                % (self.site.protocol(),
-                   self.site.hostname(),
-                   self.site.scriptpath(),
-                   self.log_page.title(asUrl=True),
-                   rotate_revid))
+            "\n\n'''[%s Older logs]'''"
+                % self.log_page.permalink(oldid=rotate_revid))
         return log_text
 
     def run(self):

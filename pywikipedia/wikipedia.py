@@ -118,7 +118,7 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 11015 2013-01-30 18:45:16Z amir $'
+__version__ = '$Id: wikipedia.py 11025 2013-02-02 12:34:53Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -1208,12 +1208,17 @@ not supported by PyWikipediaBot!"""
             #pywikibot.output(...)
             # (or create a own error, e.g. look into interwiki.py)
 
-    def permalink(self):
-        """Return the permalink URL for current revision of this page."""
-        return "%s://%s%s&oldid=%i" % (self.site().protocol(),
-                                       self.site().hostname(),
-                                       self.site().get_address(self.title()),
-                                       self.latestRevision())
+    def permalink(self, oldid=None):
+        """Return the permalink URL of an old revision of this page.
+
+        @param oldid: The revid of the revision desired.
+
+        """
+        return "%s://%s%s&oldid=%i" \
+                % (self.site().protocol(),
+                   self.site().hostname(),
+                   self.site().get_address(self.title()),
+                   (oldid if oldid is not None else self.latestRevision()))
 
     def latestRevision(self):
         """Return the current revision id for this page."""

@@ -7,7 +7,7 @@ Objects representing various types of MediaWiki pages.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: page.py 10791 2012-12-12 15:58:41Z russblau $'
+__version__ = '$Id: page.py 11024 2013-02-02 12:34:01Z drtrigon $'
 
 import pywikibot
 from pywikibot import deprecate_arg
@@ -324,14 +324,18 @@ class Page(object):
         # TODO: what about redirects, errors?
         return self._revisions[oldid].text
 
-    def permalink(self):
-        """Return the permalink URL for current revision of this page."""
+    def permalink(self, oldid=None):
+        """Return the permalink URL of an old revision of this page.
+
+        @param oldid: The revid of the revision desired.
+
+        """
         return "%s://%s/%sindex.php?title=%s&oldid=%s" \
                % (self.site.protocol(),
                   self.site.hostname(),
                   self.site.scriptpath(),
                   self.title(asUrl=True),
-                  self.latestRevision())
+                  (oldid if oldid is not None else self.latestRevision()))
 
     def latestRevision(self):
         """Return the current revision id for this page."""

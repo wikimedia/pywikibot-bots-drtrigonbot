@@ -51,7 +51,7 @@ Syntax example:
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
 __version__ = '$Id$'
-__framework_rev__ = '11022' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '11025' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.5'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #
@@ -261,12 +261,12 @@ def wiki_logger(buffer, page, rev=None):
     #buffer  = buffer.decode(config.console_encoding)
     buffer = re.sub("\03\{(.*?)\}(.*?)\03\{default\}", "\g<2>", buffer)
     if rev is None:
-        rev = page.latestRevision()
+        rev  = page.latestRevision()
+        link = page.permalink(oldid=rev)
     # append to page
     outpage = pywikibot.Page(pywikibot.getSite(), bot_config['ConfCSSoutput'])
     text = outpage.get()
-# TODO: vvv permalink is VERY CHEAP/UGLY/HACKY and has to be done better !!!!!!!! vvv
-    outpage.put(text + u"\n== Simulation vom %s mit [http://de.wikipedia.org/w/index.php?title=%s&oldid=%s code:%s] ==\n<pre>\n%s</pre>\n\n" % (pywikibot.Timestamp.now().isoformat(' '), bot_config['ConfCSSshell'], rev, rev, buffer))
+    outpage.put(text + u"\n== Simulation vom %s mit [%s code:%s] ==\n<pre>\n%s</pre>\n\n" % (pywikibot.Timestamp.now().isoformat(' '), link, rev, buffer))
 #                comment = pywikibot.translate(self.site.lang, bot_config['msg']))
 
 def main():
