@@ -3198,7 +3198,8 @@ def main():
             Bot.downloadImage()
         except pywikibot.NoPage:
             continue
-        except KeyError:
+        except Exception, e:
+            pywikibot.output(u"ERROR: %s" % e)
             pywikibot.output(u"ERROR: was not able to process page %s!!!\n" %\
                              image.title(asLink=True))
             continue
