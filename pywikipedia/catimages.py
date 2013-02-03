@@ -48,8 +48,8 @@ __version__ = '$Id$'
 #
 
 # python default packages
-import re, time, urllib2, os, locale, sys, datetime, math, shutil, mimetypes
-import StringIO, string, json # fallback: simplejson
+import re, urllib2, os, locale, sys, datetime, math, shutil, mimetypes
+import StringIO, json # fallback: simplejson
 from subprocess import Popen, PIPE
 import Image
 #import ImageFilter
@@ -595,7 +595,7 @@ class FileData(object):
         corner_dst = cv2.cornerHarris( edges, 2, 3, 0.04 )
         # Normalizing
         cv2.normalize( corner_dst, corner_dst, 0, 255, cv2.NORM_MINMAX, cv.CV_32FC1 )
-        dst_norm_scaled = cv2.convertScaleAbs( corner_dst )
+        #dst_norm_scaled = cv2.convertScaleAbs( corner_dst )
         # Drawing a circle around corners
         corner = []
         for j in range(corner_dst.shape[0]):
@@ -658,7 +658,7 @@ class FileData(object):
                                          'SIFT',        # not important; given by training
                                          'BruteForce',  # not important; given by training
                                          [str(os.path.abspath(self.image_path).encode('latin-1'))])
-        out = sys.stdout.getvalue()
+        #out = sys.stdout.getvalue()
         sys.stdout = stdout
         #print out
         if not result:
@@ -963,7 +963,7 @@ class FileData(object):
         enable_recovery()   # enable recovery from hard crash
         jseg.segdist_cpp.main( ("segdist -i %s -t 6 -r9 %s"%(tmpjpg, tmpgif)).split(" ") )
         disable_recovery()  # disable since everything worked out fine
-        out = open((tmpgif + ".stdout"), "r").read()    # reading stdout
+        #out = open((tmpgif + ".stdout"), "r").read()    # reading stdout
         #print out
         os.remove(tmpgif + ".stdout")
         
@@ -1268,7 +1268,7 @@ class FileData(object):
         if proc.returncode:
             raise ImportError("pdfimages not found!")
         images = os.listdir( tmp_path )
-        pages  = set()
+#        pages  = set()
         for f in images:
 #            pages.add( int(f.split('-')[1]) )
             os.remove( os.path.join(tmp_path, f) )
@@ -1364,7 +1364,7 @@ class FileData(object):
         img = smallImg
 
         enable_recovery()   # enable recovery from hard crash
-        res = dm_read.decode(img.size[0], img.size[1], buffer(img.tostring()))
+        #res = dm_read.decode(img.size[0], img.size[1], buffer(img.tostring()))
         disable_recovery()  # disable since everything worked out fine
         #print res
 
@@ -2091,7 +2091,7 @@ class CatImages_Default(FileData):
             self._info['Faces'][i]['ID'] = i+1
 
         # Segments and colors / Average color
-        max_dim = max(self.image_size)
+        #max_dim = max(self.image_size)
         for i in range(len(self._info['ColorRegions'])):
             data = self._info['ColorRegions'][i]
 
@@ -3063,7 +3063,7 @@ def main():
     global useGuesses
     # Command line configurable parameters
     limit = 150 # How many images to check?
-    untagged = False # Use the untagged generator
+#    untagged = False # Use the untagged generator
     sendemailActive = False # Use the send-email
     train = False
     generator = None
@@ -3148,9 +3148,9 @@ def main():
     # Defing the Main Class.
     Bot = CatImagesBot(site, sendemailActive = sendemailActive,
                        duplicatesReport = False, logFullError = False)
-    # Untagged is True? Let's take that generator
-    if untagged == True:
-        generator =  Bot.untaggedGenerator(projectUntagged, limit)
+#    # Untagged is True? Let's take that generator
+#    if untagged == True:
+#        generator =  Bot.untaggedGenerator(projectUntagged, limit)
     # Ok, We (should) have a generator, so let's go on.
     # Take the additional settings for the Project
     Bot.takesettings()
@@ -3184,7 +3184,7 @@ def main():
 
             continue
 
-        comment = None # useless, also this, let it here for further developments
+        #comment = None # useless, also this, let it here for further developments
         try:
             imageName = image.title().split(image_namespace)[1] # Deleting the namespace (useless here)
         except IndexError:# Namespace image not found, that's not an image! Let's skip...
@@ -3196,15 +3196,15 @@ def main():
         Bot.setParameters(imageName) # Setting the image for the main class
         try:
             Bot.downloadImage()
-        except pywikibot.NoPage:
-            continue
-        except Exception, e:
-            pywikibot.output(u"ERROR: %s" % e)
-            pywikibot.output(u"ERROR: was not able to process page %s!!!\n" %\
-                             image.title(asLink=True))
-            continue
         except IOError, err:
+            # skip if download not possible
             pywikibot.output(u"WARNING: %s, skipped..." % err)
+            continue
+        except Exception, err:
+            # skip on any unexpected error, but report it
+            pywikibot.output(u"ERROR: %s" % err)
+            pywikibot.output(u"ERROR: was not able to process page %s !!!\n" %\
+                             image.title(asLink=True))
             continue
         resultCheck = Bot.checkStep()
         tagged = False
@@ -3213,7 +3213,7 @@ def main():
             if ret:
                 outresult.append( ret )
         except AttributeError:
-            pywikibot.output(u"ERROR: was not able to process page %s!!!\n" %\
+            pywikibot.output(u"ERROR: was not able to process page %s !!!\n" %\
                              image.title(asLink=True))
         limit += -1
         if not tagged:
@@ -3263,17 +3263,17 @@ def trainbot(generator, Bot, image_old_namespace, image_namespace):
             Bot.setParameters(imageName) # Setting the image for the main class
             try:
                 Bot.downloadImage()
-            except pywikibot.NoPage:
+            except IOError, err:
+                # skip if download not possible
+                pywikibot.output(u"WARNING: %s, skipped..." % err)
                 continue
-            except Exception, e:
-                pywikibot.output(u"ERROR: %s" % e)
+            except Exception, err:
+                # skip on any unexpected error, but report it
+                pywikibot.output(u"ERROR: %s" % err)
                 pywikibot.output(u"ERROR: was not able to process page %s !!!\n" %\
                                  image.title(asLink=True))
                 continue
-            except IOError, err:
-                pywikibot.output(u"WARNING: %s, skipped..." % err)
-                continue
-    
+
             # gather all features (information) related to current image
             Bot._info = {}
             Bot.gatherFeatures()
