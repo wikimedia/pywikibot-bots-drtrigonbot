@@ -12,7 +12,7 @@ http://python-irclib.sourceforge.net/
 # Author: Balasyum
 # http://hu.wikipedia.org/wiki/User:Balasyum
 # License : LGPL
-__version__ = '$Id: articlenos.py 8240 2010-06-03 07:19:33Z xqt $'
+__version__ = '$Id: articlenos.py 11088 2013-02-19 20:11:53Z drtrigon $'
 
 from ircbot import SingleServerIRCBot
 from irclib import nm_to_n, nm_to_h, irc_lower, ip_numstr_to_quad
@@ -25,8 +25,14 @@ class ArtNoDisp(SingleServerIRCBot):
         SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
         self.channel = channel
         self.site = site
+        ns = []
+        for n in site.namespaces():
+            if type(n) == type(()):
+                ns += n[0]
+            else:
+                ns += [n]
         self.other_ns = re.compile(
-            u'14\[\[07(' + u'|'.join(site.namespaces()) + u')')
+            u'14\[\[07(' + u'|'.join(ns) + u')')
         self.api_url = self.site.api_address()
         self.api_url += 'action=query&meta=siteinfo&siprop=statistics&format=xml'
         self.api_found = re.compile(r'articles="(.*?)"')

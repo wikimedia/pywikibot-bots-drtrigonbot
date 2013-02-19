@@ -11,7 +11,7 @@ in any other one. Use in accordance with the rules of your community.
 
 Known parameters:
 -start            Will start from the given title (it does not have to exist).
-                  Parameter may be given as "-start" or "-start:tile"
+                  Parameter may be given as "-start" or "-start:title"
                   Defaults to '!'.
 -namespace        Works in the given namespace (only one at a time). Parameter
 -ns               may be given as "-ns:<number>" or "-namespace:<number>".
@@ -44,7 +44,7 @@ Known parameters:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: ndashredir.py 10090 2012-04-06 15:26:33Z binbot $'
+__version__='$Id: ndashredir.py 11087 2013-02-19 19:23:37Z binbot $'
 
 import codecs, re
 import wikipedia as pywikibot
