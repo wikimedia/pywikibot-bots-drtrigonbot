@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: wikidata_family.py 11009 2013-01-27 14:45:08Z xqt $'
+__version__ = '$Id: wikidata_family.py 11060 2013-02-09 17:46:15Z xqt $'
 
 import family
 
@@ -56,5 +56,8 @@ class Family(family.WikimediaFamily):
         the site opject is the repository itself, see Site.is_data_repository()
 
         """
-        return ('wikidata',
-                'wikidata') if code == 'wikidata' else ('repo', 'wikidata')
+        if transcluded:
+            return(None, None)
+        else:
+            return ('wikidata',
+                    'wikidata') if code == 'wikidata' else ('repo', 'wikidata')

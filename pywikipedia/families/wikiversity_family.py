@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiversity_family.py 11009 2013-01-27 14:45:08Z xqt $'
+__version__ = '$Id: wikiversity_family.py 11079 2013-02-15 09:47:22Z xqt $'
 
 # The Wikimedia family that is known as Wikiversity
 
@@ -11,8 +11,8 @@ class Family(family.WikimediaFamily):
         self.name = 'wikiversity'
 
         self.languages_by_size = [
-            'en', 'fr', 'de', 'beta', 'cs', 'ru', 'it', 'es', 'pt', 'ar', 'fi',
-            'el', 'sv', 'sl', 'ja',
+            'en', 'fr', 'de', 'beta', 'cs', 'ru', 'it', 'es', 'pt', 'ar', 'sv',
+            'fi', 'el', 'ko', 'sl', 'ja',
         ]
 
         self.langs = dict([(lang, '%s.wikiversity.org' % lang)
@@ -37,6 +37,7 @@ class Family(family.WikimediaFamily):
             'fr': [u'Wikiversité', u'Wikiversity'],
             'it': [u'Wikiversità', u'Wikiversity'],
             'ja': u'Wikiversity',
+            'ko': u'Wikiversity',
             'pt': [u'Wikiversidade', u'Wikiversity'],
             'ru': [u'Викиверситет', u'Wikiversity'],
             'sl': [u'Wikiverza', u'Wikiversity'],
@@ -48,13 +49,14 @@ class Family(family.WikimediaFamily):
             'beta': u'Wikiversity talk',
             'cs': [u'Diskuse k Wikiverzitě', u'Wikiversity diskuse', u'Wikiversity talk', u'Wikiverzita diskuse'],
             'de': u'Wikiversity Diskussion',
-            'el': u'Συζήτηση Βικιεπιστημίου',
+            'el': [u'Συζήτηση Βικιεπιστημίου', u'Βικιεπιστήμιο συζήτηση'],
             'en': u'Wikiversity talk',
             'es': u'Wikiversidad discusión',
             'fi': u'Keskustelu Wikiopistosta',
             'fr': u'Discussion Wikiversité',
             'it': u'Discussioni Wikiversità',
             'ja': [u'Wikiversity・トーク', u'Wikiversity talk', u'Wikiversity‐ノート'],
+            'ko': u'Wikiversity토론',
             'pt': u'Wikiversidade Discussão',
             'ru': u'Обсуждение Викиверситета',
             'sl': u'Pogovor o Wikiverzi',

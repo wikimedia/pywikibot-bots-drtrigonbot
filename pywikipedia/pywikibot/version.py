@@ -7,9 +7,10 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: version.py 10960 2013-01-20 16:03:08Z drtrigon $'
+__version__ = '$Id: version.py 11027 2013-02-04 07:36:21Z yurik $'
 
 import os
+import sys
 import time
 import urllib
 
@@ -134,3 +135,16 @@ def getfileversion(filename):
                 exec(line)
                 break
     return __version__
+
+## Get the tail path component and file name of the currently executing
+# script. Returns a tuple.
+#
+def get_executing_script():
+    """Get the last path component and filename of the currently
+    executing script."""
+    try:
+        script = os.path.abspath(sys.modules['__main__'].__file__)
+    except (KeyError, AttributeError):
+        script = sys.executable
+    path, file = os.path.split(script)
+    return (os.path.basename(path), file)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikipedia_family.py 11019 2013-01-30 23:56:18Z xqt $'
+__version__ = '$Id: wikipedia_family.py 11085 2013-02-17 14:32:15Z xqt $'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 
@@ -11,47 +11,42 @@ class Family(family.WikimediaFamily):
         self.name = 'wikipedia'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'nl', 'it', 'es', 'ru', 'pl', 'ja', 'pt', 'zh',
-            'sv', 'vi', 'uk', 'ca', 'no', 'fi', 'fa', 'cs', 'hu', 'ko', 'ro',
-            'id', 'ar', 'tr', 'kk', 'sk', 'sr', 'eo', 'da', 'ms', 'lt', 'eu',
-            'bg', 'he', 'sl', 'vo', 'hr', 'war', 'et', 'hi', 'gl', 'nn',
-            'simple', 'az', 'la', 'el', 'uz', 'th', 'sh', 'oc', 'new', 'ka',
-            'mk', 'ceb', 'tl', 'pms', 'be', 'ht', 'ta', 'te', 'be-x-old', 'lv',
-            'br', 'sq', 'hy', 'jv', 'mg', 'cy', 'mr', 'lb', 'is', 'bs', 'my',
-            'yo', 'an', 'ml', 'lmo', 'fy', 'pnb', 'af', 'ba', 'bn', 'roa-rup',
-            'bpy', 'sw', 'io', 'ky', 'scn', 'ur', 'ne', 'gu', 'zh-yue', 'nds',
-            'ku', 'ast', 'ga', 'qu', 'su', 'tt', 'cv', 'ia', 'nap', 'bat-smg',
-            'als', 'map-bms', 'sco', 'bug', 'wa', 'ckb', 'am', 'kn', 'gd',
-            'hif', 'tg', 'mzn', 'zh-min-nan', 'yi', 'vec', 'arz', 'roa-tara',
-            'nah', 'os', 'sah', 'sa', 'mn', 'pam', 'hsb', 'li', 'se', 'si',
-            'mi', 'diq', 'co', 'bar', 'gan', 'bo', 'ilo', 'glk', 'fo', 'rue',
-            'bcl', 'pa', 'fiu-vro', 'mrj', 'nds-nl', 'wuu', 'ps', 'tk', 'vls',
-            'gv', 'xmf', 'pag', 'dv', 'kv', 'zea', 'nrm', 'km', 'koi', 'rm',
-            'or', 'mhr', 'lad', 'csb', 'udm', 'lij', 'fur', 'frr', 'ug',
+            'en', 'de', 'fr', 'nl', 'it', 'es', 'ru', 'pl', 'ja', 'pt', 'sv',
+            'zh', 'vi', 'uk', 'ca', 'no', 'fi', 'fa', 'cs', 'hu', 'ko', 'ro',
+            'id', 'ar', 'tr', 'kk', 'sk', 'sr', 'ms', 'eo', 'da', 'lt', 'eu',
+            'bg', 'he', 'ceb', 'sl', 'hr', 'vo', 'war', 'et', 'hi', 'gl', 'nn',
+            'simple', 'az', 'la', 'el', 'uz', 'th', 'sh', 'oc', 'ka', 'new',
+            'mk', 'tl', 'pms', 'be', 'ht', 'ta', 'te', 'be-x-old', 'lv', 'br',
+            'sq', 'hy', 'mg', 'jv', 'cy', 'mr', 'lb', 'is', 'bs', 'my', 'yo',
+            'an', 'ml', 'lmo', 'fy', 'pnb', 'af', 'ba', 'bn', 'roa-rup', 'bpy',
+            'sw', 'io', 'ky', 'ur', 'scn', 'ne', 'gu', 'zh-yue', 'nds', 'ku',
+            'ga', 'ast', 'qu', 'su', 'tt', 'cv', 'ia', 'nap', 'bug', 'als',
+            'bat-smg', 'sco', 'map-bms', 'wa', 'ckb', 'kn', 'am', 'gd', 'hif',
+            'tg', 'mzn', 'zh-min-nan', 'yi', 'vec', 'arz', 'roa-tara', 'nah',
+            'os', 'sa', 'mn', 'sah', 'pam', 'hsb', 'li', 'si', 'se', 'mi', 'co',
+            'diq', 'bar', 'gan', 'ilo', 'bo', 'glk', 'fo', 'rue', 'bcl', 'pa',
+            'fiu-vro', 'mrj', 'nds-nl', 'cbk-zam', 'wuu', 'tk', 'ps', 'vls',
+            'gv', 'xmf', 'pag', 'kv', 'dv', 'zea', 'nrm', 'km', 'koi', 'rm',
+            'or', 'mhr', 'lad', 'csb', 'udm', 'lij', 'frr', 'fur', 'ug',
             'zh-classical', 'vep', 'sc', 'pi', 'mt', 'bh', 'ksh', 'nov', 'so',
-            'stq', 'ang', 'ay', 'kw', 'nv', 'hak', 'pcd', 'frp', 'ext', 'gn',
+            'ang', 'stq', 'ay', 'kw', 'nv', 'hak', 'pcd', 'ext', 'frp', 'gn',
             'szl', 'gag', 'as', 'ie', 'ln', 'eml', 'xal', 'haw', 'pfl', 'pdc',
             'rw', 'krc', 'crh', 'ace', 'to', 'ce', 'kl', 'arc', 'dsb', 'myv',
-            'bjn', 'sn', 'lez', 'pap', 'kab', 'tpi', 'lbe', 'bxr', 'jbo', 'mdf',
-            'wo', 'av', 'srn', 'cbk-zam', 'mwl', 'ty', 'kbd', 'lo', 'ab', 'tet',
-            'ltg', 'na', 'kg', 'ig', 'nso', 'kaa', 'za', 'zu', 'chy', 'rmy',
-            'cu', 'tn', 'chr', 'bi', 'got', 'cdo', 'sm', 'bm', 'iu', 'pih',
-            'pnt', 'ss', 'sd', 'ki', 'ee', 'ha', 'om', 'fj', 'ti', 'ts', 'ks',
-            'sg', 've', 'rn', 'dz', 'cr', 'ak', 'tum', 'lg', 'ny', 'ik', 'ch',
-            'ff', 'st', 'tw', 'xh',
+            'sn', 'bjn', 'lez', 'pap', 'kab', 'tpi', 'lbe', 'bxr', 'jbo', 'mdf',
+            'wo', 'av', 'srn', 'mwl', 'ty', 'kbd', 'lo', 'ab', 'tet', 'ltg',
+            'na', 'kg', 'ig', 'nso', 'za', 'kaa', 'zu', 'chy', 'rmy', 'cu',
+            'tn', 'chr', 'bi', 'got', 'cdo', 'sm', 'bm', 'iu', 'pih', 'pnt',
+            'ss', 'sd', 'ki', 'ee', 'ha', 'om', 'fj', 'ti', 'ts', 'ks', 'sg',
+            've', 'rn', 'dz', 'cr', 'ak', 'tum', 'lg', 'ny', 'ik', 'ch', 'ff',
+            'tw', 'st', 'xh', 'min',
         ]
 
         self.langs = dict([(lang, '%s.wikipedia.org' % lang)
                            for lang in self.languages_by_size])
 
         # Override defaults
-        self.namespaces[2]['cs'] = [u'Wikipedista', u'Uživatel', u'Wikipedistka']
         self.namespaces[3]['cs'] =  [u'Diskuse s wikipedistou', u'Diskuse s uživatelem', u'Diskuse s wikipedistkou', u'Wikipedista diskuse', u'Wikipedistka diskuse', u'Uživatel diskuse', u'Uživatelka diskuse']
         self.namespaces[12]['de'] = [u'Benutzer Diskussion', u'BD', u'Benutzerin Diskussion'],
-        self.namespaces[12]['de'] = [u'Hilfe', u'H']
-        self.namespaces[13]['de'] = [u'Hilfe Diskussion', u'HD']
-        self.namespaces[2]['fr'] = [u'Utilisateur', u'Utilisatrice']
-        self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisatrice', u'Discussion Utilisateur']
         self.namespaces[1]['ja'] = [u'ノート', u'トーク']
         self.namespaces[3]['ja'] = [u'利用者‐会話', u'利用者・トーク']
         self.namespaces[7]['ja'] = [u'ファイル‐ノート', u'ファイル・トーク', u'Image talk', u'画像‐ノート']
@@ -62,12 +57,6 @@ class Family(family.WikimediaFamily):
         self.namespaces[13]['ja'] = [u'Help‐ノート', u'ヘルプ・トーク']
         self.namespaces[14]['ja'] = [u'Category', u'カテゴリ']
         self.namespaces[15]['ja'] = [u'Category‐ノート', u'カテゴリ・トーク']
-        self.namespaces[12]['nl'] = [u'Help', u'H']
-        self.namespaces[2]['pt'] =  [u'Usuário(a)', u'Utilizador', u'Usuário', u'Usuária']
-        self.namespaces[3]['pt'] = [u'Usuário(a) Discussão', u'Utilizador Discussão', u'Usuário Discussão', u'Usuária Discussão']
-        self.namespaces[2]['ru'] = [u'Участник', u'У', u'Участница']
-        self.namespaces[10]['ru'] = [u'Шаблон', u'Ш', u'T']
-        self.namespaces[14]['ru'] = [u'Категория', u'К']
 
         # Most namespaces are inherited from family.Family.
         # Translation used on all wikis for the different namespaces.
@@ -224,6 +213,7 @@ class Family(family.WikimediaFamily):
             'mg': u'Wikipedia',
             'mhr': u'Википедий',
             'mi': u'Wikipedia',
+            'min': u'Wikipedia',
             'mk': u'Википедија',
             'ml': [u'വിക്കിപീഡിയ', u'വിക്കി', u'Wikipedia', u'WP'],
             'mn': u'Wikipedia',
@@ -254,7 +244,7 @@ class Family(family.WikimediaFamily):
             'om': u'Wikipedia',
             'or': [u'ଉଇକିପିଡ଼ିଆ', u'Wikipedia', u'WP'],
             'os': u'Википеди',
-            'pa': u'ਵਿਕਿਪੀਡਿਆ',
+            'pa': u'ਵਿਕੀਪੀਡੀਆ',
             'pag': u'Wikipedia',
             'pam': u'Wikipedia',
             'pap': u'Wikipedia',
@@ -370,7 +360,7 @@ class Family(family.WikimediaFamily):
             'ay': u'Wikipidiyan Aruskipäwi',
             'az': u'Vikipediya müzakirəsi',
             'ba': [u'Википедия буйынса фекерләшеү', u'Wikipedia буйынса фекерләшеү', u'Википедия б-са фекер алышыу'],
-            'bar': u'Wikipedia Diskussion',
+            'bar': [u'Wikipedia Dischkrian', u'Wikipedia Diskussion'],
             'bat-smg': [u'Vikipedėjės aptarėms', u'Vikipedėjė aptarimas'],
             'bcl': u'Olay sa Wikipedia',
             'be': [u'Размовы пра Вікіпедыя', u'Вікіпедыя размовы'],
@@ -411,7 +401,7 @@ class Family(family.WikimediaFamily):
             'dv': u'Wikipedia talk',
             'dz': u'Wikipedia talk',
             'ee': u'Wikipedia talk',
-            'el': u'Βικιπαίδεια συζήτηση',
+            'el': [u'Συζήτηση Βικιπαίδεια', u'Βικιπαίδεια συζήτηση'],
             'eml': u'Discussioni Wikipedia',
             'en': [u'Wikipedia talk', u'WT'],
             'eo': [u'Vikipedia diskuto', u'Vikipedio diskuto'],
@@ -432,12 +422,12 @@ class Family(family.WikimediaFamily):
             'fy': u'Wikipedy oerlis',
             'ga': u'Plé Vicipéide',
             'gag': [u'Vikipediyanın laflanması', u'Vikipediya tartışma'],
-            'gan': u'Wikipedia 談詑',
+            'gan': [u'Wikipedia・談詑', u'Wikipedia 談詑'],
             'gd': [u'An deasbaireachd aig Uicipeid', u'Wikipedia talk'],
             'gl': u'Conversa Wikipedia',
             'glk': u'بحث Wikipedia',
             'gn': u'Vikipetã myangekõi',
-            'got': u'??? Wikipedia ?????????',
+            'got': u'𐌸𐌹𐍃 Wikipedia 𐌲𐌰𐍅𐌰𐌿𐍂𐌳𐌾𐌰',
             'gu': u'વિકિપીડિયા ચર્ચા',
             'gv': u'Resooney Wikipedia',
             'ha': u'Wikipedia talk',
@@ -467,7 +457,7 @@ class Family(family.WikimediaFamily):
             'ka': u'ვიკიპედია განხილვა',
             'kaa': [u'Wikipedia sa\'wbeti', u'Wikipedia талқылауы', u'Wikipedia تالقىلاۋى'],
             'kab': u'Amyannan n Wikipedia',
-            'kbd': u'Уикипедиэм и тепсэлъыхьыгъуэ',
+            'kbd': [u'Уикипедиэм и тепсэлъыхьыгъуэ', u'Обсуждение Уикипедиэ'],
             'kg': u'Wikipedia talk',
             'ki': u'Wikipedia talk',
             'kk': [u'Уикипедия талқылауы', u'Уикипедия talqılawı', u'Уикипедия تالقىلاۋى'],
@@ -502,6 +492,7 @@ class Family(family.WikimediaFamily):
             'mg': [u'Dinika amin\'ny Wikipedia', u'Discussion Wikipedia'],
             'mhr': [u'Википедийын каҥашымаш', u'Обсуждение Википедий'],
             'mi': u'Wikipedia talk',
+            'min': u'Pembicaraan Wikipedia',
             'mk': u'Разговор за Википедија',
             'ml': [u'വിക്കിപീഡിയ സംവാദം', u'വിക്കിസം'],
             'mn': u'Wikipedia-н хэлэлцүүлэг',
@@ -532,13 +523,13 @@ class Family(family.WikimediaFamily):
             'om': u'Wikipedia talk',
             'or': [u'ଉଇକିପିଡ଼ିଆ ଆଲୋଚନା', u'Wikipedia talk', u'WT'],
             'os': [u'Википедийы тæрхон', u'Дискусси Википеди'],
-            'pa': [u'ਵਿਕਿਪੀਡਿਆ ਗੱਲ-ਬਾਤ', u'ਵਿਕਿਪੀਡਿਆ ਚਰਚਾ'],
+            'pa': [u'ਵਿਕੀਪੀਡੀਆ ਗੱਲ-ਬਾਤ', u'ਵਿਕੀਪੀਡੀਆ ਚਰਚਾ'],
             'pag': u'Wikipedia talk',
             'pam': u'Wikipedia talk',
             'pap': u'Wikipedia talk',
             'pcd': u'Discussion Wikipedia',
             'pdc': [u'Wikipedia Dischbedutt', u'Wikipedia Diskussion'],
-            'pfl': u'Wikipedia Diskussion',
+            'pfl': [u'Wikipedia Dischbediere', u'Wikipedia Diskussion'],
             'pi': u'Wikipedia सम्भासित',
             'pih': u'Wikipedia talk',
             'pl': u'Dyskusja Wikipedii',
@@ -700,6 +691,7 @@ class Family(family.WikimediaFamily):
             'lmo': u'Portal',
             'lt': u'Vikisritis',
             'lv': u'Portāls',
+            'min': u'Portal',
             'mk': u'Портал',
             'ml': u'കവാടം',
             'mr': u'दालन',
@@ -805,6 +797,7 @@ class Family(family.WikimediaFamily):
             'lmo': u'Descüssiú Portal',
             'lt': u'Vikisrities aptarimas',
             'lv': u'Portāla diskusija',
+            'min': u'Diskusi Portal',
             'mk': u'Разговор за Портал',
             'ml': [u'കവാടത്തിന്റെ സംവാദം', u'Portal talk'],
             'mr': u'दालन चर्चा',
@@ -1220,30 +1213,31 @@ class Family(family.WikimediaFamily):
         # Global bot allowed languages on
         # http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
-            'ab', 'ace', 'af', 'ak', 'als', 'am', 'an', 'ang', 'arc', 'arz',
-            'as', 'ast', 'av', 'ay', 'az', 'ba', 'bar', 'bat-smg', 'bcl', 'be',
-            'be-x-old', 'bg', 'bh', 'bi', 'bjn', 'bm', 'bo', 'bpy', 'bug',
+            'ab', 'ace', 'af', 'ak', 'als', 'am', 'an', 'ang', 'ar', 'arc',
+            'arz', 'as', 'ast', 'av', 'ay', 'az', 'ba', 'bar', 'bat-smg', 'bcl',
+            'be', 'be-x-old', 'bg', 'bh', 'bi', 'bjn', 'bm', 'bo', 'bpy', 'bug',
             'bxr', 'ca', 'cbk-zam', 'cdo', 'ce', 'ceb', 'ch', 'chr', 'chy',
             'ckb', 'co', 'cr', 'crh', 'csb', 'cu', 'cv', 'cy', 'da', 'diq',
             'dsb', 'dz', 'ee', 'el', 'eml', 'en', 'eo', 'et', 'eu', 'ext', 'fa',
             'ff', 'fi', 'fj', 'fo', 'frp', 'frr', 'fur', 'ga', 'gag', 'gan',
             'gd', 'glk', 'gn', 'got', 'gu', 'gv', 'ha', 'hak', 'haw', 'he',
             'hi', 'hif', 'hr', 'hsb', 'ht', 'hu', 'hy', 'ia', 'ie', 'ig', 'ik',
-            'ilo', 'io', 'iu', 'ja', 'jbo', 'jv', 'ka', 'kaa', 'kab', 'kg',
-            'ki', 'kk', 'kl', 'km', 'kn', 'ko', 'koi', 'krc', 'ks', 'ku', 'kv',
-            'kw', 'ky', 'la', 'lad', 'lb', 'lbe', 'lez', 'lg', 'li', 'lij',
-            'lmo', 'ln', 'lo', 'ltg', 'lv', 'map-bms', 'mdf', 'mg', 'mhr', 'mi',
-            'mk', 'ml', 'mn', 'mrj', 'ms', 'mwl', 'my', 'myv', 'mzn', 'na',
-            'nah', 'nap', 'nds-nl', 'ne', 'new', 'nl', 'no', 'nov', 'nrm', 'nv',
-            'ny', 'oc', 'om', 'or', 'os', 'pa', 'pag', 'pam', 'pap', 'pdc',
-            'pfl', 'pi', 'pih', 'pms', 'pnb', 'pnt', 'ps', 'qu', 'rm', 'rmy',
-            'rn', 'roa-rup', 'roa-tara', 'ru', 'rue', 'rw', 'sa', 'sah', 'sc',
-            'scn', 'sco', 'sd', 'se', 'sg', 'sh', 'si', 'simple', 'sk', 'sm',
-            'sn', 'so', 'srn', 'ss', 'st', 'stq', 'su', 'sv', 'sw', 'szl', 'ta',
-            'te', 'tet', 'tg', 'th', 'ti', 'tk', 'tl', 'tn', 'to', 'tpi', 'tr',
-            'ts', 'tt', 'tum', 'tw', 'ty', 'udm', 'ug', 'uz', 've', 'vec',
-            'vep', 'vls', 'vo', 'wa', 'war', 'wo', 'xal', 'xh', 'yi', 'yo',
-            'za', 'zea', 'zh', 'zh-classical', 'zh-min-nan', 'zh-yue', 'zu',
+            'ilo', 'io', 'iu', 'ja', 'jbo', 'jv', 'ka', 'kaa', 'kab', 'kdb',
+            'kg', 'ki', 'kk', 'kl', 'km', 'kn', 'ko', 'koi', 'krc', 'ks', 'ku',
+            'kv', 'kw', 'ky', 'la', 'lad', 'lb', 'lbe', 'lez', 'lg', 'li',
+            'lij', 'lmo', 'ln', 'lo', 'lt', 'ltg', 'lv', 'map-bms', 'mdf', 'mg',
+            'mhr', 'mi', 'mk', 'ml', 'mn', 'mrj', 'ms', 'mwl', 'my', 'myv',
+            'mzn', 'na', 'nah', 'nap', 'nds-nl', 'ne', 'new', 'nl', 'no', 'nov',
+            'nrm', 'nso', 'nv', 'ny', 'oc', 'om', 'or', 'os', 'pa', 'pag',
+            'pam', 'pap', 'pdc', 'pfl', 'pi', 'pih', 'pms', 'pnb', 'pnt', 'ps',
+            'qu', 'rm', 'rmy', 'rn', 'roa-rup', 'roa-tara', 'ru', 'rue', 'rw',
+            'sa', 'sah', 'sc', 'scn', 'sco', 'sd', 'se', 'sg', 'sh', 'si',
+            'simple', 'sk', 'sm', 'sn', 'so', 'srn', 'ss', 'st', 'stq', 'su',
+            'sv', 'sw', 'szl', 'ta', 'te', 'tet', 'tg', 'th', 'ti', 'tk', 'tl',
+            'tn', 'to', 'tpi', 'tr', 'ts', 'tt', 'tum', 'tw', 'ty', 'udm', 'ug',
+            'uz', 've', 'vec', 'vep', 'vls', 'vo', 'wa', 'war', 'wo', 'wuu',
+            'xal', 'xh', 'yi', 'yo', 'za', 'zea', 'zh', 'zh-classical',
+            'zh-min-nan', 'zh-yue', 'zu',
         ]
 
         # On most Wikipedias page names must start with a capital letter,
@@ -1273,10 +1267,10 @@ class Family(family.WikimediaFamily):
             'csb', 'kk', 'kw', 'rw', 'ky', 'mrj', 'rn', 'sw', 'km', 'kn', 'ko',
             'kv', 'kg', 'ht', 'ks', 'ku', 'kj', 'lad', 'lbe', 'la', 'ltg', 'lv',
             'to', 'lb', 'lez', 'lt', 'lij', 'li', 'ln', 'lo', 'jbo', 'lg',
-            'lmo', 'hu', 'mk', 'mg', 'mt', 'mi', 'cdo', 'mwl', 'ml', 'mdf',
-            'mo', 'mn', 'mr', 'mus', 'my', 'mzn', 'nah', 'fj', 'ne', 'nl',
-            'nds-nl', 'cr', 'new', 'nap', 'ce', 'frr', 'pih', 'no', 'nb', 'nn',
-            'nrm', 'nov', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa',
+            'lmo', 'hu', 'mk', 'mg', 'mt', 'mi', 'min', 'cdo', 'mwl', 'ml',
+            'mdf', 'mo', 'mn', 'mr', 'mus', 'my', 'mzn', 'nah', 'fj', 'ne',
+            'nl', 'nds-nl', 'cr', 'new', 'nap', 'ce', 'frr', 'pih', 'no', 'nb',
+            'nn', 'nrm', 'nov', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa',
             'pfl', 'pag', 'pap', 'koi', 'pi', 'pcd', 'pms', 'nds', 'pnb', 'pl',
             'pt', 'pnt', 'ps', 'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro', 'rmy',
             'rm', 'qu', 'ru', 'rue', 'sa', 'sah', 'se', 'sg', 'sc', 'sco', 'sd',
@@ -1533,7 +1527,7 @@ class Family(family.WikimediaFamily):
         return self.code2encoding(code),
 
     def shared_data_repository(self, code, transcluded=False):
-        if not transcluded or code in ['he', 'hu', 'it']:
-            return ('wikidata', 'wikidata')            
+        if not transcluded or code in ['en', 'he', 'hu', 'it']:
+            return ('wikidata', 'wikidata')
         else:
             return (None, None)

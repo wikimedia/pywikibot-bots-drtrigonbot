@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 from pywikibot import family
 
-__version__ = '$Id: wiktionary_family.py 11006 2013-01-27 14:20:10Z xqt $'
+__version__ = '$Id: wiktionary_family.py 11067 2013-02-10 15:41:55Z xqt $'
 
 # The Wikimedia family that is known as Wiktionary
 
@@ -11,18 +11,18 @@ class Family(family.WikimediaFamily):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'el', 'ko', 'sv', 'tr', 'pl',
-            'ta', 'nl', 'de', 'kn', 'vi', 'fi', 'io', 'ku', 'hu', 'pt', 'ml',
+            'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'el', 'ko', 'sv', 'pl', 'tr',
+            'ta', 'nl', 'de', 'ku', 'kn', 'vi', 'fi', 'io', 'hu', 'pt', 'ml',
             'no', 'my', 'id', 'it', 'li', 'es', 'et', 'ja', 'fa', 'te', 'ro',
             'ar', 'cs', 'jv', 'eu', 'lo', 'gl', 'ca', 'uk', 'fj', 'br', 'bg',
-            'eo', 'hr', 'oc', 'vo', 'is', 'th', 'simple', 'zh-min-nan', 'scn',
-            'cy', 'sr', 'af', 'sw', 'ast', 'fy', 'tl', 'ps', 'nn', 'he', 'ur',
-            'uz', 'wa', 'la', 'da', 'hy', 'sq', 'sm', 'sl', 'hi', 'az', 'tt',
+            'eo', 'hr', 'oc', 'vo', 'is', 'th', 'simple', 'zh-min-nan', 'cy',
+            'scn', 'sr', 'af', 'sw', 'ast', 'fy', 'ps', 'tl', 'nn', 'he', 'ur',
+            'uz', 'wa', 'la', 'da', 'hy', 'sq', 'sm', 'sl', 'hi', 'tt', 'az',
             'nah', 'pnb', 'ka', 'lv', 'lb', 'bs', 'tk', 'hsb', 'kk', 'sk', 'km',
-            'mk', 'be', 'ga', 'wo', 'ang', 'ky', 'ms', 'co', 'gn', 'mr', 'csb',
-            'st', 'nds', 'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'kl', 'mn', 'jbo',
-            'an', 'sa', 'zu', 'gu', 'rw', 'fo', 'kw', 'gv', 'qu', 'ss', 'ie',
-            'mt', 'om', 'chr', 'roa-rup', 'iu', 'pa', 'bn', 'am', 'so', 'su',
+            'mk', 'be', 'ga', 'wo', 'ms', 'ang', 'ky', 'co', 'gn', 'mr', 'csb',
+            'st', 'nds', 'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'kl', 'sa', 'mn',
+            'jbo', 'an', 'zu', 'gu', 'rw', 'fo', 'kw', 'gv', 'qu', 'ss', 'ie',
+            'mt', 'om', 'chr', 'roa-rup', 'iu', 'bn', 'pa', 'so', 'am', 'su',
             'za', 'gd', 'mi', 'tpi', 'ik', 'or', 'yi', 'ln', 'ti', 'sg', 'na',
             'dv', 'tn', 'ne', 'ha', 'ks', 'ay', 'ts',
         ]
@@ -35,12 +35,12 @@ class Family(family.WikimediaFamily):
         self.cross_allowed = [
             'am', 'an', 'ang', 'ast', 'ay', 'az', 'be', 'bg', 'bn', 'br', 'bs',
             'ca', 'chr', 'co', 'cy', 'da', 'dv', 'eo', 'es', 'et', 'eu', 'fa',
-            'fi', 'fj', 'fo', 'fy', 'ga', 'gd', 'gl', 'gv', 'hu', 'ia', 'id',
-            'ie', 'ik', 'io', 'jv', 'ka', 'kn', 'ky', 'lb', 'lo', 'lt', 'lv',
-            'mg', 'mk', 'ml', 'my', 'ne', 'nl', 'no', 'oc', 'pt', 'sh',
-            'simple', 'sk', 'sl', 'sm', 'su', 'tg', 'th', 'ti', 'tk', 'tn',
-            'tpi', 'ts', 'ug', 'uk', 'vo', 'wa', 'wo', 'za', 'zh', 'zh-min-nan',
-            'zu',
+            'fi', 'fj', 'fo', 'fy', 'ga', 'gd', 'gl', 'gn', 'gv', 'hu', 'ia',
+            'id', 'ie', 'io', 'jv', 'ka', 'kl', 'kn', 'ku', 'ky', 'lb', 'lo',
+            'lt', 'lv', 'mg', 'mk', 'ml', 'mn', 'my', 'ne', 'nl', 'no', 'oc',
+            'or', 'pt', 'sh', 'simple', 'sk', 'sl', 'sm', 'su', 'tg', 'th',
+            'ti', 'tk', 'tn', 'tpi', 'ts', 'ug', 'uk', 'vo', 'wa', 'wo', 'zh',
+            'zh-min-nan', 'zu',
         ]
 
         # Other than most Wikipedias, page names must not start with a capital

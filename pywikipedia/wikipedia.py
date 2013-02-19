@@ -45,7 +45,10 @@ Other functions:
     setAction(text): Use 'text' instead of "Wikipedia python library" in
         edit summaries
     setUserAgent(text): Sets the string being passed to the HTTP server as
-        the User-agent: header. Defaults to 'Pywikipediabot/1.0'.
+        the User-agent: header. The default is 
+        '<script>/<revision> Pywikipediabot/1.0', where '<script>' is the tail
+        path component and file name of the currently executing script and
+        revision is the SVN revision of Pywikipediabot.
 
     output(text): Prints the text 'text' in the encoding of the user's
         console. **Use this instead of "print" statements**
@@ -118,7 +121,7 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 11026 2013-02-02 13:08:58Z drtrigon $'
+__version__ = '$Id: wikipedia.py 11070 2013-02-10 16:50:53Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -160,6 +163,9 @@ try:
 except ValueError:
     WIDEBUILD = False
 
+
+# Format string for the default user agent.
+USER_AGENT_FORMAT = '{script}/r{version[rev]} Pywikipediabot/1.0'
 
 SaxError = xml.sax._exceptions.SAXParseException
 
@@ -4078,11 +4084,14 @@ class DataPage(Page):
         elif isinstance(source, Page):
             title = source.title()
             source = source.site
+        elif isinstance(source, int):
+            title = "Q%d" % source
+            source = getSite().data_repository()
         self._originSite = source
         self._originTitle = title
         source = self._originSite.data_repository()
         Page.__init__(self, source, title, *args, **kwargs)
-        if not self._originSite is source:
+        if not (self._originSite == source):
             self._title = None
 
     def setitem(self, summary=None, watchArticle=False, minorEdit=True,
@@ -4360,7 +4369,7 @@ class DataPage(Page):
             except AttributeError:
                 raise SectionError # Page has no section by this name
         self._contents = json.loads(pagetext)
-        self._title = self._contents['entity']
+        self._title = self._contents['entity'].title()
         return self._contents
 
     def getentities(self, sysop=False):
@@ -4400,7 +4409,6 @@ class DataPage(Page):
         # retrying is done by query.GetData
         data = query.GetData(params, self.site(), sysop=sysop)
         search  = data['search']
-        debuginfo = data['debuginfo']
 
         if 'error' in data:
             raise RuntimeError("API query error: %s" % data)
@@ -4433,7 +4441,8 @@ class DataPage(Page):
 
         """
         links = self.get()['links']
-        self._interwiki = [Page(code.replace('wiki', ''), links[code])
+        self._interwiki = [Page(code.replace('wiki', '').replace('_', '-'),
+                                links[code])
                            for code in links]
         return self._interwiki
 
@@ -5208,7 +5217,10 @@ def setUserAgent(s):
     useragent = s
 
 # Default User-agent
-setUserAgent('PythonWikipediaBot/1.0')
+setUserAgent(USER_AGENT_FORMAT.format(
+    script=('-'.join(version.get_executing_script())),
+    version=version.getversiondict()
+))
 
 def url2link(percentname, insite, site):
     """Convert urlname of a wiki page into interwiki link format.

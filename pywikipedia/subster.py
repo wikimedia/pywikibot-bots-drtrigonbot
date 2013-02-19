@@ -34,6 +34,7 @@ Syntax example:
 
     python subster.py -family:meta -lang:
     python subster.py -family:wikidata -lang:repo
+    python subster.py -family:wikidata -lang:en
         Run bot on another site family and language than configured as default.
         E.g. 'meta' or 'wikidata'.
 
@@ -61,7 +62,7 @@ Syntax example:
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__ = '$Id: subster.py 11023 2013-02-02 11:29:35Z drtrigon $'
+__version__ = '$Id: subster.py 11086 2013-02-19 18:32:09Z drtrigon $'
 #
 
 
@@ -177,7 +178,8 @@ class SubsterBot(basic.AutoBasicBot):
         self._ConfCSSpostprocPage = pywikibot.Page(self.site, bot_config['ConfCSSpostproc'])
         self._ConfCSSconfigPage   = pywikibot.Page(self.site, bot_config['ConfCSSconfig'])
         self.pagegen     = pagegenerators.ReferringPageGenerator(self._userListPage, onlyTemplateInclusion=True)
-        if not ((self.site.family.name == 'wikidata') and (self.site.lang == 'repo')):
+        if not (self.site.family.name == 'wikidata'):
+#        if not self.site.is_data_repository():     # wikidata?
             # DRTRIGON-130; skip this for test-repo
             self._code       = self._ConfCSSpostprocPage.get()
             pywikibot.output(u'Imported postproc %s rev %s from %s' %\
@@ -220,15 +222,29 @@ class SubsterBot(basic.AutoBasicBot):
             elif (self.site.family.name == 'wikidata'):     # DRTRIGON-130
                 # convert talk page result to wikidata(base)
                 data = self.WD_convertContent(substed_content)
-                #outpage = page.toggleTalkPage()
-                outpage = pywikibot.DataPage(self.site, page.toggleTalkPage().title())
-                #dic = json.loads(outpage.get())
-                dic = outpage.getentities()
+                datapage = pywikibot.DataPage(self.site, page.title())
+                for item in data:
+                    for element in datapage.searchentities(u'DrTrigonBot:%s' % item):
+                        dataoutpage = pywikibot.DataPage(self.site, element['id'])
+#                        dataoutpage.createclaim(u'p38', data[item])
+#                        dataoutpage.createclaim(u'p38', u'{"entity-type":"item", "numeric-id":1}')
+#                        dataoutpage.createclaim(u'p38', u'{"entity-type":"quantity", "numeric-id":1}')
+                        dataoutpage = page.toggleTalkPage()
 
-                # check for changes and then write/change/set values
-                summary = u'Bot: update data because of configuration on %s.' % page.title(asLink=True)
-                if not self.WD_save(outpage, dic[u'claims'], {u'p32': data}, summary):
-                    pywikibot.output(u'NOTHING TO DO!')
+                        ##dic = json.loads(dataoutpage.get())
+                        #dic = dataoutpage.getentities()
+                        out = u'* ~~~~~ / [[%s]] / %s / %s' % (element['id'], item, data[item])
+
+                        pywikibot.output(u'%s <--- "%s"' % (dataoutpage.title(asLink=True), out))
+
+                        ## check for changes and then write/change/set values
+                        summary = u'Bot: update data because of configuration on %s.' % page.title(asLink=True)
+                        #if not self.WD_save(dataoutpage, dic[u'claims'], {u'p32': data}, summary):
+                        buf = dataoutpage.get()
+                        if buf.strip().splitlines()[-1].split(u'/')[-1].strip() == data[item]:
+                            pywikibot.output(u'NOTHING TO DO!')
+                        else:
+                            dataoutpage.put(buf + u'\n' + out, comment=summary)
             else:
                 # if changed, write!
                 if (substed_content != content):
@@ -377,6 +393,10 @@ class SubsterBot(basic.AutoBasicBot):
             else:
                 external_buffer = u'n/a'
         else:
+            # consider using 'expires', 'last-modified', 'etag' in order to
+            # make the updating data requests more efficient! use those stored
+            # on page, if the user placed them, else use the conventional mode.
+            # http://www.diveintopython.net/http_web_services/etags.html
             f_url, external_buffer = http.request(self.site, param['url'],
                                                   no_hostname = True, 
                                                   back_response = True)
@@ -514,22 +534,16 @@ class SubsterBot(basic.AutoBasicBot):
         """
         # DRTRIGON-130: convert talk page result to wikidata(base)
         #res, i = {}, 0
-        res = []
+        res = {}
         for line in substed_content.splitlines():
             #data = self.get_var_regex('(.*?)', '(.*?)').findall(line)
             data = self.get_var_regex('.*?', '(.*?)').sub('\g<1>', line)
             #if not data:
             if data == line:
                 continue
-            #buf = []
-            #for item in data:
-            #    #print item[0], item[1]
-            #    params = { u'property':  u'p%i' % i,
-            #               u'value': item[1] }
-            #    buf.append(params)
-            #res[u'p%i' % i] = buf
-            #i += 1
-            res.append(data)
+            data = data.lstrip(u'|')
+            key, value = data.split(u'=')
+            res[key.strip()] = value.strip()
 
         return res
 

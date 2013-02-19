@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wiktionary_family.py 11009 2013-01-27 14:45:08Z xqt $'
+__version__ = '$Id: wiktionary_family.py 11084 2013-02-17 12:39:22Z xqt $'
 
 # The Wikimedia family that is known as Wiktionary
 
@@ -11,18 +11,18 @@ class Family(family.WikimediaFamily):
         self.name = 'wiktionary'
 
         self.languages_by_size = [
-            'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'el', 'ko', 'sv', 'tr', 'pl',
-            'ta', 'nl', 'de', 'kn', 'vi', 'fi', 'io', 'ku', 'hu', 'pt', 'ml',
+            'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'el', 'ko', 'sv', 'pl', 'tr',
+            'ta', 'nl', 'de', 'ku', 'kn', 'vi', 'fi', 'io', 'hu', 'pt', 'ml',
             'no', 'my', 'id', 'it', 'li', 'es', 'et', 'ja', 'fa', 'te', 'ro',
             'ar', 'cs', 'jv', 'eu', 'lo', 'gl', 'ca', 'uk', 'fj', 'br', 'bg',
-            'eo', 'hr', 'oc', 'vo', 'is', 'th', 'simple', 'zh-min-nan', 'scn',
-            'cy', 'sr', 'af', 'sw', 'ast', 'fy', 'tl', 'ps', 'nn', 'he', 'ur',
-            'uz', 'wa', 'la', 'da', 'hy', 'sq', 'sm', 'sl', 'hi', 'az', 'tt',
+            'eo', 'hr', 'oc', 'vo', 'is', 'th', 'simple', 'zh-min-nan', 'cy',
+            'scn', 'sr', 'af', 'sw', 'ast', 'fy', 'ps', 'tl', 'nn', 'he', 'ur',
+            'uz', 'wa', 'la', 'da', 'hy', 'sq', 'sm', 'sl', 'hi', 'tt', 'az',
             'nah', 'pnb', 'ka', 'lv', 'lb', 'bs', 'tk', 'hsb', 'kk', 'sk', 'km',
-            'mk', 'be', 'ga', 'wo', 'ang', 'ky', 'ms', 'co', 'gn', 'mr', 'csb',
-            'st', 'nds', 'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'kl', 'mn', 'jbo',
-            'an', 'sa', 'zu', 'gu', 'rw', 'fo', 'kw', 'gv', 'qu', 'ss', 'ie',
-            'mt', 'om', 'chr', 'roa-rup', 'iu', 'pa', 'bn', 'am', 'so', 'su',
+            'mk', 'be', 'ga', 'wo', 'ms', 'ang', 'ky', 'co', 'gn', 'mr', 'csb',
+            'st', 'nds', 'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'kl', 'sa', 'mn',
+            'jbo', 'an', 'zu', 'gu', 'rw', 'fo', 'kw', 'gv', 'qu', 'ss', 'ie',
+            'mt', 'om', 'chr', 'roa-rup', 'iu', 'bn', 'pa', 'so', 'am', 'su',
             'za', 'gd', 'mi', 'tpi', 'ik', 'or', 'yi', 'ln', 'ti', 'sg', 'na',
             'dv', 'tn', 'ne', 'ha', 'ks', 'ay', 'ts',
         ]
@@ -31,13 +31,22 @@ class Family(family.WikimediaFamily):
                            for lang in self.languages_by_size])
 
         # Override defaults
+        self.namespaces[2]['ru'] = [u'Участник', u'Участница']
+        self.namespaces[10]['ru'] = [u'Шаблон']
+        self.namespaces[14]['ru'] = [u'Категория']
+        self.namespaces[3]['eo'] = [u'Uzanta diskuto', u'Vikipediista diskuto', u'Uzula diskuto']
         self.namespaces[10]['zh'] = [u'Template', u'模板', u'样板', u'樣板']
         self.namespaces[12]['zh'] = [u'Help', u'帮助', u'幫助']
         self.namespaces[14]['zh'] = [u'Category', u'分类', u'分類']
+        self.namespaces[3]['pt'] = [u'Utilizador Discussão', u'Usuário Discussão', u'Utilizadora Discussão']
+        self.namespaces[2]['pt'] = [u'Utilizador', u'Usuário', u'Utilizadora']
         self.namespaces[15]['bn'] = [u'বিষয়শ্রেণী আলোচনা']
         self.namespaces[14]['bn'] = [u'বিষয়শ্রেণী']
         self.namespaces[3]['de'] = [u'Benutzer Diskussion', u'BD', u'Benutzerin Diskussion']
-        self.namespaces[3]['eo'] = [u'Uzanta diskuto', u'Vikipediista diskuto', u'Uzula diskuto']
+        self.namespaces[13]['de'] = [u'Hilfe Diskussion']
+        self.namespaces[12]['de'] = [u'Hilfe']
+        self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisateur']
+        self.namespaces[2]['fr'] = [u'Utilisateur']
         self.namespaces[13]['da'] = [u'Hjælp diskussion', u'Hjælp-diskussion']
         self.namespaces[9]['da'] = [u'MediaWiki diskussion', u'MediaWiki-diskussion']
         self.namespaces[11]['hi'] = [u'साँचा वार्ता']
@@ -48,6 +57,9 @@ class Family(family.WikimediaFamily):
         self.namespaces[2]['hi'] = [u'सदस्य']
         self.namespaces[9]['hi'] = [u'मीडियाविकि वार्ता']
         self.namespaces[8]['hi'] = [u'मीडियाविकि']
+        self.namespaces[3]['cs'] = [u'Diskuse s uživatelem', u'Uživatel diskuse', u'Uživatelka diskuse', u'Diskuse s uživatelkou']
+        self.namespaces[2]['cs'] = [u'Uživatel', u'Uživatelka']
+        self.namespaces[12]['nl'] = [u'Help']
         self.namespaces[9]['ro'] = [u'Discuție MediaWiki', u'Discuţie MediaWiki']
         self.namespaces[3]['ca'] = [u'Usuari Discussió']
         self.namespaces[2]['ca'] = [u'Usuari']
@@ -238,7 +250,7 @@ class Family(family.WikimediaFamily):
             'de': u'Wiktionary Diskussion',
             'dv': u'Wiktionary talk',
             'dz': u'Wiktionary talk',
-            'el': u'Συζήτηση βικιλεξικού',
+            'el': [u'Συζήτηση βικιλεξικού', u'Βικιλεξικό συζήτηση'],
             'en': u'Wiktionary talk',
             'eo': [u'Vikivortaro-Diskuto', u'Vikivortaro diskuto'],
             'es': u'Wikcionario discusión',
@@ -399,6 +411,7 @@ class Family(family.WikimediaFamily):
             'ga': u'Aguisín',
             'gl': u'Apéndice',
             'he': u'נספח',
+            'id': u'Indeks',
             'it': u'Appendice',
             'ja': u'付録',
             'ko': u'부록',
@@ -434,6 +447,7 @@ class Family(family.WikimediaFamily):
             'ga': u'Plé aguisín',
             'gl': u'Conversa apéndice',
             'he': u'שיחת נספח',
+            'id': u'Pembicaraan Indeks',
             'it': u'Discussioni appendice',
             'ja': u'付録・トーク',
             'ko': u'부록 토론',
@@ -583,12 +597,12 @@ class Family(family.WikimediaFamily):
         self.cross_allowed = [
             'am', 'an', 'ang', 'ast', 'ay', 'az', 'be', 'bg', 'bn', 'br', 'bs',
             'ca', 'chr', 'co', 'cy', 'da', 'dv', 'eo', 'es', 'et', 'eu', 'fa',
-            'fi', 'fj', 'fo', 'fy', 'ga', 'gd', 'gl', 'gv', 'hu', 'ia', 'id',
-            'ie', 'ik', 'io', 'jv', 'ka', 'kn', 'ky', 'lb', 'lo', 'lt', 'lv',
-            'mg', 'mk', 'ml', 'my', 'ne', 'nl', 'no', 'oc', 'pt', 'sh',
-            'simple', 'sk', 'sl', 'sm', 'su', 'tg', 'th', 'ti', 'tk', 'tn',
-            'tpi', 'ts', 'ug', 'uk', 'vo', 'wa', 'wo', 'za', 'zh', 'zh-min-nan',
-            'zu',
+            'fi', 'fj', 'fo', 'fy', 'ga', 'gd', 'gl', 'gn', 'gv', 'hu', 'ia',
+            'id', 'ie', 'io', 'jv', 'ka', 'kl', 'kn', 'ku', 'ky', 'lb', 'lo',
+            'lt', 'lv', 'mg', 'mk', 'ml', 'mn', 'my', 'ne', 'nl', 'no', 'oc',
+            'or', 'pt', 'sh', 'simple', 'sk', 'sl', 'sm', 'su', 'tg', 'th',
+            'ti', 'tk', 'tn', 'tpi', 'ts', 'ug', 'uk', 'vo', 'wa', 'wo', 'zh',
+            'zh-min-nan', 'zu',
         ]
 
         # Other than most Wikipedias, page names must not start with a capital

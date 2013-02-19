@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiquote_family.py 11009 2013-01-27 14:45:08Z xqt $'
+__version__ = '$Id: wikiquote_family.py 11084 2013-02-17 12:39:22Z xqt $'
 
 # The Wikimedia family that is known as Wikiquote
 
@@ -13,22 +13,29 @@ class Family(family.WikimediaFamily):
         self.languages_by_size = [
             'en', 'pl', 'it', 'ru', 'fr', 'de', 'pt', 'es', 'sk', 'cs', 'bg',
             'bs', 'tr', 'sl', 'he', 'lt', 'eo', 'uk', 'el', 'zh', 'id', 'fa',
-            'hu', 'fi', 'sv', 'li', 'nl', 'ca', 'no', 'nn', 'hr', 'ja', 'az',
-            'hy', 'ar', 'et', 'ko', 'ml', 'cy', 'ka', 'gl', 'sr', 'ro', 'ku',
-            'th', 'te', 'is', 'eu', 'da', 'af', 'vi', 'sq', 'ta', 'hi', 'la',
-            'br', 'be', 'mr', 'uz', 'ur', 'zh-min-nan', 'gu', 'su', 'kn', 'wo',
-            'ky', 'am',
+            'hu', 'fi', 'sv', 'li', 'nl', 'ca', 'no', 'nn', 'hr', 'sa', 'ja',
+            'az', 'hy', 'ar', 'et', 'ko', 'ml', 'cy', 'ka', 'gl', 'sr', 'ro',
+            'ku', 'th', 'te', 'is', 'eu', 'da', 'af', 'vi', 'sq', 'ta', 'hi',
+            'la', 'br', 'be', 'mr', 'uz', 'ur', 'zh-min-nan', 'gu', 'su', 'kn',
+            'wo', 'ky', 'am',
         ]
 
         self.langs = dict([(lang, '%s.wikiquote.org' % lang)
                            for lang in self.languages_by_size])
 
         # Override defaults
-        self.namespaces[10]['zh'] = [u'Template', u'模板', u'样板', u'樣板']
-        self.namespaces[12]['zh'] = [u'Help', u'帮助', u'幫助']
-        self.namespaces[14]['zh'] = [u'Category', u'分类', u'分類']
+        self.namespaces[10]['ru'] = [u'Шаблон']
+        self.namespaces[14]['ru'] = [u'Категория']
+        self.namespaces[2]['ru'] = [u'Участник', u'Участница']
+        self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisateur']
+        self.namespaces[2]['fr'] = [u'Utilisateur']
+        self.namespaces[12]['nl'] = [u'Help']
+        self.namespaces[3]['pt'] = [u'Utilizador Discussão', u'Usuário Discussão', u'Utilizadora Discussão']
+        self.namespaces[2]['pt'] = [u'Utilizador', u'Usuário', u'Utilizadora']
         self.namespaces[3]['ca'] = [u'Usuari Discussió']
         self.namespaces[2]['ca'] = [u'Usuari']
+        self.namespaces[13]['de'] = [u'Hilfe Diskussion']
+        self.namespaces[12]['de'] = [u'Hilfe']
         self.namespaces[3]['de'] = [u'Benutzer Diskussion', u'BD', u'Benutzerin Diskussion']
         self.namespaces[13]['da'] = [u'Hjælp diskussion', u'Hjælp-diskussion']
         self.namespaces[9]['da'] = [u'MediaWiki diskussion', u'MediaWiki-diskussion']
@@ -40,6 +47,11 @@ class Family(family.WikimediaFamily):
         self.namespaces[2]['hi'] = [u'सदस्य']
         self.namespaces[9]['hi'] = [u'मीडियाविकि वार्ता']
         self.namespaces[8]['hi'] = [u'मीडियाविकि']
+        self.namespaces[3]['cs'] = [u'Diskuse s uživatelem', u'Uživatel diskuse', u'Uživatelka diskuse', u'Diskuse s uživatelkou']
+        self.namespaces[2]['cs'] = [u'Uživatel', u'Uživatelka']
+        self.namespaces[10]['zh'] = [u'Template', u'模板', u'样板', u'樣板']
+        self.namespaces[12]['zh'] = [u'Help', u'帮助', u'幫助']
+        self.namespaces[14]['zh'] = [u'Category', u'分类', u'分類']
         self.namespaces[9]['ro'] = [u'Discuție MediaWiki', u'Discuţie MediaWiki']
         self.namespaces[3]['pl'] = [u'Dyskusja użytkownika', u'Dyskusja użytkowniczki']
         self.namespaces[2]['pl'] = [u'Użytkownik', u'Użytkowniczka']
@@ -105,6 +117,7 @@ class Family(family.WikimediaFamily):
             'pt': u'Wikiquote',
             'ro': [u'Wikicitat', u'Wikiquote'],
             'ru': [u'Викицитатник', u'ВЦ'],
+            'sa': [u'विकिसूक्तिः', u'Wikiquote'],
             'sk': [u'Wikicitáty', u'Wikiquote'],
             'sl': [u'Wikinavedek', u'Wikiquote'],
             'sq': u'Wikiquote',
@@ -144,7 +157,7 @@ class Family(family.WikimediaFamily):
             'cy': u'Sgwrs Wikiquote',
             'da': [u'Wikiquote diskussion', u'Wikiquote-diskussion'],
             'de': u'Wikiquote Diskussion',
-            'el': u'Βικιφθέγματα συζήτηση',
+            'el': [u'Συζήτηση Βικιφθέγματα', u'Βικιφθέγματα συζήτηση'],
             'en': u'Wikiquote talk',
             'eo': [u'Vikicitaro-Diskuto', u'Vikicitaro diskuto'],
             'es': u'Wikiquote discusión',
@@ -186,6 +199,7 @@ class Family(family.WikimediaFamily):
             'qu': u'Wikiquote rimanakuy',
             'ro': [u'Discuție Wikicitat', u'Discuţie Wikicitat'],
             'ru': u'Обсуждение Викицитатника',
+            'sa': [u'विकिसूक्तिःसम्भाषणम्', u'विकिसूक्तिःसंभाषणं'],
             'sk': [u'Diskusia k Wikicitátom', u'Komentár k Wikipédii'],
             'sl': u'Pogovor o Wikinavedku',
             'sq': u'Wikiquote diskutim',
@@ -267,9 +281,10 @@ class Family(family.WikimediaFamily):
         self.cross_allowed = [
             'af', 'am', 'ar', 'az', 'be', 'bg', 'br', 'bs', 'ca', 'cs', 'da',
             'el', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'gl', 'he', 'hi',
-            'hu', 'hy', 'id', 'is', 'it', 'ja', 'ka', 'kn', 'ku', 'la', 'li',
-            'lt', 'ml', 'nl', 'nn', 'no', 'pt', 'ro', 'ru', 'sk', 'sl', 'sq',
-            'sr', 'su', 'sv', 'te', 'tr', 'uk', 'uz', 'vi', 'zh', 'zh-min-nan',
+            'hu', 'hy', 'id', 'is', 'it', 'ja', 'ka', 'kn', 'ku', 'ky', 'la',
+            'li', 'lt', 'ml', 'mr', 'nl', 'nn', 'no', 'pt', 'ro', 'ru', 'sk',
+            'sl', 'sq', 'sr', 'su', 'sv', 'ta', 'te', 'tr', 'uk', 'uz', 'vi',
+            'wo', 'zh',
         ]
 
         # Which languages have a special order for putting interlanguage links,

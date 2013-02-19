@@ -338,7 +338,7 @@ that you have to break it off, use "-continue" next time.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: interwiki.py 11019 2013-01-30 23:56:18Z xqt $'
+__version__ = '$Id: interwiki.py 11059 2013-02-09 15:24:52Z xqt $'
 #
 
 import sys, copy, re, os
@@ -1315,7 +1315,8 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                 iw = page.langlinks()
             except pywikibot.NoSuchSite:
                 if not globalvar.quiet:
-                    pywikibot.output(u"NOTE: site %s does not exist" % page.site)
+                    pywikibot.output(u"NOTE: site %s does not exist."
+                                     % page.site)
                 continue
 
             (skip, alternativePage) = self.disambigMismatch(page, counter)
@@ -1988,10 +1989,12 @@ u'NOTE: number of edits are restricted at %s'
                     try:
                         linkedPages = set(pywikibot.Page(l) for l in page.iterlanglinks())
                     except pywikibot.NoPage:
-                        pywikibot.output(u"WARNING: Page %s does no longer exist?!" % page)
+                        pywikibot.output(
+                            u"WARNING: Page %s does no longer exist?!" % page)
                         break
-                    # To speed things up, create a dictionary which maps sites to pages.
-                    # This assumes that there is only one interwiki link per language.
+                    # To speed things up, create a dictionary which maps sites
+                    # to pages. This assumes that there is only one interwiki
+                    # link per language.
                     linkedPagesDict = {}
                     for linkedPage in linkedPages:
                         linkedPagesDict[linkedPage.site] = linkedPage

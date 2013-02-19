@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__version__ = '$Id: wikivoyage_family.py 11009 2013-01-27 14:45:08Z xqt $'
+__version__ = '$Id: wikivoyage_family.py 11064 2013-02-10 15:05:38Z xqt $'
 
 # The new wikivoyage family that is hosted at wikimedia
 
@@ -11,7 +11,7 @@ class Family(family.WikimediaFamily):
         super(Family, self).__init__()
         self.name = 'wikivoyage'
         self.languages_by_size = [
-            'de', 'en', 'fr', 'it', 'nl', 'ru', 'sv', 'pt', 'es',
+            'en', 'de', 'pt', 'nl', 'fr', 'it', 'ru', 'sv', 'es', 'ro', 'pl',
         ]
 
         self.langs = dict([(lang, '%s.wikivoyage.org' % lang)
@@ -24,7 +24,9 @@ class Family(family.WikimediaFamily):
             'fr': u'Wikivoyage',
             'it': u'Wikivoyage',
             'nl': u'Wikivoyage',
+            'pl': u'Wikipodróże',
             'pt': u'Wikivoyage',
+            'ro': u'Wikivoyage',
             'ru': u'Wikivoyage',
             'sv': u'Wikivoyage',
         }
@@ -36,7 +38,9 @@ class Family(family.WikimediaFamily):
             'fr': u'Discussion Wikivoyage',
             'it': u'Discussioni Wikivoyage',
             'nl': u'Overleg Wikivoyage',
+            'pl': u'Dyskusja Wikipodróży',
             'pt': u'Wikivoyage Discussão',
+            'ro': u'Discuție Wikivoyage',
             'ru': u'Обсуждение Wikivoyage',
             'sv': u'Wikivoyagediskussion',
         }
@@ -80,3 +84,6 @@ class Family(family.WikimediaFamily):
             'de': u'Nachrichten Diskussion',
             'it': u'Discussioni notizie',
         }
+
+        # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        self.cross_allowed = ['es', 'ru', ]

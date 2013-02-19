@@ -18,7 +18,7 @@ This module is responsible for
 # Distributed under the terms of the MIT license.
 #
 
-__version__ = '$Id: http.py 8028 2010-03-18 17:29:14Z russblau $'
+__version__ = '$Id: http.py 11055 2013-02-08 14:43:56Z xqt $'
 __docformat__ = 'epytext'
 
 import Queue
@@ -32,13 +32,19 @@ from pywikibot.exceptions import Server504Error
 import pywikibot
 import cookielib
 import threadedhttp
+import pywikibot.version
 
 _logger = "comm.http"
 
 
 # global variables
 
-useragent = 'Pywikipediabot/2.0' # This should include some global version string
+# the User-agent: header. The default is 
+# '<script>/<revision> Pywikipediabot/2.0', where '<script>' is the currently
+# executing script and version is the SVN revision of Pywikipediabot.
+USER_AGENT_FORMAT = '{script}/r{version[rev]} Pywikipediabot/2.0'
+useragent = USER_AGENT_FORMAT.format(script=pywikibot.calledModuleName(),
+                                     version=pywikibot.version.getversiondict())
 numthreads = 1
 threads = []
 

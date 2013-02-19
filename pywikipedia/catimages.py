@@ -761,14 +761,14 @@ class FileData(object):
         return
 
     def _detect_Properties_PIL(self):
-        self.image_size = (None, None)
+        #self.image_size = (None, None)
         self._info['Properties'] = [{'Format': u'-', 'Pages': 0}]
         if self.image_fileext == u'.svg':   # MIME: 'application/xml; charset=utf-8'
             # similar to PDF page count OR use BeautifulSoup
             svgcountpages = re.compile("<page>")
             pc = len(svgcountpages.findall( file(self.image_path,"r").read() ))
 
-            svg = rsvg.Handle(self.image_path)
+            #svg = rsvg.Handle(self.image_path)
 
             # http://validator.w3.org/docs/api.html#libs
             # http://pypi.python.org/pypi/py_w3c/
@@ -783,7 +783,7 @@ class FileData(object):
                 pass
             #print vld.errors, vld.warnings
 
-            self.image_size = (svg.props.width, svg.props.height)
+            #self.image_size = (svg.props.width, svg.props.height)
 
             result = { 'Format':     valid,
                        'Mode':       u'-',
@@ -826,7 +826,7 @@ class FileData(object):
             #icc = re.sub('[^%s]'%string.printable, ' ', icc)
             ## more image formats and more post-processing needed...
 
-            self.image_size = i.size
+            #self.image_size = i.size
 
             result = { #'bands':      i.getbands(),
                        #'bbox':       i.getbbox(),
@@ -1833,7 +1833,7 @@ class FileData(object):
 
         if not regs:
             return ([], [])
-        
+
         dmax = np.linalg.norm(self.image_size)
         #thsr = 1.0      # strict: if it is contained completely
         thsr = 0.95      # a little bit tolerant: nearly completly contained (or 0.9)
@@ -2521,6 +2521,7 @@ class CatImagesBot(checkimages.checkImagesBot, CatImages_Default):
         # http://cairographics.org/pythoncairopil/
         # http://cairographics.org/pyrsvg/
         # http://stackoverflow.com/questions/9166400/convert-rgba-png-to-rgb-with-pil
+        self.image_size = (None, None)
         if self.image_fileext == u'.svg':
             try:
                 svg = rsvg.Handle(self.image_path)
@@ -2535,6 +2536,8 @@ class CatImagesBot(checkimages.checkImagesBot, CatImages_Default):
                 background = Image.new("RGB", png.size, (255, 255, 255))
                 background.paste(png, mask=png.split()[3]) # 3 is the alpha channel
                 background.save(self.image_path_JPEG, "JPEG")
+
+                self.image_size = (svg.props.width, svg.props.height)
             except MemoryError:
                 self.image_path_JPEG = self.image_path
             except SystemError:
@@ -2544,12 +2547,23 @@ class CatImagesBot(checkimages.checkImagesBot, CatImages_Default):
                 im = Image.open(self.image_path) # might be png, gif etc, for instance
                 #im.thumbnail(size, Image.ANTIALIAS) # size is 640x480
                 im.convert('RGB').save(self.image_path_JPEG, "JPEG")
+
+                self.image_size = im.size
             except IOError, e:
                 if 'image file is truncated' in str(e):
                     # im object has changed due to exception raised
                     im.convert('RGB').save(self.image_path_JPEG, "JPEG")
+
+                    self.image_size = im.size
                 else:
-                    self.image_path_JPEG = self.image_path
+                    try:
+                        # since opencv might still work, try this as fall-back
+                        img = cv2.imread( self.image_path, 1 )
+                        cv2.imwrite(self.image_path_JPEG, img)
+
+                        self.image_size = (img.shape[1], img.shape[0])
+                    except:
+                        self.image_path_JPEG = self.image_path
             except:
                 self.image_path_JPEG = self.image_path
 

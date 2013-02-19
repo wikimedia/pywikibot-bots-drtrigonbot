@@ -22,7 +22,7 @@ Please refer to delinker.txt for full documentation.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: delinker.py 10830 2012-12-24 13:50:34Z btongminh $'
+__version__ = '$Id: delinker.py 11029 2013-02-06 19:07:42Z btongminh $'
 # This script requires MySQLdb and simplejson. Tested with:
 # * Python 2.4.4, MySQLdb 1.2.1_p, simplejson 1.3
 # * Python 2.5, MySQLdb 1.2.2, simplejson 1.5 (recommended)
@@ -49,7 +49,7 @@ import wikipedia
 import config
 
 # FIXME: They should be defined *somewhere* in the Python library, not?
-WHITESPACE = u' \t\u200e\u200f\u202a\u202a\u202b\u202c\u202d\u202e'
+WHITESPACE = u' \r\n\t\u200e\u200f\u202a\u202a\u202b\u202c\u202d\u202e'
 
 def wait_callback(object):
     output(u'%s Connection has been lost in %s. Attempting reconnection.' % (threading.currentThread(), repr(object)), False)

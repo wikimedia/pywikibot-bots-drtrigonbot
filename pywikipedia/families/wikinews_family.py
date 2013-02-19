@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikinews_family.py 11009 2013-01-27 14:45:08Z xqt $'
+__version__ = '$Id: wikinews_family.py 11062 2013-02-10 14:40:04Z xqt $'
 
 # The Wikimedia family that is known as Wikinews
 
@@ -11,7 +11,7 @@ class Family(family.WikimediaFamily):
         self.name = 'wikinews'
 
         self.languages_by_size = [
-            'sr', 'en', 'pl', 'fr', 'de', 'it', 'es', 'pt', 'ru', 'zh', 'ja',
+            'sr', 'en', 'fr', 'pl', 'de', 'it', 'es', 'pt', 'ru', 'zh', 'ja',
             'sv', 'ca', 'el', 'ta', 'cs', 'fa', 'ar', 'fi', 'ro', 'he', 'tr',
             'bg', 'sq', 'uk', 'no', 'ko', 'bs', 'eo',
         ]
@@ -37,7 +37,7 @@ class Family(family.WikimediaFamily):
         # You only need to enter translations that differ from _default.
         self.namespaces[4] = {
             '_default': self.namespaces[4]['_default'],
-            'ar': [u'ويكي الأخبار', u'وخ'],
+            'ar': [u'ويكي الأخبار', u'وخ', u'Wikinews'],
             'bg': [u'Уикиновини', u'Wikinews'],
             'bs': [u'Wikivijesti', u'Wikinews'],
             'ca': [u'Viquinotícies', u'Wikinews'],
@@ -47,21 +47,21 @@ class Family(family.WikimediaFamily):
             'en': [u'Wikinews', u'WN'],
             'eo': [u'Vikinovaĵoj', u'Wikinews'],
             'es': [u'Wikinoticias', u'Wikinews'],
-            'fa': [u'ویکی‌خبر', u'وخ'],
+            'fa': [u'ویکی‌خبر', u'وخ', u'Wikinews'],
             'fi': [u'Wikiuutiset', u'Wikinews'],
             'fr': [u'Wikinews', u'WN'],
             'he': [u'ויקיחדשות', u'Wikinews'],
             'hu': u'Wikihírek',
             'it': [u'Wikinotizie', u'Wikinews'],
-            'ja': u'ウィキニュース',
-            'ko': [u'위키뉴스', u'뉴'],
+            'ja': [u'ウィキニュース', u'Wikinews'],
+            'ko': [u'위키뉴스', u'뉴', u'Wikinews'],
             'no': [u'Wikinytt', u'Wikinews'],
             'pl': u'Wikinews',
             'pt': [u'Wikinotícias', u'Wikinews'],
             'ro': [u'Wikiștiri', u'Wikiştiri', u'Wikinews'],
-            'ru': [u'Викиновости', u'ВикиНовости', u'ВН'],
+            'ru': [u'Викиновости', u'ВикиНовости', u'ВН', u'Wikinews'],
             'sd': u'Wikinews',
-            'sq': [u'Wikilajme', u'WL'],
+            'sq': [u'Wikilajme', u'WL', u'Wikinews'],
             'sr': [u'Викивести', u'Wikinews'],
             'sv': [u'Wikinews', u'WN'],
             'ta': [u'விக்கிசெய்தி', u'Wikinews', u'விக்கிபீடியா'],
@@ -230,7 +230,7 @@ class Family(family.WikimediaFamily):
         }
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
-        self.cross_allowed = ['ca', 'cs', 'en', 'fa',]
+        self.cross_allowed = ['ca', 'cs', 'en', 'fa', 'ko', ]
 
         # Which languages have a special order for putting interlanguage links,
         # and what order is it? If a language is not in interwiki_putfirst,

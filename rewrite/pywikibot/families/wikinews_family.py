@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 from pywikibot import family
 
-__version__ = '$Id: wikinews_family.py 11006 2013-01-27 14:20:10Z xqt $'
+__version__ = '$Id: wikinews_family.py 11067 2013-02-10 15:41:55Z xqt $'
 
 # The Wikimedia family that is known as Wikinews
 
@@ -11,7 +11,7 @@ class Family(family.WikimediaFamily):
         self.name = 'wikinews'
 
         self.languages_by_size = [
-            'sr', 'en', 'pl', 'fr', 'de', 'it', 'es', 'pt', 'ru', 'zh', 'ja',
+            'sr', 'en', 'fr', 'pl', 'de', 'it', 'es', 'pt', 'ru', 'zh', 'ja',
             'sv', 'ca', 'el', 'ta', 'cs', 'fa', 'ar', 'fi', 'ro', 'he', 'tr',
             'bg', 'sq', 'uk', 'no', 'ko', 'bs', 'eo',
         ]
@@ -21,7 +21,7 @@ class Family(family.WikimediaFamily):
 
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
-        self.cross_allowed = ['ca', 'cs', 'en', 'fa',]
+        self.cross_allowed = ['ca', 'cs', 'en', 'fa', 'ko', ]
 
         # Which languages have a special order for putting interlanguage links,
         # and what order is it? If a language is not in interwiki_putfirst,
