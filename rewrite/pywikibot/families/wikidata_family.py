@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: wikidata_family.py 11068 2013-02-10 15:42:28Z xqt $'
+__version__ = '$Id: wikidata_family.py 11106 2013-02-23 22:23:33Z valhallasw $'
 
 from pywikibot import family
 
@@ -11,7 +11,7 @@ class Family(family.WikimediaFamily):
         super(Family, self).__init__()
         self.name = 'wikidata'
         self.langs = {
-            'wikidata': 'wikidata.org',
+            'wikidata': 'www.wikidata.org',
             'repo': 'wikidata-test-repo.wikimedia.de',
             'client': 'wikidata-test-client.wikimedia.de',
         }

@@ -87,7 +87,7 @@ This will move all pages in the category US to the category United States.
 # (C) xqt, 2009-2012
 # (C) Pywikipedia team, 2008-2012
 #
-__version__ = '$Id: category.py 10725 2012-11-14 18:20:26Z russblau $'
+__version__ = '$Id: category.py 11132 2013-02-26 23:28:30Z legoktm $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -491,7 +491,7 @@ class CategoryListifyRobot:
     def run(self):
         setOfArticles = set(self.cat.articles(recurse = self.recurse))
         if self.subCats:
-            setOfArticles += set(self.cat.subcategories())
+            setOfArticles = setOfArticles.union(set(self.cat.subcategories()))
         if not self.editSummary:
             self.editSummary = i18n.twtranslate(self.site,
                                                 'category-listifying',

@@ -22,7 +22,7 @@ This module allow you to use the API in a simple and easy way.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: query.py 10834 2012-12-27 14:54:14Z xqt $'
+__version__ = '$Id: query.py 11103 2013-02-22 16:14:56Z amir $'
 #
 
 import time
@@ -106,7 +106,7 @@ def GetData(params, site=None, useAPI=True, retryCount=config.maxretries,
     postAC = [
         'edit', 'login', 'purge', 'rollback', 'delete', 'undelete', 'protect',
         'parse', 'block', 'unblock', 'move', 'emailuser','import', 'userrights',
-        'upload', 'patrol', 'wbcreateclaim'
+        'upload', 'patrol', 'wbcreateclaim', 'wbeditentity'
     ]
     if site.versionnumber() >= 18:
         postAC.append('watch')

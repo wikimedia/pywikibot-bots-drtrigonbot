@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiversity_family.py 11079 2013-02-15 09:47:22Z xqt $'
+__version__ = '$Id: wikiversity_family.py 11127 2013-02-25 12:48:27Z xqt $'
 
 # The Wikimedia family that is known as Wikiversity
 
@@ -19,6 +19,11 @@ class Family(family.WikimediaFamily):
                            for lang in self.languages_by_size])
 
         # Override defaults
+        self.namespaces[3]['cs'] = [u'Diskuse s uživatelem', u'Uživatel diskuse', u'Uživatelka diskuse', u'Diskuse s uživatelkou']
+        self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisateur']
+        self.namespaces[2]['fr'] = [u'Utilisateur']
+        self.namespaces[3]['pt'] = [u'Utilizador Discussão', u'Usuário Discussão', u'Utilizadora Discussão']
+        self.namespaces[2]['pt'] = [u'Utilizador', u'Usuário', u'Utilizadora']
 
         # Most namespaces are inherited from family.Family.
         # Translation used on all wikis for the different namespaces.

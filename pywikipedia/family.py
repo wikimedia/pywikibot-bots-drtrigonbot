@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: family.py 11083 2013-02-17 12:25:27Z xqt $'
+__version__='$Id: family.py 11144 2013-03-01 15:54:31Z xqt $'
 
 import re
 import urllib
@@ -128,7 +128,6 @@ class Family(object):
                 'ay': u'Medio',
                 'az': [u'Media', u'Mediya'],
                 'ba': u'Медиа',
-                'bar': u'Medium',
                 'bat-smg': u'Medėjė',
                 'bcl': u'Medio',
                 'be': u'Мультымедыя',
@@ -753,7 +752,7 @@ class Family(object):
                 'ch': u'Muna\'sesetbi',
                 'ckb': u'بەکارھێنەر',
                 'crh': [u'Qullanıcı', u'Къулланыджы'],
-                'cs': [u'Wikipedista', u'Uživatel', u'Wikipedistka'],
+                'cs': [u'Uživatel', u'Uživatelka'],
                 'csb': [u'Brëkòwnik', u'Użytkownik', u'Użytkowniczka'],
                 'cu': [u'Польꙃєватєл҄ь', u'Участник', u'Польѕевател҄ь'],
                 'cv': u'Хутшăнакан',
@@ -881,7 +880,7 @@ class Family(object):
                 'rm': u'Utilisader',
                 'rmy': u'Jeno',
                 'ro': u'Utilizator',
-                'ru': [u'Участник', u'У', u'Участница'],
+                'ru': [u'Участник', u'Участница'],
                 'rue': u'Хоснователь',
                 'sa': u'योजकः',
                 'sah': u'Кыттааччы',
@@ -2070,7 +2069,7 @@ class Family(object):
                 'rm': u'Model',
                 'rmy': u'Sikavno',
                 'ro': u'Format',
-                'ru': [u'Шаблон', u'Ш', u'T'],
+                'ru': u'Шаблон',
                 'rue': u'Шаблона',
                 'sa': [u'फलकम्', u'बिंबधर'],
                 'sah': u'Халыып',
@@ -2389,7 +2388,7 @@ class Family(object):
                 'cv': u'Пулăшу',
                 'cy': u'Cymorth',
                 'da': u'Hjælp',
-                'de': [u'Hilfe', u'H'],
+                'de': u'Hilfe',
                 'diq': [u'Peşti', u'Desteg'],
                 'dsb': u'Pomoc',
                 'dv': u'އެހީ',
@@ -2612,7 +2611,7 @@ class Family(object):
                 'cv': u'Пулăшăва сӳтсе явмалли',
                 'cy': u'Sgwrs Cymorth',
                 'da': u'Hjælp-diskussion',
-                'de': [u'Hilfe Diskussion', u'HD'],
+                'de': u'Hilfe Diskussion',
                 'diq': [u'Peşti werênayış', u'Desteg werênayış'],
                 'dsb': u'Diskusija wó pomocy',
                 'dv': u'އެހީ ޚިޔާލު',
@@ -2957,7 +2956,7 @@ class Family(object):
                 'rm': u'Categoria',
                 'rmy': u'Shopni',
                 'ro': u'Categorie',
-                'ru': [u'Категория', u'К'],
+                'ru': u'Категория',
                 'rue': u'Катеґорія',
                 'sa': u'वर्गः',
                 'sah': u'Категория',
@@ -4398,7 +4397,7 @@ class WikimediaFamily(Family):
         """Return Wikimedia projects version number as a string."""
         # Don't use this, use versionnumber() instead. This only exists
         # to not break family files.
-        return '1.21wmf9'
+        return '1.21wmf10'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

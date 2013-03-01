@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 from pywikibot import family
 
-__version__ = '$Id: wiktionary_family.py 11067 2013-02-10 15:41:55Z xqt $'
+__version__ = '$Id: wiktionary_family.py 11111 2013-02-24 13:23:57Z xqt $'
 
 # The Wikimedia family that is known as Wiktionary
 
@@ -14,17 +14,17 @@ class Family(family.WikimediaFamily):
             'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'el', 'ko', 'sv', 'pl', 'tr',
             'ta', 'nl', 'de', 'ku', 'kn', 'vi', 'fi', 'io', 'hu', 'pt', 'ml',
             'no', 'my', 'id', 'it', 'li', 'es', 'et', 'ja', 'fa', 'te', 'ro',
-            'ar', 'cs', 'jv', 'eu', 'lo', 'gl', 'ca', 'uk', 'fj', 'br', 'bg',
+            'ar', 'cs', 'jv', 'eu', 'gl', 'lo', 'ca', 'uk', 'fj', 'br', 'bg',
             'eo', 'hr', 'oc', 'vo', 'is', 'th', 'simple', 'zh-min-nan', 'cy',
-            'scn', 'sr', 'af', 'sw', 'ast', 'fy', 'ps', 'tl', 'nn', 'he', 'ur',
-            'uz', 'wa', 'la', 'da', 'hy', 'sq', 'sm', 'sl', 'hi', 'tt', 'az',
-            'nah', 'pnb', 'ka', 'lv', 'lb', 'bs', 'tk', 'hsb', 'kk', 'sk', 'km',
+            'scn', 'sr', 'af', 'ast', 'sw', 'fy', 'ps', 'tl', 'nn', 'he', 'ur',
+            'uz', 'wa', 'da', 'la', 'hy', 'sq', 'sm', 'sl', 'hi', 'nah', 'tt',
+            'az', 'pnb', 'ka', 'lv', 'lb', 'bs', 'tk', 'hsb', 'kk', 'sk', 'km',
             'mk', 'be', 'ga', 'wo', 'ms', 'ang', 'ky', 'co', 'gn', 'mr', 'csb',
             'st', 'nds', 'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'kl', 'sa', 'mn',
-            'jbo', 'an', 'zu', 'gu', 'rw', 'fo', 'kw', 'gv', 'qu', 'ss', 'ie',
-            'mt', 'om', 'chr', 'roa-rup', 'iu', 'bn', 'pa', 'so', 'am', 'su',
-            'za', 'gd', 'mi', 'tpi', 'ik', 'or', 'yi', 'ln', 'ti', 'sg', 'na',
-            'dv', 'tn', 'ne', 'ha', 'ks', 'ay', 'ts',
+            'jbo', 'an', 'zu', 'or', 'gu', 'rw', 'kw', 'fo', 'gv', 'qu', 'ss',
+            'ie', 'mt', 'om', 'chr', 'roa-rup', 'iu', 'bn', 'pa', 'so', 'am',
+            'su', 'za', 'gd', 'mi', 'tpi', 'yi', 'ln', 'ti', 'sg', 'na', 'dv',
+            'tn', 'ne', 'ha', 'ks', 'ay', 'ts',
         ]
 
         self.langs = dict([(lang, '%s.wiktionary.org' % lang)
@@ -103,6 +103,7 @@ class Family(family.WikimediaFamily):
             'cr': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nehiyaw_Wiktionary
             'dk': 'da',
             'dz': None,
+            'ik': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Inupiak_Wiktionary
             'jp': 'ja',
             'mh': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Marshallese_Wiktionary
             'mo': 'ro', # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wiktionary

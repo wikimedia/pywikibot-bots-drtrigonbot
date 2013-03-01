@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: test_family.py 11009 2013-01-27 14:45:08Z xqt $'
+__version__ = '$Id: test_family.py 11109 2013-02-24 12:22:44Z xqt $'
 
 import family
 
@@ -143,6 +143,12 @@ class Family(family.WikimediaFamily):
         }
         self.namespaces[711] = {
             '_default': u'TimedText talk',
+        }
+        self.namespaces[866] = {
+            '_default': u'CNBanner',
+        }
+        self.namespaces[867] = {
+            '_default': u'CNBanner talk',
         }
         self.namespaces[1198] = {
             '_default': u'Translations',

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikinews_family.py 11062 2013-02-10 14:40:04Z xqt $'
+__version__ = '$Id: wikinews_family.py 11131 2013-02-26 08:06:40Z xqt $'
 
 # The Wikimedia family that is known as Wikinews
 
@@ -20,10 +20,14 @@ class Family(family.WikimediaFamily):
                            for lang in self.languages_by_size])
 
         # Override defaults
+        self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisateur']
+        self.namespaces[2]['fr'] = [u'Utilisateur']
         self.namespaces[14]['en'] = [u'Category', u'CAT']
         self.namespaces[10]['zh'] = [u'Template', u'模板', u'样板', u'樣板']
         self.namespaces[12]['zh'] = [u'Help', u'帮助', u'幫助']
         self.namespaces[14]['zh'] = [u'Category', u'分类', u'分類']
+        self.namespaces[3]['pt'] = [u'Utilizador Discussão', u'Usuário Discussão', u'Utilizadora Discussão']
+        self.namespaces[2]['pt'] = [u'Utilizador', u'Usuário', u'Utilizadora']
         self.namespaces[3]['ca'] = [u'Usuari Discussió']
         self.namespaces[2]['ca'] = [u'Usuari']
         self.namespaces[3]['cs'] = [u'Diskuse s redaktorem', u'Diskuse s redaktorkou', u'Diskuse s uživatelem', u'Redaktor diskuse', u'Redaktorka diskuse', u'Uživatel diskuse', u'Uživatelka diskuse', u'Diskuse s uživatelkou']
@@ -181,6 +185,7 @@ class Family(family.WikimediaFamily):
             'ru': u'Комментарии',
             'sq': u'Komentet',
             'sr': u'Коментар',
+            'uk': u'Коментарі',
         }
 
         self.namespaces[103] = {
@@ -197,16 +202,19 @@ class Family(family.WikimediaFamily):
             'ru': u'Обсуждение комментариев',
             'sq': u'Komentet diskutim',
             'sr': u'Разговор о коментару',
+            'uk': u'Обговорення коментарів',
         }
 
         self.namespaces[104] = {
             'fr': u'Page',
             'pt': u'Transwiki',
+            'uk': u'Інкубатор',
         }
 
         self.namespaces[105] = {
             'fr': u'Discussion Page',
             'pt': u'Transwiki Discussão',
+            'uk': u'Обговорення інкубатора',
         }
 
         self.namespaces[106] = {
@@ -227,6 +235,14 @@ class Family(family.WikimediaFamily):
 
         self.namespaces[109] = {
             'ja': u'短信‐ノート',
+        }
+
+        self.namespaces[828] = {
+            'cs': u'Module',
+        }
+
+        self.namespaces[829] = {
+            'cs': u'Module talk',
         }
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation

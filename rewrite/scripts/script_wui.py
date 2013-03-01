@@ -3,6 +3,12 @@
 Robot which runs python framework scripts as (sub-)bot and provides a
 WikiUserInterface (WUI) with Lua support for bot operators.
 
+This script needs external libraries (see imports and comments there)
+in order to run properly. Most of them can be checked-out at:
+    http://svn.toolserver.org/svnroot/drtrigon/
+(some code might get compiled on-the-fly, so a GNU compiler along
+with library header files is needed too)
+
 The following parameters are supported:
 
 &params;
@@ -50,8 +56,8 @@ Syntax example:
 #  ...
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
-__version__       = '$Id$'
-__framework_rev__ = '11088' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__version__       = '$Id: script_wui.py 11098 2013-02-20 19:30:41Z drtrigon $'
+__framework_rev__ = '11147' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.5'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #

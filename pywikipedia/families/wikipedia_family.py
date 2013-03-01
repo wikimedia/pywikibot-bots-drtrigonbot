@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikipedia_family.py 11085 2013-02-17 14:32:15Z xqt $'
+__version__ = '$Id: wikipedia_family.py 11120 2013-02-25 11:03:51Z xqt $'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 
@@ -11,42 +11,45 @@ class Family(family.WikimediaFamily):
         self.name = 'wikipedia'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'nl', 'it', 'es', 'ru', 'pl', 'ja', 'pt', 'sv',
+            'en', 'de', 'fr', 'nl', 'it', 'es', 'ru', 'pl', 'ja', 'sv', 'pt',
             'zh', 'vi', 'uk', 'ca', 'no', 'fi', 'fa', 'cs', 'hu', 'ko', 'ro',
-            'id', 'ar', 'tr', 'kk', 'sk', 'sr', 'ms', 'eo', 'da', 'lt', 'eu',
-            'bg', 'he', 'ceb', 'sl', 'hr', 'vo', 'war', 'et', 'hi', 'gl', 'nn',
-            'simple', 'az', 'la', 'el', 'uz', 'th', 'sh', 'oc', 'ka', 'new',
-            'mk', 'tl', 'pms', 'be', 'ht', 'ta', 'te', 'be-x-old', 'lv', 'br',
-            'sq', 'hy', 'mg', 'jv', 'cy', 'mr', 'lb', 'is', 'bs', 'my', 'yo',
-            'an', 'ml', 'lmo', 'fy', 'pnb', 'af', 'ba', 'bn', 'roa-rup', 'bpy',
-            'sw', 'io', 'ky', 'ur', 'scn', 'ne', 'gu', 'zh-yue', 'nds', 'ku',
-            'ga', 'ast', 'qu', 'su', 'tt', 'cv', 'ia', 'nap', 'bug', 'als',
-            'bat-smg', 'sco', 'map-bms', 'wa', 'ckb', 'kn', 'am', 'gd', 'hif',
-            'tg', 'mzn', 'zh-min-nan', 'yi', 'vec', 'arz', 'roa-tara', 'nah',
-            'os', 'sa', 'mn', 'sah', 'pam', 'hsb', 'li', 'si', 'se', 'mi', 'co',
-            'diq', 'bar', 'gan', 'ilo', 'bo', 'glk', 'fo', 'rue', 'bcl', 'pa',
-            'fiu-vro', 'mrj', 'nds-nl', 'cbk-zam', 'wuu', 'tk', 'ps', 'vls',
-            'gv', 'xmf', 'pag', 'kv', 'dv', 'zea', 'nrm', 'km', 'koi', 'rm',
-            'or', 'mhr', 'lad', 'csb', 'udm', 'lij', 'frr', 'fur', 'ug',
-            'zh-classical', 'vep', 'sc', 'pi', 'mt', 'bh', 'ksh', 'nov', 'so',
-            'ang', 'stq', 'ay', 'kw', 'nv', 'hak', 'pcd', 'ext', 'frp', 'gn',
-            'szl', 'gag', 'as', 'ie', 'ln', 'eml', 'xal', 'haw', 'pfl', 'pdc',
-            'rw', 'krc', 'crh', 'ace', 'to', 'ce', 'kl', 'arc', 'dsb', 'myv',
-            'sn', 'bjn', 'lez', 'pap', 'kab', 'tpi', 'lbe', 'bxr', 'jbo', 'mdf',
-            'wo', 'av', 'srn', 'mwl', 'ty', 'kbd', 'lo', 'ab', 'tet', 'ltg',
-            'na', 'kg', 'ig', 'nso', 'za', 'kaa', 'zu', 'chy', 'rmy', 'cu',
-            'tn', 'chr', 'bi', 'got', 'cdo', 'sm', 'bm', 'iu', 'pih', 'pnt',
-            'ss', 'sd', 'ki', 'ee', 'ha', 'om', 'fj', 'ti', 'ts', 'ks', 'sg',
-            've', 'rn', 'dz', 'cr', 'ak', 'tum', 'lg', 'ny', 'ik', 'ch', 'ff',
-            'tw', 'st', 'xh', 'min',
+            'ceb', 'ar', 'id', 'tr', 'kk', 'ms', 'sk', 'sr', 'eo', 'da', 'lt',
+            'eu', 'bg', 'he', 'sl', 'war', 'hr', 'vo', 'et', 'hi', 'gl',
+            'simple', 'nn', 'az', 'la', 'el', 'uz', 'th', 'sh', 'ka', 'oc',
+            'new', 'mk', 'tl', 'pms', 'be', 'ht', 'ta', 'te', 'be-x-old', 'lv',
+            'br', 'mg', 'sq', 'hy', 'jv', 'cy', 'mr', 'lb', 'is', 'bs', 'my',
+            'yo', 'ba', 'an', 'ml', 'lmo', 'af', 'fy', 'pnb', 'bn', 'sw',
+            'roa-rup', 'bpy', 'io', 'ky', 'ur', 'scn', 'ne', 'gu', 'zh-yue',
+            'nds', 'ku', 'ga', 'ast', 'qu', 'su', 'tt', 'cv', 'ia', 'bug',
+            'nap', 'als', 'bat-smg', 'sco', 'map-bms', 'kn', 'wa', 'ckb', 'am',
+            'gd', 'hif', 'zh-min-nan', 'tg', 'mzn', 'yi', 'vec', 'arz',
+            'roa-tara', 'nah', 'sa', 'mn', 'os', 'cbk-zam', 'sah', 'pam', 'hsb',
+            'se', 'li', 'si', 'mi', 'bar', 'co', 'gan', 'ilo', 'bo', 'glk',
+            'fo', 'rue', 'bcl', 'pa', 'mrj', 'fiu-vro', 'nds-nl', 'wuu', 'tk',
+            'ps', 'vls', 'diq', 'gv', 'xmf', 'pag', 'kv', 'zea', 'dv', 'nrm',
+            'km', 'koi', 'rm', 'or', 'mhr', 'lad', 'csb', 'udm', 'lij', 'frr',
+            'fur', 'zh-classical', 'ug', 'vep', 'sc', 'pi', 'mt', 'bh', 'ksh',
+            'so', 'nov', 'stq', 'ang', 'ay', 'kw', 'nv', 'hak', 'pcd', 'gn',
+            'ext', 'frp', 'szl', 'gag', 'as', 'ie', 'ln', 'eml', 'xal', 'haw',
+            'pfl', 'pdc', 'rw', 'krc', 'crh', 'ace', 'to', 'ce', 'kl', 'arc',
+            'dsb', 'myv', 'lez', 'sn', 'bjn', 'pap', 'kab', 'tpi', 'lbe', 'bxr',
+            'jbo', 'mdf', 'wo', 'av', 'srn', 'mwl', 'ty', 'kbd', 'lo', 'ab',
+            'tet', 'ltg', 'na', 'kg', 'ig', 'nso', 'za', 'kaa', 'zu', 'chy',
+            'rmy', 'cu', 'tn', 'chr', 'bi', 'got', 'cdo', 'sm', 'bm', 'iu',
+            'pih', 'pnt', 'sd', 'ss', 'ki', 'ee', 'ha', 'om', 'fj', 'ti', 'ts',
+            'ks', 'sg', 've', 'rn', 'dz', 'cr', 'ak', 'tum', 'lg', 'ny', 'ik',
+            'ch', 'ff', 'tw', 'st', 'xh', 'min'
         ]
 
         self.langs = dict([(lang, '%s.wikipedia.org' % lang)
                            for lang in self.languages_by_size])
 
         # Override defaults
+        self.namespaces[2]['cs'] = [u'Wikipedista', u'Uživatel', u'Wikipedistka']
         self.namespaces[3]['cs'] =  [u'Diskuse s wikipedistou', u'Diskuse s uživatelem', u'Diskuse s wikipedistkou', u'Wikipedista diskuse', u'Wikipedistka diskuse', u'Uživatel diskuse', u'Uživatelka diskuse']
-        self.namespaces[12]['de'] = [u'Benutzer Diskussion', u'BD', u'Benutzerin Diskussion'],
+        self.namespaces[3]['de'] = [u'Benutzer Diskussion', u'BD', u'Benutzerin Diskussion']
+        self.namespaces[12]['de'] = [u'Hilfe', u'H']
+        self.namespaces[13]['de'] = [u'Hilfe Diskussion', u'HD']
         self.namespaces[1]['ja'] = [u'ノート', u'トーク']
         self.namespaces[3]['ja'] = [u'利用者‐会話', u'利用者・トーク']
         self.namespaces[7]['ja'] = [u'ファイル‐ノート', u'ファイル・トーク', u'Image talk', u'画像‐ノート']
@@ -57,6 +60,9 @@ class Family(family.WikimediaFamily):
         self.namespaces[13]['ja'] = [u'Help‐ノート', u'ヘルプ・トーク']
         self.namespaces[14]['ja'] = [u'Category', u'カテゴリ']
         self.namespaces[15]['ja'] = [u'Category‐ノート', u'カテゴリ・トーク']
+        self.namespaces[2]['ru'] = [u'Участник', u'У', u'Участница']
+        self.namespaces[10]['ru'] = [u'Шаблон', u'Ш', u'T']
+        self.namespaces[14]['ru'] = [u'Категория', u'К']
 
         # Most namespaces are inherited from family.Family.
         # Translation used on all wikis for the different namespaces.
@@ -999,6 +1005,18 @@ class Family(family.WikimediaFamily):
 
         self.namespaces[711] = {
             'en': u'TimedText talk',
+        }
+
+        self.namespaces[828] = {
+            'en': u'Module',
+            'fr': u'Module',
+            'hu': u'Module',
+        }
+
+        self.namespaces[829] = {
+            'en': u'Module talk',
+            'fr': u'Module talk',
+            'hu': u'Module talk',
         }
 
         self.category_redirect_templates = {

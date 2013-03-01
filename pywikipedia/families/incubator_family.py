@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: incubator_family.py 11009 2013-01-27 14:45:08Z xqt $'
+__version__ = '$Id: incubator_family.py 11124 2013-02-25 12:13:51Z xqt $'
 
 import family
 
@@ -18,12 +18,6 @@ class Family(family.WikimediaFamily):
         }
         self.namespaces[5] = {
             '_default': [u'Incubator talk', self.namespaces[5]['_default']],
-        }
-        self.namespaces[100] = {
-            '_default': u'Lost',
-        }
-        self.namespaces[101] = {
-            '_default': u'Lost talk',
         }
         self.namespaces[1198] = {
             '_default': u'Translations',

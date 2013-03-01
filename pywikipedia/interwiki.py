@@ -340,7 +340,7 @@ that you have to break it off, use "-continue" next time.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: interwiki.py 11080 2013-02-15 14:29:03Z xqt $'
+__version__ = '$Id: interwiki.py 11146 2013-03-01 20:24:29Z amir $'
 #
 
 import sys, copy, re, os
@@ -430,6 +430,7 @@ moved_links = {
                 u'template doc',
                 u'doc',
                 u'documentation, template'], u'/doc'),
+    'sk' : (u'dokumentácia', u'/Dokumentácia'),
     'sv' : (u'dokumentation', u'/dok'),
     'uk' : ([u'документація',
              u'doc',

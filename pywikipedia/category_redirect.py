@@ -16,7 +16,7 @@ are taken into account.
 #
 # (C) Pywikipedia team, 2008-2012
 #
-__version__ = '$Id: category_redirect.py 11025 2013-02-02 12:34:53Z drtrigon $'
+__version__ = '$Id: category_redirect.py 11102 2013-02-21 16:05:59Z malafaya $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -115,7 +115,7 @@ class CategoryRedirectBot(object):
             # an update due to changes in a transcluded template
             article.put(newtext, comment)
             if newtext == oldtext:
-                pywikibot.output(u'No changes in made in page %s.'
+                pywikibot.output(u'No changes made in page %s.'
                                  % article.title(asLink=True))
                 return False
             return True

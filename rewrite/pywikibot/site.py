@@ -8,7 +8,7 @@ on the same topic in different languages).
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: site.py 11018 2013-01-30 23:43:37Z xqt $'
+__version__ = '$Id: site.py 11140 2013-02-28 17:18:29Z legoktm $'
 
 import pywikibot
 from pywikibot import deprecate_arg
@@ -1706,9 +1706,20 @@ class APISite(BaseSite):
         for pagedata in rvgen:
             if page is not None:
                 if pagedata['title'] != page.title(withSection=False):
-                    raise Error(
-                        u"loadrevisions: Query on %s returned data on '%s'"
-                        % (page, pagedata['title']))
+                    ok = False
+                    namespace = page.namespace()
+                    # gender settings ?
+                    if namespace in [2, 3]:
+                        ns, title = pagedata['title'].split(':', 1)
+                        if ns in page.site.namespace(namespace, all=True) and \
+                           title == page.title(withSection=False,
+                                               withNamespace=False):
+                       
+                            ok = True
+                    if not ok:
+                        raise Error(
+                            u"loadrevisions: Query on %s returned data on '%s'"
+                            % (page, pagedata['title']))
                 if "missing" in pagedata:
                     raise NoPage(page)
             else:
@@ -3238,26 +3249,26 @@ class DataSite (APISite):
         """generic method to get the data for multiple Wikibase items"""
         wbdata = self.get_item(source, props=props, **params)
         assert props in wbdata, \
-               "API wbgetitems response lacks %s key" % props
+               "API wbgetentities response lacks %s key" % props
         return wbdata[props]
 
     def get_item(self, source, **params):
         """get the data for multiple Wikibase items"""
         if type(source) == int or \
            isinstance(source, basestring) and source.isdigit():
-            ids = str(source)
-            wbrequest = api.Request(site=self, action="wbgetitems", ids=ids,
+            ids = 'q'+str(source)
+            wbrequest = api.Request(site=self, action="wbgetentities", ids=ids,
                                     **params)
             wbdata = wbrequest.submit()
             assert 'success' in wbdata,  \
-                   "API wbgetitems response lacks 'success' key"
+                   "API wbgetentities response lacks 'success' key"
             assert wbdata['success'] == 1, \
                    "API 'success' key ist not 1"
-            assert 'items' in wbdata,  \
-                   "API wbgetitems response lacks 'items' key"
-            assert ids in wbdata['items'], \
-                   "API  wbgetitems response lacks %s key" % ids
-            return wbdata['items'][ids]
+            assert 'entities' in wbdata,  \
+                   "API wbgetentities response lacks 'entities' key"
+            assert ids in wbdata['entities'], \
+                   "API  wbgetentities response lacks %s key" % ids
+            return wbdata['entities'][ids]
         else:
             # not implemented yet
             raise NotImplementedError

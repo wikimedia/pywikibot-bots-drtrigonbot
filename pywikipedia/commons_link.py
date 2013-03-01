@@ -32,7 +32,7 @@ and option can be one of these:
 # Distributed under the terms of the MIT license.
 #
 
-__version__='$Id: commons_link.py 9692 2011-10-30 15:03:29Z xqt $'
+__version__='$Id: commons_link.py 11142 2013-03-01 12:32:51Z xqt $'
 
 import re
 import wikipedia as pywikibot
@@ -70,7 +70,7 @@ class CommonsLinkBot:
         for page in self.generator:
             try:
                 pywikibot.output(u'\n>>>> %s <<<<' % page.title())
-                commons = pywikibot.getSite('commons', 'commons')
+                commons = pywikibot.getSite().image_repository()
                 commonspage = pywikibot.Page(commons, page.title())
                 try:
                     getcommons = commonspage.get(get_redirect=True)
@@ -123,7 +123,7 @@ class CommonsLinkBot:
         for page in self.generator:
             try:
                 pywikibot.output(u'\n>>>> %s <<<<' % page.title())
-                getCommons = pywikibot.getSite('commons', 'commons')
+                commons = pywikibot.getSite().image_repository()
                 commonsCategory = catlib.Category(getCommons,
                                                   'Category:%s' % page.title())
                 try:

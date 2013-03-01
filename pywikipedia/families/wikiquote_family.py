@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiquote_family.py 11084 2013-02-17 12:39:22Z xqt $'
+__version__ = '$Id: wikiquote_family.py 11127 2013-02-25 12:48:27Z xqt $'
 
 # The Wikimedia family that is known as Wikiquote
 
@@ -12,11 +12,11 @@ class Family(family.WikimediaFamily):
 
         self.languages_by_size = [
             'en', 'pl', 'it', 'ru', 'fr', 'de', 'pt', 'es', 'sk', 'cs', 'bg',
-            'bs', 'tr', 'sl', 'he', 'lt', 'eo', 'uk', 'el', 'zh', 'id', 'fa',
-            'hu', 'fi', 'sv', 'li', 'nl', 'ca', 'no', 'nn', 'hr', 'sa', 'ja',
+            'bs', 'tr', 'sl', 'he', 'lt', 'uk', 'eo', 'el', 'zh', 'id', 'fa',
+            'hu', 'fi', 'sv', 'nl', 'li', 'ca', 'no', 'nn', 'hr', 'sa', 'ja',
             'az', 'hy', 'ar', 'et', 'ko', 'ml', 'cy', 'ka', 'gl', 'sr', 'ro',
             'ku', 'th', 'te', 'is', 'eu', 'da', 'af', 'vi', 'sq', 'ta', 'hi',
-            'la', 'br', 'be', 'mr', 'uz', 'ur', 'zh-min-nan', 'gu', 'su', 'kn',
+            'la', 'be', 'br', 'mr', 'uz', 'ur', 'zh-min-nan', 'gu', 'su', 'kn',
             'wo', 'ky', 'am',
         ]
 
@@ -24,9 +24,8 @@ class Family(family.WikimediaFamily):
                            for lang in self.languages_by_size])
 
         # Override defaults
-        self.namespaces[10]['ru'] = [u'Шаблон']
-        self.namespaces[14]['ru'] = [u'Категория']
-        self.namespaces[2]['ru'] = [u'Участник', u'Участница']
+        self.namespaces[6]['be'] = [u'Файл', u'Выява']
+        self.namespaces[7]['be'] = [u'Размовы пра файл', u'Размовы пра выяву']
         self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisateur']
         self.namespaces[2]['fr'] = [u'Utilisateur']
         self.namespaces[12]['nl'] = [u'Help']
@@ -34,8 +33,6 @@ class Family(family.WikimediaFamily):
         self.namespaces[2]['pt'] = [u'Utilizador', u'Usuário', u'Utilizadora']
         self.namespaces[3]['ca'] = [u'Usuari Discussió']
         self.namespaces[2]['ca'] = [u'Usuari']
-        self.namespaces[13]['de'] = [u'Hilfe Diskussion']
-        self.namespaces[12]['de'] = [u'Hilfe']
         self.namespaces[3]['de'] = [u'Benutzer Diskussion', u'BD', u'Benutzerin Diskussion']
         self.namespaces[13]['da'] = [u'Hjælp diskussion', u'Hjælp-diskussion']
         self.namespaces[9]['da'] = [u'MediaWiki diskussion', u'MediaWiki-diskussion']
@@ -48,7 +45,6 @@ class Family(family.WikimediaFamily):
         self.namespaces[9]['hi'] = [u'मीडियाविकि वार्ता']
         self.namespaces[8]['hi'] = [u'मीडियाविकि']
         self.namespaces[3]['cs'] = [u'Diskuse s uživatelem', u'Uživatel diskuse', u'Uživatelka diskuse', u'Diskuse s uživatelkou']
-        self.namespaces[2]['cs'] = [u'Uživatel', u'Uživatelka']
         self.namespaces[10]['zh'] = [u'Template', u'模板', u'样板', u'樣板']
         self.namespaces[12]['zh'] = [u'Help', u'帮助', u'幫助']
         self.namespaces[14]['zh'] = [u'Category', u'分类', u'分類']
@@ -261,6 +257,14 @@ class Family(family.WikimediaFamily):
 
         self.namespaces[109] = {
             'fr': u'Discussion Transwiki',
+            }
+
+        self.namespaces[828] = {
+            'cs': u'Module',
+            }
+
+        self.namespaces[829] = {
+            'cs': u'Module talk',
             }
 
         # attop is a list of languages that prefer to have the interwiki

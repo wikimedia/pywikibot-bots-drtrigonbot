@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 from pywikibot import family
 
-__version__ = '$Id: wikisource_family.py 11038 2013-02-08 12:34:58Z xqt $'
+__version__ = '$Id: wikisource_family.py 11100 2013-02-21 07:28:15Z xqt $'
 
 # The Wikimedia family that is known as Wikisource
 
@@ -14,9 +14,9 @@ class Family(family.WikimediaFamily):
             'fr', 'en', 'de', 'ru', 'it', 'zh', 'pl', 'pt', 'he', 'es', 'sv',
             'fa', 'hu', 'ar', 'ca', 'cs', 'ko', 'sl', 'ro', 'fi', 'vi', 'te',
             'sa', 'el', 'sr', 'hr', 'bn', 'th', 'no', 'hy', 'nl', 'ml', 'la',
-            'vec', 'ja', 'tr', 'eo', 'br', 'yi', 'mk', 'uk', 'gu', 'ta', 'id',
-            'is', 'da', 'be', 'li', 'et', 'mr', 'bg', 'bs', 'sah', 'az', 'gl',
-            'lt', 'kn', 'cy', 'sk', 'zh-min-nan', 'fo',
+            'vec', 'tr', 'eo', 'ja', 'br', 'yi', 'mk', 'uk', 'gu', 'ta', 'id',
+            'is', 'da', 'be', 'li', 'et', 'mr', 'bg', 'bs', 'as', 'sah', 'az',
+            'gl', 'lt', 'kn', 'cy', 'sk', 'zh-min-nan', 'fo',
         ]
 
         self.langs = dict([(lang, '%s.wikisource.org' % lang)
