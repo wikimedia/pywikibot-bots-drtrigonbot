@@ -4,7 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: terminal_interface_win32.py 10046 2012-03-26 08:10:48Z valhallasw $'
+__version__ = '$Id: terminal_interface_win32.py 11150 2013-03-02 08:25:12Z xqt $'
 
 import re
 import terminal_interface_base
@@ -52,7 +52,7 @@ class Win32CtypesUI(Win32BaseUI):
         self.stdout = stdout
         self.stderr = stderr
         self.encoding = 'utf-8'
-        
+
     def printColorized(self, text, targetStream):
         std_out_handle = ctypes.windll.kernel32.GetStdHandle(-11)
         # Color tags might be cascaded, e.g. because of transliteration.
@@ -82,7 +82,7 @@ class Win32CtypesUI(Win32BaseUI):
         targetStream.write(text.encode(self.encoding, 'replace'))
         # just to be sure, reset the color
         ctypes.windll.kernel32.SetConsoleTextAttribute(std_out_handle, windowsColors['default'])
-        
+
     def _raw_input(self):
         data = self.stdin.readline()
         if '\x1a' in data:
