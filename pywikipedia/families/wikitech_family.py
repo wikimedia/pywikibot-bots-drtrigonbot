@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: wikitech_family.py 10990 2013-01-27 11:54:09Z xqt $'
+__version__ = '$Id: wikitech_family.py 11165 2013-03-02 20:13:59Z xqt $'
 
 import family
 
@@ -22,7 +22,7 @@ class Family(family.Family):
         }
 
     def version(self, code):
-        return '1.19wmf2'
+        return '1.21wmf8'
 
     def scriptpath(self, code):
         return ''

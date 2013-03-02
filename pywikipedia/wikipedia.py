@@ -122,7 +122,7 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 11138 2013-02-28 07:58:27Z amir $'
+__version__ = '$Id: wikipedia.py 11166 2013-03-02 21:46:33Z legoktm $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -2588,12 +2588,15 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
             'action'     : 'edit',
             'title'      : self.title(),
             'section'    : '%s' % section,
-            'appendtext' : self._encodeArg(newtext, 'text'),
             'token'      : self.site().getToken(),
             'summary'    : self._encodeArg(comment, 'summary'),
             'bot'        : 1,
             }
 
+        if section == 'new':
+            params['text'] = self._encodeArg(newtext, 'text')
+        else:
+            params['appendtext'] = self._encodeArg(newtext, 'text')
         if minorEdit:
             params['minor'] = 1
         else:
