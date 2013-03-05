@@ -1,12 +1,13 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: wikitech_family.py 11165 2013-03-02 20:13:59Z xqt $'
+__version__ = '$Id: wikitech_family.py 11171 2013-03-03 11:01:57Z xqt $'
 
 import family
 
 # The Wikitech family
 
 class Family(family.Family):
+
     def __init__(self):
         super(Family, self).__init__()
         self.name = 'wikitech'

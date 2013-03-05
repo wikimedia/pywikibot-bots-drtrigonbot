@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikinews_family.py 11131 2013-02-26 08:06:40Z xqt $'
+__version__ = '$Id: wikinews_family.py 11171 2013-03-03 11:01:57Z xqt $'
 
 # The Wikimedia family that is known as Wikinews
 
@@ -12,8 +12,8 @@ class Family(family.WikimediaFamily):
 
         self.languages_by_size = [
             'sr', 'en', 'fr', 'pl', 'de', 'it', 'es', 'pt', 'ru', 'zh', 'ja',
-            'sv', 'ca', 'el', 'ta', 'cs', 'fa', 'ar', 'fi', 'ro', 'he', 'tr',
-            'bg', 'sq', 'uk', 'no', 'ko', 'bs', 'eo',
+            'sv', 'ca', 'el', 'ta', 'cs', 'fa', 'ar', 'fi', 'ro', 'tr', 'he',
+            'bg', 'uk', 'sq', 'no', 'ko', 'bs', 'eo',
         ]
 
         self.langs = dict([(lang, '%s.wikinews.org' % lang)

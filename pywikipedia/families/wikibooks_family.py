@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikibooks_family.py 11120 2013-02-25 11:03:51Z xqt $'
+__version__ = '$Id: wikibooks_family.py 11171 2013-03-03 11:01:57Z xqt $'
 
 # The Wikimedia family that is known as Wikibooks
 
@@ -15,8 +15,8 @@ class Family(family.WikimediaFamily):
             'he', 'sq', 'ca', 'id', 'fi', 'ru', 'cs', 'zh', 'hr', 'sv', 'tr',
             'da', 'th', 'no', 'gl', 'fa', 'ko', 'sr', 'ta', 'ar', 'tl', 'mk',
             'ro', 'is', 'tt', 'lt', 'ka', 'az', 'eo', 'uk', 'bg', 'el', 'hy',
-            'sl', 'sk', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'et', 'ms', 'ur',
-            'mr', 'bn', 'hi', 'ml', 'oc', 'km', 'kk', 'eu', 'fy', 'ie', 'ne',
+            'sl', 'sk', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'ms', 'et', 'ur',
+            'mr', 'bn', 'hi', 'ml', 'oc', 'kk', 'km', 'eu', 'fy', 'ie', 'ne',
             'te', 'sa', 'af', 'tg', 'ky', 'bs', 'pa', 'mg', 'be', 'zh-min-nan',
             'cy', 'ku', 'uz',
         ]

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikipedia_family.py 11120 2013-02-25 11:03:51Z xqt $'
+__version__ = '$Id: wikipedia_family.py 11171 2013-03-03 11:01:57Z xqt $'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 
@@ -11,34 +11,34 @@ class Family(family.WikimediaFamily):
         self.name = 'wikipedia'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'nl', 'it', 'es', 'ru', 'pl', 'ja', 'sv', 'pt',
-            'zh', 'vi', 'uk', 'ca', 'no', 'fi', 'fa', 'cs', 'hu', 'ko', 'ro',
-            'ceb', 'ar', 'id', 'tr', 'kk', 'ms', 'sk', 'sr', 'eo', 'da', 'lt',
-            'eu', 'bg', 'he', 'sl', 'war', 'hr', 'vo', 'et', 'hi', 'gl',
-            'simple', 'nn', 'az', 'la', 'el', 'uz', 'th', 'sh', 'ka', 'oc',
+            'en', 'de', 'fr', 'nl', 'it', 'ru', 'es', 'pl', 'ja', 'sv', 'pt',
+            'zh', 'vi', 'uk', 'ca', 'no', 'fi', 'fa', 'ceb', 'cs', 'hu', 'ko',
+            'ro', 'ar', 'tr', 'id', 'kk', 'war', 'ms', 'sr', 'sk', 'eo', 'da',
+            'lt', 'eu', 'bg', 'he', 'sl', 'hr', 'vo', 'et', 'hi', 'gl',
+            'simple', 'nn', 'az', 'la', 'uz', 'el', 'th', 'sh', 'ka', 'oc',
             'new', 'mk', 'tl', 'pms', 'be', 'ht', 'ta', 'te', 'be-x-old', 'lv',
-            'br', 'mg', 'sq', 'hy', 'jv', 'cy', 'mr', 'lb', 'is', 'bs', 'my',
-            'yo', 'ba', 'an', 'ml', 'lmo', 'af', 'fy', 'pnb', 'bn', 'sw',
+            'mg', 'br', 'sq', 'hy', 'jv', 'cy', 'mr', 'lb', 'is', 'bs', 'my',
+            'yo', 'ba', 'ml', 'an', 'lmo', 'af', 'pnb', 'fy', 'bn', 'sw',
             'roa-rup', 'bpy', 'io', 'ky', 'ur', 'scn', 'ne', 'gu', 'zh-yue',
-            'nds', 'ku', 'ga', 'ast', 'qu', 'su', 'tt', 'cv', 'ia', 'bug',
-            'nap', 'als', 'bat-smg', 'sco', 'map-bms', 'kn', 'wa', 'ckb', 'am',
+            'tt', 'nds', 'ku', 'ga', 'ast', 'qu', 'su', 'cv', 'ia', 'bug',
+            'als', 'nap', 'sco', 'bat-smg', 'map-bms', 'kn', 'wa', 'am', 'ckb',
             'gd', 'hif', 'zh-min-nan', 'tg', 'mzn', 'yi', 'vec', 'arz',
-            'roa-tara', 'nah', 'sa', 'mn', 'os', 'cbk-zam', 'sah', 'pam', 'hsb',
-            'se', 'li', 'si', 'mi', 'bar', 'co', 'gan', 'ilo', 'bo', 'glk',
-            'fo', 'rue', 'bcl', 'pa', 'mrj', 'fiu-vro', 'nds-nl', 'wuu', 'tk',
-            'ps', 'vls', 'diq', 'gv', 'xmf', 'pag', 'kv', 'zea', 'dv', 'nrm',
-            'km', 'koi', 'rm', 'or', 'mhr', 'lad', 'csb', 'udm', 'lij', 'frr',
-            'fur', 'zh-classical', 'ug', 'vep', 'sc', 'pi', 'mt', 'bh', 'ksh',
-            'so', 'nov', 'stq', 'ang', 'ay', 'kw', 'nv', 'hak', 'pcd', 'gn',
-            'ext', 'frp', 'szl', 'gag', 'as', 'ie', 'ln', 'eml', 'xal', 'haw',
-            'pfl', 'pdc', 'rw', 'krc', 'crh', 'ace', 'to', 'ce', 'kl', 'arc',
-            'dsb', 'myv', 'lez', 'sn', 'bjn', 'pap', 'kab', 'tpi', 'lbe', 'bxr',
-            'jbo', 'mdf', 'wo', 'av', 'srn', 'mwl', 'ty', 'kbd', 'lo', 'ab',
+            'roa-tara', 'nah', 'mn', 'sa', 'os', 'sah', 'pam', 'hsb', 'se',
+            'li', 'si', 'mi', 'bar', 'co', 'gan', 'ilo', 'bo', 'glk', 'fo',
+            'rue', 'bcl', 'pa', 'mrj', 'fiu-vro', 'nds-nl', 'wuu', 'tk', 'ps',
+            'vls', 'xmf', 'gv', 'diq', 'pag', 'kv', 'zea', 'dv', 'nrm', 'km',
+            'koi', 'rm', 'or', 'mhr', 'lad', 'csb', 'udm', 'frr', 'lij', 'fur',
+            'vep', 'zh-classical', 'ug', 'stq', 'sc', 'pi', 'bh', 'mt', 'so',
+            'ksh', 'nov', 'ay', 'ang', 'kw', 'nv', 'hak', 'pcd', 'gn', 'ext',
+            'frp', 'szl', 'as', 'gag', 'ie', 'ln', 'eml', 'xal', 'haw', 'pfl',
+            'krc', 'pdc', 'ce', 'rw', 'crh', 'ace', 'to', 'kl', 'arc', 'dsb',
+            'myv', 'lez', 'sn', 'bjn', 'pap', 'kab', 'tpi', 'lbe', 'bxr', 'jbo',
+            'mdf', 'wo', 'cbk-zam', 'av', 'srn', 'mwl', 'ty', 'kbd', 'lo', 'ab',
             'tet', 'ltg', 'na', 'kg', 'ig', 'nso', 'za', 'kaa', 'zu', 'chy',
             'rmy', 'cu', 'tn', 'chr', 'bi', 'got', 'cdo', 'sm', 'bm', 'iu',
             'pih', 'pnt', 'sd', 'ss', 'ki', 'ee', 'ha', 'om', 'fj', 'ti', 'ts',
-            'ks', 'sg', 've', 'rn', 'dz', 'cr', 'ak', 'tum', 'lg', 'ny', 'ik',
-            'ch', 'ff', 'tw', 'st', 'xh', 'min'
+            'ks', 'sg', 've', 'rn', 'dz', 'cr', 'ak', 'tum', 'lg', 'ny', 'ff',
+            'ik', 'ch', 'tw', 'st', 'xh', 'min',
         ]
 
         self.langs = dict([(lang, '%s.wikipedia.org' % lang)
@@ -46,10 +46,6 @@ class Family(family.WikimediaFamily):
 
         # Override defaults
         self.namespaces[2]['cs'] = [u'Wikipedista', u'Uživatel', u'Wikipedistka']
-        self.namespaces[3]['cs'] =  [u'Diskuse s wikipedistou', u'Diskuse s uživatelem', u'Diskuse s wikipedistkou', u'Wikipedista diskuse', u'Wikipedistka diskuse', u'Uživatel diskuse', u'Uživatelka diskuse']
-        self.namespaces[3]['de'] = [u'Benutzer Diskussion', u'BD', u'Benutzerin Diskussion']
-        self.namespaces[12]['de'] = [u'Hilfe', u'H']
-        self.namespaces[13]['de'] = [u'Hilfe Diskussion', u'HD']
         self.namespaces[1]['ja'] = [u'ノート', u'トーク']
         self.namespaces[3]['ja'] = [u'利用者‐会話', u'利用者・トーク']
         self.namespaces[7]['ja'] = [u'ファイル‐ノート', u'ファイル・トーク', u'Image talk', u'画像‐ノート']
@@ -63,6 +59,12 @@ class Family(family.WikimediaFamily):
         self.namespaces[2]['ru'] = [u'Участник', u'У', u'Участница']
         self.namespaces[10]['ru'] = [u'Шаблон', u'Ш', u'T']
         self.namespaces[14]['ru'] = [u'Категория', u'К']
+        self.namespaces[6]['be'] = [u'Файл', u'Выява']
+        self.namespaces[7]['be'] = [u'Размовы пра файл', u'Размовы пра выяву']
+        self.namespaces[13]['de'] = [u'Hilfe Diskussion', u'HD']
+        self.namespaces[12]['de'] = [u'Hilfe', u'H']
+        self.namespaces[3]['de'] = [u'Benutzer Diskussion', u'BD', u'Benutzerin Diskussion']
+        self.namespaces[-2]['bar'] = [u'Media', u'Medium']
 
         # Most namespaces are inherited from family.Family.
         # Translation used on all wikis for the different namespaces.
@@ -433,7 +435,7 @@ class Family(family.WikimediaFamily):
             'gl': u'Conversa Wikipedia',
             'glk': u'بحث Wikipedia',
             'gn': u'Vikipetã myangekõi',
-            'got': u'𐌸𐌹𐍃 Wikipedia 𐌲𐌰𐍅𐌰𐌿𐍂𐌳𐌾𐌰',
+            'got': u'??? Wikipedia ?????????',
             'gu': u'વિકિપીડિયા ચર્ચા',
             'gv': u'Resooney Wikipedia',
             'ha': u'Wikipedia talk',
