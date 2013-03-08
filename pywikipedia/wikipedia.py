@@ -122,7 +122,7 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 11166 2013-03-02 21:46:33Z legoktm $'
+__version__ = '$Id: wikipedia.py 11181 2013-03-06 08:13:25Z amir $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -4547,7 +4547,7 @@ class DataPage(Page):
 
         """
         links = self.get()['links']
-        self._interwiki = [Page(code.replace('wiki', '').replace('_', '-'),
+        self._interwiki = [Page(getSite(code.replace('wiki', '').replace('_', '-'),fam='wikipedia'),
                                 links[code])
                            for code in links]
         return self._interwiki

@@ -50,7 +50,7 @@ TODO:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: commonscat.py 11172 2013-03-03 13:22:18Z xqt $'
+__version__ = '$Id: commonscat.py 11193 2013-03-07 22:01:23Z amir $'
 #
 
 import wikipedia as pywikibot
@@ -149,7 +149,11 @@ ignoreTemplates = {
            u'Commonskat', u'Commonscat2', u'GalleriCommons', u'Søsterlinks'],
     'de': [u'Commons', u'ZhSZV', u'Bauwerk-stil-kategorien',
            u'Bauwerk-funktion-kategorien', u'KsPuB',
-           u'Kategoriesystem Augsburg-Infoleiste', u'Kategorie v. Chr. Ge'],
+           u'Kategoriesystem Augsburg-Infoleiste', u'Kategorie Ge',
+           u'Kategorie v. Chr. Ge', u'Kategorie Geboren nach Jh. v. Chr.',
+           u'Kategorie Geboren nach Jh.',
+           u'!Kategorie Gestorben nach Jh. v. Chr.',
+           u'!Kategorie Gestorben nach Jh.'],
     'en': [u'Category redirect', u'Commons', u'Commonscat1A', u'Commoncats',
            u'Commonscat4Ra',
            u'Sisterlinks', u'Sisterlinkswp', u'Sister project links',
@@ -178,7 +182,7 @@ ignoreTemplates = {
     'om': [u'Commons'],
     'pt': [u'Correlatos'],
     'simple': [u'Sisterlinks'],
-    'ru': [u'Навигация', u'Навигация для категорий', u'КПР', u'КБР'],
+    'ru': [u'Навигация', u'Навигация для категорий', u'КПР', u'КБР', u'Годы в России', u'commonscat-inline'],
     'tt': [u'Навигация'],
     'zh': [u'Category redirect', u'cr', u'Commons',
            u'Sisterlinks', u'Sisterlinkswp',

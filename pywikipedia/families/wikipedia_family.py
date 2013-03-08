@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikipedia_family.py 11171 2013-03-03 11:01:57Z xqt $'
+__version__ = '$Id: wikipedia_family.py 11185 2013-03-07 04:45:47Z legoktm $'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 
@@ -1547,7 +1547,4 @@ class Family(family.WikimediaFamily):
         return self.code2encoding(code),
 
     def shared_data_repository(self, code, transcluded=False):
-        if not transcluded or code in ['en', 'he', 'hu', 'it']:
-            return ('wikidata', 'wikidata')
-        else:
-            return (None, None)
+        return ('wikidata', 'wikidata')
