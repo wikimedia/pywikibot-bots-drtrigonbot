@@ -73,7 +73,7 @@ Syntax example:
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__ = '$Id: sum_disc.py 11197 2013-03-09 10:33:56Z drtrigon $'
+__version__ = '$Id: sum_disc.py 11214 2013-03-16 10:45:37Z drtrigon $'
 #
 
 
@@ -283,8 +283,8 @@ class SumDiscBot(basic.AutoBasicBot):
 
 
         lang = locale.locale_alias.get(self.site.lang, locale.locale_alias['en']).split('.')[0]
-        # use e.g. 'de_DE.utf8' (thus no decode('latin-1') anymore!)
-        locale.setlocale(locale.LC_TIME, lang + '.utf8')
+        # use e.g. 'de_DE.UTF-8', 'de_DE.utf8' (thus no decode('latin-1') anymore!)
+        locale.setlocale(locale.LC_TIME, lang + '.UTF-8')
 
         # init constants
         self._userListPage = pywikibot.Page(self.site, bot_config['userlist'])
@@ -1530,7 +1530,7 @@ class PageSections(object):
                'lasteditor': False, }
 
         # check if thread has changed
-        checksum_cur = hashlib.md5(data.encode('utf8').strip()).hexdigest()
+        checksum_cur = hashlib.md5(data.encode('utf-8').strip()).hexdigest()
         if ((checksum and (len(checksum) > 0)) and (anchor in checksum)):
             checks['changed'] = (not (checksum[anchor][0] == checksum_cur))
 

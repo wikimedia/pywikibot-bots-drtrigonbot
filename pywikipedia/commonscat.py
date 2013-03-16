@@ -50,7 +50,7 @@ TODO:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: commonscat.py 11193 2013-03-07 22:01:23Z amir $'
+__version__ = '$Id: commonscat.py 11202 2013-03-10 13:40:53Z xqt $'
 #
 
 import wikipedia as pywikibot
@@ -149,11 +149,15 @@ ignoreTemplates = {
            u'Commonskat', u'Commonscat2', u'GalleriCommons', u'Søsterlinks'],
     'de': [u'Commons', u'ZhSZV', u'Bauwerk-stil-kategorien',
            u'Bauwerk-funktion-kategorien', u'KsPuB',
-           u'Kategoriesystem Augsburg-Infoleiste', u'Kategorie Ge',
-           u'Kategorie v. Chr. Ge', u'Kategorie Geboren nach Jh. v. Chr.',
-           u'Kategorie Geboren nach Jh.',
+           u'Kategoriesystem Augsburg-Infoleiste',
+           u'Kategorie Ge', u'Kategorie v. Chr. Ge',
+           u'Kategorie Geboren nach Jh. v. Chr.', u'Kategorie Geboren nach Jh.',
            u'!Kategorie Gestorben nach Jh. v. Chr.',
-           u'!Kategorie Gestorben nach Jh.'],
+           u'!Kategorie Gestorben nach Jh.',
+           u'Kategorie Jahr', u'Kategorie Jahr v. Chr.',
+           u'Kategorie Jahrzehnt', u'Kategorie Jahrzehnt v. Chr.',
+           u'Kategorie Jahrhundert', u'Kategorie Jahrhundert v. Chr.',
+           u'Kategorie Jahrtausend', u'Kategorie Jahrtausend v. Chr.'],
     'en': [u'Category redirect', u'Commons', u'Commonscat1A', u'Commoncats',
            u'Commonscat4Ra',
            u'Sisterlinks', u'Sisterlinkswp', u'Sister project links',

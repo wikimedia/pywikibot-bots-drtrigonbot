@@ -635,7 +635,7 @@ class SubsterBot(basic.AutoBasicBot):
 
         zip_buffer = zipfile.ZipFile(StringIO.StringIO(external_buffer))
         data_file  = zip_buffer.namelist()[i]
-        external_buffer = zip_buffer.open(data_file).read().decode('latin-1')
+        external_buffer = zip_buffer.open(data_file).read().decode('utf-8')
 
         return external_buffer
 

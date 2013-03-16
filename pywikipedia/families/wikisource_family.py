@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikisource_family.py 11171 2013-03-03 11:01:57Z xqt $'
+__version__ = '$Id: wikisource_family.py 11199 2013-03-09 11:37:22Z xqt $'
 
 # The Wikimedia family that is known as Wikisource
 
@@ -655,7 +655,7 @@ class Family(family.WikimediaFamily):
         self.namespaces[829] = {
             'cs': u'Module talk',
             'en': u'Module talk',
-            'fr': u'Module talk',
+            'fr': u'Discussion module',
             'it': u'Module talk',
         }
 

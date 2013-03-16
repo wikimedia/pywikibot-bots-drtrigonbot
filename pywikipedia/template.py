@@ -103,7 +103,7 @@ pages:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: template.py 10963 2013-01-20 20:56:04Z xqt $'
+__version__='$Id: template.py 11204 2013-03-12 15:19:55Z amir $'
 #
 import re, sys, string
 import wikipedia as pywikibot
@@ -354,12 +354,9 @@ u'Unless using solely -subst or -remove, you must give an even number of templat
         gens = [pg.ReferringPageGenerator(t, onlyTemplateInclusion=True)
                 for t in oldTemplates]
         gen = pg.CombinedPageGenerator(gens)
-        gen = pg.NamespaceFilterPageGenerator(gen,
-                                              map(int, genFactory.namespaces))
         gen = pg.DuplicateFilterPageGenerator(gen)
-
+        
     preloadingGen = pg.PreloadingGenerator(gen)
-
     bot = TemplateRobot(preloadingGen, templates, subst, remove, editSummary,
                         acceptAll, addedCat)
     bot.run()
