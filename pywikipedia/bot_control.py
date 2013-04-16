@@ -374,6 +374,10 @@ def main():
 #    global log, error
 #    global do_dict        # alle anderen NICHT noetig, warum diese hier ?!?????
 
+    # system     
+    pywikibot.output(u'SYSTEM:')
+    pywikibot.output(u'  ' + u' '.join(os.uname()))
+
     # script call
     pywikibot.output(u'SCRIPT CALL:')
     pywikibot.output(u'  ' + u' '.join(sys.argv))

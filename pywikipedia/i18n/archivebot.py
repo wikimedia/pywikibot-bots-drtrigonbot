@@ -254,13 +254,14 @@ msg = {
 		'archivebot-archiveheader': u'{{talkarchive}}',
 		'archivebot-archive-full': u'(ARKIVIÐ ER FULT)',
 	},
+	# Author: Boniface
 	# Author: Gomoko
 	# Author: Xqt
 	'fr': {
 		'archivebot-older-than': u'plus ancien que',
 		'archivebot-page-summary': u'Robot: Archivage de %(count)d {{PLURAL:%(count)d|thread|threads}} (%(why)s) vers %(archives)s.',
 		'archivebot-archiveheader': u'{{talkarchive}}',
-		'archivebot-archive-full': u'(ARCHIVE PLEINE)',
+		'archivebot-archive-full': u'(ARCHIVE SATURÉE)',
 		'archivebot-archive-summary': u'Robot: Archivage de %(count)d {{PLURAL:%(count)d|thread|threads}} depuis [[%(from)s]].',
 	},
 	# Author: ChrisPtDe
@@ -846,13 +847,14 @@ msg = {
 		'archivebot-archive-full': u'(ÀPÒ TI KÚN)',
 	},
 	# Author: Anakmalaysia
+	# Author: Makecat
 	# Author: Yfdyh000
 	'zh': {
 		'archivebot-older-than': u'早于',
-		'archivebot-page-summary': u'存档%(count)d个%(why)s至%(archives)s。',
+		'archivebot-page-summary': u'机器人：存档%(count)d个%(why)s的讨论至%(archives)s。',
 		'archivebot-archiveheader': u'{{talkarchive}}',
 		'archivebot-archive-full': u'（存档已满）',
-		'archivebot-archive-summary': u'存档%(count)d个来自[[%(from)s]]的讨论。',
+		'archivebot-archive-summary': u'机器人：存档%(count)d个来自[[%(from)s]]的讨论。',
 	},
 	# Author: Justincheng12345
 	# Author: Simon Shek

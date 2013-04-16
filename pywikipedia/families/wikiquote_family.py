@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiquote_family.py 11171 2013-03-03 11:01:57Z xqt $'
+__version__ = '$Id: wikiquote_family.py 11289 2013-03-29 08:45:29Z xqt $'
 
 # The Wikimedia family that is known as Wikiquote
 
@@ -11,9 +11,9 @@ class Family(family.WikimediaFamily):
         self.name = 'wikiquote'
 
         self.languages_by_size = [
-            'en', 'pl', 'it', 'ru', 'fr', 'de', 'pt', 'es', 'sk', 'cs', 'bg',
-            'bs', 'tr', 'sl', 'he', 'uk', 'lt', 'eo', 'el', 'zh', 'id', 'fa',
-            'hu', 'fi', 'sv', 'nl', 'li', 'ca', 'no', 'nn', 'hr', 'sa', 'ja',
+            'en', 'pl', 'it', 'ru', 'fr', 'de', 'pt', 'es', 'cs', 'sk', 'bg',
+            'bs', 'tr', 'sl', 'he', 'uk', 'lt', 'eo', 'el', 'id', 'zh', 'fa',
+            'hu', 'fi', 'sv', 'nl', 'li', 'ca', 'no', 'nn', 'hr', 'sa' 'ja',
             'az', 'hy', 'ar', 'et', 'ko', 'ml', 'cy', 'ka', 'gl', 'sr', 'ro',
             'ku', 'th', 'te', 'is', 'eu', 'da', 'af', 'vi', 'sq', 'ta', 'hi',
             'la', 'be', 'br', 'mr', 'uz', 'ur', 'zh-min-nan', 'gu', 'su', 'kn',
@@ -257,14 +257,6 @@ class Family(family.WikimediaFamily):
 
         self.namespaces[109] = {
             'fr': u'Discussion Transwiki',
-            }
-
-        self.namespaces[828] = {
-            'cs': u'Module',
-            }
-
-        self.namespaces[829] = {
-            'cs': u'Module talk',
             }
 
         # attop is a list of languages that prefer to have the interwiki

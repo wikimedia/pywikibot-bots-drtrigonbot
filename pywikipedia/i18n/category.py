@@ -221,7 +221,7 @@ msg = {
 	# Author: Wizardist
 	'be-x-old': {
 		'category-version-history': u'Робат: захаваньне гісторыі вэрсіяў папярэдняй %(oldcat)s',
-		'category-changing': u'Робат: зьмена %(oldcat)s',
+		'category-changing': u'Робат: зьмена %(oldcat)s на %(newcat)s',
 		'category-adding': u'Робат: дадаваньне category [[:Category:%(newcat)s|%(newcat)s]]',
 		'category-also-in': u'(таксама ў %(alsocat)s)',
 		'category-was-disbanded': u'Робат: катэгорыя расфармаваная',
@@ -474,7 +474,7 @@ msg = {
 		'category-adding': u'Roboto: Aldonado de kategorio [[:Category:%(newcat)s|%(newcat)s]]',
 		'category-also-in': u'(ankaŭ en %(alsocat)s)',
 		'category-was-disbanded': u'Roboto: Kategorio estas nuligita',
-		'category-replacing': u'Roboto: Anstataŭigado de kategorio %(oldcat)s per kategorio $(newcat)s',
+		'category-replacing': u'Roboto: Anstataŭigado de kategorio %(oldcat)s per %(newcat)s',
 		'category-removing': u'Roboto: Forigado el %(oldcat)s',
 		'category-was-moved': u'Roboto: Kategorio estas movita al [[:Category:%(newcat)s|%(title)s]]',
 		'category-renamed': u'Roboto: Movita el %s. Aŭtoroj: %s',
@@ -568,6 +568,7 @@ msg = {
 		'category-was-moved': u'Bottur: Bólkur varð fluttur til [[:Category:%(newcat)s|%(title)s]]',
 		'category-listifying': u'Bottur: Umskapar frá %(fromcat)s ({{PLURAL:%(num)d|1 entry|%(num)d entries}})',
 	},
+	# Author: Boniface
 	# Author: Crochet.david
 	# Author: Gomoko
 	# Author: IAlex
@@ -576,13 +577,13 @@ msg = {
 	# Author: Xqt
 	'fr': {
 		'category-version-history': u'Robot: Enregistrement de l\'historique de version de l\'ancien %(oldcat)s',
-		'category-changing': u'Robot : modification de %(oldcat)s à %(newcat)s',
+		'category-changing': u'Robot : modification de %(oldcat)s en %(newcat)s',
 		'category-adding': u'Robot : Ajout de la catégorie [[:Category:%(newcat)s|%(newcat)s]]',
 		'category-also-in': u'(également dans %(alsocat)s)',
 		'category-was-disbanded': u'Robot : La catégorie a été supprimée',
 		'category-replacing': u'Robot : Remplacement de la catégorie %(oldcat)s par %(newcat)s',
 		'category-removing': u'Robot : Retiré depuis %(oldcat)s',
-		'category-was-moved': u'Robot : catégorie déplacée sur [[:Category:%(newcat)s|%(title)s]]',
+		'category-was-moved': u'Robot : catégorie déplacée vers [[:Category:%(newcat)s|%(title)s]]',
 		'category-renamed': u'Robot : déplacé depuis %s. Auteurs: %s',
 		'category-section-title': u'Historique de page de l\'ancien %(oldcat)s',
 		'category-listifying': u'Robot : Listage de %(fromcat)s (%(num)d éléments)',
@@ -1835,8 +1836,8 @@ msg = {
 		'category-replacing': u'机器人：变更分类[[%(oldcat)s]]为[[%(newcat)s]]',
 		'category-removing': u'机器人：从[[%(oldcat)s]]中移除',
 		'category-was-moved': u'机器人：移动分类至[[:Category:%(newcat)s|%(title)s]]',
-		'category-renamed': u'機器人: 已從 %s 移動。原作者是 %s',
-		'category-section-title': u'前%(oldcat)s的页面历史',
+		'category-renamed': u'机器人：已从 %s 移动。原作者：%s',
+		'category-section-title': u'之前%(oldcat)s的页面历史',
 		'category-listifying': u'机器人：从%(fromcat)s提取列表(%(num)d个项目)',
 	},
 	'zh-classical': {

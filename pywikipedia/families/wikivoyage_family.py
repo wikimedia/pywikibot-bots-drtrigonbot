@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__version__ = '$Id: wikivoyage_family.py 11120 2013-02-25 11:03:51Z xqt $'
+__version__ = '$Id: wikivoyage_family.py 11281 2013-03-28 11:11:42Z xqt $'
 
 # The new wikivoyage family that is hosted at wikimedia
 
@@ -12,6 +12,7 @@ class Family(family.WikimediaFamily):
         self.name = 'wikivoyage'
         self.languages_by_size = [
             'en', 'de', 'pt', 'nl', 'fr', 'it', 'ru', 'sv', 'es', 'ro', 'pl',
+            'he', 'uk',
         ]
 
         self.langs = dict([(lang, '%s.wikivoyage.org' % lang)
@@ -23,6 +24,8 @@ class Family(family.WikimediaFamily):
         self.namespaces[12]['nl'] = [u'Help']
         self.namespaces[3]['pt'] = [u'Utilizador Discussão', u'Usuário Discussão', u'Utilizadora Discussão']
         self.namespaces[2]['pt'] = [u'Utilizador', u'Usuário', u'Utilizadora']
+        self.namespaces[12]['uk'] = [u'Довідка', u'Д']
+        self.namespaces[14]['uk'] = [u'Категорія', u'K']
         self.namespaces[9]['ro'] = [u'Discuție MediaWiki', u'Discuţie MediaWiki']
         self.namespaces[3]['pl'] = [u'Dyskusja użytkownika', u'Dyskusja użytkowniczki']
         self.namespaces[2]['pl'] = [u'Użytkownik', u'Użytkowniczka']
@@ -36,6 +39,7 @@ class Family(family.WikimediaFamily):
             'en': u'Wikivoyage',
             'es': u'Wikiviajes',
             'fr': u'Wikivoyage',
+            'he': u'ויקימסע',
             'it': u'Wikivoyage',
             'nl': u'Wikivoyage',
             'pl': u'Wikipodróże',
@@ -43,6 +47,7 @@ class Family(family.WikimediaFamily):
             'ro': u'Wikivoyage',
             'ru': u'Wikivoyage',
             'sv': u'Wikivoyage',
+            'uk': u'Вікімандри',
         }
 
         self.namespaces[5] = {
@@ -50,6 +55,7 @@ class Family(family.WikimediaFamily):
             'en': u'Wikivoyage talk',
             'es': u'Wikiviajes discusión',
             'fr': u'Discussion Wikivoyage',
+            'he': u'שיחת ויקימסע',
             'it': u'Discussioni Wikivoyage',
             'nl': u'Overleg Wikivoyage',
             'pl': u'Dyskusja Wikipodróży',
@@ -57,26 +63,27 @@ class Family(family.WikimediaFamily):
             'ro': u'Discuție Wikivoyage',
             'ru': u'Обсуждение Wikivoyage',
             'sv': u'Wikivoyagediskussion',
+            'uk': u'Обговорення Вікімандри',
         }
 
         self.namespaces[100] = {
             'de': u'Portal',
             'it': u'Portale',
+            'uk': u'Портал',
         }
 
         self.namespaces[101] = {
             'de': u'Portal Diskussion',
             'it': u'Discussioni portale',
+            'uk': u'Обговорення порталу',
         }
 
         self.namespaces[102] = {
             'de': u'Wahl',
-            'it': u'Elezione',
         }
 
         self.namespaces[103] = {
             'de': u'Wahl Diskussion',
-            'it': u'Discussioni elezione',
         }
 
         self.namespaces[104] = {
@@ -91,12 +98,18 @@ class Family(family.WikimediaFamily):
 
         self.namespaces[106] = {
             'de': u'Nachrichten',
-            'it': u'Notizie',
         }
 
         self.namespaces[107] = {
             'de': u'Nachrichten Diskussion',
-            'it': u'Discussioni notizie',
+        }
+
+        self.namespaces[108] = {
+            'he': u'ספר',
+        }
+
+        self.namespaces[109] = {
+            'he': u'שיחת ספר',
         }
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation

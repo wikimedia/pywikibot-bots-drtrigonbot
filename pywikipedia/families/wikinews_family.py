@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikinews_family.py 11171 2013-03-03 11:01:57Z xqt $'
+__version__ = '$Id: wikinews_family.py 11224 2013-03-18 16:37:20Z xqt $'
 
 # The Wikimedia family that is known as Wikinews
 
@@ -235,14 +235,6 @@ class Family(family.WikimediaFamily):
 
         self.namespaces[109] = {
             'ja': u'短信‐ノート',
-        }
-
-        self.namespaces[828] = {
-            'cs': u'Module',
-        }
-
-        self.namespaces[829] = {
-            'cs': u'Module talk',
         }
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation

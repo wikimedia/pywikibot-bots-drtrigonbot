@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikisource_family.py 11199 2013-03-09 11:37:22Z xqt $'
+__version__ = '$Id: wikisource_family.py 11289 2013-03-29 08:45:29Z xqt $'
 
 # The Wikimedia family that is known as Wikisource
 
@@ -11,11 +11,11 @@ class Family(family.WikimediaFamily):
         self.name = 'wikisource'
 
         self.languages_by_size = [
-            'fr', 'en', 'de', 'ru', 'it', 'zh', 'pl', 'pt', 'he', 'es', 'sv',
-            'fa', 'hu', 'ar', 'ca', 'cs', 'ko', 'sl', 'ro', 'fi', 'vi', 'te',
+            'fr', 'en', 'de', 'ru', 'it', 'pl', 'zh', 'he', 'pt', 'es', 'sv',
+            'fa', 'ca', 'hu', 'ar', 'cs', 'ko', 'sl', 'ro', 'fi', 'vi', 'te',
             'sa', 'el', 'sr', 'hr', 'bn', 'th', 'no', 'hy', 'nl', 'ml', 'la',
-            'vec', 'tr', 'eo', 'ja', 'br', 'yi', 'mk', 'gu', 'uk', 'ta', 'id',
-            'is', 'be', 'da', 'li', 'et', 'mr', 'bg', 'bs', 'as', 'sah', 'az',
+            'vec', 'tr', 'eo', 'ja', 'br', 'yi', 'mk', 'gu', 'uk', 'is', 'ta',
+            'id', 'be', 'da', 'li', 'et', 'bg', 'mr', 'bs', 'as', 'sah', 'az',
             'gl', 'kn', 'lt', 'cy', 'sk', 'zh-min-nan', 'fo',
         ]
 
@@ -111,7 +111,7 @@ class Family(family.WikimediaFamily):
             'sr': [u'Викизворник', u'Wikisource'],
             'sv': u'Wikisource',
             'ta': [u'விக்கிமூலம்', u'Wikisource', u'விக்கிபீடியா'],
-            'te': u'Wikisource',
+            'te': [u'వికీసోర్స్', u'Wikisource'],
             'th': [u'วิกิซอร์ซ', u'Wikisource'],
             'tr': [u'Vikikaynak', u'VikiKaynak', u'Wikisource'],
             'uk': [u'Wikisource', u'ВД'],
@@ -180,7 +180,7 @@ class Family(family.WikimediaFamily):
             'sr': [u'Разговор о Викизворнику', u'Razgovor o Викизворник'],
             'sv': u'Wikisourcediskussion',
             'ta': [u'விக்கிமூலம் பேச்சு', u'விக்கிபீடியா பேச்சு'],
-            'te': u'Wikisource చర్చ',
+            'te': u'వికీసోర్స్ చర్చ',
             'th': u'คุยเรื่องวิกิซอร์ซ',
             'tr': [u'Vikikaynak tartışma', u'Oluşturuluyor VikiKaynak tartışma'],
             'uk': u'Обговорення Wikisource',
@@ -643,20 +643,6 @@ class Family(family.WikimediaFamily):
             'uk': u'Index talk',
             'yi': u'Index talk',
             'zh-min-nan': u'Index talk',
-        }
-
-        self.namespaces[828] = {
-            'cs': u'Module',
-            'en': u'Module',
-            'fr': u'Module',
-            'it': u'Module',
-        }
-
-        self.namespaces[829] = {
-            'cs': u'Module talk',
-            'en': u'Module talk',
-            'fr': u'Discussion module',
-            'it': u'Module talk',
         }
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation

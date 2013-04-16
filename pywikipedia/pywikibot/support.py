@@ -3,11 +3,11 @@
 The initialization file for the Pywikibot framework.
 """
 #
-# (C) Pywikipedia bot team, 2010-2011
+# (C) Pywikipedia bot team, 2010-2013
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: __init__.py 9398 2011-07-16 16:17:18Z xqt $'
+__version__ = '$Id: support.py 11234 2013-03-22 05:35:23Z xqt $'
 
 import datetime
 import difflib
@@ -18,6 +18,7 @@ from textlib import *
 from throttle import *
 
 import wikipedia
+
 
 class Timestamp(datetime.datetime):
     """Class for handling Mediawiki timestamps.
@@ -44,7 +45,10 @@ class Timestamp(datetime.datetime):
 
     @classmethod
     def fromtimestampformat(cls, ts):
-        """Convert the internal MediaWiki timestamp format to a Timestamp object."""
+        """Convert the internal MediaWiki timestamp format to a Timestamp
+        object.
+
+        """
         return cls.strptime(ts, cls.mediawikiTSFormat)
 
     def __str__(self):
@@ -84,11 +88,13 @@ def deprecated(instead=None):
                 wikipedia.output(u"%s.%s is DEPRECATED, use %s instead."
                                  % (classname, funcname, instead))
             else:
-                wikipedia.output(u"%s.%s is DEPRECATED." % (classname, funcname))
+                wikipedia.output(u"%s.%s is DEPRECATED." % (classname,
+                                                            funcname))
             return method(*args, **kwargs)
         wrapper.func_name = method.func_name
         return wrapper
     return decorator
+
 
 def deprecate_arg(old_arg, new_arg):
     """Decorator to declare old_arg deprecated and replace it with new_arg"""
@@ -182,4 +188,3 @@ def showDiff(oldtext, newtext):
         lastcolor = colors[i]
         result += diff[i]
     wikipedia.output(result)
-

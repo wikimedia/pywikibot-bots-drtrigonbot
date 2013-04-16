@@ -1,44 +1,44 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikipedia_family.py 11200 2013-03-09 11:43:52Z xqt $'
+__version__ = '$Id: wikipedia_family.py 11289 2013-03-29 08:45:29Z xqt $'
+
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
-
 class Family(family.WikimediaFamily):
     def __init__(self):
         super(Family, self).__init__()
         self.name = 'wikipedia'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'nl', 'it', 'ru', 'es', 'pl', 'ja', 'sv', 'pt',
-            'zh', 'vi', 'uk', 'ca', 'no', 'fi', 'fa', 'ceb', 'cs', 'hu', 'ko',
-            'ro', 'ar', 'tr', 'id', 'kk', 'war', 'ms', 'sr', 'sk', 'eo', 'da',
-            'lt', 'eu', 'bg', 'he', 'sl', 'hr', 'vo', 'et', 'hi', 'gl',
-            'simple', 'nn', 'az', 'la', 'uz', 'el', 'th', 'sh', 'ka', 'oc',
-            'new', 'mk', 'tl', 'pms', 'be', 'ht', 'ta', 'te', 'be-x-old', 'lv',
-            'mg', 'br', 'sq', 'hy', 'jv', 'cy', 'mr', 'lb', 'is', 'bs', 'my',
-            'yo', 'ba', 'ml', 'an', 'lmo', 'af', 'pnb', 'fy', 'bn', 'sw',
-            'roa-rup', 'bpy', 'io', 'ky', 'ur', 'scn', 'ne', 'gu', 'zh-yue',
-            'tt', 'nds', 'ku', 'ga', 'ast', 'qu', 'su', 'cv', 'ia', 'bug',
-            'als', 'nap', 'sco', 'bat-smg', 'map-bms', 'kn', 'wa', 'am', 'ckb',
-            'gd', 'hif', 'zh-min-nan', 'tg', 'mzn', 'yi', 'vec', 'arz',
-            'roa-tara', 'nah', 'mn', 'sa', 'os', 'sah', 'pam', 'hsb', 'se',
-            'li', 'si', 'mi', 'bar', 'co', 'gan', 'ilo', 'bo', 'glk', 'fo',
-            'rue', 'bcl', 'pa', 'mrj', 'fiu-vro', 'nds-nl', 'wuu', 'tk', 'ps',
-            'vls', 'xmf', 'gv', 'diq', 'pag', 'kv', 'zea', 'dv', 'nrm', 'km',
-            'koi', 'rm', 'or', 'mhr', 'lad', 'csb', 'udm', 'frr', 'lij', 'fur',
-            'vep', 'zh-classical', 'ug', 'stq', 'sc', 'pi', 'bh', 'mt', 'so',
-            'ksh', 'nov', 'ay', 'ang', 'kw', 'nv', 'hak', 'pcd', 'gn', 'ext',
-            'frp', 'szl', 'as', 'gag', 'ie', 'ln', 'eml', 'xal', 'haw', 'pfl',
-            'krc', 'pdc', 'ce', 'rw', 'crh', 'ace', 'to', 'kl', 'arc', 'dsb',
-            'myv', 'lez', 'sn', 'bjn', 'pap', 'kab', 'tpi', 'lbe', 'bxr', 'jbo',
-            'mdf', 'wo', 'cbk-zam', 'av', 'srn', 'mwl', 'ty', 'kbd', 'lo', 'ab',
-            'tet', 'ltg', 'na', 'kg', 'ig', 'nso', 'za', 'kaa', 'zu', 'chy',
-            'rmy', 'cu', 'tn', 'chr', 'bi', 'got', 'cdo', 'sm', 'bm', 'iu',
-            'pih', 'pnt', 'sd', 'ss', 'ki', 'ee', 'ha', 'om', 'fj', 'ti', 'ts',
-            'ks', 'sg', 've', 'rn', 'dz', 'cr', 'ak', 'tum', 'lg', 'ny', 'ff',
-            'ik', 'ch', 'tw', 'st', 'xh', 'min',
+            'en', 'de', 'fr', 'nl', 'it', 'ru', 'es', 'pl', 'sv', 'ja', 'pt',
+            'zh', 'vi', 'uk', 'ca', 'no', 'ceb', 'war', 'fi', 'fa', 'cs', 'hu',
+            'ko', 'ro', 'ar', 'tr', 'id', 'kk', 'ms', 'sr', 'sk', 'eo', 'da',
+            'lt', 'eu', 'bg', 'he', 'sl', 'hr', 'vo', 'et', 'hi', 'uz', 'gl',
+            'nn', 'simple', 'az', 'la', 'el', 'th', 'sh', 'ka', 'oc', 'new',
+            'mk', 'tl', 'pms', 'be', 'ht', 'ta', 'te', 'be-x-old', 'lv', 'br',
+            'mg', 'sq', 'hy', 'jv', 'cy', 'mr', 'lb', 'is', 'tt', 'bs', 'my',
+            'yo', 'ba', 'ml', 'an', 'lmo', 'af', 'fy', 'pnb', 'bn', 'sw', 'bpy',
+            'io', 'ky', 'ur', 'scn', 'ne', 'gu', 'zh-yue', 'nds', 'ku', 'ga',
+            'ast', 'qu', 'su', 'cv', 'sco', 'ia', 'als', 'bug', 'nap',
+            'bat-smg', 'kn', 'map-bms', 'wa', 'am', 'ckb', 'gd', 'hif',
+            'zh-min-nan', 'tg', 'mzn', 'arz', 'yi', 'vec', 'mn', 'roa-tara',
+            'sa', 'nah', 'os', 'sah', 'pam', 'hsb', 'si', 'se', 'li', 'mi',
+            'bar', 'co', 'ilo', 'gan', 'bo', 'glk', 'fo', 'rue', 'pa', 'bcl',
+            'mrj', 'fiu-vro', 'nds-nl', 'tk', 'ps', 'vls', 'xmf', 'gv', 'diq',
+            'pag', 'kv', 'zea', 'dv', 'km', 'nrm', 'or', 'rm', 'koi', 'udm',
+            'mhr', 'lad', 'csb', 'frr', 'lij', 'fur', 'wuu', 'vep',
+            'zh-classical', 'ug', 'stq', 'sc', 'roa-rup', 'pi', 'so', 'bh',
+            'ay', 'mt', 'ksh', 'nov', 'ang', 'kw', 'nv', 'pcd', 'hak', 'gn',
+            'ext', 'frp', 'as', 'szl', 'gag', 'ie', 'ln', 'eml', 'ce', 'xal',
+            'pfl', 'haw', 'krc', 'pdc', 'rw', 'crh', 'ace', 'to', 'kl', 'dsb',
+            'arc', 'myv', 'lez', 'bjn', 'sn', 'pap', 'kab', 'tpi', 'lbe', 'bxr',
+            'jbo', 'wo', 'mdf', 'cbk-zam', 'av', 'srn', 'mwl', 'kbd', 'ty',
+            'lo', 'ab', 'tet', 'ltg', 'na', 'kg', 'ig', 'nso', 'za', 'kaa',
+            'zu', 'chy', 'rmy', 'cu', 'tn', 'chr', 'bi', 'got', 'cdo', 'sm',
+            'bm', 'iu', 'pih', 'pnt', 'sd', 'ss', 'ki', 'ee', 'ha', 'om', 'fj',
+            'ti', 'ts', 'ks', 've', 'sg', 'rn', 'st', 'dz', 'cr', 'ak', 'tum',
+            'lg', 'ny', 'ff', 'ik', 'ch', 'tw', 'xh', 'min',
         ]
 
         self.langs = dict([(lang, '%s.wikipedia.org' % lang)
@@ -1009,18 +1009,6 @@ class Family(family.WikimediaFamily):
             'en': u'TimedText talk',
         }
 
-        self.namespaces[828] = {
-            'en': u'Module',
-            'fr': u'Module',
-            'hu': u'Module',
-        }
-
-        self.namespaces[829] = {
-            'en': u'Module talk',
-            'fr': u'Module talk',
-            'hu': u'Module talk',
-        }
-
         self.category_redirect_templates = {
             '_default': (),
             'ar': (u'تحويل تصنيف',
@@ -1102,24 +1090,8 @@ class Family(family.WikimediaFamily):
             # If no templates are given, retrieve names from  the live wiki
             # ([[MediaWiki:Disambiguationspage]])
             # first char must be in uppercase
-            '_default': [u'Disambig'], # for default MediaWiki message only
-            'cdo': [u'Gì-ngiê', u'Disambig'],
-            'frp': [u'Homonimos', u'Disambig'],
-            'fur': [u'Disambiguazion', u'Disambig'],
-            'gd':  [u'Soilleireachadh'],
+            '_default': [u'Disambig'],  # for default MediaWiki message only
             'haw': [u'Huaʻōlelo puana like'],
-            'hr':  [u'Preusmjerenje u razdvojbu', u'Razdvojba', u'Razdvojba1',
-                    u'Nova razdvojba'],
-            'hy':  [u'Երկիմաստ', u'Բազմիմաստություն', u'Բազմանշանակ',
-                    u'Disambig'],
-            'kg':  [u'Bisongidila'],
-            'krc': [u'Кёб магъаналы', u'Disambig'],
-            'li':  [u'Verdudeliking', u'Verdudelikingpazjena', u'Vp'],
-            'lmo': [u'Desambiguació', u'Dezambiguasiú', u'Desambiguazion',
-                    u'Desambiguassiú', u'Desambiguació'],
-            'mn':  [u'Салаа утгатай', u'Disambig'],
-            'nn':  [u'Fleirtyding', u'Tobokstavforkorting', u'Pekerside',
-                    u'Peikar', u'Disambig'],
             'no':  [u'Peker', u'Etternavn', u'Disambig',
                     u'Tobokstavsforkortelse', u'Trebokstavsforkortelse',
                     u'Flertydig', u'Pekerside'],
@@ -1138,8 +1110,7 @@ class Family(family.WikimediaFamily):
             'wo':  [u'Bokktekki'],
             'yi':  [u'באדייטען'],
             'zea': [u'Dp', u'Deurverwiespagina'],
-            'zh-classical':  [u'Disambig', u'釋義', u'消歧義'],
-            'zh-yue': [u'搞清楚', u'Disambig'],
+            'zh-classical':  [u'釋義', u'消歧義', u'Disambig'],
         }
 
         self.disambcatname = {
@@ -1218,7 +1189,7 @@ class Family(family.WikimediaFamily):
             'zea': u'Wikipedia:Deurverwiespagina',
             'zh':  u'消歧义',
             'zh-min-nan': u'Khu-pia̍t-ia̍h',
-            }
+        }
 
         # families that redirect their interlanguage links here.
         self.interwiki_forwarded_from = [
@@ -1262,7 +1233,7 @@ class Family(family.WikimediaFamily):
 
         # On most Wikipedias page names must start with a capital letter,
         # but some languages don't use this.
-        self.nocapitalize = ['jbo',]
+        self.nocapitalize = ['jbo']
 
         # Which languages have a special order for putting interlanguage links,
         # and what order is it? If a language is not in interwiki_putfirst,
@@ -1333,23 +1304,23 @@ class Family(family.WikimediaFamily):
 
         self.obsolete = {
             'aa': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wikipedia
-            'cho': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Choctaw_Wikipedia
+            'cho': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Choctaw_Wikipedia
             'dk': 'da',
-            'ho': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Hiri_Motu_Wikipedia
-            'hz': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Herero_Wikipedia
-            'ii': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yi_Wikipedia
-            'kj': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kwanyama_Wikipedia
-            'kr': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kanuri_Wikipedia
-            'mh': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Marshallese_Wikipedia
+            'ho': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Hiri_Motu_Wikipedia
+            'hz': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Herero_Wikipedia
+            'ii': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yi_Wikipedia
+            'kj': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kwanyama_Wikipedia
+            'kr': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kanuri_Wikipedia
+            'mh': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Marshallese_Wikipedia
             'minnan': 'zh-min-nan',
-            'mo': 'ro', # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wikipedia
-            'mus': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Muscogee_Wikipedia
+            'mo': 'ro',  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wikipedia
+            'mus': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Muscogee_Wikipedia
             'nan': 'zh-min-nan',
-            'nl_nds': 'nl-nds', # miss-spelling
+            'nl_nds': 'nl-nds',  # miss-spelling
             'nb': 'no',
-            'ng': None, #(not reachable) http://meta.wikimedia.org/wiki/Inactive_wikis
+            'ng': None,  # (not reachable) http://meta.wikimedia.org/wiki/Inactive_wikis
             'jp': 'ja',
-            'ru-sib': None, # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Siberian_Wikipedia
+            'ru-sib': None,  # http://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Siberian_Wikipedia
             'tlh': None,
             'tokipona': None,
             'zh-tw': 'zh',
@@ -1357,11 +1328,11 @@ class Family(family.WikimediaFamily):
         }
 
         # Languages that used to be coded in iso-8859-1
-        self.latin1old = ['de', 'en', 'et', 'es', 'ia', 'la', 'af', 'cs',
-                    'fr', 'pt', 'sl', 'bs', 'fy', 'vi', 'lt', 'fi', 'it',
-                    'no', 'simple', 'gl', 'eu', 'nds', 'co', 'mi', 'mr',
-                    'id', 'lv', 'sw', 'tt', 'uk', 'vo', 'ga', 'na', 'es',
-                    'nl', 'da', 'dk', 'sv', 'test']
+        self.latin1old = [
+            'de', 'en', 'et', 'es', 'ia', 'la', 'af', 'cs', 'fr', 'pt', 'sl',
+            'bs', 'fy', 'vi', 'lt', 'fi', 'it', 'no', 'simple', 'gl', 'eu',
+            'nds', 'co', 'mi', 'mr', 'id', 'lv', 'sw', 'tt', 'uk', 'vo', 'ga',
+            'na', 'es', 'nl', 'da', 'dk', 'sv', 'test']
 
         self.crossnamespace[0] = {
             '_default': {
@@ -1523,7 +1494,8 @@ class Family(family.WikimediaFamily):
         # prefix for 'wikisource'.
         if site.language() == 'sv':
             d = self.known_families.copy()
-            d.pop('s') ; d['src'] = 'wikisource'
+            d.pop('s')
+            d['src'] = 'wikisource'
             return d
         else:
             return self.known_families

@@ -77,6 +77,7 @@ try:
     import rsvg                     # gnome-python2-rsvg (binding to librsvg)
     import cairo
     import magic                    # python-magic (binding to libmagic)
+    import pywt                     # python-pywt
 except:
     # either raise the ImportError later or skip it
     pass
@@ -499,14 +500,14 @@ class FileData(object):
         if (self.image_mime[1] in ['ogg', 'pdf', 'vnd.djvu']):
             return
 
-        result = self._util_get_Geometry_CVnSCIPY()
+        result = self._util_get_Geometry_CVnSCIPYnPYWT()
 
         self._info['Geometry'] = [{'Lines': result['Lines'], 'Circles': result['Circles'], 'Corners': result['Corners'],
                                    'FFT_Comp': result['FFT_Comp'], 'SVD_Comp': result['SVD_Comp'], 'SVD_Min': result['SVD_Min']}]
         return
 
     # https://code.ros.org/trac/opencv/browser/trunk/opencv/samples/python/houghlines.py?rev=2770
-    def _util_get_Geometry_CVnSCIPY(self):
+    def _util_get_Geometry_CVnSCIPYnPYWT(self):
         # http://docs.opencv.org/modules/imgproc/doc/feature_detection.html#cornerharris
         # http://docs.opencv.org/modules/imgproc/doc/feature_detection.html#houghcircles
         # http://docs.opencv.org/modules/imgproc/doc/feature_detection.html#houghlines
@@ -638,6 +639,10 @@ class FileData(object):
         data['FFT_Peaks'] = peaks
         #pywikibot.output( u'FFT_Comp: %s %s' % (1.-float(i*i)/(s[0]*s[1]), peaks) )
 
+# TODO: peak detection
+#        # http://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks_cwt.html
+#        peakind = scipy.signal.find_peaks_cwt(fft, np.arange(1,10))
+
         # svd
         try:
             U, S, Vh = linalg.svd(np.matrix(gray))
@@ -660,6 +665,22 @@ class FileData(object):
         except linalg.LinAlgError:
             # SVD did not converge; in fact this should NEVER happen...(?!?)
             pass
+
+# TODO: for audio and video (time-based) also...!!!
+        # wavelet transformation
+        # https://github.com/nigma/pywt/tree/master/demo
+        # image_blender, dwt_signal_decomposition.py, wp_scalogram.py, dwt_multidim.py, user_filter_banks.py:
+        #coeffs = pywt.dwtn(gray, 'db1')       # Single-level n-dimensional Discrete Wavelet Transform
+        coeffs = pywt.dwt2(gray, 'db1')       # 2D Discrete Wavelet Transform
+        #coeffs = pywt.wavedec2(gray, 'db1')   # Multilevel 2D Discrete Wavelet Transform
+        pass
+        result = pywt.idwt2(coeffs, 'db1')    # 2D Inverse Discrete Wavelet Transform
+        #result = pywt.waverec2(coeffs, 'db1') # Multilevel 2D Inverse Discrete Wavelet Transform
+        result = result[:gray.shape[0],:gray.shape[1]]
+        # consider 'swt' (2D Stationary Wavelet Transform) instead of 'dwt' too
+        print coeffs
+        print np.abs(result - gray).max()
+        #data['Wavelet_Comp'] = coeffs
 
         if data:
             self._buffer_Geometry.update(data)
@@ -809,8 +830,8 @@ class FileData(object):
             return
 
         result              = self._util_average_Color_colormath(h)
-        result['Gradient']  = self._util_get_Geometry_CVnSCIPY().get('Edge_Ratio', None) or '-'
-        result['FFT_Peaks'] = self._util_get_Geometry_CVnSCIPY().get('FFT_Peaks', None) or '-'
+        result['Gradient']  = self._util_get_Geometry_CVnSCIPYnPYWT().get('Edge_Ratio', None) or '-'
+        result['FFT_Peaks'] = self._util_get_Geometry_CVnSCIPYnPYWT().get('FFT_Peaks', None) or '-'
         self._info['ColorAverage'] = [result]
         return
 

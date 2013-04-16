@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikibooks_family.py 11171 2013-03-03 11:01:57Z xqt $'
+__version__ = '$Id: wikibooks_family.py 11288 2013-03-29 08:21:34Z xqt $'
 
 # The Wikimedia family that is known as Wikibooks
 
@@ -12,13 +12,13 @@ class Family(family.WikimediaFamily):
 
         self.languages_by_size = [
             'en', 'de', 'fr', 'hu', 'ja', 'pt', 'it', 'vi', 'nl', 'pl', 'es',
-            'he', 'sq', 'ca', 'id', 'fi', 'ru', 'cs', 'zh', 'hr', 'sv', 'tr',
-            'da', 'th', 'no', 'gl', 'fa', 'ko', 'sr', 'ta', 'ar', 'tl', 'mk',
+            'he', 'sq', 'ca', 'id', 'fi', 'ru', 'cs', 'zh', 'sv', 'hr', 'tr',
+            'da', 'no', 'th', 'gl', 'fa', 'ko', 'sr', 'ta', 'mk', 'ar', 'tl',
             'ro', 'is', 'tt', 'lt', 'ka', 'az', 'eo', 'uk', 'bg', 'el', 'hy',
             'sl', 'sk', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'ms', 'et', 'ur',
             'mr', 'bn', 'hi', 'ml', 'oc', 'kk', 'km', 'eu', 'fy', 'ie', 'ne',
-            'te', 'sa', 'af', 'tg', 'ky', 'bs', 'pa', 'mg', 'be', 'zh-min-nan',
-            'cy', 'ku', 'uz',
+            'te', 'sa', 'af', 'tg', 'ky', 'bs', 'pa', 'mg', 'be', 'cy',
+            'zh-min-nan', 'ku', 'uz',
         ]
 
         self.langs = dict([(lang, '%s.wikibooks.org' % lang)
@@ -415,16 +415,6 @@ class Family(family.WikimediaFamily):
 
         self.namespaces[115] = {
             'si': u'කණිෂ්ඨ විකි සාකච්ඡාව',
-        }
-
-        self.namespaces[828] = {
-            'cs': u'Module',
-            'pt': u'Module',
-        }
-
-        self.namespaces[829] = {
-            'cs': u'Module talk',
-            'pt': u'Module talk',
         }
 
         # Global bot allowed languages on http://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation

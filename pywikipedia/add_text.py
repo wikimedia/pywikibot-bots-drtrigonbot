@@ -70,7 +70,7 @@ or you need some help regarding this script, you can find us here:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: add_text.py 11154 2013-03-02 10:37:00Z xqt $'
+__version__ = '$Id: add_text.py 11286 2013-03-28 17:08:58Z xqt $'
 #
 
 import re, urllib2, urllib
@@ -86,8 +86,6 @@ import config
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
 }
-
-nn_iw_msg = u'<!--interwiki (no, sv, da first; then other languages alphabetically by name)-->'
 
 
 class NoEnoughData(pywikibot.Error):
@@ -240,16 +238,6 @@ Match was: %s''' % result)
             interwikiInside = pywikibot.getLanguageLinks(newtext, site)
             # Removing the interwiki
             newtext = pywikibot.removeLanguageLinks(newtext, site)
-            # nn got a message between the categories and the iw's
-            # and they want to keep it there, first remove it
-            hasCommentLine = False
-            if (site.language() == u'nn'):
-                regex = re.compile(
-                    '(<!-- ?interwiki \(no(?:/nb)?, ?sv, ?da first; then other languages alphabetically by name\) ?-->)')
-                found = regex.findall(newtext)
-                if found:
-                    hasCommentLine = True
-                    newtext = regex.sub('', newtext)
 
             # Adding the text
             newtext += u"\n%s" % addText
@@ -257,9 +245,6 @@ Match was: %s''' % result)
             newtext = pywikibot.replaceCategoryLinks(newtext,
                                                      categoriesInside, site,
                                                      True)
-            #Put the nn iw message back
-            if site.language() == u'nn' and (interwikiInside or hasCommentLine):
-                newtext = newtext + u'\r\n\r\n' + nn_iw_msg
             # Dealing the stars' issue
             allstars = []
             starstext = pywikibot.removeDisabledParts(text)
