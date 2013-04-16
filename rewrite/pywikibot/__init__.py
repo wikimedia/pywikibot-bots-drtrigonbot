@@ -7,7 +7,7 @@ The initialization file for the Pywikibot framework.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: __init__.py 10326 2012-06-08 12:08:53Z xqt $'
+__version__ = '$Id: __init__.py 11276 2013-03-25 23:55:40Z xqt $'
 
 import datetime
 import difflib
@@ -130,7 +130,7 @@ u"%(old_arg)s argument of %(meth_name)s is deprecated; use %(new_arg)s instead."
 
 _sites = {}
 
-@deprecate_arg("persistent_http", None)
+
 def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     """Return the specified Site object.
 
@@ -168,17 +168,17 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None):
     except ImportError:
         raise ValueError("Invalid interface name '%(interface)s'" % locals())
     key = '%s:%s:%s' % (fam, code, user)
-    if not key in _sites:
+    if not key in _sites or not isinstance(_sites[key], __Site):
         _sites[key] = __Site(code=code, fam=fam, user=user, sysop=sysop)
         pywikibot.debug(u"Instantiating Site object '%(site)s'"
-                             % {'site': _sites[key]},
-                        _logger)
+                        % {'site': _sites[key]}, _logger)
     return _sites[key]
 
-getSite = Site # alias for backwards-compability
+
+getSite = Site  # alias for backwards-compability
 
 
-from page import Page, ImagePage, Category, Link, User
+from page import Page, ImagePage, Category, Link, User, ItemPage, PropertyPage, Claim
 from page import html2unicode, url2unicode
 
 

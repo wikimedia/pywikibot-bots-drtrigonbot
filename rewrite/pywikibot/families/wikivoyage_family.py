@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__version__ = '$Id: wikivoyage_family.py 11067 2013-02-10 15:41:55Z xqt $'
+__version__ = '$Id: wikivoyage_family.py 11282 2013-03-28 11:12:47Z xqt $'
 
 # The new wikivoyage family that is hosted at wikimedia
 
@@ -12,6 +12,7 @@ class Family(family.WikimediaFamily):
         self.name = 'wikivoyage'
         self.languages_by_size = [
             'en', 'de', 'pt', 'nl', 'fr', 'it', 'ru', 'sv', 'es', 'ro', 'pl',
+            'he', 'uk',
         ]
 
         self.langs = dict([(lang, '%s.wikivoyage.org' % lang)

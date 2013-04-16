@@ -16,7 +16,7 @@ These parameters are supported to specify which pages titles to print:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: pagegenerators.py 10638 2012-11-01 12:12:57Z xqt $'
+__version__ = '$Id: pagegenerators.py 11267 2013-03-25 14:19:36Z legoktm $'
 
 import re
 import sys
@@ -604,11 +604,16 @@ def CategorizedPageGenerator(category, recurse=False, start=None,
     retrieved page will be downloaded.
 
     """
-    # TODO: page generator could be modified to use cmstartsortkey ...
-    for a in category.articles(
-                      recurse=recurse, step=step, total=total, content=content):
-        if start is None or a.title(withNamespace=False) >= start:
-            yield a
+    kwargs = dict(recurse=recurse,
+                  step=step,
+                  total=total,
+                  content=content,
+                  )
+    if start:
+        kwargs['sortby'] = 'sortkey'
+        kwargs['startsort'] = start
+    for a in category.site.categorymembers(category, **kwargs):
+        yield a
 
 
 def SubCategoriesPageGenerator(category, recurse=False, start=None,
@@ -804,6 +809,14 @@ def NewimagesPageGenerator(step=None, total=None, site=None):
         # entry is an UploadEntry object
         # entry.title() returns a Page object
         yield entry.title()
+
+def WikidataItemGenerator(gen):
+    """
+    A wrapper generator used to take another generator
+    and yield their relevant Wikidata items
+    """
+    for page in gen:
+        yield pywikibot.ItemPage.fromPage(page)
 
 
 #TODO below

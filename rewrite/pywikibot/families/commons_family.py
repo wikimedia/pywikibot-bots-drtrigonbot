@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: commons_family.py 10993 2013-01-27 12:38:06Z xqt $'
+__version__ = '$Id: commons_family.py 11163 2013-03-02 20:04:53Z legoktm $'
 
 from pywikibot import family
 
@@ -35,9 +35,6 @@ class Family(family.WikimediaFamily):
         self.disambcatname = {
             'commons':  u'Disambiguation'
         }
-
-    def dbName(self, code):
-        return 'commonswiki_p'
 
     def ssl_pathprefix(self, code):
         return "/wikipedia/commons"

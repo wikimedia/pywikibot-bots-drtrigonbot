@@ -20,7 +20,7 @@ and the bot will only work on that single page.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: basic.py 10404 2012-06-21 18:19:05Z russblau $'
+__version__ = '$Id: basic.py 11157 2013-03-02 13:46:19Z xqt $'
 #
 
 import pywikibot
@@ -32,6 +32,7 @@ from pywikibot import i18n
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
 }
+
 
 class BasicBot:
     # Edit summary message that should be used is placed on /i18n subdirectory.
@@ -103,7 +104,7 @@ class BasicBot:
                              % page.title())
             # show what was changed
             pywikibot.showDiff(page.get(), text)
-            pywikibot.output(u'Comment: %s' %comment)
+            pywikibot.output(u'Comment: %s' % comment)
             if not self.dry:
                 choice = pywikibot.inputChoice(
                     u'Do you want to accept these changes?',
