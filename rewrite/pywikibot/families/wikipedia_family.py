@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 from pywikibot import family
 
-__version__ = '$Id: wikipedia_family.py 11274 2013-03-25 19:08:19Z xqt $'
+__version__ = '$Id: wikipedia_family.py 11355 2013-04-07 11:39:46Z xqt $'
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 
@@ -11,34 +11,34 @@ class Family(family.WikimediaFamily):
         self.name = 'wikipedia'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'nl', 'it', 'ru', 'es', 'pl', 'ja', 'sv', 'pt',
-            'zh', 'vi', 'uk', 'ca', 'no', 'fi', 'fa', 'ceb', 'cs', 'hu', 'ko',
-            'ro', 'ar', 'tr', 'id', 'kk', 'war', 'ms', 'sr', 'sk', 'eo', 'da',
-            'lt', 'eu', 'bg', 'he', 'sl', 'hr', 'vo', 'et', 'hi', 'gl',
-            'simple', 'nn', 'az', 'la', 'uz', 'el', 'th', 'sh', 'ka', 'oc',
-            'new', 'mk', 'tl', 'pms', 'be', 'ht', 'ta', 'te', 'be-x-old', 'lv',
-            'mg', 'br', 'sq', 'hy', 'jv', 'cy', 'mr', 'lb', 'is', 'bs', 'my',
-            'yo', 'ba', 'ml', 'an', 'lmo', 'af', 'pnb', 'fy', 'bn', 'sw',
-            'roa-rup', 'bpy', 'io', 'ky', 'ur', 'scn', 'ne', 'gu', 'zh-yue',
-            'tt', 'nds', 'ku', 'ga', 'ast', 'qu', 'su', 'cv', 'ia', 'bug',
-            'als', 'nap', 'sco', 'bat-smg', 'map-bms', 'kn', 'wa', 'am', 'ckb',
-            'gd', 'hif', 'zh-min-nan', 'tg', 'mzn', 'yi', 'vec', 'arz',
-            'roa-tara', 'nah', 'mn', 'sa', 'os', 'sah', 'pam', 'hsb', 'se',
-            'li', 'si', 'mi', 'bar', 'co', 'gan', 'ilo', 'bo', 'glk', 'fo',
-            'rue', 'bcl', 'pa', 'mrj', 'fiu-vro', 'nds-nl', 'wuu', 'tk', 'ps',
-            'vls', 'xmf', 'gv', 'diq', 'pag', 'kv', 'zea', 'dv', 'nrm', 'km',
-            'koi', 'rm', 'or', 'mhr', 'lad', 'csb', 'udm', 'frr', 'lij', 'fur',
-            'vep', 'zh-classical', 'ug', 'stq', 'sc', 'pi', 'bh', 'mt', 'so',
-            'ksh', 'nov', 'ay', 'ang', 'kw', 'nv', 'hak', 'pcd', 'gn', 'ext',
-            'frp', 'szl', 'as', 'gag', 'ie', 'ln', 'eml', 'xal', 'haw', 'pfl',
-            'krc', 'pdc', 'ce', 'rw', 'crh', 'ace', 'to', 'kl', 'arc', 'dsb',
-            'myv', 'lez', 'sn', 'bjn', 'pap', 'kab', 'tpi', 'lbe', 'bxr', 'jbo',
-            'mdf', 'wo', 'cbk-zam', 'av', 'srn', 'mwl', 'ty', 'kbd', 'lo', 'ab',
+            'en', 'de', 'nl', 'fr', 'it', 'ru', 'es', 'sv', 'pl', 'ja', 'pt',
+            'zh', 'vi', 'uk', 'ca', 'war', 'no', 'ceb', 'fi', 'fa', 'cs', 'hu',
+            'ko', 'ro', 'ar', 'tr', 'id', 'ms', 'kk', 'sr', 'sk', 'eo', 'da',
+            'lt', 'eu', 'bg', 'he', 'hr', 'sl', 'vo', 'et', 'uz', 'hi', 'gl',
+            'nn', 'simple', 'az', 'la', 'el', 'th', 'sh', 'ka', 'oc', 'mk',
+            'new', 'tl', 'pms', 'be', 'ht', 'ta', 'te', 'be-x-old', 'lv', 'br',
+            'mg', 'sq', 'hy', 'tt', 'jv', 'cy', 'mr', 'lb', 'is', 'bs', 'my',
+            'yo', 'ba', 'ml', 'an', 'lmo', 'af', 'pnb', 'fy', 'bn', 'sw', 'bpy',
+            'io', 'ky', 'ur', 'ne', 'scn', 'gu', 'zh-yue', 'nds', 'ku', 'ga',
+            'ast', 'qu', 'su', 'cv', 'sco', 'als', 'ia', 'bug', 'nap',
+            'bat-smg', 'kn', 'map-bms', 'wa', 'am', 'ckb', 'gd', 'hif',
+            'zh-min-nan', 'tg', 'mzn', 'arz', 'yi', 'vec', 'mn', 'roa-tara',
+            'sa', 'nah', 'os', 'sah', 'pam', 'hsb', 'si', 'se', 'li', 'mi',
+            'bar', 'co', 'ilo', 'gan', 'bo', 'glk', 'fo', 'rue', 'pa', 'bcl',
+            'mrj', 'fiu-vro', 'nds-nl', 'tk', 'ps', 'vls', 'xmf', 'gv', 'diq',
+            'pag', 'kv', 'or', 'zea', 'dv', 'km', 'nrm', 'rm', 'koi', 'udm',
+            'mhr', 'frr', 'lad', 'csb', 'lij', 'wuu', 'vep', 'fur',
+            'zh-classical', 'ug', 'stq', 'sc', 'pi', 'so', 'bh', 'mt', 'ay',
+            'nov', 'ksh', 'ang', 'kw', 'nv', 'pcd', 'hak', 'gn', 'ext', 'frp',
+            'as', 'szl', 'gag', 'ie', 'ln', 'eml', 'ce', 'xal', 'pfl', 'haw',
+            'krc', 'pdc', 'rw', 'crh', 'ace', 'to', 'kl', 'dsb', 'arc', 'myv',
+            'lez', 'bjn', 'sn', 'kab', 'pap', 'tpi', 'lbe', 'bxr', 'wo', 'jbo',
+            'mdf', 'cbk-zam', 'av', 'srn', 'mwl', 'kbd', 'ty', 'lo', 'ab',
             'tet', 'ltg', 'na', 'kg', 'ig', 'nso', 'za', 'kaa', 'zu', 'chy',
-            'rmy', 'cu', 'tn', 'chr', 'bi', 'got', 'cdo', 'sm', 'bm', 'iu',
-            'pih', 'pnt', 'sd', 'ss', 'ki', 'ee', 'ha', 'om', 'fj', 'ti', 'ts',
-            'ks', 'sg', 've', 'rn', 'dz', 'cr', 'ak', 'tum', 'lg', 'ny', 'ff',
-            'ik', 'ch', 'tw', 'st', 'xh', 'min',
+            'rmy', 'roa-rup', 'cu', 'tn', 'chr', 'bi', 'cdo', 'got', 'sm', 'bm',
+            'iu', 'pih', 'pnt', 'sd', 'ss', 'ki', 'ee', 'ha', 'om', 'fj', 'ti',
+            'ts', 'ks', 've', 'sg', 'rn', 'st', 'dz', 'cr', 'ak', 'tum', 'lg',
+            'ny', 'ff', 'ik', 'ch', 'tw', 'xh', 'min',
         ]
 
         self.langs = dict([(lang, '%s.wikipedia.org' % lang)

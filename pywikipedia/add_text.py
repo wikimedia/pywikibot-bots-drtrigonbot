@@ -70,7 +70,7 @@ or you need some help regarding this script, you can find us here:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: add_text.py 11286 2013-03-28 17:08:58Z xqt $'
+__version__ = '$Id: add_text.py 11350 2013-04-07 09:29:26Z xqt $'
 #
 
 import re, urllib2, urllib
@@ -294,9 +294,11 @@ Match was: %s''' % result)
             if always or choice == 'y':
                 try:
                     if always:
-                        page.put(newtext, summary)
+                        page.put(newtext, summary,
+                                 minorEdit=page.namespace() != 3)
                     else:
-                        page.put_async(newtext, summary)
+                        page.put_async(newtext, summary,
+                                       minorEdit=page.namespace() != 3)
                 except pywikibot.EditConflict:
                     pywikibot.output(u'Edit conflict! skip!')
                     return (False, False, always)

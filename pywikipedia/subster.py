@@ -61,7 +61,7 @@ Syntax example:
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__ = '$Id: subster.py 11291 2013-03-29 10:38:05Z drtrigon $'
+__version__ = '$Id: subster.py 11375 2013-04-16 20:58:15Z drtrigon $'
 #
 
 
@@ -253,6 +253,9 @@ class SubsterBot(basic.AutoBasicBot):
                         self.data_save(page, data)
                 else:
                     pywikibot.output(u'NOTHING TO DO!')
+                if self.site.is_data_repository():
+                    data = self.data_convertContent(substed_content)
+                    self.data_save(page, data)
 
     def subContent(self, content, params):
         """Substitute the tags in content according to params.
@@ -275,7 +278,7 @@ class SubsterBot(basic.AutoBasicBot):
         for item in params:
             # 1st stage: main/general content substitution
             # 1.) - 5.) subst templates
-            metadata = { 'bot-error':           unicode(False), 
+            metadata = { 'bot-error':           unicode(False),
                          'bot-error-traceback': u'', }  # DRTRIGON-132
             try:
                 (substed_content, tags, md) = self.subTemplate(substed_content, item)
@@ -329,13 +332,13 @@ class SubsterBot(basic.AutoBasicBot):
         """
 
         substed_tags = []  # DRTRIGON-73
-        metadata     = { 'mw-signature': u'~~~~', 
-                         'mw-timestamp': u'~~~~~', }  # DRTRIGON-132
+        metadata     = {'mw-signature': u'~~~~',
+                        'mw-timestamp': u'~~~~~',}  # DRTRIGON-132
 
         # 0.2.) check for 'simple' mode and get additional params
         if param['simple']:
             p = self.site.getExpandedString(param['simple'])
-            param.update( pywikibot.extract_templates_and_params(p)[0][1] )
+            param.update(pywikibot.extract_templates_and_params(p)[0][1])
 
         # 0.5.) check cron/date
         if param['cron']:
@@ -345,9 +348,14 @@ class SubsterBot(basic.AutoBasicBot):
                 param['cron'] = '* * ' + param['cron']
             entry = crontab.CronTab(param['cron'])
             # find the delay from midnight (does not return 0.0 - but next)
-            delay = entry.next(datetime.datetime.now().replace(hour=0,minute=0,second=0,microsecond=0)-datetime.timedelta(microseconds=1))
+            delay = entry.next(datetime.datetime.now().replace(hour=0,
+                                                               minute=0,
+                                                               second=0,
+                                                               microsecond=0)- \
+                               datetime.timedelta(microseconds=1))
 
-            pywikibot.output(u'CRON delay for execution: %.3f (<= %i)' % (delay, self._bot_config['CRONMaxDelay']))
+            pywikibot.output(u'CRON delay for execution: %.3f (<= %i)'
+                             % (delay, self._bot_config['CRONMaxDelay']))
 
             if not (delay <= self._bot_config['CRONMaxDelay']):
                 return (content, substed_tags, metadata)
@@ -356,7 +364,8 @@ class SubsterBot(basic.AutoBasicBot):
         # (security: check url not to point to a local file on the server,
         #  e.g. 'file://' - same as used in xsalt.py)
         secure = False
-        for item in [u'http://', u'https://', u'mail://', u'local://', u'wiki://']:
+        for item in [u'http://', u'https://',
+                     u'mail://', u'local://', u'wiki://']:
             secure = secure or (param['url'][:len(item)] == item)
         param['zip'] = ast.literal_eval(param['zip'])
         if not secure:
@@ -364,19 +373,24 @@ class SubsterBot(basic.AutoBasicBot):
         if   (param['url'][:7] == u'wiki://'):
             url = param['url'][7:].strip('[]')              # enable wiki-links
             if ast.literal_eval(param['expandtemplates']):  # DRTRIGON-93 (only with 'wiki://')
-                external_buffer = pywikibot.Page(self.site, url).get(expandtemplates=True)
+                external_buffer = pywikibot.Page(self.site,
+                                                 url).get(expandtemplates=True)
             else:
                 external_buffer = self.load( pywikibot.Page(self.site, url) )
         elif (param['url'][:7] == u'mail://'):              # DRTRIGON-101
             url = param['url'].replace(u'{{@}}', u'@')     # e.g. nlwiki
-            mbox = SubsterMailbox(pywikibot.config.datafilepath(self._bot_config['data_path'], self._bot_config['mbox_file'], ''))
+            mbox = SubsterMailbox(
+              pywikibot.config.datafilepath(self._bot_config['data_path'],
+                                            self._bot_config['mbox_file'], ''))
             external_buffer = mbox.find_data(url)
             mbox.close()
         elif (param['url'][:8] == u'local://'):             # DRTRIGON-131
             if (param['url'][8:] == u'cache/state_bots'):
                 # filename hard-coded
-                d = shelve.open(pywikibot.config.datafilepath('cache', 'state_bots'))
-                external_buffer = pprint.pformat(ast.literal_eval(pprint.pformat(d)))
+                d = shelve.open(pywikibot.config.datafilepath('cache',
+                                                              'state_bots'))
+                external_buffer = pprint.pformat(
+                    ast.literal_eval(pprint.pformat(d)))
                 d.close()
             else:
                 external_buffer = u'n/a'
@@ -386,12 +400,13 @@ class SubsterBot(basic.AutoBasicBot):
             # on page, if the user placed them, else use the conventional mode.
             # http://www.diveintopython.net/http_web_services/etags.html
             f_url, external_buffer = http.request(self.site, param['url'],
-                                                  no_hostname = True, 
+                                                  no_hostname = True,
                                                   back_response = True)
             headers = f_url.headers # same like 'f_url.info()'
             #if param['zip']:
             if ('text/' not in headers['content-type']):
-                pywikibot.output(u'Source is of non-text content-type, using raw data instead.')
+                pywikibot.output(u'Source is of non-text content-type, '
+                                 u'using raw data instead.')
                 external_buffer = f_url.read()
             del f_url               # free some memory (no need to keep copy)
 
@@ -421,7 +436,8 @@ class SubsterBot(basic.AutoBasicBot):
             if external_data:    # not None
                 external_data = external_data.groups()
 
-                pywikibot.output(u'Groups found by regex: %i' % len(external_data))
+                pywikibot.output(u'Groups found by regex: %i'
+                                 % len(external_data))
 
                 # DRTRIGON-114: Support for named groups in regexs
                 if regex.groupindex:
@@ -482,7 +498,7 @@ class SubsterBot(basic.AutoBasicBot):
 
     def subTag(self, content, value, external_data=u'~~~~', count=1):
         """Substitute one single tag (of a template) in content.
-        
+
            Can also be (ab)used to check for presence of a tag.
         """
         substed_tags = []
@@ -558,23 +574,24 @@ class SubsterBot(basic.AutoBasicBot):
             if len(el) > 3:
                 propid = el[3]
 
-            dataoutpage = pywikibot.DataPage(self.site, element['id'])
+#            dataoutpage = pywikibot.DataPage(self.site, element['id'])
+            dataoutpage = pywikibot.DataPage(self.site, u'Q4115189')
 
             # check for changes and then write/change/set values
             summary = u'Bot: update data because of configuration on %s.' % page.title(asLink=True)
             buf = dataoutpage.get()
             claim = [ claim for claim in buf[u'claims'] if (claim['m'][1] == propid) ]
-# TODO: does this check (if) work at all? what if multiple claims per property?
+            # TODO: does this check (if) work with multiple claims per property?
             if (not claim) or (claim[0]['m'][3] != data[item]):
                 pywikibot.output(u'%s in %s <--- %s = %s' %\
                     (element[u'aliases'][0], dataoutpage.title(asLink=True), item, data[item]))
-
-# TODO: change wikipedia.py 'Changed'/'Created' --> 'Changed claim in'/'Created claim in'
-# TODO: handle; {u'messages': {u'0': {u'type': u'warning', u'name': u'edit-no-change'}, ...}
-# TODO: refs as dict and make it working
                 dataoutpage.editclaim(u'p%s' % propid, data[item],
-#                                        refs={(self._bot_config['data_PropertyId'], datapage.title()),},
-                                        comment=summary)
+                                      refs={"p%s" % propid:
+                                          [{"snaktype":  "value",
+                                            "property":  "p%s" % propid,
+                                            "datavalue": {u'type':  u'string', 
+                                                          u'value': datapage.title()}},]},
+                                      comment=summary)
 
     def get_var_regex(self, var, cont='.*?'):
         """Get regex used/needed to find the tags to replace.

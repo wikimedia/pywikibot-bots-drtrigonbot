@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikisource_family.py 11289 2013-03-29 08:45:29Z xqt $'
+__version__ = '$Id: wikisource_family.py 11368 2013-04-13 08:16:45Z xqt $'
 
 # The Wikimedia family that is known as Wikisource
 
@@ -14,7 +14,7 @@ class Family(family.WikimediaFamily):
             'fr', 'en', 'de', 'ru', 'it', 'pl', 'zh', 'he', 'pt', 'es', 'sv',
             'fa', 'ca', 'hu', 'ar', 'cs', 'ko', 'sl', 'ro', 'fi', 'vi', 'te',
             'sa', 'el', 'sr', 'hr', 'bn', 'th', 'no', 'hy', 'nl', 'ml', 'la',
-            'vec', 'tr', 'eo', 'ja', 'br', 'yi', 'mk', 'gu', 'uk', 'is', 'ta',
+            'vec', 'tr', 'ja', 'eo', 'br', 'yi', 'mk', 'gu', 'uk', 'is', 'ta',
             'id', 'be', 'da', 'li', 'et', 'bg', 'mr', 'bs', 'as', 'sah', 'az',
             'gl', 'kn', 'lt', 'cy', 'sk', 'zh-min-nan', 'fo',
         ]

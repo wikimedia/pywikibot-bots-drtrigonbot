@@ -3,6 +3,10 @@ msg = {
 	'en': {
 		'capitalize_redirects-create-redirect': u'Robot: Create redirect to [[%(to)s]]',
 	},
+	# Author: Shirayuki
+	'qqq': {
+		'capitalize_redirects-create-redirect': u'Edit summary. Parameters:\n* %(to)s - page title',
+	},
 	# Author: Csisc
 	'aeb': {
 		'capitalize_redirects-create-redirect': u'روبوت: إنشاء تحويلة إلى [[%(to)s]]',
@@ -98,10 +102,11 @@ msg = {
 	'el': {
 		'capitalize_redirects-create-redirect': u'Ρομπότ: Δημιουργία ανακατεύθυνσης [[%(to)s]]',
 	},
+	# Author: Airon90
 	# Author: Objectivesea
 	# Author: Remux
 	'eo': {
-		'capitalize_redirects-create-redirect': u'Roboto: Kreas redirektilo al [[%(to)s]]',
+		'capitalize_redirects-create-redirect': u'Roboto: Kreado de alidirektilo al [[%(to)s]]',
 	},
 	# Author: Invadinado
 	# Author: Vivaelcelta

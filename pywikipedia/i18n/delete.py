@@ -7,6 +7,14 @@ msg = {
 		'delete-linked-pages': u'Robot: Deleting all pages linked from %(page)s',
 		'delete-referring-pages': u'Robot: Deleting all pages referring from %(page)s',
 	},
+	# Author: Shirayuki
+	'qqq': {
+		'delete-images': u'Used as edit summary. Parameters:\n* %(page)s - page name',
+		'delete-referring-pages': u'Used as edit summary. Parameters:\n* %(page)s - page name',
+		'delete-from-category': u'Used as edit summary. Parameters:\n* %(page)s - page name',
+		'delete-from-file': u'Used as edit summary.',
+		'delete-linked-pages': u'Used as edit summary. Parameters:\n* %(page)s - page name',
+	},
 	# Author: Csisc
 	'aeb': {
 		'delete-images': u'روبوت -حذف كل الصور في الصفحة %(page)s',
@@ -168,14 +176,15 @@ msg = {
 		'delete-from-file': u'Ρομπότ: Διαγραφή μια λίστας αρχείων.',
 		'delete-linked-pages': u'Ρομπότ: Διαγραφή όλων των σελίδων που συνδέονται από την %(page)s',
 	},
+	# Author: Airon90
 	# Author: Blahma
 	# Author: Objectivesea
 	# Author: Remux
 	'eo': {
-		'delete-images': u'Roboto: Forigas ĉiujn bildojn ĉe la paĝo %(page)s',
-		'delete-referring-pages': u'Roboto: Forigas ĉiujn paĝojn kiuj ligas el %(page)s',
-		'delete-from-category': u'Roboto: Forigas ĉiujn paĝojn de la kategorio %(page)s',
-		'delete-from-file': u'Roboto: Forigas liston da dosieroj',
+		'delete-images': u'Roboto: Forigado de ĉiuj bildoj ĉe la paĝo %(page)s',
+		'delete-referring-pages': u'Roboto: Forigado de ĉiuj paĝoj, kiuj ligas al %(page)s',
+		'delete-from-category': u'Roboto: Forigado de ĉiuj paĝoj de la kategorio %(page)s',
+		'delete-from-file': u'Roboto: Forigado de listo da dosieroj.',
 		'delete-linked-pages': u'Roboto: Forigante ĉiujn paĝojn ligatajn el %(page)s',
 	},
 	# Author: Invadinado

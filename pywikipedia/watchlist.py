@@ -21,7 +21,7 @@ Command line options:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: watchlist.py 10485 2012-08-15 14:13:57Z xqt $'
+__version__='$Id: watchlist.py 11367 2013-04-11 21:04:35Z legoktm $'
 #
 
 import wikipedia as pywikibot
@@ -72,9 +72,8 @@ def refresh(site, sysop=False):
 
     params = {
         'action': 'query',
-        'list': 'watchlist',
-        'wllimit': pywikibot.config.special_page_limit,
-        'wlprop': 'title',
+        'list': 'watchlistraw',
+        'wrlimit': pywikibot.config.special_page_limit,
     }
 
     pywikibot.output(u'Retrieving watchlist for %s via API.' % repr(site))
@@ -84,10 +83,10 @@ def refresh(site, sysop=False):
         data = pywikibot.query.GetData(params, site, sysop=sysop)
         if 'error' in data:
             raise RuntimeError('ERROR: %s' % data)
-        watchlist.extend([w['title'] for w in data['query']['watchlist']])
+        watchlist.extend([w['title'] for w in data['watchlistraw']])
 
         if 'query-continue' in data:
-            params.update(data['query-continue']['watchlist'])
+            params.update(data['query-continue']['watchlistraw'])
         else:
             break
 

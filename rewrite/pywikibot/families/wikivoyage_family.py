@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__version__ = '$Id: wikivoyage_family.py 11282 2013-03-28 11:12:47Z xqt $'
+__version__ = '$Id: wikivoyage_family.py 11296 2013-03-29 17:26:23Z xqt $'
 
 # The new wikivoyage family that is hosted at wikimedia
 
@@ -11,8 +11,8 @@ class Family(family.WikimediaFamily):
         super(Family, self).__init__()
         self.name = 'wikivoyage'
         self.languages_by_size = [
-            'en', 'de', 'pt', 'nl', 'fr', 'it', 'ru', 'sv', 'es', 'ro', 'pl',
-            'he', 'uk',
+            'en', 'de', 'pt', 'nl', 'fr', 'it', 'pl', 'ru', 'sv', 'es', 'ro',
+            'uk', 'he',
         ]
 
         self.langs = dict([(lang, '%s.wikivoyage.org' % lang)

@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: family.py 11283 2013-03-28 15:33:20Z xqt $'
+__version__ = '$Id: family.py 11348 2013-04-06 15:10:19Z legoktm $'
 
 import re
 import urllib
@@ -4536,7 +4536,7 @@ class WikimediaFamily(Family):
         """Return Wikimedia projects version number as a string."""
         # Don't use this, use versionnumber() instead. This only exists
         # to not break family files.
-        return '1.21wmf12'
+        return '1.22wmf1'
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

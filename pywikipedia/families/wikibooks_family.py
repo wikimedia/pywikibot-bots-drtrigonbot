@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikibooks_family.py 11288 2013-03-29 08:21:34Z xqt $'
+__version__ = '$Id: wikibooks_family.py 11368 2013-04-13 08:16:45Z xqt $'
 
 # The Wikimedia family that is known as Wikibooks
 
@@ -11,13 +11,13 @@ class Family(family.WikimediaFamily):
         self.name = 'wikibooks'
 
         self.languages_by_size = [
-            'en', 'de', 'fr', 'hu', 'ja', 'pt', 'it', 'vi', 'nl', 'pl', 'es',
+            'en', 'de', 'fr', 'hu', 'ja', 'pt', 'vi', 'it', 'nl', 'pl', 'es',
             'he', 'sq', 'ca', 'id', 'fi', 'ru', 'cs', 'zh', 'sv', 'hr', 'tr',
-            'da', 'no', 'th', 'gl', 'fa', 'ko', 'sr', 'ta', 'mk', 'ar', 'tl',
-            'ro', 'is', 'tt', 'lt', 'ka', 'az', 'eo', 'uk', 'bg', 'el', 'hy',
-            'sl', 'sk', 'si', 'li', 'la', 'ang', 'ia', 'cv', 'ms', 'et', 'ur',
+            'da', 'no', 'th', 'gl', 'fa', 'sr', 'ko', 'ta', 'ar', 'mk', 'tl',
+            'ro', 'is', 'tt', 'lt', 'ka', 'az', 'uk', 'eo', 'bg', 'el', 'hy',
+            'sl', 'sk', 'si', 'li', 'ms', 'la', 'ang', 'ia', 'cv', 'et', 'ur',
             'mr', 'bn', 'hi', 'ml', 'oc', 'kk', 'km', 'eu', 'fy', 'ie', 'ne',
-            'te', 'sa', 'af', 'tg', 'ky', 'bs', 'pa', 'mg', 'be', 'cy',
+            'sa', 'te', 'af', 'tg', 'ky', 'bs', 'pa', 'mg', 'be', 'cy',
             'zh-min-nan', 'ku', 'uz',
         ]
 

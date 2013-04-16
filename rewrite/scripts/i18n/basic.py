@@ -3,6 +3,10 @@ msg = {
 	'en': {
 		'basic-changing': u'Robot: Changing ...',
 	},
+	# Author: Shirayuki
+	'qqq': {
+		'basic-changing': u'Edit summary.',
+	},
 	# Author: Csisc
 	'aeb': {
 		'basic-changing': u'بوت: تغيير ...',
@@ -110,7 +114,7 @@ msg = {
 	# Author: Airon90
 	# Author: Objectivesea
 	'eo': {
-		'basic-changing': u'Roboto: Ŝanĝas ...',
+		'basic-changing': u'Roboto: Ŝanĝado...',
 	},
 	# Author: Fitoschido
 	'es': {

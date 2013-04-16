@@ -57,7 +57,7 @@ Syntax example:
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
 __version__       = '$Id: script_wui.py 11098 2013-02-20 19:30:41Z drtrigon $'
-__framework_rev__ = '11147' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '11375' # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.5'   # increase minor (1.x) at re-merges with framework
 __release_rev__   = '%i'
 #

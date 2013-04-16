@@ -1,5 +1,5 @@
 # -*- coding: utf-8  -*-
-__version__ = '$Id: anarchopedia_family.py 10503 2012-08-23 10:23:04Z xqt $'
+__version__ = '$Id: anarchopedia_family.py 11299 2013-03-29 17:43:58Z xqt $'
 
 from pywikibot import family
 
@@ -11,8 +11,10 @@ class Family(family.Family):
         self.name = 'anarchopedia'
 
         self.languages_by_size = [
-            'ar','sr','da','de','nl','el','en','fa','fi','fr','he','sr','hy','id','it','ja',
-            'ko','lv','lit','no','sr','pl','pt','ro','ru','es','sq','sr','sv','tr','zh',
+            'ar', 'en', 'ger', 'de', 'nl', 'el', 'it', 'fa', 'fi', 'fr', 'he',
+            'es', 'hy', 'id', 'meta', 'ja', 'ko', 'lv', 'lit', 'no', 'hrv',
+            'pl', 'pt', 'ro', 'ru', 'sr', 'sq', 'da', 'sv', 'tr', 'zh', 'gre',
+            'chi',
         ]
         for l in self.languages_by_size:
             self.langs[l] = '%s.anarchopedia.org' % l

@@ -30,7 +30,7 @@ Todo:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: flickrripper.py 10559 2012-10-12 22:55:43Z platonides $'
+__version__ = '$Id: flickrripper.py 11331 2013-04-03 20:03:54Z legoktm $'
 
 import sys, urllib, re,  StringIO, hashlib, base64, time
 import wikipedia as pywikibot
@@ -501,7 +501,7 @@ def main():
             'Any flickr user can get a key at http://www.flickr.com/services/api/keys/apply/')
         return
 
-    if config.flickr['api_secret']:
+    if 'api_secret' in config.flickr and config.flickr['api_secret']:
         flickr = flickrapi.FlickrAPI(config.flickr['api_key'], config.flickr['api_secret'])
         (token, frob) = flickr.get_token_part_one(perms='read')
         if not token: # The user still hasn't authorised this app yet, get_token_part_one() will have spawn a browser window

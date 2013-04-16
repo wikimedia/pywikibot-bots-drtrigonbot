@@ -20,7 +20,7 @@ options -file, -ref, -links, ...
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: fixing_redirects.py 11061 2013-02-10 13:21:48Z xqt $'
+__version__='$Id: fixing_redirects.py 11352 2013-04-07 10:33:13Z xqt $'
 #
 import re, sys
 import wikipedia as pywikibot
@@ -170,11 +170,9 @@ def workon(page):
         try:
             target = page2.getRedirectTarget()
         except pywikibot.NoPage:
-            gen = mysite.logpages(number=1, mode='move', title=page2.title(),
-                                  dump=True)
             try:
-                lastmove = gen.next()['move']
-            except StopIteration:
+                target = page2.getMovedTarget()
+            except pywikibot.NoPage:
                 continue
             target = pywikibot.Page(mysite, lastmove['new_title'])
         except (pywikibot.Error, pywikibot.SectionError):

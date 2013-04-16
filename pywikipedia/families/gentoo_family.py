@@ -2,7 +2,7 @@
 
 import family
 
-__version__ = '$Id: gentoo_family.py 10828 2012-12-23 20:59:00Z drtrigon $'
+__version__ = '$Id: gentoo_family.py 11297 2013-03-29 17:42:34Z xqt $'
 
 # An inofficial Gentoo wiki project.
 # Ask for permission at http://gentoo-wiki.com/Help:Bots before running a bot.
@@ -15,7 +15,9 @@ class Family(family.Family):
         family.Family.__init__(self)
         self.name = 'gentoo'
 
-        self.languages_by_size = ['en', 'de', 'es', 'fr', 'cs', 'nl', 'tr', 'ru', 'fi']
+        self.languages_by_size = [
+            'en', 'ru', 'de', 'fr', 'tr', 'es', 'scratch', 'cs', 'nl', 'fi',
+        ]
         for l in self.languages_by_size:
             self.langs[l] = '%s.gentoo-wiki.com' % l
 

@@ -45,6 +45,13 @@ msg = {
 		'weblinkchecker-summary': u'Robot : A gemenn ez eus ul liamm diavaez diziraezus',
 		'weblinkchecker-report': u'E-pad meur a batrouilhenn robot n\'eus ket bet gallet diaraez arliamm da-heul. Gwiriit mat eo dall al liamm e gwirionez ha mard eo, reizhit-eñ pe lamit-eñ.',
 	},
+	# Author: Edinwiki
+	'bs': {
+		'weblinkchecker-archive_msg': u'Ova stranica je arhivirana na "Internet Archive". Pokušajte staviti vezu prema arhiviranoj verziji ove stranice: [%(URL)s].',
+		'weblinkchecker-caption': u'Mrtav link',
+		'weblinkchecker-summary': u'Bot: Prijavljam nedostupnu vanjsku vezu',
+		'weblinkchecker-report': u'Poslije nekoliko automatskih pokušaja bota, ustanovljeno je da je sljedeća vanjska veza nedostupna. Provjerite da li je veza zaista neispravna i zatim je ispravite ako je ovo slučaj!',
+	},
 	# Author: Anskar
 	# Author: Pitort
 	'ca': {
@@ -52,6 +59,13 @@ msg = {
 		'weblinkchecker-caption': u'Enllaç trencat',
 		'weblinkchecker-summary': u'Robot: Informant d\'un enllaç extern inaccessible',
 		'weblinkchecker-report': u'Durant diverses execucions automàtiques, el bot ha comprovat que el següent enllaç extern no està disponible. Comproveu que l\'enllaç estigui realment trencat i corregiu-lo o retireu-lo.!',
+	},
+	# Author: Tchoř
+	'cs': {
+		'weblinkchecker-archive_msg': u'Webová stránka je uložena v projektu Internet Archive. Prosím zvažte, zda neodkázat na patřičnou archivovanou verzi  [%(URL)s].',
+		'weblinkchecker-caption': u'Mrtvý odkaz',
+		'weblinkchecker-summary': u'Robot: Ohlašuji nedostupný externí odkaz.',
+		'weblinkchecker-report': u'Během několika automatizovaných běhů byl následující externí odkaz nedostupný. Prosím, ověřte, zda je skutečně nedostupný, a pokud ano, pak jej opravte nebo odstraňte!',
 	},
 	# Author: Steenth
 	'da': {
@@ -73,8 +87,9 @@ msg = {
 		'weblinkchecker-report': u'Bei mehreren automatisierten Botläufen wurde die folgende Verknüpfung als nicht verfügbar erkannt. Bitte überprüfe, ob die Verknüpfung tatsächlich nicht erreichbar ist, und korrigiere oder entferne sie in diesem Fall!',
 	},
 	# Author: Gorizon
+	# Author: Mirzali
 	'diq': {
-		'weblinkchecker-caption': u'Greyo merde',
+		'weblinkchecker-caption': u'Gıreyo merde',
 	},
 	# Author: Airon90
 	'eo': {
@@ -213,7 +228,7 @@ msg = {
 		'weblinkchecker-archive_msg': u'Deze website is bewaard in het Internet Archive. Overweeg te koppelen naar een gearchiveerde pagina: [%(URL)s].',
 		'weblinkchecker-caption': u'Dode koppeling',
 		'weblinkchecker-summary': u'Robot: melding (tijdelijk) onbereikbare externe koppeling',
-		'weblinkchecker-report': u'Tijdens enkele automatische controles bleek de onderstaande externe koppeling onbereikbaar. Controleer alstublieft of de koppeling inderdaad onbereikbaar is. Verwijder deze tekst alstublieft na een succesvolle controle of na het verwijderen of corrigeren van de externe koppeling.',
+		'weblinkchecker-report': u'Tijdens enkele automatische controles bleek de onderstaande externe koppeling onbereikbaar. Controleer of de koppeling inderdaad onbereikbaar is. Verwijder deze tekst na een succesvolle controle of na het verwijderen of corrigeren van de externe koppeling.',
 	},
 	# Author: Jon Harald Søby
 	'no': {
@@ -223,10 +238,12 @@ msg = {
 		'weblinkchecker-report': u'I løpet av flere automatiske botkjøringer ble følgende lenke funnet å være utilgjengelig. Sjekk om lenken faktisk er død, og fiks eller fjern den om det er tilfelle.',
 	},
 	# Author: Rezonansowy
+	# Author: Ty221
 	'pl': {
 		'weblinkchecker-archive_msg': u'%(URL)s',
 		'weblinkchecker-caption': u'Niedziałający link',
 		'weblinkchecker-summary': u'Robot zgłasza niedostępny link zewnętrzny',
+		'weblinkchecker-report': u'W ciągu kilku automatycznych kontroli następujący link zewnętrzny był niedostępny. Proszę, sprawdź linki naprawdę "martwe" i w takim przypadku należy skorygować lub usunąć go!',
 	},
 	'pt': {
 		'weblinkchecker-archive_msg': u'Esta página web foi gravada na Internet Archive. Por favor considere o link para a versão arquivada: [%(URL)s].',
@@ -287,8 +304,10 @@ msg = {
 	},
 	# Author: Гусейн
 	'tly': {
+		'weblinkchecker-archive_msg': u'Веб-сәһифә интернет-архивәдә огәтә быә. Бә архивә рәвојәти дәвардејро ын сәбони око быдәјон: [%(URL)s].',
 		'weblinkchecker-caption': u'Ко ныкардә сәвонон',
 		'weblinkchecker-summary': u'Робот: ко ныкардә бешемонә сәвон пәјдо быә',
+		'weblinkchecker-report': u'Бот пәјдош карде ки пеш омә бешемонә сәвонон ко кардејдәнин. Сәвонон дәвинә ијән сәрост быкәјон јаанки әвони бымолән.',
 	},
 	'uk': {
 		'weblinkchecker-archive_msg': u'Веб-сторінка була збережена у Internet Archive. Будь ласка, подумайте над заміною посилання на відповідну збережену версію: [%(URL)s].',

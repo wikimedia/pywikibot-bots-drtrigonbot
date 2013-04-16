@@ -122,7 +122,7 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 11268 2013-03-25 14:30:06Z amir $'
+__version__ = '$Id: wikipedia.py 11374 2013-04-16 20:48:25Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -901,8 +901,10 @@ not supported by PyWikipediaBot!"""
             else:
                 # search for messages with no "view source" (aren't used in new versions)
                 if self.site().mediawiki_message('whitelistedittitle') in text:
-                    raise NoPage(u'Page editing is forbidden for anonymous users.')
-                elif self.site().has_mediawiki_message('nocreatetitle') and self.site().mediawiki_message('nocreatetitle') in text:
+                    raise NoPage(u'Page editing is forbidden for anonymous '
+                                 u'users.')
+                elif self.site().has_mediawiki_message('nocreatetitle') and \
+                     self.site().mediawiki_message('nocreatetitle') in text:
                     raise NoPage(self.site(), unicode(self))
                 # Bad title
                 elif 'var wgPageName = "Special:Badtitle";' in text \
@@ -2838,117 +2840,13 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
                 thistxt = self.get(get_redirect=get_redirect)
             except (IsRedirectPage, NoPage):
                 return []
-
-        # remove commented-out stuff etc.
-        thistxt  = removeDisabledParts(thistxt)
-
-        # marker for inside templates or parameters
-        marker = findmarker(thistxt,  u'@@', u'@')
-
-        # marker for links
-        marker2 = findmarker(thistxt,  u'##', u'#')
-
-        # marker for math
-        marker3 = findmarker(thistxt,  u'%%', u'%')
-
-        result = []
-        inside = {}
-        count = 0
-        Rtemplate = re.compile(
-                    ur'{{(msg:)?(?P<name>[^{\|]+?)(\|(?P<params>[^{]*?))?}}')
-        Rlink = re.compile(ur'\[\[[^\]]+\]\]')
-        Rmath = re.compile(ur'<math>[^<]+</math>')
-        Rmarker = re.compile(ur'%s(\d+)%s' % (marker, marker))
-        Rmarker2 = re.compile(ur'%s(\d+)%s' % (marker2, marker2))
-        Rmarker3 = re.compile(ur'%s(\d+)%s' % (marker3, marker3))
-
-        # Replace math with markers
-        maths = {}
-        count = 0
-        for m in Rmath.finditer(thistxt):
-            count += 1
-            text = m.group()
-            thistxt = thistxt.replace(text, '%s%d%s' % (marker3, count, marker3))
-            maths[count] = text
-
-        while Rtemplate.search(thistxt) is not None:
-            for m in Rtemplate.finditer(thistxt):
-                # Make sure it is not detected again
-                count += 1
-                text = m.group()
-                thistxt = thistxt.replace(text,
-                                          '%s%d%s' % (marker, count, marker))
-                # Make sure stored templates don't contain markers
-                for m2 in Rmarker.finditer(text):
-                    text = text.replace(m2.group(), inside[int(m2.group(1))])
-                for m2 in Rmarker3.finditer(text):
-                    text = text.replace(m2.group(), maths[int(m2.group(1))])
-                inside[count] = text
-
-                # Name
-                name = m.group('name').strip()
-                m2 = Rmarker.search(name) or Rmath.search(name)
-                if m2 is not None:
-                    # Doesn't detect templates whose name changes,
-                    # or templates whose name contains math tags
-                    continue
-                if self.site().isInterwikiLink(name):
-                    continue
-
-                # {{#if: }}
-                if name.startswith('#'):
-                    continue
-                # {{DEFAULTSORT:...}}
-                defaultKeys = self.site().versionnumber() > 13 and \
-                              self.site().getmagicwords('defaultsort')
-                # It seems some wikis does not have this magic key
-                if defaultKeys:
-                    found = False
-                    for key in defaultKeys:
-                        if name.startswith(key):
-                            found = True
-                            break
-                    if found: continue
-
-                try:
-                    name = Page(self.site(), name).title()
-                except InvalidTitle:
-                    if name:
-                        output(
-                            u"Page %s contains invalid template name {{%s}}."
-                           % (self.title(), name.strip()))
-                    continue
-                # Parameters
-                paramString = m.group('params')
-                params = []
-                if paramString:
-                    # Replace links to markers
-                    links = {}
-                    count2 = 0
-                    for m2 in Rlink.finditer(paramString):
-                        count2 += 1
-                        text = m2.group()
-                        paramString = paramString.replace(text,
-                                        '%s%d%s' % (marker2, count2, marker2))
-                        links[count2] = text
-                    # Parse string
-                    markedParams = paramString.split('|')
-                    # Replace markers
-                    for param in markedParams:
-                        for m2 in Rmarker.finditer(param):
-                            param = param.replace(m2.group(),
-                                                  inside[int(m2.group(1))])
-                        for m2 in Rmarker2.finditer(param):
-                            param = param.replace(m2.group(),
-                                                  links[int(m2.group(1))])
-                        for m2 in Rmarker3.finditer(param):
-                            param = param.replace(m2.group(),
-                                                  maths[int(m2.group(1))])
-                        params.append(param)
-
-                # Add it to the result
-                result.append((name, params))
-        return result
+        else:
+            pass
+##            output(u"""\
+##thistxt argument of templatesWithParams is deprecated. Please use textlib method
+##extract_templates_and_params() instead.""")
+        return [(t[0].upper() + t[1:], p) for t, p in
+                extract_templates_and_params(thistxt, asList=True)]
 
     def getRedirectTarget(self):
         """Return a Page object for the target this Page redirects to.
@@ -2971,6 +2869,20 @@ u'Page %s is semi-protected. Getting edit page to find out if we are allowed to 
             return Page(self.site(), target)
         else:
             raise IsNotRedirectPage(self)
+
+    def getMovedTarget(self):
+        """Return a Page object for the target this Page was moved to.
+
+        If this page was not moved, it will raise a NoPage exception.
+
+        """
+        gen = self.site.logpages(number=1, mode='move', title=self.title(),
+                                 dump=True)
+        try:
+            lastmove = gen.next()['move']
+        except StopIteration:
+            raise NoPage(self.site(), unicode(self))
+        return Page(self.site, lastmove['new_title'])
 
     def getVersionHistory(self, forceReload=False, reverseOrder=False,
                           getAll=False, revCount=500):
@@ -4401,11 +4313,12 @@ class DataPage(Page):
             params['token'] = token or self.site().getToken(sysop=sysop)
             if botflag:
                 params['bot'] = 1
-            output(u"Changing %s" % self.title())
+            output(u"Changing claim in item %s" % self.title())
             data = query.GetData(params, self.site(), sysop=sysop)
             if 'error' in data:
                 raise RuntimeError("API query error: %s" % data)
-            if u'warnings' in data:
+            if (u'warnings' in data) and \
+               (not data[u'warnings'][u'messages'][u'0'][u'name'] == u'edit-no-change'):
                 output(str(data[u'warnings']))
             guid=theclaim['g']
         else:
@@ -4419,7 +4332,7 @@ class DataPage(Page):
             params['token'] = token or self.site().getToken(sysop=sysop)
             if botflag:
                 params['bot'] = 1
-            output(u"Creating %s" % self.title())
+            output(u"Creating claim in item %s" % self.title())
             data = query.GetData(params, self.site(), sysop=sysop)
             if 'error' in data:
                 raise RuntimeError("API query error: %s" % data)
@@ -4428,49 +4341,65 @@ class DataPage(Page):
             guid=data['claim']['id']
         if refs:
             snak = []
-            for ref in refs:
-                if isinstance(ref,basestring):
-                    raise RuntimeError(
-                        "the references must be like this: {(ref1, value1), (ref2, value2)}")
-                for i in range(2):
-                    if isinstance(ref[i], int):
-                        value = ref[i]
-                    elif isinstance(ref[i], basestring):
-                        try:
-                            value = int(ref[i])
-                        except ValueError:
+            if isinstance(refs, dict):
+                # the references must be like this:
+                # {"p?": [{"snaktype": "value", 
+                #          "property":"p?",
+                #          "datavalue": {u'type': u'string', u'value': u'...'}},
+                #         {"snaktype": "value", ... }}, ]}
+                pass
+            elif isinstance(refs, set):
+                # the references must be like this:
+                # {(ref1, value1), (ref2, value2)}
+                for ref in refs:
+                    if isinstance(ref, basestring):
+                        raise RuntimeError(
+                            "the references must be like this: {(ref1, value1), (ref2, value2)}")
+                    for i in range(2):
+                        if isinstance(ref[i], int):
+                            value = ref[i]
+                        elif isinstance(ref[i], basestring):
                             try:
-                                value = int(
-                                    ref[i].lower().replace("Q",
-                                                           "").replace("P", ""))
+                                value = int(ref[i])
                             except ValueError:
-                                if i == 0:
-                                    typesearch = 'property'
+                                try:
+                                    value = int(
+                                        ref[i].lower().replace("Q",
+                                                               "").replace("P", ""))
+                                except ValueError:
+                                    if i == 0:
+                                        typesearch = 'property'
+                                    else:
+                                        typesearch = 'item'
+                                    search=self.searchentities(
+                                        ref[i], typesearch,
+                                        lang=self._originSite.lang)
+                                    value = int(
+                                        search[0]["id"].replace("q",
+                                                                "").replace("p",
+                                                                            ""))
                                 else:
-                                    typesearch = 'item'
-                                search=self.searchentities(
-                                    ref[i], typesearch,
-                                    lang=self._originSite.lang)
-                                value = int(
-                                    search[0]["id"].replace("q",
-                                                            "").replace("p",
-                                                                        ""))
+                                    pass
                             else:
                                 pass
                         else:
-                            pass
-                    else:
-                        raise RuntimeError("Unknown item: %s" % ref[i])
-                    snak.append(value)
-            finalsnak = {}
-            for i in range(0, len(snak) / 2):
-                snaki = [
-                    {"snaktype": "value",
-                     "property":"p"+str(snak[i*2]),
-                     "datavalue": {"type": "wikibase-entityid",
-                                   "value": {"entity-type": "item",
-                                             "numeric-id": snak[(i * 2) + 1]}}}]
-                finalsnak["p%d" % snak[i * 2]] = snaki
+                            raise RuntimeError("Unknown item: %s" % ref[i])
+                        snak.append(value)
+            else:
+                raise RuntimeError(
+                    "the references format cannot be understood!")
+            if snak:
+                finalsnak = {}
+                for i in range(0, len(snak) / 2):
+                    snaki = [
+                        {"snaktype": "value",
+                         "property":"p"+str(snak[i*2]),
+                         "datavalue": {"type": "wikibase-entityid",
+                                       "value": {"entity-type": "item",
+                                                 "numeric-id": snak[(i * 2) + 1]}}}]
+                    finalsnak["p%d" % snak[i * 2]] = snaki
+            else:
+                finalsnak=refs
             finalsnak=json.dumps(finalsnak)
             finalsnak=finalsnak.replace("'", '"')
             params = {
@@ -4485,11 +4414,12 @@ class DataPage(Page):
                 params['token'] = self.site().getToken(sysop = sysop)
             if botflag:
                 params['bot'] = 1
-            output(u"Adding references to %s" % self.title())
+            output(u"Adding references to claim in %s" % self.title())
             data = query.GetData(params, self.site(), sysop=sysop)
             if 'error' in data:
                 raise RuntimeError("API query error: %s" % data)
-            if 'warnings' in data:
+            if (u'warnings' in data) and \
+               (not data[u'warnings'][u'messages'][u'0'][u'name'] == u'edit-no-change'):
                 output(str(data[u'warnings']))
 
     def _getentity(self,force=False, get_redirect=False, throttle=True,
@@ -4518,7 +4448,8 @@ class DataPage(Page):
         data['query'] = {'pages': data['entities']}
         for pageid in data['entities'].keys():
             if pageid == "-1":
-                raise NoPage(self.site(), unicode(self),"API query error, no pages found: %s" % data)
+                raise NoPage(self.site(), unicode(self),
+                             "API query error, no pages found: %s" % data)
             params1['titles'] = pageid
             ndata=query.GetData(params1, self.site(), sysop=sysop)
             data['entities'].update(ndata['query']['pages'])
@@ -4526,7 +4457,8 @@ class DataPage(Page):
         if 'error' in data:
             raise RuntimeError("API query error: %s" % data)
         if not 'pages' in data['query']:
-            raise NoPage(self.site(), unicode(self),"API query error, no pages found: %s" % data)
+            raise NoPage(self.site(), unicode(self),
+                         "API query error, no pages found: %s" % data)
         pageInfo = ndata['query']['pages'].values()[0]
         if data['query']['pages'].keys()[0] == "-1":
             if 'missing' in pageInfo:
@@ -4717,6 +4649,7 @@ class ImagePage(Page):
 
         Caches the HTML code, so that if you run this method twice on the
         same ImagePage object, the page will only be downloaded once.
+
         """
         if not self._imagePageHtml:
             path = self.site().get_address(self.urlname())
@@ -4758,7 +4691,8 @@ class ImagePage(Page):
                 for info in pageInfo['imageinfo']:
                     count += 1
                     if count == 1 and 'iistart' not in params:
-                    # count 1 and no iicontinue mean first image revision is latest.
+                        # count 1 and no iicontinue mean first image revision
+                        # is latest.
                         self._latestInfo = info
                     infos.append(info)
                     if limit == 1:
@@ -4769,7 +4703,7 @@ class ImagePage(Page):
                 else:
                     break
         except KeyError:
-            output("Not image in imagepage")
+            output("No image in imagepage")
         self._infoLoaded = True
         if limit > 1:
             return infos
@@ -4814,8 +4748,8 @@ class ImagePage(Page):
             return self.fileUrl().startswith(u'http://wikitravel.org/upload/shared/')
         return self.fileIsOnCommons()
 
-    # FIXME: MD5 might be performed on incomplete file due to server disconnection
-    # (see bug #1795683).
+    # FIXME: MD5 might be performed on incomplete file due to server
+    # disconnection (see bug #1795683).
     def getFileMd5Sum(self):
         """Return image file's MD5 checksum."""
         f = MyURLopener.open(self.fileUrl())

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 from pywikibot import family
 
-__version__ = '$Id: wikisource_family.py 11170 2013-03-03 11:01:02Z xqt $'
+__version__ = '$Id: wikisource_family.py 11296 2013-03-29 17:26:23Z xqt $'
 
 # The Wikimedia family that is known as Wikisource
 
@@ -11,11 +11,11 @@ class Family(family.WikimediaFamily):
         self.name = 'wikisource'
 
         self.languages_by_size = [
-            'fr', 'en', 'de', 'ru', 'it', 'zh', 'pl', 'pt', 'he', 'es', 'sv',
-            'fa', 'hu', 'ar', 'ca', 'cs', 'ko', 'sl', 'ro', 'fi', 'vi', 'te',
+            'fr', 'en', 'de', 'ru', 'it', 'pl', 'zh', 'he', 'pt', 'es', 'sv',
+            'fa', 'ca', 'hu', 'ar', 'cs', 'ko', 'sl', 'ro', 'fi', 'vi', 'te',
             'sa', 'el', 'sr', 'hr', 'bn', 'th', 'no', 'hy', 'nl', 'ml', 'la',
-            'vec', 'tr', 'eo', 'ja', 'br', 'yi', 'mk', 'gu', 'uk', 'ta', 'id',
-            'is', 'be', 'da', 'li', 'et', 'mr', 'bg', 'bs', 'as', 'sah', 'az',
+            'vec', 'tr', 'eo', 'ja', 'br', 'yi', 'mk', 'gu', 'uk', 'is', 'ta',
+            'id', 'be', 'da', 'li', 'et', 'bg', 'mr', 'bs', 'as', 'sah', 'az',
             'gl', 'kn', 'lt', 'cy', 'sk', 'zh-min-nan', 'fo',
         ]
 

@@ -7,7 +7,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: config.py 10895 2013-01-12 16:17:54Z drtrigon $'
+__version__ = '$Id: config.py 11337 2013-04-04 07:53:54Z xqt $'
 
 import os, re
 import sys as __sys
@@ -439,12 +439,6 @@ copyright_show_length = True
 copyright_economize_query = True
 
 ############## HTTP SETTINGS ##############
-# Use a persistent http connection. An http connection has to be established
-# only once per site object, making stuff a whole lot faster. Do NOT EVER
-# use this if you share Site objects across threads without proper locking.
-## DISABLED FUNCTION. Setting this variable will not have any effect.
-persistent_http = False
-
 # Default socket timeout. Set to None to disable timeouts.
 socket_timeout = 120  # set a pretty long timeout just in case...
 

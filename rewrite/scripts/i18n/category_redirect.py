@@ -9,8 +9,13 @@ msg = {
 		'category_redirect-fix-double': u'Robot: Fixing double-redirect',
 	},
 	# Author: Csisc
+	# Author: Shirayuki
 	# Author: Xqt
 	'qqq': {
+		'category_redirect-change-category': u'Used as comment. Parameters:\n* %(oldCatLink)s - old category name\n* %(oldCatTitle)s - old category name\n* %(newCatLink)s - new category name\n* %(newCatTitle)s - new category name',
+		'category_redirect-add-template': u'Used as edit summary.',
+		'category_redirect-edit-request': u'Variables:\n* %(itemlists)s - list of edit requests (pages). Uses the message {{msg-pywikipedia|Category redirect-edit-request-item}}.',
+		'category_redirect-edit-request-item': u'Used as <code>%(itemlist)s</code> in {{msg-pywikipedia|Category_redirect-edit-request}}.\n\nVariables:\n* %(title)s - page title\n* %(oldcat)s - old category name\n* %(newcat)s - new category name',
 		'category_redirect-fix-double': u'Edit summary when the bot fixes double category redirects.',
 	},
 	# Author: Csisc
@@ -239,12 +244,12 @@ msg = {
 	# Author: Blahma
 	# Author: Objectivesea
 	'eo': {
-		'category_redirect-comment': u'Zorga roboto pri kategoria alidirekto',
-		'category_redirect-change-category': u'Roboto: ŝanĝi alidirektan kategorion [[:%(oldCatLink)s|%(oldCatTitle)s]] al [[:%(newCatLink)s|%(newCatTitle)s]]',
-		'category_redirect-add-template': u'Roboto: aldonanta ŝablonon pri alidirekta kategorio por prizorgado',
-		'category_redirect-edit-request': u'Jenaj protektitaj paĝoj evidente bezonas ĝisdatigon de kategoriaj ligiloj: %(itemlist)s',
-		'category_redirect-edit-request-item': u'* %(title)s estas en %(oldcat)s, kiu estas alidirekto al %(newcat)s',
-		'category_redirect-fix-double': u'Roboto: Riparas duoblan alidirekton',
+		'category_redirect-comment': u'Zorga roboto pri kategoria alidirektado',
+		'category_redirect-change-category': u'Roboto: Ŝanĝado de alidirekta kategorio [[:%(oldCatLink)s|%(oldCatTitle)s]] al [[:%(newCatLink)s|%(newCatTitle)s]]',
+		'category_redirect-add-template': u'Roboto: Aldonado de ŝablono pri alidirekta kategorio por prizorgado',
+		'category_redirect-edit-request': u'La jenaj protektitaj paĝoj evidente bezonas ĝisdatigon de kategoriaj ligiloj: %(itemlist)s',
+		'category_redirect-edit-request-item': u'* %(title)s en %(oldcat)s, kiu estas alidirektilo al %(newcat)s',
+		'category_redirect-fix-double': u'Roboto: Riparado de duobla alidirektilo',
 	},
 	# Author: Dferg
 	# Author: Invadinado

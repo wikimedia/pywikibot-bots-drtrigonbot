@@ -3,6 +3,10 @@ msg = {
 	'en': {
 		'catall-changing': u'Robot: Changing categories',
 	},
+	# Author: Shirayuki
+	'qqq': {
+		'catall-changing': u'Edit summary.',
+	},
 	# Author: Csisc
 	'aeb': {
 		'catall-changing': u'بوت: تغيير التصنيفات',
@@ -88,10 +92,11 @@ msg = {
 	'el': {
 		'catall-changing': u'Ρομπότ: Αλλαγή κατηγοριών',
 	},
+	# Author: Airon90
 	# Author: Objectivesea
 	# Author: Remux
 	'eo': {
-		'catall-changing': u'Roboto: Ŝanĝas kategoriojn',
+		'catall-changing': u'Roboto: Ŝanĝado de kategorioj',
 	},
 	# Author: Armando-Martin
 	# Author: Xqt

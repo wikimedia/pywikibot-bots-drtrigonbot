@@ -3,11 +3,11 @@
 Objects representing various types of MediaWiki pages.
 """
 #
-# (C) Pywikipedia bot team, 2008-2012
+# (C) Pywikipedia bot team, 2008-2013
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: page.py 11287 2013-03-29 02:54:48Z legoktm $'
+__version__ = '$Id: page.py 11360 2013-04-08 13:22:36Z legoktm $'
 
 import pywikibot
 from pywikibot import deprecate_arg
@@ -2199,26 +2199,36 @@ class WikibasePage(Page):
             self.repo = self.site.data_repository()
         self._isredir = False  # Wikibase pages cannot be a redirect
 
-    def __defined_by(self):
+    def __defined_by(self, singular=False):
         """
-        returns the parameters needed by the API
-        to identify an item.
-        Once an item's "p/q##" is looked up, that
-        will be used for all future requests.
+        returns the parameters needed by the API to identify an item.
+        Once an item's "p/q##" is looked up, that will be used for all future
+        requests.
+        @param singular: Whether the parameter names should use the singular
+                         form
+        @type singular: bool
         """
         params = {}
+        if singular:
+            id = 'id'
+            site = 'site'
+            title = 'title'
+        else:
+            id = 'ids'
+            site = 'sites'
+            title = 'titles'
         #id overrides all
         if hasattr(self, 'id'):
-            params['ids'] = self.id
+            params[id] = self.id
             return params
 
         #the rest only applies to ItemPages, but is still needed here.
 
         if isinstance(self.site, pywikibot.site.DataSite):
-            params['ids'] = self.title(withNamespace=False)
+            params[id] = self.title(withNamespace=False)
         elif isinstance(self.site, pywikibot.site.BaseSite):
-            params['sites'] = self.site.dbName()
-            params['titles'] = self.title()
+            params[site] = self.site.dbName()
+            params[title] = self.title()
         else:
             raise pywikibot.exceptions.BadTitle
         return params
@@ -2302,7 +2312,7 @@ class WikibasePage(Page):
                 del data[key]
         return data
 
-    def __getdbName(self, site):
+    def getdbName(self, site):
         """
         Helper function to normalize site
         objects into dbnames
@@ -2326,7 +2336,8 @@ class WikibasePage(Page):
             baserevid = self.lastrevid
         else:
             baserevid = None
-        updates = self.repo.editEntity(self.__defined_by(), data, baserevid=baserevid, **kwargs)
+        updates = self.repo.editEntity(self.__defined_by(singular=True), data,
+                                       baserevid=baserevid, **kwargs)
         self.lastrevid = updates['entity']['lastrevid']
 
     def editLabels(self, labels, **kwargs):
@@ -2337,6 +2348,8 @@ class WikibasePage(Page):
         You can set it to '' to remove the label.
         """
         labels = self.__normalizeLanguages(labels)
+        for key in labels:
+            labels[key] = {'language': key, 'value': labels[key]}
         data = {'labels': labels}
         self.editEntity(data, **kwargs)
 
@@ -2348,6 +2361,8 @@ class WikibasePage(Page):
         You can set it to '' to remove the description.
         """
         descriptions = self.__normalizeLanguages(descriptions)
+        for key in descriptions:
+            descriptions[key] = {'language': key, 'value': descriptions[key]}
         data = {'descriptions': descriptions}
         self.editEntity(data, **kwargs)
 
@@ -2431,7 +2446,7 @@ class ItemPage(WikibasePage):
         """
         if force or not hasattr(self, '_content'):
             self.get(force=force)
-        dbname = self.__getdbName(site)
+        dbname = self.getdbName(site)
         if not dbname in self.sitelinks:
             raise pywikibot.NoPage(self)
         else:
@@ -2456,10 +2471,10 @@ class ItemPage(WikibasePage):
         Sites should be a list, with values either
         being Site objects, or dbNames.
         """
-        data = {}
+        data = list()
         for site in sites:
-            site = self.__getdbName(site)
-            data[site] = {'site': site, 'title': ''}
+            site = self.getdbName(site)
+            data.append({'site': site, 'title': ''})
         self.setSitelinks(data, **kwargs)
 
     def setSitelinks(self, sitelinks, **kwargs):
@@ -2472,7 +2487,7 @@ class ItemPage(WikibasePage):
         data = {}
         for obj in sitelinks:
             if isinstance(obj, Page):
-                dbName = self.__getdbName(obj.site)
+                dbName = self.getdbName(obj.site)
                 data[dbName] = {'site': dbName, 'title': obj.title()}
             else:
                 #TODO: Do some verification here
@@ -2490,6 +2505,13 @@ class ItemPage(WikibasePage):
         @type bot bool
         """
         self.repo.addClaim(self, claim, bot=bot)
+
+    def removeClaims(self, claims, **kwargs):
+        """
+        Removes the claims from the item
+        @type claims: list
+        """
+        self.repo.removeClaims(claims, **kwargs)
 
 
 class PropertyPage(WikibasePage):
@@ -2515,9 +2537,7 @@ class PropertyPage(WikibasePage):
         Examples: item, commons media file, StringValue, NumericalValue
         """
         if not hasattr(self, 'type'):
-            self.get()
-        if self.type == 'wikibase-entityid':
-            self.type = 'wikibase-item'
+            self.type = self.repo.getPropertyType(self)
         return self.type
 
 
@@ -2561,11 +2581,14 @@ class Claim(PropertyPage):
             claim.isReference = True
         claim.snaktype = data['mainsnak']['snaktype']
         if claim.getSnakType() == 'value':
-            claim.type = data['mainsnak']['datavalue']['type']
-            if claim.type == 'wikibase-entityid':
+            if claim.getType() == 'wikibase-item':
                 claim.target = ItemPage(site, 'Q' +
                                               str(data['mainsnak']['datavalue']['value']['numeric-id']))
+            elif claim.getType() == 'commonsMedia':
+                claim.target = ImagePage(site.image_repository(), 'File:' +
+                                                                  data['mainsnak']['datavalue']['value'])
             else:
+                #This covers string type
                 claim.target = data['mainsnak']['datavalue']['value']
         if 'references' in data:
             for source in data['references']:
