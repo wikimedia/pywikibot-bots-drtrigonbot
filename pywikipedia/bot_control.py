@@ -359,7 +359,10 @@ def getSVN_framework_ver(site):
 def getSVN_release_ver(site):
     global __release_rev__
     __release_rev__ %= int(version.getversion_svn(pywikibot.config.datafilepath('..'))[1])
-    match = version.getversion_onlinerepo('http://svn.toolserver.org/svnroot/drtrigon/')
+    try:
+        match = version.getversion_onlinerepo('http://svn.toolserver.org/svnroot/drtrigon/')
+    except version.ParseError:
+        match = None
     if match:
         release_rev = int(match)
         info = version.cmp_ver(release_rev, int(__release_rev__))
