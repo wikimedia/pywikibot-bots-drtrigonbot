@@ -61,7 +61,7 @@ Syntax example:
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__ = '$Id: subster.py 11375 2013-04-16 20:58:15Z drtrigon $'
+__version__ = '$Id: subster.py 11376 2013-04-17 09:40:00Z drtrigon $'
 #
 
 
@@ -83,9 +83,9 @@ from pywikibot import i18n
 from pywikibot.comms import http
 
 
+# TODO: think about what config to move to 'subster-config.css' (per wiki)
+#       e.g. 'VerboseMessage', 'data_VerboseMessage', ...
 bot_config = {
-# TODO: think about what config should be moved to 'subster-config.css' directly/instead...
-#       e.g. 'VerboseMessage', ... ?
         # unicode values
              'BotName':     pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang],
         'TemplateName':     u'User:DrTrigonBot/Subster',    # or 'template' for 'Flagged Revisions'
@@ -246,16 +246,12 @@ class SubsterBot(basic.AutoBasicBot):
                                (head + u' ' + msg) % {'tags':", ".join(substed_tags)},
                                **flags )
 
-# TODO: consider doing this first in order for full error output to 'master-page' (template)
                     # DRTRIGON-130: data repository (wikidata) output to items
                     if self.site.is_data_repository():
                         data = self.data_convertContent(substed_content)
                         self.data_save(page, data)
                 else:
                     pywikibot.output(u'NOTHING TO DO!')
-                if self.site.is_data_repository():
-                    data = self.data_convertContent(substed_content)
-                    self.data_save(page, data)
 
     def subContent(self, content, params):
         """Substitute the tags in content according to params.
@@ -537,7 +533,8 @@ class SubsterBot(basic.AutoBasicBot):
            @type  substed_content: string
         """
         # DRTRIGON-130: convert talk page result to wikidata(base)
-        #res, i = {}, 0
+        # TODO: consider format; every line starting with "|" is data
+        # TODO: combine with 'outputContentDiff' in order to update changed only
         res = {}
         for line in substed_content.splitlines():
             #data = self.get_var_regex('(.*?)', '(.*?)').findall(line)
@@ -570,12 +567,11 @@ class SubsterBot(basic.AutoBasicBot):
             item = el[2]
             if item not in data:
                 pywikibot.output(u'Value "%s" not found.' % (item,))
-                continue
+                data[item] = u'%s: N/A' % self._bot_config['BotName']
             if len(el) > 3:
                 propid = el[3]
 
-#            dataoutpage = pywikibot.DataPage(self.site, element['id'])
-            dataoutpage = pywikibot.DataPage(self.site, u'Q4115189')
+            dataoutpage = pywikibot.DataPage(self.site, element['id'])
 
             # check for changes and then write/change/set values
             summary = u'Bot: update data because of configuration on %s.' % page.title(asLink=True)

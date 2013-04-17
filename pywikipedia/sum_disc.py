@@ -36,10 +36,6 @@ Entries can be changed (deleted for example when the discussion is finished) tha
 will cause no problem for the bot, because the entries are also written to the
 history.
 
-The following parameters are supported:
-
-&params;
-
 All other parameters will be ignored.
 
 Syntax example:
@@ -73,7 +69,7 @@ Syntax example:
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__ = '$Id: sum_disc.py 11214 2013-03-16 10:45:37Z drtrigon $'
+__version__ = '$Id: sum_disc.py 11377 2013-04-17 14:38:34Z drtrigon $'
 #
 
 
@@ -1116,7 +1112,7 @@ class SumDiscBot(basic.AutoBasicBot):
         for line in text.splitlines():
             try:
                 #date = time.strptime(u'abc', u'; %d. %B %Y')
-                date = time.strptime(line, str(self._param['parse_msg'][u'start']))
+                date = time.strptime(line.encode('utf-8'), str(self._param['parse_msg'][u'start']))
                 #date = time.strptime(str(line), str(self._param['parse_msg'][u'start']))
                 date = datetime.datetime.fromtimestamp(time.mktime(date))
                 diff = (today - date).days
