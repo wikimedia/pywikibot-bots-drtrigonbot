@@ -122,7 +122,7 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 11427 2013-04-21 20:16:57Z drtrigon $'
+__version__ = '$Id: wikipedia.py 11435 2013-04-22 20:57:35Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -4312,7 +4312,7 @@ class DataPage(Page):
                 value = "{\"entity-type\":\"item\",\"numeric-id\":%s}" % value
         else:
             pass
-        claims = self.get()['claims'] if 'claims' in self.get() else []
+        claims = self.get()['claims']
         theclaim = None
         for claim in claims:
             if claim['m'][1] == propertyID:
@@ -4352,7 +4352,7 @@ class DataPage(Page):
                 raise RuntimeError("API query error: %s" % data)
             if 'warnings' in data:
                 output(str(data[u'warnings']))
-            guid=data['claim']['id']
+            guid=data['claim']['id'] if 'claim' in data else ''
         if refs:
             snak = []
             if isinstance(refs, dict):

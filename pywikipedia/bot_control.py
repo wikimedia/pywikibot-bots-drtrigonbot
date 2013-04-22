@@ -36,7 +36,7 @@ It will also catch all output to stdout and stderr and report those incidents.
 #  @verbatim python bot_control.py <name_of_script> <options> @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '11434'  # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '11435'  # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.5.%i' # increase minor (1.x) at re-merges with framework
 #
 
@@ -128,7 +128,7 @@ if len(sys.argv) < 2:
 else:
     logname = pywikibot.config.datafilepath('logs', '%s.log')
     #logfile = logname % ''.join([os.path.basename(sys.argv[0])]+sys.argv[1:])
-    logfile = logname % ''.join([os.path.basename(sys.argv[0]), sys.argv[1], '-cron']+sys.argv[2:])
+    logfile = logname % ''.join([os.path.basename(sys.argv[0]), sys.argv[1], '-cron']+sys.argv[2:]) # (temporary work-a-round)
 
     # may be use "log = ['*']" in 'user-config.py' instead
     pywikibot.setLogfileStatus(True, logfile, header=True)  # set '-log' to catch all
