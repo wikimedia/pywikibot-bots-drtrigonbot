@@ -6,7 +6,7 @@ Should not be run manually/directly, but automatically by maintainer.py
 Warning: experimental software, use at your own risk
 """
 
-__version__ = '$Id: censure.py 9042 2011-03-13 10:14:47Z xqt $'
+__version__ = '$Id: censure.py 11393 2013-04-19 21:28:02Z drtrigon $'
 
 # Author: Balasyum
 # http://hu.wikipedia.org/wiki/User:Balasyum
@@ -33,13 +33,13 @@ badWordList = {
 
 site = pywikibot.getSite()
 if not (site.language() + '.' + site.family.name) in badWordList or not (site.language() + '.' + site.family.name) in logPages:
-    pywikibot.output('Error: your language isn\'t supported, see the source code for further details')
+    pywikibot.error('your language isn\'t supported, see the source code for further details')
     sys.exit(1)
 ownWordPage = pywikibot.Page(site, badWordList[site.language() + '.' + site.family.name])
 try:
     ownWordList = ownWordPage.get(get_redirect = True)
 except pywikibot.NoPage:
-    pywikibot.output('Error: the page containing the bad word list of your language doesn\'t exist')
+    pywikibot.error('the page containing the bad word list of your language doesn\'t exist')
     sys.exit(1)
 ownWordList = ownWordList.split('\n')
 del ownWordList[0]
@@ -109,7 +109,7 @@ def checkPage(title, onlyLastDiff = False):
         pywikibot.output(u'%s doesn\'t match any of the bad word list' %title)
 
 def main():
-    pywikibot.output('Warning: this script should not be run manually/directly, but automatically by maintainer.py')
+    pywikibot.warning('this script should not be run manually/directly, but automatically by maintainer.py')
     if len(sys.argv) == 1:
         pywikibot.output("Usage: censure.py <article title>")
         sys.exit(1)

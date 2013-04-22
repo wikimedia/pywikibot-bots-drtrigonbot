@@ -13,7 +13,7 @@ Library to work with category pages on Wikipedia
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: catlib.py 11334 2013-04-04 06:30:35Z xqt $'
+__version__ = '$Id: catlib.py 11393 2013-04-19 21:28:02Z drtrigon $'
 #
 import re, time, urllib, query
 import wikipedia
@@ -655,8 +655,8 @@ def change_category(article, oldCat, newCat, comment=None, sortKey=None,
             newCatList.append(cat)
 
     if not changesMade:
-        wikipedia.output(u'ERROR: %s is not in category %s!'
-                         % (article.title(asLink=True), oldCat.title()))
+        wikipedia.error(u'%s is not in category %s!'
+                        % (article.title(asLink=True), oldCat.title()))
     else:
         text = article.get(get_redirect=True)
         try:

@@ -91,7 +91,7 @@ This will move all pages in the category US to the category United States.
 # (C) xqt, 2009-2012
 # (C) Pywikipedia team, 2008-2012
 #
-__version__ = '$Id: category.py 10897 2013-01-12 18:51:22Z multichill $'
+__version__ = '$Id: category.py 11393 2013-04-19 21:28:02Z drtrigon $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -302,9 +302,9 @@ class AddCategory:
                                  % page.title(asLink=True))
         except pywikibot.IsRedirectPage, arg:
             redirTarget = pywikibot.Page(self.site, arg.args[0])
-            pywikibot.output(u"WARNING: Page %s is a redirect to %s; skipping."
-                             % (page.title(asLink=True),
-                                redirTarget.title(asLink=True)))
+            pywikibot.warning(u"Page %s is a redirect to %s; skipping."
+                              % (page.title(asLink=True),
+                                 redirTarget.title(asLink=True)))
         else:
             return text
         return None

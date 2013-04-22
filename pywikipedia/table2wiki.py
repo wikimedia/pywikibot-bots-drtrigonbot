@@ -52,7 +52,7 @@ Please check every article you change.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: table2wiki.py 9681 2011-10-29 15:43:50Z xqt $'
+__version__='$Id: table2wiki.py 11393 2013-04-19 21:28:02Z drtrigon $'
 #
 
 import re, sys, time
@@ -466,7 +466,7 @@ class Table2WikiRobot:
         try:
             text = page.get()
         except pywikibot.NoPage:
-            pywikibot.output(u"ERROR: couldn't find %s" % page.title())
+            pywikibot.error(u"couldn't find %s" % page.title())
             return False
         except pywikibot.IsRedirectPage:
             pywikibot.output(u'Skipping redirect %s' % page.title())
@@ -476,8 +476,8 @@ class Table2WikiRobot:
         # Check if there are any marked tags left
         markedTableTagR = re.compile("<##table##|</##table##>", re.IGNORECASE)
         if markedTableTagR.search(newText):
-            pywikibot.output(
-                u'ERROR: not all marked table start or end tags processed!')
+            pywikibot.error(
+                u'not all marked table start or end tags processed!')
             return
 
         if convertedTables == 0:

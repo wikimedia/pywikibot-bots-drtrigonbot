@@ -20,7 +20,7 @@ options -file, -ref, -links, ...
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: fixing_redirects.py 11352 2013-04-07 10:33:13Z xqt $'
+__version__='$Id: fixing_redirects.py 11393 2013-04-19 21:28:02Z drtrigon $'
 #
 import re, sys
 import wikipedia as pywikibot
@@ -187,7 +187,7 @@ def workon(page):
         try:
             page.put(text, comment)
         except (pywikibot.Error):
-            pywikibot.output('Error: unable to put %s' % page)
+            pywikibot.error('unable to put %s' % page)
 
 def main():
     featured = False

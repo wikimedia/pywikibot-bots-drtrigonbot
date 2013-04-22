@@ -69,7 +69,7 @@ Syntax example:
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__ = '$Id: sum_disc.py 11377 2013-04-17 14:38:34Z drtrigon $'
+__version__ = '$Id: sum_disc.py 11397 2013-04-20 12:20:45Z drtrigon $'
 #
 
 
@@ -260,6 +260,7 @@ class SumDiscBot(basic.AutoBasicBot):
 
         pywikibot.output(u'\03{lightgreen}* Initialization of bot:\03{default}')
 
+        # code debugging
         logging.basicConfig(level=logging.DEBUG if ('code' in debug) else logging.INFO)
 
         basic.AutoBasicBot.__init__(self)
@@ -314,9 +315,6 @@ class SumDiscBot(basic.AutoBasicBot):
         self._wday = time.gmtime().tm_wday
 
         # init variable/dynamic objects
-
-        # code debugging
-        pywikibot.debug = ('code' in debug)
 
     ## @todo re-write some functions to be pagegenerators and use pagegenerators.CombinedPageGenerator()
     #        and others to combine and use them
@@ -387,7 +385,7 @@ class SumDiscBot(basic.AutoBasicBot):
         # warnings/exceptions are printed to log, could be get by panel.py from there!
         # (separate and explicit warning handling not used anymore)
         #for warning in self._global_warn:        # output all warnings to log (what about a special wiki page?)
-        #    pywikibot.output( "%s: %s" % warning )    
+        #    pywikibot.warning( "%s: %s" % warning )    
 
     def compressHistory(self, users = []):
         """Read history, and re-write new history without any duplicates.

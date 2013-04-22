@@ -19,7 +19,7 @@ and the bot will only work on that single page.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: blockreview.py 10354 2012-06-13 10:26:56Z drtrigon $'
+__version__ = '$Id: blockreview.py 11397 2013-04-20 12:20:45Z drtrigon $'
 #
 
 import wikipedia as pywikibot
@@ -82,7 +82,7 @@ class BlockreviewBot:
                                      self.unblock_tpl[self.site.lang],
                                      defaultNamespace=10)
         except KeyError:
-            pywikibot.output(u'ERROR: Language "%s" not supported by this bot.'
+            pywikibot.error(u'Language "%s" not supported by this bot.'
                              % self.site.lang)
         else:
             for page in genPage.getReferences(follow_redirects=False,
@@ -140,7 +140,8 @@ class BlockreviewBot:
                         talkComment = pywikibot.translate(self.site.lang, self.msg_user % self.parts)
 
                         # some test stuff
-                        if pywikibot.debug and self.site().loggedInAs() == u'Xqbot:':
+                        if pywikibot.logger.isEnabledFor(pywikibot.DEBUG) \
+                           and self.site().loggedInAs() == u'Xqbot:':
                             testPage = pywikibot.Page(self.site, 'Benutzer:Xqt/Test')
                             test = testPage.get()
                             test += note

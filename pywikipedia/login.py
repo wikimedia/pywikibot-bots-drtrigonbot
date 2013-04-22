@@ -53,7 +53,7 @@ subdirectory.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: login.py 10446 2012-07-09 08:17:26Z xqt $'
+__version__='$Id: login.py 11393 2013-04-19 21:28:02Z drtrigon $'
 
 import re, os, query
 import urllib2
@@ -391,7 +391,7 @@ def main():
             return
 
     if pywikibot.verbose > 1:
-        pywikibot.output(u"WARNING: Using -v -v on login.py might leak private data. When sharing, please double check your password is not readable and log out your bots session.")
+        pywikibot.warning(u"Using -v -v on login.py might leak private data. When sharing, please double check your password is not readable and log out your bots session.")
         verbose = True # only use this verbose when running from login.py
     if logall:
         if sysop:

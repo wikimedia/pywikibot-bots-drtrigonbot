@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 from pywikibot import family
 
-__version__ = '$Id: wikiversity_family.py 11043 2013-02-08 13:00:51Z xqt $'
+__version__ = '$Id: wikiversity_family.py 11417 2013-04-21 16:21:47Z xqt $'
 
 # The Wikimedia family that is known as Wikiversity
 
@@ -12,7 +12,7 @@ class Family(family.WikimediaFamily):
 
         self.languages_by_size = [
             'en', 'fr', 'de', 'beta', 'cs', 'ru', 'it', 'es', 'pt', 'ar', 'sv',
-            'fi', 'el', 'ko', 'sl', 'ja',
+            'fi', 'el', 'sl', 'ko', 'ja',
         ]
 
         self.langs = dict([(lang, '%s.wikiversity.org' % lang)

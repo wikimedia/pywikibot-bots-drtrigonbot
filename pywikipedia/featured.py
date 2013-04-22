@@ -38,7 +38,7 @@ This script understands various command-line arguments:
 usage: featured.py [-interactive] [-nocache] [-top] [-after:zzzz] [-fromlang:xx,yy--zz|-fromall]
 
 """
-__version__ = '$Id: featured.py 11250 2013-03-24 11:13:03Z xqt $'
+__version__ = '$Id: featured.py 11393 2013-04-19 21:28:02Z drtrigon $'
 
 #
 # (C) Maxim Razin, 2005
@@ -322,8 +322,8 @@ def featuredArticles(site, pType):
     try:
         method = info[site.lang][0]
     except KeyError:
-        pywikibot.output(
-            u'Error: language %s doesn\'t has %s category source.'
+        pywikibot.error(
+            u'language %s doesn\'t has %s category source.'
             % (site.lang, pType))
         return
     name = info[site.lang][1]

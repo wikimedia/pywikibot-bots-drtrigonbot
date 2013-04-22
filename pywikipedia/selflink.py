@@ -30,7 +30,7 @@ and the bot will only work on that single page.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: selflink.py 10753 2012-12-01 07:39:18Z xqt $'
+__version__='$Id: selflink.py 11393 2013-04-19 21:28:02Z drtrigon $'
 #
 
 import re, sys
@@ -132,7 +132,7 @@ class SelflinkBot:
         try:
             linkedPage = pywikibot.Page(page.site(), match.group('title'))
         except pywikibot.InvalidTitle, err:
-            pywikibot.output(u'Warning: %s' % err)
+            pywikibot.warning(u'%s' % err)
             return text, False
 
         # Check whether the link found is to the current page itself.

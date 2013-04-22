@@ -60,7 +60,7 @@ python blockpageschecker.py -show -protectedpages:4
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: blockpageschecker.py 10831 2012-12-24 14:29:26Z xqt $'
+__version__ = '$Id: blockpageschecker.py 11393 2013-04-19 21:28:02Z drtrigon $'
 #
 
 import re, webbrowser
@@ -354,7 +354,7 @@ def main():
 
         if changes == 0:
             # We tried to fix edit-protection templates, but it did not work.
-            pywikibot.output('Warning : No edit-protection template could be found')
+            pywikibot.warning('No edit-protection template could be found')
 
         if moveBlockCheck and changes > -1:
             # checking move protection now
@@ -402,7 +402,7 @@ def main():
 
             if changes == 0:
                 # We tried to fix move-protection templates, but it did not work.
-                pywikibot.output('Warning : No move-protection template could be found')
+                pywikibot.warning('No move-protection template could be found')
 
 
         if oldtext != text:

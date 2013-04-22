@@ -25,7 +25,7 @@ http://python-irclib.sourceforge.net/
 #
 #  Distributed under the terms of the LGPL license.
 #
-__version__ = '$Id: subster_irc.py 11371 2013-04-16 16:37:10Z drtrigon $'
+__version__ = '$Id: subster_irc.py 11393 2013-04-19 21:28:02Z drtrigon $'
 #
 
 import wikipedia as pywikibot
@@ -130,7 +130,7 @@ class SubsterTagModifiedBot(articlenos.ArtNoDisp):
         try:
             thread.start_new_thread( main_subster, (self.refs[page_title], params) )
         except:
-            pywikibot.output(u"WARNING: unable to start thread")
+            pywikibot.warning(u"unable to start thread")
 
 # Define a function for the thread
 def main_subster(page, params=None):

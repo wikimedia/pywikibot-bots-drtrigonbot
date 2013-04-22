@@ -15,7 +15,7 @@ The following parameters are supported:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: patrol.py 9692 2011-10-30 15:03:29Z xqt $'
+__version__ = '$Id: patrol.py 11397 2013-04-20 12:20:45Z drtrigon $'
 import wikipedia as pywikibot
 import pagegenerators
 import mwlib.uparser # used to parse the whitelist
@@ -102,7 +102,7 @@ class PatrolBot:
             # cascade if there isnt a whitelist to fallback on
             if not self.whitelist:
                 raise
-            pywikibot.output(u'Error: ' + e)
+            pywikibot.error(u'%s' % e)
 
     def add_to_tuples(self, tuples, user, page):
         if pywikibot.verbose:
@@ -150,8 +150,7 @@ class PatrolBot:
         # is registered as the user the rest of the structure
         # refers to.
         def process_children(obj,current_user):
-            if pywikibot.debug:
-                pywikibot.output(u'parsing node: %s' % obj)
+            pywikibot.debug(u'parsing node: %s' % obj)
             for c in obj.children:
                 temp = process_node(c,current_user)
                 if temp and not current_user:
@@ -227,8 +226,7 @@ class PatrolBot:
         if author_ns:
             author_ns_prefix = self.site.namespace(author_ns)
 
-        if pywikibot.debug:
-            pywikibot.output(u'Author ns: %d; name: %s' % (author_ns, author_ns_prefix))
+        pywikibot.debug(u'Author ns: %d; name: %s' % (author_ns, author_ns_prefix))
 
         if title.find(author_ns_prefix+':') == 0:
             return True

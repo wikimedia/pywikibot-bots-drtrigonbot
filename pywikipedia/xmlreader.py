@@ -20,7 +20,7 @@ to the older method using regular expressions.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: xmlreader.py 10259 2012-05-27 18:15:12Z xqt $'
+__version__='$Id: xmlreader.py 11393 2013-04-19 21:28:02Z drtrigon $'
 #
 
 import threading
@@ -289,8 +289,8 @@ class XmlDump(object):
         """Return a generator that will yield XmlEntry objects"""
         print 'Reading XML dump...'
         if not 'iterparse' in globals():
-            pywikibot.output(
-u'''WARNING: cElementTree not found. Using slower fallback solution.
+            pywikibot.warning(
+u'''cElementTree not found. Using slower fallback solution.
 Consider installing the python-celementtree package.''')
             return self.regex_parse()
         else:

@@ -8,7 +8,7 @@ on the same topic in different languages).
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: site.py 11360 2013-04-08 13:22:36Z legoktm $'
+__version__ = '$Id: site.py 11401 2013-04-20 20:45:30Z multichill $'
 
 try:
     from hashlib import md5
@@ -1549,8 +1549,10 @@ class APISite(BaseSite):
     def categorymembers(self, category, namespaces=None, sortby="",
                         reverse=False, starttime=None, endtime=None,
                         startsort=None, endsort=None, step=None, total=None,
-                        content=False):
+                        content=False, recurse=False):
         """Iterate members of specified category.
+        FIXME: Properly implement recursion, see:
+        https://sourceforge.net/tracker/?func=detail&atid=603138&aid=3611098&group_id=93107
 
         @param category: The Category to iterate.
         @param namespaces: If present, only return category members from
@@ -2250,7 +2252,7 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
         @param where: Where to search; value must be "text" or "titles" (many
             wikis do not support title search)
         @param namespaces: search only in these namespaces (defaults to 0)
-        @type namespaces: list of ints
+        @type namespaces: list of ints, or an empty list to signal all namespaces
         @param getredirects: if True, include redirects in results
         @param content: if True, load the current content of each iterated page
             (default False)
@@ -2260,6 +2262,8 @@ u"allpages: 'includeRedirects' argument is deprecated; use 'filterredirs'.",
             raise Error("search: searchstring cannot be empty")
         if where not in ("text", "titles"):
             raise Error("search: unrecognized 'where' value: %s" % where)
+        if namespaces == []:
+            namespaces = [ns for ns in self.namespaces().keys() if ns >= 0]
         if not namespaces:
             pywikibot.warning(u"search: namespaces cannot be empty; using [0].")
             namespaces = [0]

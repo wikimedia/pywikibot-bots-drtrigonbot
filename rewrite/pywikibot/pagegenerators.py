@@ -16,7 +16,7 @@ These parameters are supported to specify which pages titles to print:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: pagegenerators.py 11267 2013-03-25 14:19:36Z legoktm $'
+__version__ = '$Id: pagegenerators.py 11430 2013-04-22 09:52:39Z legoktm $'
 
 import re
 import sys
@@ -604,17 +604,13 @@ def CategorizedPageGenerator(category, recurse=False, start=None,
     retrieved page will be downloaded.
 
     """
-    kwargs = dict(recurse=recurse,
-                  step=step,
-                  total=total,
-                  content=content,
-                  )
+    kwargs = dict(recurse=recurse, step=step, total=total,
+                  content=content)
     if start:
         kwargs['sortby'] = 'sortkey'
         kwargs['startsort'] = start
-    for a in category.site.categorymembers(category, **kwargs):
+    for a in category.articles(**kwargs):
         yield a
-
 
 def SubCategoriesPageGenerator(category, recurse=False, start=None,
                                step=None, total=None, content=False):

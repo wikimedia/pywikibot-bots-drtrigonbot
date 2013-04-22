@@ -69,7 +69,7 @@ or by adding a list to the given one:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: cosmetic_changes.py 11285 2013-03-28 17:03:30Z xqt $'
+__version__ = '$Id: cosmetic_changes.py 11411 2013-04-21 13:04:36Z xqt $'
 #
 import sys
 import re

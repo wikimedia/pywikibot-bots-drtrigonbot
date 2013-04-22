@@ -40,7 +40,7 @@ This script understands the following command-line arguments:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: clean_sandbox.py 10930 2013-01-15 17:17:46Z drtrigon $'
+__version__ = '$Id: clean_sandbox.py 11428 2013-04-22 09:31:23Z xqt $'
 #
 
 import time
@@ -136,7 +136,9 @@ class SandboxBot:
         self.user = user
         self.site = pywikibot.getSite()
         if self.user:
-            localSandboxTitle = pywikibot.translate(self.site, user_sandboxTemplate)
+            localSandboxTitle = pywikibot.translate(self.site,
+                                                    user_sandboxTemplate,
+                                                    fallback=False)
             localSandbox      = pywikibot.Page(self.site, localSandboxTitle)
             content.update(user_content)
             sandboxTitle[self.site.lang] = [item.title() \
@@ -160,28 +162,29 @@ class SandboxBot:
                    int(time2[10:12])
             return abs(t2-t1)
 
-        mySite = self.site
         while True:
             wait = False
             now = time.strftime("%d %b %Y %H:%M:%S (UTC)", time.gmtime())
-            localSandboxTitle = pywikibot.translate(mySite, sandboxTitle)
+            localSandboxTitle = pywikibot.translate(self.site, sandboxTitle,
+                                                    fallback=False)
             if type(localSandboxTitle) is list:
                 titles = localSandboxTitle
             else:
                 titles = [localSandboxTitle,]
             for title in titles:
-                sandboxPage = pywikibot.Page(mySite, title)
+                sandboxPage = pywikibot.Page(self.site, title)
                 pywikibot.output(u'Preparing to process sandbox page %s' % sandboxPage.title(asLink=True))
                 try:
                     text = sandboxPage.get()
-                    translatedContent = pywikibot.translate(mySite, content)
-                    translatedMsg = i18n.twtranslate(mySite,
+                    translatedContent = pywikibot.translate(self.site, content,
+                                                            fallback=False)
+                    translatedMsg = i18n.twtranslate(self.site,
                                                      'clean_sandbox-cleaned')
                     subst = 'subst:' in translatedContent
                     pos = text.find(translatedContent.strip())
                     if text.strip() == translatedContent.strip():
                         pywikibot.output(u'The sandbox is still clean, no change necessary.')
-                    elif subst and sandboxPage.userName() == mySite.loggedInAs():
+                    elif subst and sandboxPage.userName() == self.site.loggedInAs():
                         pywikibot.output(u'The sandbox might be clean, no change necessary.')
                     elif pos <> 0 and not subst:
                         if self.user:

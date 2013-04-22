@@ -162,7 +162,7 @@ Please type "replace.py -help | more" if you can't read the top of the help.
 #
 # (C) Daniel Herding & the Pywikipedia team, 2004-2012
 #
-__version__='$Id: replace.py 10576 2012-10-14 17:16:30Z xqt $'
+__version__='$Id: replace.py 11393 2013-04-19 21:28:02Z drtrigon $'
 #
 # Distributed under the terms of the MIT license.
 #
@@ -549,8 +549,8 @@ class ReplaceRobot:
                             u'Cannot change %s because of blacklist entry %s'
                             % (page.title(), e.url))
                     except pywikibot.PageNotSaved, error:
-                        pywikibot.output(u'Error putting page: %s'
-                                         % (error.args,))
+                        pywikibot.error(u'putting page: %s'
+                                        % (error.args,))
                     except pywikibot.LockedPage:
                         pywikibot.output(u'Skipping %s (locked page)'
                                          % (page.title(),))

@@ -14,7 +14,7 @@ options:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: update_namespaces.py 11269 2013-03-25 16:41:16Z xqt $'
+__version__ = '$Id: update_namespaces.py 11422 2013-04-21 18:50:41Z xqt $'
 
 import sys
 sys.path.insert(1, '..')
@@ -63,7 +63,8 @@ def update_family(family, changes, upmain):
             output(msg % (namespace_id, lang, ', '.join(namespace_list)))
             once = False
             if family and not upmain and \
-               namespace_id in range(-2, 16) and namespace_id not in (4, 5):
+               namespace_id in range(-2, 16) + [828, 829]  and \
+               namespace_id not in (4, 5):
                 once = True
 ##                namespace_section = re.search(r_namespace_section_once
 ##                                              % (namespace_id, lang),

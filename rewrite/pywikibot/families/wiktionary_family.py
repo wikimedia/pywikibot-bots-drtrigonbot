@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 from pywikibot import family
 
-__version__ = '$Id: wiktionary_family.py 11355 2013-04-07 11:39:46Z xqt $'
+__version__ = '$Id: wiktionary_family.py 11417 2013-04-21 16:21:47Z xqt $'
 
 # The Wikimedia family that is known as Wiktionary
 
@@ -12,19 +12,19 @@ class Family(family.WikimediaFamily):
 
         self.languages_by_size = [
             'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'el', 'ko', 'sv', 'pl', 'tr',
-            'ta', 'nl', 'de', 'ku', 'kn', 'vi', 'fi', 'io', 'hu', 'pt', 'ml',
-            'no', 'my', 'id', 'it', 'li', 'es', 'et', 'ja', 'fa', 'te', 'ro',
+            'ta', 'nl', 'de', 'ku', 'kn', 'vi', 'fi', 'io', 'pt', 'hu', 'ml',
+            'no', 'my', 'id', 'it', 'li', 'es', 'et', 'ja', 'te', 'fa', 'ro',
             'ar', 'cs', 'jv', 'eu', 'gl', 'lo', 'ca', 'uk', 'fj', 'br', 'bg',
             'eo', 'hr', 'oc', 'is', 'vo', 'th', 'simple', 'zh-min-nan', 'cy',
-            'scn', 'sr', 'af', 'ast', 'ps', 'sw', 'fy', 'tl', 'nn', 'he', 'ur',
-            'da', 'uz', 'wa', 'la', 'hy', 'sq', 'sm', 'sl', 'hi', 'nah', 'az',
-            'tt', 'pnb', 'ka', 'lv', 'bs', 'lb', 'tk', 'hsb', 'kk', 'sk', 'km',
-            'mk', 'be', 'ga', 'wo', 'ms', 'ang', 'ky', 'nds', 'co', 'gn', 'mr',
-            'csb', 'st', 'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'mn', 'sa', 'kl',
+            'scn', 'sr', 'af', 'ps', 'ast', 'sw', 'fy', 'tl', 'nn', 'he', 'ur',
+            'da', 'uz', 'wa', 'la', 'hy', 'sq', 'sm', 'sl', 'hi', 'nah', 'ka',
+            'pnb', 'az', 'tt', 'bs', 'lv', 'lb', 'tk', 'hsb', 'kk', 'sk', 'km',
+            'mk', 'be', 'ga', 'wo', 'ms', 'nds', 'ang', 'ky', 'co', 'gn', 'mr',
+            'csb', 'st', 'ia', 'sd', 'si', 'sh', 'tg', 'ug', 'sa', 'mn', 'kl',
             'jbo', 'an', 'ln', 'zu', 'or', 'gu', 'kw', 'rw', 'gv', 'fo', 'qu',
             'ss', 'ie', 'mt', 'om', 'chr', 'roa-rup', 'iu', 'bn', 'pa', 'so',
-            'am', 'su', 'za', 'gd', 'mi', 'tpi', 'yi', 'ti', 'sg', 'na', 'dv',
-            'tn', 'ne', 'ha', 'ks', 'ay', 'ts',
+            'am', 'su', 'za', 'gd', 'mi', 'tpi', 'ne', 'yi', 'ti', 'sg', 'na',
+            'dv', 'tn', 'ha', 'ks', 'ay', 'ts',
         ]
 
         self.langs = dict([(lang, '%s.wiktionary.org' % lang)

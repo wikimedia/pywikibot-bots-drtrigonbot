@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: meta_family.py 11124 2013-02-25 12:13:51Z xqt $'
+__version__ = '$Id: meta_family.py 11419 2013-04-21 16:27:26Z xqt $'
 
 import family
 
@@ -50,6 +50,18 @@ class Family(family.WikimediaFamily):
         }
         self.namespaces[471] = {
             '_default': u'Schema talk',
+        }
+        self.namespaces[480] = {
+            '_default': u'Zero',
+        }
+        self.namespaces[481] = {
+            '_default': u'Zero talk',
+        }
+        self.namespaces[866] = {
+            '_default': u'CNBanner',
+        }
+        self.namespaces[867] = {
+            '_default': u'CNBanner talk',
         }
         self.namespaces[1198] = {
             '_default': u'Translations',

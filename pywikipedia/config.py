@@ -7,7 +7,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: config.py 11337 2013-04-04 07:53:54Z xqt $'
+__version__ = '$Id: config.py 11432 2013-04-22 18:10:03Z drtrigon $'
 
 import os, re
 import sys as __sys
@@ -489,7 +489,12 @@ retry_on_fail = True
 actions_to_block = ['edit', 'watch', 'move', 'delete', 'undelete', 'protect',
                     'emailuser',
                     'submit',                               # for non-API
-                    'wbcreateclaim', 'wbsetclaimvalue']     # for Wikidata
+                    'wbcreateclaim', 'wbsetclaimvalue',     # for Wikidata
+                    'wbsetclaim', 'wbeditentity',           #
+                    'wbsetlabel', 'wbsetdescription',       #
+                    'wbsetaliases', 'wbsetsitelink',        #
+                    'wbsetreference', 'wblinktitles',       #
+                    'wbremoveclaims', 'wbremovereferences'] #
 
 # How many pages should be put to a queue in asynchroneous mode.
 # If maxsize is <= 0, the queue size is infinite.

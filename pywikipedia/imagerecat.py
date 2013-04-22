@@ -24,7 +24,7 @@ The following command line parameters are supported:
                 wps : Work on all wikipedia's
 
 """
-__version__ = '$Id: imagerecat.py 10831 2012-12-24 14:29:26Z xqt $'
+__version__ = '$Id: imagerecat.py 11393 2013-04-19 21:28:02Z drtrigon $'
 #
 #  (C) Multichill 2008-2011
 #  (C) Pywikipedia bot team, 2008-2011
@@ -230,7 +230,7 @@ def getOpenStreetMap(latitude, longitude):
 	elif addresspart.tag in invalidParts:
 	    pywikibot.output(u'Dropping %s, %s' % (addresspart.tag, addresspart.text))
 	else:
-	    pywikibot.output(u'WARNING %s, %s is not in addressparts lists' % (addresspart.tag, addresspart.text))
+	    pywikibot.warning(u'%s, %s is not in addressparts lists' % (addresspart.tag, addresspart.text))
     #print result
     return result
 

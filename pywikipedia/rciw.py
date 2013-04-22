@@ -25,7 +25,7 @@ Warning: experimental software, use at your own risk
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: rciw.py 8629 2010-10-09 16:11:46Z xqt $'
+__version__ = '$Id: rciw.py 11393 2013-04-19 21:28:02Z drtrigon $'
 #
 
 import threading
@@ -70,7 +70,7 @@ class IWRCBot():
         self.queue.put_nowait(page)
 
 def main():
-    pywikibot.output('Warning: this script can not be run manually/directly, but automatically by maintainer.py')
+    pywikibot.warning('this script can not be run manually/directly, but automatically by maintainer.py')
 
 if __name__ == "__main__":
     main()

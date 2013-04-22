@@ -36,7 +36,7 @@ See [[:en:User:DumZiBoT/refLinks]] for more information on the bot.
 #
 # Distributed under the terms of the GPL
 #
-__version__ = '$Id: reflinks.py 10894 2013-01-12 13:49:07Z xqt $'
+__version__ = '$Id: reflinks.py 11393 2013-04-19 21:28:02Z drtrigon $'
 #
 
 import sys, re, urllib2, httplib, socket, codecs, ftplib
@@ -464,7 +464,7 @@ class ReferencesRobot:
                     u'Cannot change %s because of blacklist entry %s'
                     % (page.title(), e.url))
             except pywikibot.PageNotSaved, error:
-                pywikibot.output(u'Error putting page: %s' % (error.args,))
+                pywikibot.error(u'putting page: %s' % (error.args,))
             except pywikibot.LockedPage:
                 pywikibot.output(u'Skipping %s (locked page)'
                                   % (page.title(),))

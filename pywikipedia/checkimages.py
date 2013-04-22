@@ -87,7 +87,7 @@ right parameter.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: checkimages.py 11339 2013-04-04 17:30:35Z xqt $'
+__version__ = '$Id: checkimages.py 11393 2013-04-19 21:28:02Z drtrigon $'
 #
 
 import re
@@ -1600,7 +1600,7 @@ class checkImagesBot(object):
             elif imagechanges.lower() == 'true':
                 imagestatus = True
             else:
-                pywikibot.output(u"Error! Imagechanges set wrongly!")
+                pywikibot.error(u"Imagechanges set wrongly!")
                 self.settingsData = None
                 break
             summary = tupla[5]

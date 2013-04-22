@@ -57,7 +57,7 @@ your user-config.py:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: cosmetic_changes.py 11284 2013-03-28 16:25:40Z xqt $'
+__version__ = '$Id: cosmetic_changes.py 11412 2013-04-21 13:07:03Z xqt $'
 #
 import sys
 import re

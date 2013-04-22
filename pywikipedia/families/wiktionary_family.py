@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wiktionary_family.py 11368 2013-04-13 08:16:45Z xqt $'
+__version__ = '$Id: wiktionary_family.py 11423 2013-04-21 19:01:18Z xqt $'
 
 # The Wikimedia family that is known as Wiktionary
 
@@ -13,14 +13,14 @@ class Family(family.WikimediaFamily):
         self.languages_by_size = [
             'en', 'fr', 'mg', 'zh', 'lt', 'ru', 'el', 'ko', 'sv', 'pl', 'tr',
             'ta', 'nl', 'de', 'ku', 'kn', 'vi', 'fi', 'io', 'pt', 'hu', 'ml',
-            'no', 'my', 'id', 'it', 'li', 'es', 'et', 'ja', 'fa', 'te', 'ro',
+            'no', 'my', 'id', 'it', 'li', 'es', 'et', 'ja', 'te', 'fa', 'ro',
             'ar', 'cs', 'jv', 'eu', 'gl', 'lo', 'ca', 'uk', 'fj', 'br', 'bg',
             'eo', 'hr', 'oc', 'is', 'vo', 'th', 'simple', 'zh-min-nan', 'cy',
-            'scn', 'sr', 'af', 'ast', 'ps', 'sw', 'fy', 'tl', 'nn', 'he', 'ur',
-            'da', 'uz', 'wa', 'la', 'hy', 'sq', 'sm', 'sl', 'hi', 'nah', 'az',
-            'tt', 'pnb', 'ka', 'lv', 'bs', 'lb', 'tk', 'hsb', 'kk', 'sk', 'km',
-            'mk', 'be', 'ga', 'wo', 'ms', 'ang', 'ky', 'nds', 'co', 'gn', 'mr',
-            'csb', 'st', 'ia', 'si', 'sh', 'sd', 'tg', 'ug', 'mn', 'sa', 'kl',
+            'scn', 'sr', 'af', 'ps', 'ast', 'sw', 'fy', 'tl', 'nn', 'he', 'ur',
+            'da', 'uz', 'wa', 'la', 'hy', 'sq', 'sm', 'sl', 'hi', 'nah', 'ka',
+            'pnb', 'az', 'tt', 'bs', 'lv', 'lb', 'tk', 'hsb', 'kk', 'sk', 'km',
+            'mk', 'be', 'ga', 'wo', 'ms', 'nds', 'ang', 'ky', 'co', 'gn', 'mr',
+            'csb', 'st', 'ia', 'sd', 'si', 'sh', 'tg', 'ug', 'sa', 'mn', 'kl',
             'jbo', 'an', 'ln', 'zu', 'or', 'gu', 'kw', 'rw', 'gv', 'fo', 'qu',
             'ss', 'ie', 'mt', 'om', 'chr', 'roa-rup', 'iu', 'bn', 'pa', 'so',
             'am', 'su', 'za', 'gd', 'mi', 'tpi', 'ne', 'yi', 'ti', 'sg', 'na',
@@ -31,21 +31,72 @@ class Family(family.WikimediaFamily):
                            for lang in self.languages_by_size])
 
         # Override defaults
-        self.namespaces[6]['be'] = [u'Файл', u'Выява']
-        self.namespaces[7]['be'] = [u'Размовы пра файл', u'Размовы пра выяву']
         self.namespaces[3]['eo'] = [u'Uzanta diskuto', u'Vikipediista diskuto', u'Uzula diskuto']
+        self.namespaces[829]['scn'] = [u'Discussioni modulo']
+        self.namespaces[828]['scn'] = [u'Modulo']
         self.namespaces[10]['zh'] = [u'Template', u'模板', u'样板', u'樣板']
         self.namespaces[12]['zh'] = [u'Help', u'帮助', u'幫助']
         self.namespaces[14]['zh'] = [u'Category', u'分类', u'分類']
+        self.namespaces[828]['zh'] = [u'模組']
+        self.namespaces[829]['ca'] = [u'Mòdul Discussió']
+        self.namespaces[828]['ca'] = [u'Mòdul']
+        self.namespaces[3]['ca'] = [u'Usuari Discussió']
+        self.namespaces[2]['ca'] = [u'Usuari']
+        self.namespaces[829]['it'] = [u'Discussioni modulo']
+        self.namespaces[828]['it'] = [u'Modulo']
+        self.namespaces[829]['an'] = [u'Descusión modulo']
+        self.namespaces[828]['an'] = [u'Modulo']
+        self.namespaces[3]['cs'] = [u'Diskuse s uživatelem', u'Uživatel diskuse', u'Uživatelka diskuse', u'Diskuse s uživatelkou']
+        self.namespaces[829]['cy'] = [u'Sgwrs modiwl']
+        self.namespaces[828]['cy'] = [u'Modiwl']
+        self.namespaces[829]['ar'] = [u'نقاش الوحدة']
+        self.namespaces[828]['ar'] = [u'وحدة']
+        self.namespaces[829]['gn'] = [u'Módulo discusión']
+        self.namespaces[828]['gn'] = [u'Módulo']
+        self.namespaces[829]['eu'] = [u'Modulu eztabaida']
+        self.namespaces[828]['eu'] = [u'Modulu']
+        self.namespaces[829]['et'] = [u'Mooduli arutelu']
+        self.namespaces[828]['et'] = [u'Moodul']
+        self.namespaces[829]['gl'] = [u'Conversa módulo']
+        self.namespaces[829]['id'] = [u'Pembicaraan Modul']
+        self.namespaces[828]['id'] = [u'Modul']
+        self.namespaces[829]['es'] = [u'Módulo discusión']
+        self.namespaces[828]['es'] = [u'Módulo']
+        self.namespaces[829]['ru'] = [u'Обсуждение модуля']
+        self.namespaces[828]['ru'] = [u'Модуль']
+        self.namespaces[12]['nl'] = [u'Help']
         self.namespaces[3]['pt'] = [u'Utilizador Discussão', u'Usuário Discussão', u'Utilizadora Discussão']
         self.namespaces[2]['pt'] = [u'Utilizador', u'Usuário', u'Utilizadora']
+        self.namespaces[829]['tt'] = [u'Обсуждение модуля']
+        self.namespaces[828]['tt'] = [u'Модуль']
+        self.namespaces[829]['csb'] = [u'Dyskusja modułu']
+        self.namespaces[828]['csb'] = [u'Moduł']
+        self.namespaces[9]['ro'] = [u'Discuție MediaWiki', u'Discuţie MediaWiki']
         self.namespaces[15]['bn'] = [u'বিষয়শ্রেণী আলোচনা']
         self.namespaces[14]['bn'] = [u'বিষয়শ্রেণী']
-        self.namespaces[3]['de'] = [u'Benutzer Diskussion', u'BD', u'Benutzerin Diskussion']
+        self.namespaces[829]['bn'] = [u'মডিউল আলাপ']
+        self.namespaces[828]['bn'] = [u'মডিউল']
+        self.namespaces[829]['pl'] = [u'Dyskusja modułu']
+        self.namespaces[828]['pl'] = [u'Moduł']
+        self.namespaces[6]['be'] = [u'Файл', u'Выява']
+        self.namespaces[7]['be'] = [u'Размовы пра файл', u'Размовы пра выяву']
         self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisateur']
         self.namespaces[2]['fr'] = [u'Utilisateur']
+        self.namespaces[829]['uk'] = [u'Обговорення модуля']
+        self.namespaces[828]['uk'] = [u'Модуль']
+        self.namespaces[829]['ast'] = [u'Alderique módulu']
+        self.namespaces[828]['ast'] = [u'Módulu']
+        self.namespaces[829]['jv'] = [u'Pembicaraan Modul']
+        self.namespaces[828]['jv'] = [u'Modul']
+        self.namespaces[3]['de'] = [u'Benutzer Diskussion', u'BD', u'Benutzerin Diskussion']
         self.namespaces[13]['da'] = [u'Hjælp diskussion', u'Hjælp-diskussion']
+        self.namespaces[829]['da'] = [u'Moduldiskussion']
+        self.namespaces[828]['da'] = [u'Modul']
         self.namespaces[9]['da'] = [u'MediaWiki diskussion', u'MediaWiki-diskussion']
+        self.namespaces[829]['fa'] = [u'بحث پودمان']
+        self.namespaces[828]['fa'] = [u'پودمان']
+        self.namespaces[829]['ay'] = [u'Módulo discusión']
+        self.namespaces[828]['ay'] = [u'Módulo']
         self.namespaces[11]['hi'] = [u'साँचा वार्ता']
         self.namespaces[10]['hi'] = [u'साँचा']
         self.namespaces[15]['hi'] = [u'श्रेणी वार्ता']
@@ -54,11 +105,28 @@ class Family(family.WikimediaFamily):
         self.namespaces[2]['hi'] = [u'सदस्य']
         self.namespaces[9]['hi'] = [u'मीडियाविकि वार्ता']
         self.namespaces[8]['hi'] = [u'मीडियाविकि']
-        self.namespaces[3]['cs'] = [u'Diskuse s uživatelem', u'Uživatel diskuse', u'Uživatelka diskuse', u'Diskuse s uživatelkou']
-        self.namespaces[12]['nl'] = [u'Help']
-        self.namespaces[9]['ro'] = [u'Discuție MediaWiki', u'Discuţie MediaWiki']
-        self.namespaces[3]['ca'] = [u'Usuari Discussió']
-        self.namespaces[2]['ca'] = [u'Usuari']
+        self.namespaces[829]['dv'] = [u'މޮޑިއުލް ޚިޔާލު']
+        self.namespaces[828]['dv'] = [u'މޮޑިއުލް']
+        self.namespaces[829]['ja'] = [u'モジュール・トーク']
+        self.namespaces[828]['ja'] = [u'モジュール']
+        self.namespaces[828]['ka'] = [u'მოდული']
+        self.namespaces[829]['qu'] = [u'Módulo discusión']
+        self.namespaces[828]['qu'] = [u'Módulo']
+        self.namespaces[829]['nn'] = [u'Moduldiskusjon']
+        self.namespaces[828]['nn'] = [u'Modul']
+        self.namespaces[829]['ko'] = [u'모듈토론']
+        self.namespaces[828]['ko'] = [u'모듈']
+        self.namespaces[829]['su'] = [u'Pembicaraan Modul']
+        self.namespaces[828]['su'] = [u'Modul']
+        self.namespaces[829]['kl'] = [u'Moduldiskussion']
+        self.namespaces[828]['kl'] = [u'Modul']
+        self.namespaces[829]['sk'] = [u'Diskusia k modulu']
+        self.namespaces[828]['sk'] = [u'Modul']
+        self.namespaces[828]['ms'] = [u'Modul']
+        self.namespaces[829]['sl'] = [u'Pogovor o modulu']
+        self.namespaces[828]['sl'] = [u'Modul']
+        self.namespaces[829]['nah'] = [u'Módulo discusión']
+        self.namespaces[828]['nah'] = [u'Módulo']
 
         # Most namespaces are inherited from family.Family.
         # Translation used on all wikis for the different namespaces.
