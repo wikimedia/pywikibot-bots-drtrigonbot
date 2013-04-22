@@ -138,17 +138,18 @@ else:
     sys.stdout = BotLoggerObject(layer='stdout')            # handle stdout
     sys.stderr = BotLoggerObject(layer='stderr')            # handle stderr
 
-    cmd = sys.argv.pop(1)
+    cmd  = sys.argv.pop(1)
+    path = os.path.split(sys.argv[0])[0]
     if (cmd.lower() == "-compress_history:[]"): # (temporary work-a-round)
         sys.argv.append(cmd)                    #
-        sys.argv[0] = u'sum_disc.py'            #
+        cmd      = u'sum_disc.py'               #
         bot_name = u'compress_history'          #
     else:
         cmd = cmd.lstrip(u'-')
         if u'.py' not in cmd.lower():
             cmd += u'.py'
-        sys.argv[0] = cmd
         bot_name = os.path.splitext(os.path.basename(sys.argv[0]))
+    sys.argv[0] = os.path.join(path, cmd)
 
     #arg = pywikibot.handleArgs()
 
@@ -168,6 +169,7 @@ else:
                            }
         d.close()
 
+        sys.path.append(os.path.split(sys.argv[0])[0])
         execfile(sys.argv[0])
 
         exitcode = ERROR_SGE_ok
