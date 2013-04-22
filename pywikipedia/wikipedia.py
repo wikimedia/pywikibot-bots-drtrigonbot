@@ -122,7 +122,7 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 11435 2013-04-22 20:57:35Z drtrigon $'
+__version__ = '$Id: wikipedia.py 11436 2013-04-22 22:23:48Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -9539,7 +9539,8 @@ def stopme():
        not slow down other bots any more.
     """
     get_throttle.drop()
-    logging.shutdown()
+    logger.flush()
+    #logging.shutdown()
 
 def _flush():
     """Wait for the page-putter to flush its queue.
