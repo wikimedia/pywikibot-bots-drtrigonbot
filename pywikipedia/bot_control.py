@@ -127,7 +127,8 @@ if len(sys.argv) < 2:
     raise RuntimeError("Not enough arguments defined.")
 else:
     logname = pywikibot.config.datafilepath('logs', '%s.log')
-    logfile = logname % ''.join([os.path.basename(sys.argv[0])]+sys.argv[1:])
+    #logfile = logname % ''.join([os.path.basename(sys.argv[0])]+sys.argv[1:])
+    logfile = logname % ''.join([os.path.basename(sys.argv[0]), sys.argv[1], '-cron']+sys.argv[2:])
 
     # may be use "log = ['*']" in 'user-config.py' instead
     pywikibot.setLogfileStatus(True, logfile, header=True)  # set '-log' to catch all
