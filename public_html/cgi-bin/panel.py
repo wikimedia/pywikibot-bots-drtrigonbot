@@ -98,8 +98,6 @@ Evaluated data period from %(start_date)s to %(end_date)s.<br>
 </table>
 </div>
 <br>
-History compressed: %(histcomp_count)s (times)<br>
-<br>
 <h2>Logging messages</h2>
 <a href="%(graphlink-mcount)s"><img src="%(graphlink-mcount)s" alt=""></a>
 <a href="%(graphlink-mcount-i)s"><img src="%(graphlink-mcount-i)s" alt=""></a><br>
@@ -145,10 +143,14 @@ html_color = {	'green':	'#00ff00',
 #
 bottimeout = 24
 botdonemsg = 'DONE'
-botcontinuous = ['trunk/bot_control.py-subster_irc-cron.log', 'rewrite/script_wui-bot.log']
+botcontinuous = ['trunk/bot_control.py-subster_irc.log', 'rewrite/script_wui-bot.log']
 
 # use classic 're' since 'pyparsing' does not work with unicode
-regex    = re.compile(r'(?P<timestamp>[\d-]+\s[\d:,]+)\s+(?P<file>\S+)\s+(?P<level>\S+)\s+(?P<message>.*)')#, re.U)
+## fmt='%(asctime)s %(name)18s: %(levelname)-8s %(message)s',
+#regex    = re.compile(r'(?P<timestamp>[\d-]+\s[\d:,]+)\s+(?P<file>\S+)\s+(?P<level>\S+)\s+(?P<message>.*)')#, re.U)
+# fmt="%(asctime)s %(caller_file)18s, %(caller_line)4s "
+# "in %(caller_name)18s: %(levelname)-8s %(message)s",
+regex    = re.compile(r'(?P<timestamp>[\d-]+\s[\d:,]+)\s+(?P<caller_file>\S+)\s+(?P<caller_line>\S+)\s+\S+\s+(?P<file>\S+)\s+(?P<level>\S+)\s+(?P<message>.*)')#, re.U)
 timefmt  = "%Y-%m-%d %H:%M:%S,%f"
 timefmt2 = "%Y-%m-%d %H:%M:%S"
 datefmt  = "%Y-%m-%d"
@@ -211,7 +213,6 @@ def irc_status():
 	IDENT    = NICK.lower()
 	REALNAME = NICK
 	CHAN     = "#de.wikipedia"
-	readbuffer=""
 
 	s=socket.socket( )
 	s.connect((HOST, PORT))
@@ -219,26 +220,27 @@ def irc_status():
 	s.send("USER %s %s bla :%s\r\n" % (IDENT, HOST, REALNAME))
 	#s.send('JOIN ' + CHAN + '\r\n') # Join the pre defined channel
 	s.send('NAMES ' + CHAN + '\r\n') # Show all Nicks in channel
+	sleep(.5)			 # give the server some time
 
-	users = []
-	while (not users):
-		readbuffer=readbuffer+s.recv(1024)
-		temp=string.split(readbuffer, "\n")
-		readbuffer=temp.pop( )
-
-		for line in temp:
-			line=string.rstrip(line)
-			line=string.split(line)
-
-			if (line[1] == "353"):  # answer to 'NAMES' request
-				i = line.index(CHAN)
-				users = line[(i+1):]
-
+	readbuffer=""
+	while True:
+		buf=s.recv(1024)
+		readbuffer=readbuffer+buf
+		if (':End of /NAMES' in readbuffer) or (len(buf) < 1024):
+			break
+	s.close()
 	del s
 
-	botname = "DrTrigonBot"
-	return ((botname in users) or
-		(":"+botname in users), users)
+	users = []
+	for line in readbuffer.splitlines():
+		line=string.rstrip(line)
+		line=string.split(line)
+
+		if (line[1] == "353"):  # answer to 'NAMES' request
+			i = line.index(CHAN)
+			users += line[(i+1):]
+
+	return users
 
 def logging_statistics(logfiles, exclude):
 	# chronological sort
@@ -259,7 +261,7 @@ def logging_statistics(logfiles, exclude):
 		#	continue
 		f = open(os.path.join(localdir, file), "r")
 		#buffer += f.read(-1).strip().split("\n")
-		buffer += f.read(-1).strip().splitlines()
+		buffer.append( (file, f.read(-1).strip().splitlines()) )
 		f.close()
 
 	if not buffer:
@@ -268,15 +270,13 @@ def logging_statistics(logfiles, exclude):
 	# statistics (like mentioned in 'logging.statistics')
 	mcount    = { 'debug': 0, 'warning': 0, 'info': 0, 'error': 0, 'critical': 0, 'unknown': 0, }
 	mqueue    = { 'debug': [], 'warning': [], 'info': [], 'error': [], 'critical': [], 'unknown': [], }
-	events    = { 'start':     'SCRIPT CALL:',
-	              'end':       botdonemsg,
-	              'histcomp':  'RUN BOT: Compressing Discussion Summary',
-	              'sum_disc':  'RUN BOT: Discussion Summary',
-	              'subster':   'RUN BOT: "SubsterBot"',
-	              'catimages': 'RUN BOT: Categorize Images (by content)', }
-	ecount    = { 'start': 0, 'end': 0, 'histcomp': 0, 'sum_disc': 0, 'subster': 0, 'catimages': 0 }
-	etiming   = { 'start': [], 'end': [], 'histcomp': [], 'sum_disc': [], 'subster': [], 'catimages': [],
+	events    = { 'start':     '=== Pywikipediabot framework v1.0 -- Logging header ===',
+	              'end':       botdonemsg, }
+	ecount    = { 'start': 0, 'end': 0, }
+	etiming   = { 'start': [], 'end': [],
 	              'mainstart': None, 'mainend': None, }
+	fcount    = {}
+	ftiming   = {}
 	resources = { 'files': set(), }
 
 	def process_event(event, result, log, process=None, ignore=[]):
@@ -304,27 +304,33 @@ def logging_statistics(logfiles, exclude):
 	#How many requests are being handled per second, how much of various resources are 
 
 	# gather statistics
-	etiming['mainstart'] = [ regex.match(buffer[0]).groupdict()['timestamp'] ]
-	etiming['mainend']   = [ regex.match(buffer[-1]).groupdict()['timestamp'] ]
+	etiming['mainstart'] = [ regex.match(buffer[0][1][0]).groupdict()['timestamp'] ]
+	etiming['mainend']   = [ regex.match(buffer[-1][1][-1]).groupdict()['timestamp'] ]
 	info = {'level': 'unknown', 'message': '', 'timestamp': etiming['mainstart'][0], 'file': ''}
-	for line in buffer:
-		if not line.strip(): continue
+	for item in buffer:
+		file = os.path.split(item[0])[1].split('-')[1]
+		for line in item[1]:
+			if not line.strip(): continue
 
-		data = regex.match(line)
-		if (data is not None):
-			data = data.groupdict()
-		else:
-			#line = ("%(level)s " % info) + line
-			data = {'message': line}
-		info.update( data )
+			data = regex.match(line)
+			if (data is not None):
+				data = data.groupdict()
+			else:
+				#line = ("%(level)s " % info) + line
+				data = {'message': line}
+			info.update( data )
 
-		process_event( info['level'].lower(), mcount, (mqueue, cgi.escape(line)), 
-		               ignore='info' )
-		process_event( info['message'],       ecount, (etiming, info['timestamp']), 
-		               process=events )
-		resources['files'].add( info['file'] )
+			process_event( info['level'].lower(), mcount, (mqueue, cgi.escape(line)), 
+		        	       process=None, ignore=['info'] )
+			process_event( info['message'],       ecount, (etiming, info['timestamp']), 
+			               process=events, ignore=[] )
+			resources['files'].add( info['file'] )
+		fcount[file]  = fcount.get(file, 0) + ecount['start']
+		ftiming[file] = ftiming.get(file, []) + etiming['start']
 
 	# evaluate statistics
+	ecount.update(fcount)
+	etiming.update(ftiming)
 	stats = {'mcount': mcount, 'mqueue': mqueue, 'ecount': ecount, 'resources': resources}
 	# (in use, how long we've been up.)
 	start = datetime.datetime.strptime(etiming['mainstart'][0], (timefmt if ',' in etiming['mainstart'][0] else timefmt2))
@@ -338,12 +344,12 @@ def logging_statistics(logfiles, exclude):
 		if key == 'info': continue
 		stats['messages'].append( "<i>%s</i>" % key )
 		stats['messages'] += mqueue[key]
-	# convert event times
+	# assign and convert event times
 	for key in etiming:
 		etiming[key] = [ timeepoch(item) for item in etiming[key] ]
 	stats['etiming'] = etiming
 	# last message
-	stats['lastmessage'] = regex.match(buffer[-1]).groupdict()['message'].strip()
+	stats['lastmessage'] = regex.match(buffer[-1][1][-1]).groupdict()['message'].strip()
 
 	return (stats, logfiles[keys[-1]])
 
@@ -365,11 +371,9 @@ def maintain_stats(init=False):
          "DS:sum_start:GAUGE:144000:U:U",
          "DS:sum_end:GAUGE:144000:U:U",
          "DS:sum_diff:GAUGE:144000:U:U",
-         "DS:bot_histcomp:GAUGE:144000:U:U",
          "DS:bot_sum_disc:GAUGE:144000:U:U",
          "DS:bot_subster:GAUGE:144000:U:U",
          "DS:bot_catimages:GAUGE:144000:U:U",
-         "DS:bot_uptime_histcomp:GAUGE:144000:U:U",
          "DS:bot_uptime_sum_disc:GAUGE:144000:U:U",
          "DS:bot_uptime_subster:GAUGE:144000:U:U",
          "DS:bot_uptime_catimages:GAUGE:144000:U:U",
@@ -416,11 +420,11 @@ def maintain_stats(init=False):
 #                runtime += 3600
 #            uptime = numpy.array(runtime).sum()
 
-        (bot_uptime_histcomp, bot_uptime_sum_disc, bot_uptime_subster, bot_uptime_catimages) = (0, 0, 0, 0)
+        (bot_uptime_sum_disc, bot_uptime_subster, bot_uptime_catimages) = (0, 0, 0)
         (metric1, metric2, metric3, metric4, metric5) = (0, 0, 0, 0, 0)
         val = (ecount['start'], ecount['end'],  (ecount['start']-ecount['end']),
-               ecount['histcomp'], ecount['sum_disc'], ecount['subster'], ecount['catimages'],
-               bot_uptime_histcomp, bot_uptime_sum_disc, bot_uptime_subster, bot_uptime_catimages,
+               ecount['sum_disc'], ecount['subster'], ecount['catimages'],
+               bot_uptime_sum_disc, bot_uptime_subster, bot_uptime_catimages,
                mcount['unknown'], mcount['info'], mcount['warning'], mcount['error'], mcount['critical'], mcount['debug'],
                metric1, metric2, metric3, metric4, metric5,)
 
@@ -446,13 +450,11 @@ def maintain_stats(init=False):
                  '--watermark=DrTrigonBot.TS',
                  "DEF:end_num=%s:sum_end:AVERAGE" % rrd_fn,
                  "DEF:start_num=%s:sum_start:AVERAGE" % rrd_fn,
-                 "DEF:histcomp_num=%s:bot_histcomp:AVERAGE" % rrd_fn,
                  "DEF:subster_num=%s:bot_subster:AVERAGE" % rrd_fn,
                  "DEF:sum_disc_num=%s:bot_sum_disc:AVERAGE" % rrd_fn,
                  "DEF:catimages_num=%s:bot_catimages:AVERAGE" % rrd_fn,
                  "LINE1:end_num#0000FF:end\\r",
                  "LINE2:start_num#00FF00:start\\r",
-                 "LINE3:histcomp_num#00FF00:histcomp\\r",
                  "LINE4:subster_num#00FF00:subster\\r",
                  "LINE5:sum_disc_num#00FF00:sum_disc\\r",
                  "LINE6:catimages_num#00FF00:catimages\\r",
@@ -540,7 +542,7 @@ def displaystate(form):
 			data['botstate_daily'] = botstate_img['orange']
 			color = html_color['orange']
 
-	users = irc_status()[1]
+	users = irc_status()
 
 	data['botstate_subster'] = botstate_img['red']
 	if ("DrTrigonBot" in users) or (":DrTrigonBot" in users):
@@ -648,8 +650,7 @@ def logstat(form):
 
 	import numpy
 
-	data = {'histcomp_count':	0, 
-		'messages':		'', }
+	data = {'messages':		'', }
 
 	format = form.getvalue('format', 'html')
 
@@ -699,8 +700,6 @@ def logstat(form):
 			d['uptimes'].append( list(runtime) )
 		else:
 			d['uptimes'].append( '-' )
-
-		data['histcomp_count'] += stat[item]['ecount']['histcomp']
 
 	d['mcount'] = numpy.array(d['mcount'])
 	d['ecount'] = numpy.array(d['ecount'])
@@ -778,13 +777,10 @@ def logstat(form):
 		ax_size = [0.125, 0.15, 
 			1-0.1-0.05, 1-0.15-0.05]
 		ax = fig.add_axes(ax_size)
-		p1 = ax.step(d[:,0], d[:,1], where='mid')#, marker='x')
-		p2 = ax.step(d[:,0], d[:,2], where='mid')#, marker='x')
-		p3 = ax.step(d[:,0], d[:,3], where='mid')#, marker='x')
-		p4 = ax.step(d[:,0], d[:,4], where='mid')#, marker='x')
-		p5 = ax.step(d[:,0], d[:,5], where='mid')#, marker='x')
-		p6 = ax.step(d[:,0], d[:,6], where='mid')#, marker='x')
-		plt.legend([p1, p2, p3, p4, p5, p6], stat[last]['ecount'].keys(), loc='upper left', bbox_to_anchor=[-0.15, 1.0], ncol=2, prop={'size':8})
+		pa = []
+		for i in range(1, d.shape[1]):
+			pa.append( ax.step(d[:,0], d[:,i], where='mid') )#, marker='x') )
+		plt.legend(pa, stat[last]['ecount'].keys(), loc='upper left', bbox_to_anchor=[-0.15, 1.0], ncol=2, prop={'size':8})
 		plt.grid(True, which='both')
 		#plt.ylim(ymax=10)
 		# format the ticks

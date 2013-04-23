@@ -149,12 +149,6 @@ else:
 
     error = u''
     try:
-        # script call (not needed anymore still here because of panel.py)
-        pywikibot.output(u'SCRIPT CALL:')
-        pywikibot.output(u'  ' + u' '.join(sys.argv))
-        pywikibot.output(u'(this is a temporary work-a-round)')
-        pywikibot.output(u'')
-
         __release_ver__ %= int(version.getversion_svn(pywikibot.config.datafilepath('..'))[1])
         d = shelve.open(pywikibot.config.datafilepath('cache', 'state_bots'))
         d['bot_control'] = {'release_ver':      __release_ver__,
