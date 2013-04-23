@@ -127,8 +127,7 @@ if len(sys.argv) < 2:
     raise RuntimeError("Not enough arguments defined.")
 else:
     logname = pywikibot.config.datafilepath('logs', '%s.log')
-    #logfile = logname % ''.join([os.path.basename(sys.argv[0])]+sys.argv[1:])
-    logfile = logname % ''.join([os.path.basename(sys.argv[0]), sys.argv[1], '-cron']+sys.argv[2:]) # (temporary work-a-round)
+    logfile = logname % ''.join([os.path.basename(sys.argv[0])]+sys.argv[1:])
 
     sys.stdout = BotLoggerObject(layer='stdout')            # handle stdout
     sys.stderr = BotLoggerObject(layer='stderr')            # handle stderr
@@ -140,18 +139,13 @@ else:
     arg = pywikibot.handleArgs()                            # '-family' and '-lang' have to be known for log-header
     pywikibot.setLogfileStatus(True, logfile, header=True)  # set '-log' to catch all
 
-    cmd  = sys.argv.pop(1)
     path = os.path.split(sys.argv[0])[0]
-    if (cmd.lower() == "-compress_history:[]"): # (temporary work-a-round)
-        sys.argv.append(cmd)                    #
-        cmd      = u'sum_disc.py'               #
-        bot_name = u'compress_history'          #
-    else:
-        cmd = cmd.lstrip(u'-')
-        if u'.py' not in cmd.lower():
-            cmd += u'.py'
-        bot_name = os.path.splitext(os.path.basename(sys.argv[0]))
+    cmd  = sys.argv.pop(1)
+    cmd  = cmd.lstrip(u'-')
+    if u'.py' not in cmd.lower():
+        cmd += u'.py'
     sys.argv[0] = os.path.join(path, cmd)
+    bot_name = os.path.splitext(os.path.basename(sys.argv[0]))
 
     error = u''
     try:
