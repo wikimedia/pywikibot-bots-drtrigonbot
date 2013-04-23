@@ -803,8 +803,8 @@ def logstat(form):
 		ax_size = [0.125, 0.15, 
 			1-0.1-0.05, 1-0.15-0.05]
 		ax = fig.add_axes(ax_size)
-		p1 = ax.step(d[:,0], (d[:,4]-d[:,1]), marker='x', where='mid')
-		p2 = ax.step(d[:,0], d[:,1], marker='x', where='mid')
+		p1 = ax.step(d[:,0], (d[:,ks]-d[:,ke]), marker='x', where='mid')
+		p2 = ax.step(d[:,0], d[:,ke], marker='x', where='mid')
 		plt.legend([p1, p2], ['runs failed', 'successful'], prop={'size':8})
 		plt.grid(True, which='both')
 		# format the ticks
