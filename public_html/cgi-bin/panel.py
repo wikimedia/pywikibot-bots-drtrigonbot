@@ -705,12 +705,14 @@ def logstat(form):
 	d['ecount'] = numpy.array(d['ecount'])
 	d['mcount'][:,0] = epoch2num(d['mcount'][:,0])
 	d['ecount'][:,0] = epoch2num(d['ecount'][:,0])
+	keys = stat[last]['ecount'].keys()
+	ks, ke = keys.index('start')+1, keys.index('end')+1
 
         plotlink = os.path.basename(sys.argv[0]) + (r"?action=logstat&amp;filter=%s" % filt)
 	data.update({
-		'run_diff':		"</td><td>".join( map(str, d['ecount'][:,4]-d['ecount'][:,1]) ),
-		'start_count':		"</td><td>".join( map(str, d['ecount'][:,4]) ),
-		'end_count':		"</td><td>".join( map(str, d['ecount'][:,1]) ),
+		'run_diff':		"</td><td>".join( map(str, d['ecount'][:,ks]-d['ecount'][:,ke]) ),
+		'start_count':		"</td><td>".join( map(str, d['ecount'][:,ks]) ),
+		'end_count':		"</td><td>".join( map(str, d['ecount'][:,ke]) ),
 		'uptimes':		"</td><td>".join( map(str, d['uptimes']) ),
 		'graphlink-mcount':	plotlink + r"&amp;format=graph-mcount",
 		'graphlink-mcount-i':	plotlink + r"&amp;format=graph-mcount-i",
