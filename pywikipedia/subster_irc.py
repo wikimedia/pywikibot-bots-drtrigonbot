@@ -25,7 +25,7 @@ http://python-irclib.sourceforge.net/
 #
 #  Distributed under the terms of the LGPL license.
 #
-__version__ = '$Id: subster_irc.py 11393 2013-04-19 21:28:02Z drtrigon $'
+__version__ = '$Id: subster_irc.py 11438 2013-04-23 15:14:51Z drtrigon $'
 #
 
 import wikipedia as pywikibot
@@ -145,12 +145,22 @@ def main_subster(page, params=None):
     del bot
 
 def main():
+    args = pywikibot.handleArgs()
     subster.debug = debug
     site = pywikibot.getSite()
     site.forceLogin()
     chan = '#' + site.language() + '.' + site.family.name
     bot = SubsterTagModifiedBot(site, chan, site.loggedInAs(), "irc.wikimedia.org")
-    bot.start()
+    for arg in args:
+        pywikibot.showHelp()
+        return
+    try:
+        bot.start()
+    except KeyboardInterrupt:
+        pywikibot.output('\nQuitting program...')
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        pywikibot.stopme()

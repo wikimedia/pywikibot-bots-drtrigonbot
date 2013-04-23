@@ -69,7 +69,7 @@ Syntax example:
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__ = '$Id: sum_disc.py 11397 2013-04-20 12:20:45Z drtrigon $'
+__version__ = '$Id: sum_disc.py 11438 2013-04-23 15:14:51Z drtrigon $'
 #
 
 
@@ -917,7 +917,7 @@ class SumDiscBot(basic.AutoBasicBot):
                 # skip to local disc page, since this is the only page the user should watch itself
                 if (page.site().language() == localinterwiki) and \
                    (page.site().family.name == u'wikipedia'):
-                    logging.getLogger('sum_disc').warning(
+                    pywikibot.warning(
                           u'skipping global wiki notify to local wiki %s' %
                           page.title(asLink=True) )
                     continue
@@ -1075,7 +1075,7 @@ class SumDiscBot(basic.AutoBasicBot):
                 try:
                     self.append(page, text, comment=comment, minorEdit=minEd, force=True)
                 except pywikibot.MaxTriesExceededError:
-                    logging.getLogger('sum_disc').warning(
+                    pywikibot.warning(
                           u'Problem MaxTriesExceededError occurred, thus skipping this user!')
                     return  # skip history write
             else:
@@ -1433,7 +1433,7 @@ class PageSections(object):
             #sections = page.getSections(minLevel=1, force=True)  # slow for pages with > 100 sections
             sections = []
 
-            logging.getLogger('sum_disc').warning(
+            pywikibot.warning(
                   u'Problem resolving section data, processing the whole page at once...')
 
         # drop from templates included headings (are None)

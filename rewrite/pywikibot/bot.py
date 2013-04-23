@@ -7,7 +7,7 @@ User-interface related functions for building bots
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: bot.py 11426 2013-04-21 20:16:36Z drtrigon $'
+__version__ = '$Id: bot.py 11439 2013-04-23 15:20:48Z drtrigon $'
 
 # Note: the intention is to develop this module (at some point) into a Bot
 # class definition that can be subclassed to create new, functional bot
@@ -241,11 +241,11 @@ def writelogheader():
     # script call
     output(u'COMMAND: %s' % unicode(sys.argv))
 
-    # new framework release/revision?
+    # new framework release/revision? (handleArgs needs to be called first)
     site = pywikibot.getSite()
-    output(u'VERSION: %s' % unicode((version.getversion().strip(' ()'),
-                                          version.getversion_onlinerepo(),
-                                          site.live_version())))
+    output(u'VERSION: %s' % unicode((version.getversion().strip(),
+                                     version.getversion_onlinerepo(),
+                                     site.live_version())))
 
     # system
     if hasattr(os, 'uname'):
