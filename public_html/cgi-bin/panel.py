@@ -146,11 +146,11 @@ botdonemsg = 'DONE'
 botcontinuous = ['trunk/bot_control.py-subster_irc.log', 'rewrite/script_wui-bot.log']
 
 # use classic 're' since 'pyparsing' does not work with unicode
-## fmt='%(asctime)s %(name)18s: %(levelname)-8s %(message)s',
+## fmt='%(asctime)s %(name)18s: %(levelname)-8s %(message)s'
 #regex    = re.compile(r'(?P<timestamp>[\d-]+\s[\d:,]+)\s+(?P<file>\S+)\s+(?P<level>\S+)\s+(?P<message>.*)')#, re.U)
 # fmt="%(asctime)s %(caller_file)18s, %(caller_line)4s "
-# "in %(caller_name)18s: %(levelname)-8s %(message)s",
-regex    = re.compile(r'(?P<timestamp>[\d-]+\s[\d:,]+)\s+(?P<caller_file>\S+)\s+(?P<caller_line>\S+)\s+\S+\s+(?P<file>\S+)\s+(?P<level>\S+)\s+(?P<message>.*)')#, re.U)
+# "in %(caller_name)18s: %(levelname)-8s %(message)s"
+regex    = re.compile(r'(?P<timestamp>[\d-]+\s[\d:,]+)\s+(?P<caller_file>\S+),\s+(?P<caller_line>\S+)\s+in\s+(?P<file>\S+):\s+(?P<level>\S+)\s+(?P<message>.*)')#, re.U)
 timefmt  = "%Y-%m-%d %H:%M:%S,%f"
 timefmt2 = "%Y-%m-%d %H:%M:%S"
 datefmt  = "%Y-%m-%d"
