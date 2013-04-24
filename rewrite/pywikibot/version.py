@@ -7,7 +7,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: version.py 11053 2013-02-08 14:30:09Z xqt $'
+__version__ = '$Id: version.py 11446 2013-04-24 16:55:33Z drtrigon $'
 
 import os
 import time
@@ -53,9 +53,8 @@ def getversiondict():
                     version = pywikibot.__version__
 
                 id, file, rev, date, ts, author, dollar = version.split(' ')
-                tag = ''
+                tag = 'pywikibot/__init__.py'
                 date = time.strptime('%sT%s' % (date, ts), '%Y-%m-%dT%H:%M:%SZ')
-                rev += ' (pywikibot/__init__.py)'
             except: # nothing worked; version unknown (but suppress exceptions)
                 # the value is most likely '$Id' + '$', it means that
                 # wikipedia.py got imported without using svn at all

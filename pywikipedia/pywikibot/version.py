@@ -7,7 +7,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: version.py 11027 2013-02-04 07:36:21Z yurik $'
+__version__ = '$Id: version.py 11447 2013-04-24 17:00:58Z drtrigon $'
 
 import os
 import sys
@@ -54,9 +54,8 @@ def getversiondict():
                     version = wikipedia.__version__
 
                 id, file, rev, date, ts, author, dollar = version.split(' ')
-                tag = ''
+                tag = 'wikipedia.py'
                 date = time.strptime('%sT%s' % (date, ts), '%Y-%m-%dT%H:%M:%SZ')
-                rev += ' (wikipedia.py)'
             except: # nothing worked; version unknown (but suppress exceptions)
                 # the value is most likely '$Id' + '$', it means that
                 # wikipedia.py got imported without using svn at all

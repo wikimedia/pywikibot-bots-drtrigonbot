@@ -7,7 +7,7 @@ User-interface related functions for building bots
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: bot.py 11444 2013-04-24 12:31:07Z drtrigon $'
+__version__ = '$Id: bot.py 11446 2013-04-24 16:55:33Z drtrigon $'
 
 # Note: the intention is to develop this module (at some point) into a Bot
 # class definition that can be subclassed to create new, functional bot
@@ -252,11 +252,11 @@ def writelogheader():
         output(u'SYSTEM: %s' % unicode(os.uname()))
 
     # imported modules
-    #output(u'MODULES:')
-    #for item in sys.modules.keys():
-    #    ver = version.getfileversion('%s.py' % item)
-    #    if ver and (ver[0] == u'$'):
-    #        output(u'  %s' % ver)
+    output(u'MODULES:')
+    for item in sys.modules.keys():
+        ver = version.getfileversion('%s.py' % item.replace('.', '/'))
+        if ver and (ver[0] == u'$'):
+            output(u'  %s' % ver)
 
     # messages on bot discussion page?
     output(u'MESSAGES: %s' % ('unanswered' if site.messages() else 'none'))

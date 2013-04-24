@@ -36,7 +36,7 @@ It will also catch all output to stdout and stderr and report those incidents.
 #  @verbatim python bot_control.py <name_of_script> <options> @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '11445'  # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '11447'  # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.5.%i' # increase minor (1.x) at re-merges with framework
 #
 
@@ -120,7 +120,6 @@ ERROR_SGE_lock    = 100  # stop in error state (prevents re-starts)
 exitcode = ERROR_SGE_stop       # action in error case (stop with error)
 #exitcode = ERROR_SGE_restart    # -------- " --------- (restart)
 #exitcode = ERROR_SGE_lock       # -------- " --------- (stop and lock)
-cron     = True                 # (set to 'False' for debugging)
 
 
 if len(sys.argv) < 2:
@@ -129,14 +128,14 @@ else:
     logname = pywikibot.config.datafilepath('logs', '%s.log')
     logfile = logname % ''.join([os.path.basename(sys.argv[0])]+sys.argv[1:])
 
+    arg = pywikibot.handleArgs()                            # '-family' and '-lang' have to be known for log-header
     sys.stdout = BotLoggerObject(layer='stdout')            # handle stdout
     sys.stderr = BotLoggerObject(layer='stderr')            # handle stderr
-    if cron:                                                # suppress console output
+    if not pywikibot.simulate:                              # suppress console output
         pywikibot.ui.stdout = open(os.devnull, 'w')         #
         pywikibot.ui.stderr = open(os.devnull, 'w')         #
         #pywikibot._outputOld = lambda text, **kwargs: None #
     # may be use "log = ['*']" in 'user-config.py' instead
-    arg = pywikibot.handleArgs()                            # '-family' and '-lang' have to be known for log-header
     pywikibot.setLogfileStatus(True, logfile, header=True)  # set '-log' to catch all
 
     path = os.path.split(sys.argv[0])[0]
@@ -151,10 +150,13 @@ else:
     try:
         __release_ver__ %= int(version.getversion_svn(pywikibot.config.datafilepath('..'))[1])
         d = shelve.open(pywikibot.config.datafilepath('cache', 'state_bots'))
-        d['bot_control'] = {'release_ver':      __release_ver__,
-                            'framework_ver':    __framework_rev__,
-                            '(runningsubbots)': u'n/a',
+        d['bot_control'] = {'release_ver':          __release_ver__,
+                            'framework_ver':        __framework_rev__,
+                            'release_online_ver':   version.getversion_onlinerepo('http://svn.toolserver.org/svnroot/drtrigon/'),
+                            'framework_online_ver': version.getversion_onlinerepo(),
                            }
+        pywikibot.output(d['bot_control'])
+        pywikibot.output(u'=== ' * 14)
         d.close()
 
         sys.path.append(os.path.split(sys.argv[0])[0])
