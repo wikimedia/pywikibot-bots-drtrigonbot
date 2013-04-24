@@ -11,7 +11,7 @@ and return a unicode string.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: textlib.py 11413 2013-04-21 15:45:32Z xqt $'
+__version__ = '$Id: textlib.py 11442 2013-04-23 16:10:15Z amir $'
 
 
 import wikipedia as pywikibot
@@ -844,7 +844,9 @@ def compileLinkR(withoutBracketed=False, onlyBracketed=False):
     # Note: While allowing dots inside URLs, MediaWiki will regard
     # dots at the end of the URL as not part of that URL.
     # The same applies to comma, colon and some other characters.
-    notAtEnd = '\]\s\.:;,<>"\|'
+    notAtEnd = '\]\s\.:;,<>"\|\)'
+    #This is specially set for brackted link
+    notAtEndb = '\]\s\.:;,<>"\|'
     # So characters inside the URL can be anything except whitespace,
     # closing squared brackets, quotation marks, greater than and less
     # than, and the last character also can't be parenthesis or another
@@ -857,11 +859,15 @@ def compileLinkR(withoutBracketed=False, onlyBracketed=False):
     regex = r'(?P<url>http[s]?://[^%(notInside)s]*?[^%(notAtEnd)s]' \
             r'(?=[%(notAtEnd)s]*\'\')|http[s]?://[^%(notInside)s]*' \
             r'[^%(notAtEnd)s])' % {'notInside': notInside, 'notAtEnd': notAtEnd}
-
+    regexb = r'(?P<urlb>http[s]?://[^%(notInside)s]*?[^%(notAtEnd)s]' \
+            r'(?=[%(notAtEnd)s]*\'\')|http[s]?://[^%(notInside)s]*' \
+            r'[^%(notAtEnd)s])' % {'notInside': notInside, 'notAtEnd': notAtEndb}
     if withoutBracketed:
         regex = r'(?<!\[)' + regex
     elif onlyBracketed:
-        regex = r'\[' + regex
+        regex = r'\[' + regexb
+    else:
+        regex=r'(?:(?<!\[)'+ regex+r'|\['+regexb+')'
     linkR = re.compile(regex)
     return linkR
 

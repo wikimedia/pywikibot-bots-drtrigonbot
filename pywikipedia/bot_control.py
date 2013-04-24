@@ -36,7 +36,7 @@ It will also catch all output to stdout and stderr and report those incidents.
 #  @verbatim python bot_control.py <name_of_script> <options> @endverbatim
 #
 __version__       = '$Id$'
-__framework_rev__ = '11439'  # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
+__framework_rev__ = '11445'  # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 __release_ver__   = '1.5.%i' # increase minor (1.x) at re-merges with framework
 #
 
@@ -145,7 +145,7 @@ else:
     if u'.py' not in cmd.lower():
         cmd += u'.py'
     sys.argv[0] = os.path.join(path, cmd)
-    bot_name = os.path.splitext(os.path.basename(sys.argv[0]))
+    bot_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
 
     error = u''
     try:
@@ -164,7 +164,7 @@ else:
         pywikibot.output(u'')
         pywikibot.output(u'DONE')
     except:
-        pywikibot.exception(full=True)
+        pywikibot.exception(tb=True)
         error = traceback.format_exc()
         if pywikibot.logger.isEnabledFor(pywikibot.DEBUG):
             exitcode = ERROR_SGE_ok    # print traceback of re-raised errors by skipping sys.exit()
