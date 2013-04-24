@@ -37,7 +37,7 @@ It will also catch all output to stdout and stderr and report those incidents.
 #
 __version__       = '$Id$'
 __framework_rev__ = '11447'  # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
-__release_ver__   = '1.5.%i' # increase minor (1.x) at re-merges with framework
+__release_ver__   = '1.5.%s' # increase minor (1.x) at re-merges with framework
 #
 
 
