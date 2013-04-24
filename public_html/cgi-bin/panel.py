@@ -305,10 +305,13 @@ def logging_statistics(logfiles, exclude):
 
 	# gather statistics
 	etiming['mainstart'] = [ regex.match(buffer[0][1][0]).groupdict()['timestamp'] ]
-	etiming['mainend']   = [ regex.match(buffer[-1][1][-1]).groupdict()['timestamp'] ]
+	#etiming['mainend']   = [ regex.match(buffer[-1][1][-1]).groupdict()['timestamp'] ]
+	end  = regex.match(buffer[-1][1][-1])
+	end  = regex.match(buffer[-1][1][-2]) if not end else end  # or strftime(timefmt2)
+	etiming['mainend']   = [ end.groupdict()['timestamp'] ]
 	info = {'level': 'unknown', 'message': '', 'timestamp': etiming['mainstart'][0], 'file': ''}
 	for item in buffer:
-		file = os.path.split(item[0])[1].split('-')[1]
+		file = os.path.splitext(os.path.split(item[0])[1])[0].split('-')[1]
 		for line in item[1]:
 			if not line.strip(): continue
 
@@ -681,12 +684,16 @@ def logstat(form):
 	keys.sort()
 	data['start_date'] = str(strftime("%a %b %d %Y", localtime( stat[keys[0]]['mainstart'] )))
 	data['end_date']   = str(strftime("%a %b %d %Y", localtime( stat[keys[-1]]['mainend'] )))
-	for item in keys:
+	dkeys = dict([ (k, i) for item in keys for i, k in enumerate(stat[item]['ecount'].keys()) ])
+	d['ecount'] = numpy.zeros((len(keys),len(dkeys)+1))
+	for i, item in enumerate(keys):
 		t = mktime(strptime(item.split('.')[-1], datefmt))
 
 		d['mcount'].append( [t] + stat[item]['mcount'].values() )
 
-		d['ecount'].append( [t] + stat[item]['ecount'].values() )
+		d['ecount'][i,0] = t
+		for kj in dkeys:
+			d['ecount'][i,(dkeys[kj]+1)] = stat[item]['ecount'].get(kj, 0)
 
 		data['messages'] += "<b>%s</b>\n<i>used resources: %s</i>\n" % (item, stat[item]['resources'])
 		data['messages'] += "\n".join(stat[item]['messages']) + ("\n"*2)
@@ -702,10 +709,10 @@ def logstat(form):
 			d['uptimes'].append( '-' )
 
 	d['mcount'] = numpy.array(d['mcount'])
-	d['ecount'] = numpy.array(d['ecount'])
+	#d['ecount'] = numpy.array(d['ecount'])
 	d['mcount'][:,0] = epoch2num(d['mcount'][:,0])
 	d['ecount'][:,0] = epoch2num(d['ecount'][:,0])
-	keys = stat[last]['ecount'].keys()
+	keys = dkeys.keys()
 	ks, ke = keys.index('start')+1, keys.index('end')+1
 
         plotlink = os.path.basename(sys.argv[0]) + (r"?action=logstat&amp;filter=%s" % filt)
