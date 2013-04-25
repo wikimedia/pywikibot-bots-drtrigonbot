@@ -143,7 +143,7 @@ html_color = {	'green':	'#00ff00',
 #
 bottimeout = 24
 botdonemsg = 'DONE'
-botcontinuous = ['trunk/bot_control.py-subster_irc.log', 'rewrite/script_wui-bot.log']
+botcontinuous = ['trunk/pwb.py-subster_irc.log', 'rewrite/script_wui-bot.log']
 
 # use classic 're' since 'pyparsing' does not work with unicode
 ## fmt='%(asctime)s %(name)18s: %(levelname)-8s %(message)s'
