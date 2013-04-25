@@ -35,9 +35,7 @@ It will also catch all output to stdout and stderr and report those incidents.
 #  @li Run any bot on server (according to rewrite/pwb.py):
 #  @verbatim python bot_control.py <name_of_script> <options> @endverbatim
 #
-__version__       = '$Id$'
-__framework_rev__ = '11454'  # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
-__release_ver__   = '1.5.%s' # increase minor (1.x) at re-merges with framework
+__version__ = '$Id$'
 #
 
 
@@ -46,15 +44,15 @@ import sys, os, traceback, shelve
 # wikipedia-bot imports
 import userlib
 # Splitting the bot into library parts
-from pywikibot import version   # JIRA: DRTRIGON-131
 import wikipedia as pywikibot
+from pywikibot import version   # JIRA: DRTRIGON-131
 
 
 ## Server Error Handling; send mail to user in case of error
 #
 #  @todo consider solving/doing this with a logging handler like SMTPHandler
 #
-def send_mailnotification(text, subject, recipient):
+def send_mailnotification(text, subject):
     username = pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang]
     pos = username.lower().find('bot')
     username = username[:pos] if (pos > 0) else username
@@ -71,7 +69,8 @@ def send_mailnotification(text, subject, recipient):
         if usr.sendMail(subject=subject, text=text):    # 'text' should be unicode!
             return
     except:  # break exception handling recursion
-        pywikibot.warning(u'mail could not be sent!')
+        pywikibot.exception(tb=True)
+        pywikibot.error(u'mail to %s could not be sent!' % username)
 
     pywikibot.output(u'May be not logged in - try to send emergency email')
     try:
@@ -79,7 +78,7 @@ def send_mailnotification(text, subject, recipient):
         from email.mime.text import MIMEText
         # sender's and recipient's email addresses
         FROM = "%s@toolserver.org" % username.lower()
-        TO   = recipient    # must be a list
+        TO   = [FROM]   # must be a list
         # Create a text/plain message
         msg = MIMEText(text)
         msg['Subject'] = "!EMERGENCY! " + subject
@@ -90,7 +89,8 @@ def send_mailnotification(text, subject, recipient):
         server.sendmail(FROM, TO, msg.as_string())
         server.quit()
     except:  # break exception handling recursion
-        pywikibot.warning(u'emergency mail could not be sent!')
+        pywikibot.exception(tb=True)
+        pywikibot.error(u'emergency mail to %s could not be sent!' % TO)
 
 
 ## Bot Output Redirecting And Logging; to assure all output is logged
@@ -137,6 +137,7 @@ else:
         #pywikibot._outputOld = lambda text, **kwargs: None #
     # may be use "log = ['*']" in 'user-config.py' instead
     pywikibot.setLogfileStatus(True, logfile, header=True)  # set '-log' to catch all
+    # check: http://de.wikipedia.org/wiki/Hilfe:MediaWiki/Versionen
 
     path = os.path.split(sys.argv[0])[0]
     cmd  = sys.argv.pop(1)
@@ -148,12 +149,12 @@ else:
 
     error = u''
     try:
-        __release_ver__ %= int(version.getversion_svn(pywikibot.config.datafilepath('..'))[1])
+        __release_ver = str(version.getversion_svn(pywikibot.config.datafilepath('..'))[1])
+        #__release_ver = version.getversion().strip()
         d = shelve.open(pywikibot.config.datafilepath('cache', 'state_bots'))
-        d['bot_control'] = {'release_ver':          __release_ver__,
-                            'framework_ver':        __framework_rev__,
-                            'release_online_ver':   version.getversion_onlinerepo('http://svn.toolserver.org/svnroot/drtrigon/'),
-                            'framework_online_ver': version.getversion_onlinerepo(),
+        d['bot_control'] = {  'release_ver': __release_ver,
+                            'framework_ver': __release_ver,
+                               'online_ver': version.getversion_onlinerepo(),
                            }
         pywikibot.output(d['bot_control'])
         pywikibot.output(u'=== ' * 14)
@@ -172,7 +173,7 @@ else:
             exitcode = ERROR_SGE_ok    # print traceback of re-raised errors by skipping sys.exit()
             raise
         else:
-            send_mailnotification(error, u'Bot ERROR', ["dr.trigon@surfeu.ch"])
+            send_mailnotification(error, u'Bot ERROR')
         pywikibot.output(u'')
         pywikibot.warning(u'DONE with Exception(s) occured in Bot')
     finally:

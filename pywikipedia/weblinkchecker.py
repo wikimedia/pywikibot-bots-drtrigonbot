@@ -92,7 +92,7 @@ Syntax examples:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__='$Id: weblinkchecker.py 10741 2012-11-18 20:22:23Z xqt $'
+__version__='$Id: weblinkchecker.py 11452 2013-04-25 12:05:05Z amir $'
 
 import sys, re
 import codecs, pickle
@@ -155,8 +155,10 @@ def weblinksIn(text, withoutBracketed = False, onlyBracketed = False):
     # Also remove text inside nowiki links etc.
     text = pywikibot.removeDisabledParts(text)
     for m in linkR.finditer(text):
-        yield m.group('url')
-
+        if m.group('url'):
+            yield m.group('url')
+        else:
+            yield m.group('urlb')
 class InternetArchiveConsulter:
     def __init__(self, url):
         self.url = url
