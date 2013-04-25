@@ -311,7 +311,7 @@ def logging_statistics(logfiles, exclude):
 	etiming['mainend']   = [ end.groupdict()['timestamp'] ]
 	info = {'level': 'unknown', 'message': '', 'timestamp': etiming['mainstart'][0], 'file': ''}
 	for item in buffer:
-		file = os.path.splitext(os.path.split(item[0])[1])[0].split('-')[1]
+		file = os.path.split(item[0])[1].split('-')[1].split('.')[0]
 		for line in item[1]:
 			if not line.strip(): continue
 
