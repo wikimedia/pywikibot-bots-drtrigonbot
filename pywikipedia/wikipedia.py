@@ -130,7 +130,7 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 11443 2013-04-24 12:27:31Z drtrigon $'
+__version__ = '$Id: wikipedia.py 11448 2013-04-24 17:30:40Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -9188,7 +9188,7 @@ def writelogheader():
     # imported modules
     output(u'MODULES:')
     for item in sys.modules.keys():
-        ver = version.getfileversion('%s.py' % item)
+        ver = version.getfileversion('%s.py' % item.replace('.', '/'))
         if ver and (ver[0] == u'$'):
             output(u'  %s' % ver)
 

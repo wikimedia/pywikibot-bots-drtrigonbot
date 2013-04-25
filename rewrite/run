@@ -31,7 +31,7 @@ if [ $SGE_CLUSTER_NAME ] || [ $INSTANCENAME ]
 then cd $HOME/rewrite
 fi
 
-export PYTHONPATH=.:./externals/httplib2:./externals/setuptools:./externals/simplejson
+export PYTHONPATH=.:./externals
 python $1 -dir:. -log
 #python $1 -dir:. -log &> /dev/null
 
