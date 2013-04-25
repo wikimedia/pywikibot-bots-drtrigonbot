@@ -281,7 +281,7 @@ def main():
     __sys_argv = sys.argv
 
     # output version info
-    __release_ver__ %= version.getversion_svn(pywikibot.config.datafilepath('..'))[1]
+    __release_ver__ %= version.getversion_svn(pywikibot.config.datafilepath('.'))[1]
     pywikibot.output({'release_ver':          __release_ver__,
                       'framework_ver':        __framework_rev__,
                       'release_online_ver':   version.getversion_onlinerepo('http://svn.toolserver.org/svnroot/drtrigon/'),
