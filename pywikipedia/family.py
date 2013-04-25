@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: family.py 11392 2013-04-19 15:37:30Z xqt $'
+__version__ = '$Id: family.py 11455 2013-04-25 13:43:07Z amir $'
 
 import re
 import urllib
@@ -4457,6 +4457,7 @@ class WikimediaFamily(Family):
             'de': u'Modul',
             'dsb': u'Modul',
             'eo': u'Modulo',
+            'fa': u'پودمان',
             'frr': u'Modul',
             'gag': u'Modül',
             'gan': u'模組',
@@ -4493,6 +4494,7 @@ class WikimediaFamily(Family):
             'de': u'Modul Diskussion',
             'dsb': u'Modul diskusija',
             'eo': u'Modulo-Diskuto',
+            'fa': u'بحث پودمان',
             'ff': u'Discussion module',
             'fr': u'Discussion module',
             'frp': u'Discussion module',
