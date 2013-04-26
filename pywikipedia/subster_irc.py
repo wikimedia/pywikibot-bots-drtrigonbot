@@ -25,7 +25,7 @@ http://python-irclib.sourceforge.net/
 #
 #  Distributed under the terms of the LGPL license.
 #
-__version__ = '$Id: subster_irc.py 11438 2013-04-23 15:14:51Z drtrigon $'
+__version__ = '$Id: subster_irc.py 11458 2013-04-26 11:25:54Z drtrigon $'
 #
 
 import wikipedia as pywikibot
@@ -38,10 +38,6 @@ import time
 import thread
 
 # Configuration imported from 'subster.py'.
-
-# debug tools
-# (look at 'bot_control.py' and 'subster.py' for more info)
-debug = []
 
 
 class SubsterTagModifiedBot(articlenos.ArtNoDisp):
@@ -146,7 +142,6 @@ def main_subster(page, params=None):
 
 def main():
     args = pywikibot.handleArgs()
-    subster.debug = debug
     site = pywikibot.getSite()
     site.forceLogin()
     chan = '#' + site.language() + '.' + site.family.name

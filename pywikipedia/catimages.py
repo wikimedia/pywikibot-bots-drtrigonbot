@@ -43,7 +43,7 @@ X                    http://toolserver.org/~daniel/WikiSense/UntaggedImages.php
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: catimages.py 11393 2013-04-19 21:28:02Z drtrigon $'
+__version__ = '$Id: catimages.py 11461 2013-04-26 18:21:06Z drtrigon $'
 #
 
 # python default packages
@@ -94,14 +94,14 @@ import pagegenerators, catlib
 import checkimages
 
 # DrTrigonBot framework packages
-import dtbext.pycolorname as pycolorname
-#import dtbext._mlpy as mlpy
 target = os.path.join(scriptdir, 'dtbext')
 sys.path.append(target)
+import pycolorname
+#import _mlpy as mlpy
 from colormath.color_objects import RGBColor
 from py_w3c.validators.html.validator import HTMLValidator, ValidationFault
-sys.path.remove(target)
-#from dtbext.pdfminer import pdfparser, pdfinterp, pdfdevice, converter, cmapdb, layout
+#from pdfminer import pdfparser, pdfinterp, pdfdevice, converter, cmapdb, layout
+#sys.path.remove(target)
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -498,7 +498,8 @@ class FileData(object):
         if (self.image_mime[1] in ['ogg', 'pdf', 'vnd.djvu']):
             return
 
-        result = self._util_get_Geometry_CVnSCIPY()#nPYWT()
+#        result = self._util_get_Geometry_CVnSCIPYnPYWT()
+        result = self._util_get_Geometry_CVnSCIPY()
 
         self._info['Geometry'] = [{'Lines': result['Lines'], 'Circles': result['Circles'], 'Corners': result['Corners'],
                                    'FFT_Comp': result['FFT_Comp'], 'SVD_Comp': result['SVD_Comp'], 'SVD_Min': result['SVD_Min']}]
@@ -665,7 +666,7 @@ class FileData(object):
             # SVD did not converge; in fact this should NEVER happen...(?!?)
             pass
 
-# TODO: for audio and video (time-based) also...!!!
+## TODO: for audio and video (time-based) also...!!!
 #        # wavelet transformation
 #        # https://github.com/nigma/pywt/tree/master/demo
 #        # image_blender, dwt_signal_decomposition.py, wp_scalogram.py, dwt_multidim.py, user_filter_banks.py:
@@ -716,7 +717,7 @@ class FileData(object):
         #   BoWclassify /data/toolserver/pywikipedia/dtbext/opencv/VOC2007 /data/toolserver/pywikipedia/dtbext/opencv/data FAST SURF BruteForce | tee run.log
         #   BoWclassify /data/toolserver/pywikipedia/dtbext/opencv/VOC2007 /data/toolserver/pywikipedia/dtbext/opencv/data HARRIS SIFT BruteForce | tee run.log
         # http://experienceopencv.blogspot.com/2011/02/object-recognition-bag-of-keypoints.html
-        import dtbext.opencv as opencv
+        import opencv
 
         if os.path.exists(bowDescPath):
             os.remove(bowDescPath)
@@ -1040,7 +1041,7 @@ class FileData(object):
         # ^^^  THUS RESCALING TO ABOUT 200px ABOVE  ^^^
 
         # sys.stdout handeled, but with freopen which could give issues
-        import dtbext.jseg as jseg
+        import jseg
         # e.g. "segdist -i test3.jpg -t 6 -r9 test3.map.gif"
         enable_recovery()   # enable recovery from hard crash
         jseg.segdist_cpp.main( ("segdist -i %s -t 6 -r9 %s"%(tmpjpg, tmpgif)).split(" ") )
@@ -1064,7 +1065,7 @@ class FileData(object):
     # http://peekaboo-vision.blogspot.ch/2012/05/superpixels-for-python-pretty-slic.html
     # http://ivrg.epfl.ch/supplementary_material/RK_SLICSuperpixels/index.html
     def _util_detect_ColorSegments_SLIC(self, img):
-        import dtbext.slic as slic
+        import slic
 
         im = np.array(img)
         image_argb = np.dstack([im[:, :, :1], im]).copy("C")
@@ -1418,9 +1419,9 @@ class FileData(object):
 
         # DataMatrix
         try:
-            from pydmtx import DataMatrix           # linux distro package (fedora)
+            from pydmtx import DataMatrix   # linux distro package (fedora)
         except:
-            from dtbext._pydmtx import DataMatrix   # TS (debian)
+            from _pydmtx import DataMatrix  # TS (debian)
 
         ## Write a Data Matrix barcode
         #dm_write = DataMatrix()
@@ -1468,9 +1469,9 @@ class FileData(object):
 
         # supports many popular symbologies
         try:
-            import zbar                     # TS (debian)
+            import zbar             # TS (debian)
         except:
-            import dtbext._zbar as zbar     # other distros (fedora)
+            import _zbar as zbar    # other distros (fedora)
         
         try:
             img = Image.open(self.image_path_JPEG).convert('L')
@@ -3505,11 +3506,11 @@ def main():
             # skip if download not possible
             pywikibot.warning(u"%s, skipped..." % err)
             continue
-        except Exception, err:
+        except:
             # skip on any unexpected error, but report it
-            pywikibot.error(u"%s" % err)
+            pywikibot.exception(tb=True)
             pywikibot.error(u"was not able to process page %s !!!\n" %\
-                             image.title(asLink=True))
+                            image.title(asLink=True))
             continue
         resultCheck = Bot.checkStep()
         tagged = False
@@ -3518,6 +3519,7 @@ def main():
             if ret:
                 outresult.append( ret )
         except AttributeError:
+            pywikibot.exception(tb=True)
             pywikibot.error(u"was not able to process page %s !!!\n" %\
                             image.title(asLink=True))
         limit += -1
