@@ -14,7 +14,8 @@ options:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: update_namespaces.py 11422 2013-04-21 18:50:41Z xqt $'
+__version__ = '$Id: update_namespaces.py 11463 2013-04-26 22:34:49Z drtrigon $'
+#
 
 import sys
 sys.path.insert(1, '..')

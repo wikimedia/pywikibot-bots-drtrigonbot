@@ -9,6 +9,14 @@ user-config and output the contents of the talk page.
 TODO:
 *Error checking
 """
+#
+# (C) Pywikipedia bot team, ?-2013
+#
+# Distributed under the terms of the MIT license.
+#
+__version__ = '$Id: readtalk.py 11463 2013-04-26 22:34:49Z drtrigon $'
+#
+
 import sys, re
 sys.path.append(re.sub('/[^/]*$', '', sys.path[0]))
 sys.path.insert(1, '..')

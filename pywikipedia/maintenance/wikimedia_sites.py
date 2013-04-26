@@ -9,7 +9,8 @@ against the language lists
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikimedia_sites.py 11302 2013-03-30 12:36:14Z xqt $'
+__version__ = '$Id: wikimedia_sites.py 11463 2013-04-26 22:34:49Z drtrigon $'
+#
 
 import sys
 import re

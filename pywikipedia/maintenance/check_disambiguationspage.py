@@ -10,8 +10,9 @@ with Family.disambiguationTemplates dictionary
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: check_disambiguationspage.py 11271 2013-03-25 17:48:25Z xqt $'
+__version__ = '$Id: check_disambiguationspage.py 11463 2013-04-26 22:34:49Z drtrigon $'
 #
+
 import sys
 sys.path.insert(1, '..')
 import pywikibot

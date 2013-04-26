@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: $'
+__version__ = '$Id: family_check.py 11463 2013-04-26 22:34:49Z drtrigon $'
 #
 
 import sys
