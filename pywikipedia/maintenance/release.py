@@ -3,7 +3,10 @@
 performing several actions:
 
 * create docs from docstrings in HTML and LaTeX (PDF) format
-  [doxygen]
+  [doxygen & doxypy]
+  (enable doxypy by downloading doxypy.py from http://code.foosel.org/doxypy,
+   placing it into the docs/ folder and uncommenting the doxypy related lines
+   in Doxygen config file)
 * run unittests
   [nosetests]
 * create coverage report in HTML format
@@ -19,10 +22,10 @@ Script very similar to the one given in
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: release.py 11462 2013-04-26 22:21:42Z drtrigon $'
+__version__ = '$Id: release.py 11468 2013-04-27 09:51:46Z drtrigon $'
 #
 
-import sys, os
+import sys, os, time
 
 scriptdir = os.path.dirname(sys.argv[0])
 if not os.path.isabs(scriptdir):
@@ -36,10 +39,12 @@ os.chdir( scriptdir )
 
 
 print '* create docs from docstrings in HTML and LaTeX (PDF) format\n' \
-      '  [doxygen]'
-if not os.path.exists(docsdir):
-    os.mkdir(docsdir)
-os.system('date > %s' % os.path.join(docsdir, 'release-doxygen.log'))
+      '  [doxygen & doxypy]\n' \
+      '  (enable doxypy by downloading doxypy.py from http://code.foosel.org/doxypy,\n' \
+      '   placing it into the docs/ folder and uncommenting the doxypy related lines\n' \
+      '   in Doxygen config file)'
+with open(os.path.join(docsdir, 'release-doxygen.log'), 'w') as f:
+    f.write('%s\n' % time.asctime())
 os.system('doxygen &>> %s' % os.path.join(docsdir, 'release-doxygen.log'))
 
 
@@ -52,11 +57,12 @@ print '* run unittests\n' \
 #""")
 #os.system('date > ../output/test_pywikipedia.txt')
 #os.system('nosetests --with-xunit --xunit-file=../output/xunit_pywikipedia.xml tests 2>> ../output/test_pywikipedia.txt')
-os.system('date > %s' % os.path.join(docsdir, 'release-nosetests.log'))
+with open(os.path.join(docsdir, 'release-nosetests.log'), 'w') as f:
+    f.write('%s\n' % time.asctime())
 os.system('nosetests 2>> %s' % os.path.join(docsdir, 'release-nosetests.log'))
 
 
 print '* create coverage report in HTML format\n' \
       '  [coverage]'
 #os.system('coverage report -m')
-os.system('coverage html --directory=%s' % os.path.join(docsdir, 'coverage/'))
+os.system('coverage html --directory=%s' % coveragedir)

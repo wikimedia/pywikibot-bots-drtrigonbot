@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikipedia_family.py 11418 2013-04-21 16:22:21Z xqt $'
+__version__ = '$Id: wikipedia_family.py 11469 2013-04-27 09:52:20Z xqt $'
 
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
@@ -324,7 +324,7 @@ class Family(family.WikimediaFamily):
             'ug': u'Wikipedia',
             'uk': [u'Вікіпедія', u'ВП'],
             'ur': u'منصوبہ',
-            'uz': u'Vikipediya',
+            'uz': [u'Vikipediya', u'VP'],
             've': u'Wikipedia',
             'vec': [u'Wikipedia', u'WP'],
             'vep': u'Vikipedii',
@@ -603,7 +603,7 @@ class Family(family.WikimediaFamily):
             'ug': u'مۇنازىرىسىWikipedia',
             'uk': u'Обговорення Вікіпедії',
             'ur': u'تبادلۂ خیال منصوبہ',
-            'uz': u'Vikipediya munozarasi',
+            'uz': [u'Vikipediya munozarasi', u'VM'],
             've': u'Wikipedia talk',
             'vec': u'Discussion Wikipedia',
             'vep': [u'Paginad Vikipedii', u'Vikipedii arutelu'],

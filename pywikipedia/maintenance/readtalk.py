@@ -10,11 +10,11 @@ TODO:
 *Error checking
 """
 #
-# (C) Pywikipedia bot team, ?-2013
+# (C) Pywikipedia bot team, 2008-2013
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: readtalk.py 11463 2013-04-26 22:34:49Z drtrigon $'
+__version__ = '$Id: readtalk.py 11465 2013-04-27 06:54:52Z xqt $'
 #
 
 import sys, re
