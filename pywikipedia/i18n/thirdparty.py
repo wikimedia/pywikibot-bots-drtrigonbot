@@ -361,6 +361,10 @@ msg = {
 	'cv': {
 		'thirdparty-drtrigonbot-sum_disc-summary-head': u'робот',
 	},
+	# Author: Robin Owain
+	'cy': {
+		'thirdparty-drtrigonbot-sum_disc-summary-head': u'robot',
+	},
 	# Author: Christian List
 	# Author: Kaare
 	'da': {
@@ -1672,6 +1676,10 @@ msg = {
 		'thirdparty-drtrigonbot-sum_disc-summary-mod': u'Đã cập nhật tóm lược thảo luận: %(num)i mục tại “%(page)s”',
 		'thirdparty-drtrigonbot-sum_disc-notify-maintmsg': u'THÔNG ĐIỆP BOT',
 		'thirdparty-drtrigonbot-sum_disc-parse-end': u'<noinclude>\n\nThành viên và lúc giờ tính tóm lược: %(sign)s</noinclude>',
+	},
+	# Author: Malafaya
+	'vo': {
+		'thirdparty-drtrigonbot-sum_disc-notify-new': u'Bespik Nulik',
 	},
 	# Author: Srtxg
 	'wa': {

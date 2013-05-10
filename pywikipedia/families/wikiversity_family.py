@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikiversity_family.py 11423 2013-04-21 19:01:18Z xqt $'
+__version__ = '$Id: wikiversity_family.py 11500 2013-05-05 10:03:52Z xqt $'
 
 # The Wikimedia family that is known as Wikiversity
 
@@ -19,25 +19,12 @@ class Family(family.WikimediaFamily):
                            for lang in self.languages_by_size])
 
         # Override defaults
-        self.namespaces[829]['ru'] = [u'Обсуждение модуля']
-        self.namespaces[828]['ru'] = [u'Модуль']
-        self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisateur']
-        self.namespaces[2]['fr'] = [u'Utilisateur']
-        self.namespaces[3]['pt'] = [u'Utilizador Discussão', u'Usuário Discussão', u'Utilizadora Discussão']
-        self.namespaces[2]['pt'] = [u'Utilizador', u'Usuário', u'Utilizadora']
-        self.namespaces[829]['ko'] = [u'모듈토론']
-        self.namespaces[828]['ko'] = [u'모듈']
-        self.namespaces[829]['it'] = [u'Discussioni modulo']
-        self.namespaces[828]['it'] = [u'Modulo']
-        self.namespaces[829]['ar'] = [u'نقاش الوحدة']
-        self.namespaces[828]['ar'] = [u'وحدة']
-        self.namespaces[829]['sl'] = [u'Pogovor o modulu']
-        self.namespaces[828]['sl'] = [u'Modul']
+        self.namespaces[2]['cs'] = [u'Uživatel', u'Uživatelka']
         self.namespaces[3]['cs'] = [u'Diskuse s uživatelem', u'Uživatel diskuse', u'Uživatelka diskuse', u'Diskuse s uživatelkou']
-        self.namespaces[829]['ja'] = [u'モジュール・トーク']
-        self.namespaces[828]['ja'] = [u'モジュール']
-        self.namespaces[829]['es'] = [u'Módulo discusión']
-        self.namespaces[828]['es'] = [u'Módulo']
+        self.namespaces[2]['fr'] = [u'Utilisateur']
+        self.namespaces[3]['fr'] = [u'Discussion utilisateur', u'Discussion Utilisateur']
+        self.namespaces[2]['pt'] = [u'Utilizador', u'Usuário', u'Utilizadora']
+        self.namespaces[3]['pt'] = [u'Utilizador Discussão', u'Usuário Discussão', u'Utilizadora Discussão']
 
         # Most namespaces are inherited from family.Family.
         # Translation used on all wikis for the different namespaces.
@@ -56,7 +43,7 @@ class Family(family.WikimediaFamily):
             'fr': [u'Wikiversité', u'Wikiversity'],
             'it': [u'Wikiversità', u'Wikiversity'],
             'ja': u'Wikiversity',
-            'ko': u'Wikiversity',
+            'ko': [u'위키배움터', u'Wikiversity'],
             'pt': [u'Wikiversidade', u'Wikiversity'],
             'ru': [u'Викиверситет', u'Wikiversity'],
             'sl': [u'Wikiverza', u'Wikiversity'],
@@ -75,7 +62,7 @@ class Family(family.WikimediaFamily):
             'fr': u'Discussion Wikiversité',
             'it': u'Discussioni Wikiversità',
             'ja': [u'Wikiversity・トーク', u'Wikiversity talk', u'Wikiversity‐ノート'],
-            'ko': u'Wikiversity토론',
+            'ko': [u'위키배움터토론', u'Wikiversity토론'],
             'pt': u'Wikiversidade Discussão',
             'ru': u'Обсуждение Викиверситета',
             'sl': u'Pogovor o Wikiverzi',
@@ -107,6 +94,7 @@ class Family(family.WikimediaFamily):
             'fr': u'Projet',
             'it': u'Corso',
             'ja': u'Portal',
+            'ko': u'포털',
         }
         self.namespaces[103] = {
             'ar': u'نقاش البوابة',
@@ -115,6 +103,7 @@ class Family(family.WikimediaFamily):
             'fr': u'Discussion Projet',
             'it': u'Discussioni corso',
             'ja': u'Portal‐ノート',
+            'ko': u'포털토론',
         }
         self.namespaces[104] = {
             'ar': u'موضوع',

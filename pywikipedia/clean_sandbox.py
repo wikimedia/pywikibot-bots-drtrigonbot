@@ -40,7 +40,7 @@ This script understands the following command-line arguments:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: clean_sandbox.py 11428 2013-04-22 09:31:23Z xqt $'
+__version__ = '$Id: clean_sandbox.py 11478 2013-04-28 12:17:07Z drtrigon $'
 #
 
 import time
@@ -200,7 +200,7 @@ class SandboxBot:
                     else:
                         diff = minutesDiff(sandboxPage.editTime(), time.strftime("%Y%m%d%H%M%S", time.gmtime()))
                         if pywikibot.verbose:
-                            pywikibot.output(str((sandboxPage.editTime(), time.strftime("%Y%m%d%H%M%S", time.gmtime()))))
+                            pywikibot.output(unicode((sandboxPage.editTime(), time.strftime("%Y%m%d%H%M%S", time.gmtime()))))
                         #Is the last edit more than 5 minutes ago?
                         if diff >= self.delay:
                             sandboxPage.put(translatedContent, translatedMsg)

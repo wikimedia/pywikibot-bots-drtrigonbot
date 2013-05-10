@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 
-__version__ = '$Id: wikidata_family.py 11419 2013-04-21 16:27:26Z xqt $'
+__version__ = '$Id: wikidata_family.py 11502 2013-05-05 10:58:03Z xqt $'
 
 import family
 
@@ -19,6 +19,12 @@ class Family(family.WikimediaFamily):
         # Override defaults
         self.namespaces[1]['repo'] = [u'Talk', u'Item talk']
         self.namespaces[0]['repo'] = [u'', u'Item']
+        del(self.namespaces[828]['_default'])
+        del(self.namespaces[829]['_default'])
+        self.namespaces[828]['client'] = u'Module'
+        self.namespaces[829]['client'] = u'Module talk'
+        self.namespaces[828]['wikidata'] = u'Module'
+        self.namespaces[829]['wikidata'] = u'Module talk'
 
         # Most namespaces are inherited from family.Family.
         # Translation used on all wikis for the different namespaces.

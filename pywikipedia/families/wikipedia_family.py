@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 import family
 
-__version__ = '$Id: wikipedia_family.py 11469 2013-04-27 09:52:20Z xqt $'
+__version__ = '$Id: wikipedia_family.py 11506 2013-05-05 11:34:24Z xqt $'
 
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
@@ -12,40 +12,52 @@ class Family(family.WikimediaFamily):
 
         self.languages_by_size = [
             'en', 'de', 'nl', 'fr', 'it', 'ru', 'es', 'sv', 'pl', 'ja', 'pt',
-            'zh', 'vi', 'uk', 'ca', 'war', 'no', 'ceb', 'fi', 'fa', 'cs', 'hu',
+            'zh', 'vi', 'uk', 'ca', 'no', 'war', 'ceb', 'fi', 'fa', 'cs', 'hu',
             'ko', 'ar', 'ro', 'ms', 'tr', 'id', 'kk', 'sr', 'sk', 'eo', 'da',
-            'lt', 'eu', 'bg', 'he', 'hr', 'sl', 'vo', 'uz', 'et', 'hi', 'gl',
-            'nn', 'simple', 'az', 'la', 'el', 'th', 'sh', 'ka', 'oc', 'mk',
-            'new', 'tl', 'pms', 'be', 'ht', 'ta', 'te', 'be-x-old', 'lv', 'br',
-            'bs', 'sq', 'mg', 'hy', 'tt', 'jv', 'cy', 'mr', 'lb', 'is', 'my',
+            'lt', 'eu', 'bg', 'he', 'hr', 'sl', 'vo', 'uz', 'et', 'hi', 'nn',
+            'gl', 'simple', 'az', 'la', 'el', 'th', 'sh', 'ka', 'mk', 'oc',
+            'new', 'tl', 'pms', 'be', 'ht', 'ta', 'te', 'be-x-old', 'lv', 'cy',
+            'br', 'bs', 'sq', 'mg', 'hy', 'tt', 'jv', 'mr', 'lb', 'is', 'my',
             'yo', 'ba', 'ml', 'an', 'lmo', 'af', 'fy', 'pnb', 'bn', 'sw', 'bpy',
-            'io', 'ky', 'ur', 'ne', 'scn', 'gu', 'zh-yue', 'nds', 'ku', 'ga',
+            'io', 'ky', 'ur', 'ne', 'scn', 'zh-yue', 'gu', 'nds', 'ga', 'ku',
             'ast', 'qu', 'su', 'cv', 'sco', 'als', 'ia', 'bug', 'nap',
-            'bat-smg', 'kn', 'map-bms', 'wa', 'am', 'ckb', 'gd', 'hif',
+            'bat-smg', 'map-bms', 'kn', 'wa', 'am', 'ckb', 'gd', 'hif',
             'zh-min-nan', 'tg', 'mzn', 'arz', 'yi', 'vec', 'mn', 'roa-tara',
-            'nah', 'sa', 'os', 'sah', 'pam', 'hsb', 'si', 'se', 'li', 'bar',
-            'mi', 'co', 'ilo', 'gan', 'bo', 'fo', 'glk', 'rue', 'pa', 'bcl',
+            'nah', 'sa', 'sah', 'os', 'pam', 'hsb', 'si', 'se', 'bar', 'li',
+            'mi', 'co', 'ilo', 'gan', 'fo', 'bo', 'glk', 'rue', 'pa', 'bcl',
             'fiu-vro', 'mrj', 'nds-nl', 'tk', 'ps', 'vls', 'xmf', 'gv', 'diq',
-            'min', 'pag', 'kv', 'or', 'zea', 'dv', 'km', 'nrm', 'rm', 'koi',
-            'udm', 'mhr', 'frr', 'csb', 'lad', 'vep', 'lij', 'wuu', 'fur',
-            'zh-classical', 'ug', 'stq', 'sc', 'pi', 'ay', 'so', 'mt', 'bh',
-            'nov', 'ksh', 'ang', 'kw', 'nv', 'pcd', 'hak', 'gn', 'ext', 'frp',
-            'as', 'szl', 'gag', 'ie', 'eml', 'ln', 'ce', 'krc', 'pfl', 'xal',
-            'haw', 'pdc', 'rw', 'ace', 'crh', 'to', 'dsb', 'kl', 'arc', 'myv',
-            'lez', 'sn', 'kab', 'bjn', 'pap', 'tpi', 'lbe', 'wo', 'jbo', 'mdf',
-            'cbk-zam', 'av', 'srn', 'mwl', 'kbd', 'ty', 'lo', 'ab', 'tet',
-            'ltg', 'na', 'ig', 'kg', 'bxr', 'nso', 'za', 'kaa', 'zu', 'chy',
+            'min', 'or', 'kv', 'pag', 'zea', 'km', 'dv', 'nrm', 'rm', 'koi',
+            'mhr', 'udm', 'frr', 'csb', 'lad', 'vep', 'lij', 'wuu', 'fur',
+            'zh-classical', 'ug', 'stq', 'sc', 'pi', 'ay', 'mt', 'so', 'bh',
+            'ksh', 'nov', 'ang', 'hak', 'kw', 'nv', 'pcd', 'gn', 'ext', 'frp',
+            'as', 'szl', 'ce', 'gag', 'eml', 'ie', 'ln', 'ace', 'krc', 'pfl',
+            'xal', 'haw', 'pdc', 'rw', 'crh', 'to', 'dsb', 'kl', 'arc', 'myv',
+            'kab', 'lez', 'bjn', 'sn', 'pap', 'tpi', 'lbe', 'wo', 'jbo', 'mdf',
+            'cbk-zam', 'av', 'srn', 'kbd', 'mwl', 'ty', 'lo', 'ab', 'tet',
+            'ltg', 'kg', 'na', 'ig', 'bxr', 'nso', 'za', 'kaa', 'zu', 'chy',
             'rmy', 'roa-rup', 'cu', 'tn', 'chr', 'bi', 'cdo', 'got', 'sm', 'bm',
             'iu', 'pih', 'pnt', 'sd', 'ss', 'ki', 'ee', 'ha', 'om', 'fj', 'ti',
             'ts', 'ks', 've', 'sg', 'rn', 'st', 'dz', 'ak', 'cr', 'tum', 'lg',
-            'ny', 'ff', 'ch', 'ik', 'tw', 'xh',
+            'ik', 'ny', 'ff', 'ch', 'tw', 'xh',
         ]
 
         self.langs = dict([(lang, '%s.wikipedia.org' % lang)
                            for lang in self.languages_by_size])
 
         # Override defaults
+        self.namespaces[-2]['bar'] = [u'Media', u'Medium']
+        self.namespaces[6]['be'] = [u'Файл', u'Выява']
+        self.namespaces[7]['be'] = [u'Размовы пра файл', u'Размовы пра выяву']
         self.namespaces[2]['cs'] = [u'Wikipedista', u'Uživatel', u'Wikipedistka']
+        self.namespaces[3]['de'] = [u'Benutzer Diskussion', u'BD', u'Benutzerin Diskussion']
+        self.namespaces[12]['de'] = [u'Hilfe', u'H']
+        self.namespaces[13]['de'] = [u'Hilfe Diskussion', u'HD']
+        self.namespaces[2]['hi'] = [u'सदस्य', u'U', u'स']
+        self.namespaces[3]['hi'] = [u'सदस्य वार्ता', u'UT', u'सवा']
+        self.namespaces[10]['hi'] = [u'साँचा', u'सा', u'T']
+        self.namespaces[11]['hi'] = [u'साँचा वार्ता', u'सावा']
+        self.namespaces[14]['hi'] = [u'श्रेणी', u'श्र', u'C']
+        self.namespaces[15]['hi'] = [u'श्रेणी वार्ता', u'श्रवा', u'CT']
         self.namespaces[1]['ja'] = [u'ノート', u'トーク']
         self.namespaces[3]['ja'] = [u'利用者‐会話', u'利用者・トーク']
         self.namespaces[7]['ja'] = [u'ファイル‐ノート', u'ファイル・トーク', u'Image talk', u'画像‐ノート']
@@ -56,15 +68,11 @@ class Family(family.WikimediaFamily):
         self.namespaces[13]['ja'] = [u'Help‐ノート', u'ヘルプ・トーク']
         self.namespaces[14]['ja'] = [u'Category', u'カテゴリ']
         self.namespaces[15]['ja'] = [u'Category‐ノート', u'カテゴリ・トーク']
+        self.namespaces[829]['ja'] = [u'モジュール‐ノート', u'モジュール・トーク']
+        self.namespaces[12]['nl'] = [u'Help', u'H']
         self.namespaces[2]['ru'] = [u'Участник', u'У', u'Участница']
         self.namespaces[10]['ru'] = [u'Шаблон', u'Ш', u'T']
         self.namespaces[14]['ru'] = [u'Категория', u'К']
-        self.namespaces[6]['be'] = [u'Файл', u'Выява']
-        self.namespaces[7]['be'] = [u'Размовы пра файл', u'Размовы пра выяву']
-        self.namespaces[13]['de'] = [u'Hilfe Diskussion', u'HD']
-        self.namespaces[12]['de'] = [u'Hilfe', u'H']
-        self.namespaces[3]['de'] = [u'Benutzer Diskussion', u'BD', u'Benutzerin Diskussion']
-        self.namespaces[-2]['bar'] = [u'Media', u'Medium']
 
         # Most namespaces are inherited from family.Family.
         # Translation used on all wikis for the different namespaces.
@@ -599,7 +607,7 @@ class Family(family.WikimediaFamily):
             'tum': u'Wikipedia talk',
             'tw': u'Wikipedia talk',
             'ty': u'Discussion Wikipedia',
-            'udm': u'Wikipedia сярысь вераськон',
+            'udm': [u'Википедия сярысь вераськон', u'Wikipedia сярысь вераськон'],
             'ug': u'مۇنازىرىسىWikipedia',
             'uk': u'Обговорення Вікіпедії',
             'ur': u'تبادلۂ خیال منصوبہ',

@@ -7,7 +7,7 @@ Mechanics to slow down wiki read and/or write rate.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: throttle.py 8035 2010-03-22 14:49:07Z xqt $'
+__version__ = '$Id: throttle.py 11477 2013-04-28 12:08:31Z xqt $'
 
 import wikipedia as pywikibot
 import config
@@ -121,7 +121,8 @@ class Throttle(object):
                     f.write("%(pid)s %(time)s %(site)s\n" % p)
             except IOError:
                 pass
-            f.close()
+            else:
+                f.close()
             self.process_multiplicity = count
             if self.verbosedelay or pywikibot.verbose:
                 pywikibot.output(
@@ -218,7 +219,7 @@ class Throttle(object):
             for p in processes:
                 f.write("%(pid)s %(time)s %(site)s\n" % p)
         except IOError:
-            pass
+            return
         f.close()
 
     def __call__(self, requestsize=1, write=False):

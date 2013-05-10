@@ -130,7 +130,7 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 11448 2013-04-24 17:30:40Z drtrigon $'
+__version__ = '$Id: wikipedia.py 11522 2013-05-10 19:57:56Z drtrigon $'
 
 import os, sys
 import httplib, socket, urllib, urllib2, cookielib
@@ -828,7 +828,7 @@ not supported by PyWikipediaBot!"""
         # I raise a ServerError() yet, but maybe it should be NoPage().
         if not textareaFound:
             if verbose:
-                output(str(pageInfo))
+                output(unicode(pageInfo))
             raise ServerError('ServerError: No textarea found in %s' % self)
 
         self.editRestriction = ''
@@ -4565,7 +4565,7 @@ class DataPage(Page):
         # I raise a ServerError() yet, but maybe it should be NoPage().
         if not textareaFound:
             if verbose:
-                output(str(pageInfo))
+                output(unicode(pageInfo))
             raise ServerError('ServerError: No textarea found in %s' % self)
 
         self.editRestriction = ''
@@ -5060,6 +5060,8 @@ class _GetAll(object):
     def run(self):
         if self.pages:
             # Sometimes query does not contains revisions
+            # or some pages are missing. Deactivate api call and use the
+            # old API special:export
             if  self.site.has_api() and logger.isEnabledFor(DEBUG):
                 while True:
                     try:
@@ -5081,7 +5083,7 @@ class _GetAll(object):
                     self._norm = dict([(x['from'],x['to']) for x in data['query']['normalized']])
                 for vals in data['query']['pages'].values():
                     self.oneDoneApi(vals)
-            else: #read pages via Special:Export
+            else:  # read pages via Special:Export
                 while True:
                     try:
                         data = self.getData()
@@ -5255,7 +5257,7 @@ class _GetAll(object):
         pagenames = u'\r\n'.join(pagenames)
         if type(pagenames) is not unicode:
             warning(u'xmlreader.WikipediaXMLHandler.getData() got non-unicode page names. Please report this.')
-            output(str(pagenames))
+            output(unicode(pagenames))
         # convert Unicode string to the encoding used on that wiki
         pagenames = pagenames.encode(self.site.encoding())
         predata = {
@@ -5443,11 +5445,13 @@ def getall(site, pages, throttle=True, force=False):
     """
     # TODO: why isn't this a Site method?
     pages = list(pages)  # if pages is an iterator, we need to make it a list
-    output(u'Getting %d page%s %sfrom %s...'
-           %(len(pages), 
-             (u'', u's')[len(pages) != 1],
-             (u'', u'via API ')[site.has_api() and logger.isEnabledFor(DEBUG)],
-             site))
+    output(pywikibot.translate('en',
+                               u'Getting %(count)d page{{PLURAL:count||s}} %(API)sfrom %(site)s...',
+                               {'count': len(pages),
+                                # API is deactivated since r8036 because some pages are missing
+                                'API': (u'',
+                                        u'via API ')[site.has_api() and logger.isEnabledFor(DEBUG)],
+                                'site': site}))
     limit = config.special_page_limit / 4 # default is 500/4, but It might have good point for server.
     if len(pages) > limit:
         # separate export pages for bulk-retrieve
@@ -6882,7 +6886,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
             params['siprop'].extend(['statistics', ])
             if key in ['specialpagealiases', 'interwikimap', 'namespacealiases', 'usergroups', ]:
                 if verbose:
-                    output('getting huge siprop %s...' % key)
+                    output(u'getting huge siprop %s...' % key)
                 params['siprop'] = [key]
 
         #ver 1.13 handle
@@ -6891,7 +6895,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                 params['siprop'].extend(['fileextensions', 'rightsinfo', ])
             if key in ['magicwords', 'extensions', ]:
                 if verbose:
-                    output('getting huge siprop %s...' % key)
+                    output(u'getting huge siprop %s...' % key)
                 params['siprop'] = [key]
         try:
             data = query.GetData(params, self)['query']
@@ -7810,7 +7814,7 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
                 get_throttle()
             data = query.GetData(params, self)
             if verbose:
-                debug('allpages>>> data.keys() %s' % data.keys())
+                debug(u'allpages>>> data.keys() %s' % data.keys())
             if 'warnings' in data:
                 warning = data['warnings']['allpages']['*']
                 raise RuntimeError("API query warning: %s" % warning)
@@ -8305,6 +8309,8 @@ sysopnames['%s']['%s']='name' to your user-config.py"""
 
     def blocksearch_address(self, s, usertype):
         """Return path to search for blocks on IP address 's'."""
+        if not self.has_api() or self.versionnumber() <12:
+            return self.family.blocksearch_address(self.lang, s)
         params = {
             'bk%s' % usertype : s,
             'action' : 'query',
@@ -8892,7 +8898,7 @@ def handleArgs(*args):
         # global debug option for development purposes. Normally does nothing.
         elif arg == '-debug':
             if not logger:
-                setLogfileStatus(False)
+                init_handlers()
             logging.getLogger().setLevel(DEBUG)
             config.special_page_limit = 500
         else:
@@ -8902,6 +8908,8 @@ def handleArgs(*args):
 
     if username:
         config.usernames[default_family][default_code] = username
+
+    #init_handlers()
 
     # TEST for bug #3081100
     if unicode_error:
@@ -9016,7 +9024,6 @@ if unicode_error:
 
 default_family = config.family
 default_code = config.mylang
-logger = None
 # Check
 
 # if the default family+wiki is a non-public one,
@@ -9055,66 +9062,23 @@ def writeToCommandLogFile():
 #
 # ( Please confer branches/rewrite/pywikibot/bot.py for further info )
 
+logger = None
+#_handlers_initialized = False
+
 def setLogfileStatus(enabled, logname=None, header=False):
     # NOTE-1: disable 'fh.setFormatter(formatter)' below in order to get "old"
     #         logging format (without additional info)
     # NOTE-2: enable 'logger.addHandler(ch)' below in order output to console
     #         also (e.g. for simplifying 'pywikibot.output')
-    init_handlers(strm=None, logname=logname, header=header)
-    logger.propagate = enabled
-
-def init_handlers(strm=None, logname=None, header=False):
-    """Initialize logging system for terminal-based bots.
-
-    This function must be called before using pywikibot.output(); and must
-    be called again if the destination stream is changed.
-
-    @param strm: Output stream. If None, re-uses the last stream if one
-        was defined, otherwise uses sys.stderr
-
-    Note: this function is called by handleArgs(), so it should normally
-    not need to be called explicitly
-
-    All user output is routed through the logging module.
-    Each type of output is handled by an appropriate handler object.
-    This structure is used to permit eventual development of other
-    user interfaces (GUIs) without modifying the core bot code.
-    The following output levels are defined:
-       DEBUG - only for file logging; debugging messages
-       STDOUT - output that must be sent to sys.stdout (for bots that may
-                have their output redirected to a file or other destination)
-       VERBOSE - optional progress information for display to user
-       INFO - normal (non-optional) progress information for display to user
-       INPUT - prompts requiring user response
-       WARN - user warning messages
-       ERROR - user error messages
-       CRITICAL - fatal error messages
-    Accordingly, do ''not'' use print statements in bot code; instead,
-    use pywikibot.output function.
-    """
-
-    global logger
+    global logger #_handlers_initialized
 
     if not logger:
+        init_handlers()
+
+    if not logger.handlers:         # init just once (if re-called)
         moduleName = calledModuleName()
         if not moduleName:
             moduleName = "terminal-interface"
-
-        logging.addLevelName(VERBOSE, "VERBOSE")
-            # for messages to be displayed on terminal at "verbose" setting
-            # use INFO for messages to be displayed even on non-verbose setting
-        logging.addLevelName(STDOUT, "STDOUT")
-            # for messages to be displayed to stdout
-        logging.addLevelName(INPUT, "INPUT")
-            # for prompts requiring user response
-
-        logger = logging.getLogger()    # root logger
-        if logger.handlers:             # init just once (if re-called)
-            logger = logging.getLogger('pywiki')
-            return
-        logger.setLevel(DEBUG+1) # all records except DEBUG go to logger
-        if hasattr(logger, 'captureWarnings'):
-            logger.captureWarnings(True)    # introduced in Python >= 2.7
 
         if not logname:
             logname = '%s.log' % moduleName
@@ -9165,6 +9129,59 @@ def init_handlers(strm=None, logname=None, header=False):
         if header:
             writelogheader()
 
+    logger.propagate = enabled
+
+def init_handlers(strm=None):#, logname=None, header=False):
+    """Initialize logging system for terminal-based bots.
+
+    This function must be called before using pywikibot.output(); and must
+    be called again if the destination stream is changed.
+
+    @param strm: Output stream. If None, re-uses the last stream if one
+        was defined, otherwise uses sys.stderr
+
+    Note: this function is called by handleArgs(), so it should normally
+    not need to be called explicitly
+
+    All user output is routed through the logging module.
+    Each type of output is handled by an appropriate handler object.
+    This structure is used to permit eventual development of other
+    user interfaces (GUIs) without modifying the core bot code.
+    The following output levels are defined:
+       DEBUG - only for file logging; debugging messages
+       STDOUT - output that must be sent to sys.stdout (for bots that may
+                have their output redirected to a file or other destination)
+       VERBOSE - optional progress information for display to user
+       INFO - normal (non-optional) progress information for display to user
+       INPUT - prompts requiring user response
+       WARN - user warning messages
+       ERROR - user error messages
+       CRITICAL - fatal error messages
+    Accordingly, do ''not'' use print statements in bot code; instead,
+    use pywikibot.output function.
+    """
+    # currently only the logger is initialized here
+    # the handlers are initialized in setLogfileStatus
+
+    global logger #_handlers_initialized
+
+    if not logger:
+        logging.addLevelName(VERBOSE, "VERBOSE")
+            # for messages to be displayed on terminal at "verbose" setting
+            # use INFO for messages to be displayed even on non-verbose setting
+        logging.addLevelName(STDOUT, "STDOUT")
+            # for messages to be displayed to stdout
+        logging.addLevelName(INPUT, "INPUT")
+            # for prompts requiring user response
+
+        logger = logging.getLogger()    # root logger
+        if logger.handlers:             # init just once (if re-called)
+            logger = logging.getLogger('pywiki')
+            return
+        logger.setLevel(DEBUG+1) # all records except DEBUG go to logger
+        if hasattr(logger, 'captureWarnings'):
+            logger.captureWarnings(True)    # introduced in Python >= 2.7
+
 def writelogheader():
     """
     Save additional version, system and status info to the logfile in use,
@@ -9177,9 +9194,12 @@ def writelogheader():
 
     # new framework release/revision? (handleArgs needs to be called first)
     site = getSite()
-    output(u'VERSION: %s' % unicode((version.getversion().strip(),
-                                     version.getversion_onlinerepo(),
-                                     site.live_version())))
+    try:
+        output(u'VERSION: %s' % unicode((version.getversion().strip(),
+                                         version.getversion_onlinerepo(),
+                                         site.live_version())))
+    except version.ParseError:
+        exception()
 
     # system
     if hasattr(os, 'uname'):
@@ -9196,6 +9216,8 @@ def writelogheader():
     output(u'MESSAGES: %s' % ('unanswered' if site.messages() else 'none'))
 
     output(u'=== ' * 14)
+
+init_handlers()     # guarantee 'logger' to be defined
 
 writeToCommandLogFile()
 
@@ -9260,7 +9282,7 @@ def logoutput(text, decoder=None, newline=True, _level=INFO, _logger="",
 
     # make sure logging system has been initialized
     if not logger:
-        setLogfileStatus(False)
+        init_handlers()
 
     frame = currentframe()
     module = os.path.basename(frame.f_code.co_filename)

@@ -16,7 +16,7 @@ This module is responsible for
 # Distributed under the terms of the MIT license.
 #
 
-__version__ = '$Id: http.py 11393 2013-04-19 21:28:02Z drtrigon $'
+__version__ = '$Id: http.py 11478 2013-04-28 12:17:07Z drtrigon $'
 
 import urllib2
 
@@ -158,8 +158,8 @@ def request(site, uri, retry=None, sysop=False, data=None, compress=True,
             else:
                 pywikibot.output(u"Result: %s %s" % (e.code, e.msg))
                 raise
-        except Exception, e:
-            pywikibot.output(u'%s' %e)
+        except:
+            pywikibot.exception()
             if retry:
                 retry_attempt += 1
                 if retry_attempt > config.maxretries:
@@ -219,9 +219,9 @@ def request(site, uri, retry=None, sysop=False, data=None, compress=True,
     # Check if this is the charset we expected
     try:
         site.checkCharset(charset)
-    except AssertionError, e:
+    except AssertionError:
         if (not back_response) or verbose:
-            pywikibot.output(u'%s' %e)
+            pywikibot.exception()
             if no_hostname:
                 pywikibot.error(u'Invalid charset found on %s.' % uri)
             else:
@@ -230,9 +230,9 @@ def request(site, uri, retry=None, sysop=False, data=None, compress=True,
     # Convert HTML to Unicode
     try:
         text = unicode(text, charset, errors = 'strict')
-    except UnicodeDecodeError, e:
+    except UnicodeDecodeError:
         if (not back_response) or verbose:
-            pywikibot.output(u'%s' %e)
+            pywikibot.exception()
             if no_hostname:
                 pywikibot.error(u'Invalid characters found on %s, '
                                 u'replaced by \\ufffd.' % uri)
