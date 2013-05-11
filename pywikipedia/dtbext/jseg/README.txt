@@ -5,8 +5,6 @@ It is compiled on SGI IRIX 6.3, Sun Solaris 2.4, or Windows 95 operating systems
 
 For information on the algorithm, please read the following web document:
 http://maya.ece.ucsb.edu/JSEG
-http://vision.ece.ucsb.edu/segmentation/jseg/
-http://vision.ece.ucsb.edu/segmentation/jseg/software/
 
 PC Windows: The programs are built to "Console Application" using visual C.
             You can use dosprompt to run the program and specify the
