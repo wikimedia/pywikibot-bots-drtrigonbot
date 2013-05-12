@@ -8,7 +8,7 @@ diff -Naur '--exclude=*.pyc' TEST__music21/__init__.py _music21/__init__.py
 +if not os.path.isabs(scriptdir):
 +    scriptdir = os.path.abspath(os.path.join(os.curdir, scriptdir))
 +    
-+libdir = os.path.join(scriptdir, 'dtbext/_music21')
++libdir = os.path.join(scriptdir, 'externals/_music21')
 +sys.path.append(os.path.join(libdir))
 +
 +from music21 import *

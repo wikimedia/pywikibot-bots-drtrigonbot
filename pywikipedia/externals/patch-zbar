@@ -10,7 +10,7 @@ diff -Nau '--exclude=*.pyc' TEST__zbar/__init__.py _zbar/__init__.py
 +if not os.path.isabs(scriptdir):
 +    scriptdir = os.path.abspath(os.path.join(os.curdir, scriptdir))
 +    
-+libdir = os.path.join(scriptdir, 'dtbext/_zbar/build/lib.linux-x86_64-%s.%s' % sys.version_info[:2])
++libdir = os.path.join(scriptdir, 'externals/_zbar/build/lib.linux-x86_64-%s.%s' % sys.version_info[:2])
 +if not os.path.exists(libdir):
 +    os.makedirs(libdir)
 +# path has to exist BEFORE appending, otherwise the re-import fails
@@ -23,7 +23,7 @@ diff -Nau '--exclude=*.pyc' TEST__zbar/__init__.py _zbar/__init__.py
 +    print "(re-)compilation triggered because of: '%s'" % e
 +
 +    cur = os.path.abspath(os.curdir)
-+    os.chdir( os.path.join(scriptdir, 'dtbext/_zbar') )
++    os.chdir( os.path.join(scriptdir, 'externals/_zbar') )
 +
 +    # remove/reset if existing already
 +    if os.path.exists(os.path.join(libdir, 'zbar.so')):

@@ -43,7 +43,7 @@ X                    http://toolserver.org/~daniel/WikiSense/UntaggedImages.php
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: catimages.py 11525 2013-05-12 15:45:43Z drtrigon $'
+__version__ = '$Id: catimages.py 11528 2013-05-12 21:55:40Z drtrigon $'
 #
 
 # python default packages
@@ -91,8 +91,18 @@ except:
 import wikipedia as pywikibot
 import pagegenerators, catlib
 import checkimages
-import dtbext as externals          # check for and install needed 'externals'
-externals.check_setup_all()         #
+import dtbext                        # check for and install needed 'externals'
+dtbext.check_setup_all()             #
+import externals                             # check for and install needed
+externals.check_setup('colormath')           # 'externals' modules
+externals.check_setup('jseg')                #
+externals.check_setup('jseg/jpeg-6b')        #
+#externals.check_setup('_mlpy')               #
+externals.check_setup('_music21')            #
+#externals.check_setup('opencv/haarcascades') #
+externals.check_setup('pydmtx')              # <<< !!! test OS package management here !!!
+externals.check_setup('py_w3c')              #
+externals.check_setup('_zbar')               #
 
 # DrTrigonBot framework packages
 target = os.path.join(scriptdir, 'dtbext')
@@ -1507,10 +1517,7 @@ class FileData(object):
             return
 
         # DataMatrix
-        try:
-            from pydmtx import DataMatrix   # linux distro package (fedora)
-        except:
-            from _pydmtx import DataMatrix  # TS (debian)
+        from pydmtx import DataMatrix   # linux distro package (fedora) / TS (debian)
 
         ## Write a Data Matrix barcode
         #dm_write = DataMatrix()
