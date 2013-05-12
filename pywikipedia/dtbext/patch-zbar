@@ -2,8 +2,8 @@ Gemeinsame Unterverzeichnisse: TEST__zbar/build und _zbar/build.
 Gemeinsame Unterverzeichnisse: TEST__zbar/examples und _zbar/examples.
 diff -Nau '--exclude=*.pyc' TEST__zbar/__init__.py _zbar/__init__.py
 --- TEST__zbar/__init__.py	1970-01-01 01:00:00.000000000 +0100
-+++ _zbar/__init__.py	2012-12-29 12:28:35.000000000 +0100
-@@ -0,0 +1,30 @@
++++ _zbar/__init__.py	2013-05-12 13:58:08.098509211 +0200
+@@ -0,0 +1,34 @@
 +import sys, os
 +
 +scriptdir = os.path.dirname(sys.argv[0])
@@ -11,7 +11,10 @@ diff -Nau '--exclude=*.pyc' TEST__zbar/__init__.py _zbar/__init__.py
 +    scriptdir = os.path.abspath(os.path.join(os.curdir, scriptdir))
 +    
 +libdir = os.path.join(scriptdir, 'dtbext/_zbar/build/lib.linux-x86_64-%s.%s' % sys.version_info[:2])
-+sys.path.append(os.path.join(libdir))
++if not os.path.exists(libdir):
++    os.makedirs(libdir)
++# path has to exist BEFORE appending, otherwise the re-import fails
++sys.path.append(libdir)
 +
 +try:
 +    # try to import
@@ -23,15 +26,16 @@ diff -Nau '--exclude=*.pyc' TEST__zbar/__init__.py _zbar/__init__.py
 +    os.chdir( os.path.join(scriptdir, 'dtbext/_zbar') )
 +
 +    # remove/reset if existing already
-+    if os.path.exists(os.path.join(scriptdir, 'zbar.so')):
-+        os.remove( os.path.join(scriptdir, 'zbar.so') )
++    if os.path.exists(os.path.join(libdir, 'zbar.so')):
++        os.remove( os.path.join(libdir, 'zbar.so') )
 +
 +    # compile python module (may be use 'distutil' instead of 'make' here)
 +    if os.system("python setup.py build"):
++    #if os.system("make"):
 +        raise ImportError("'zbar.so' could not be compiled!")
 +
 +    os.chdir( cur )
 +
-+    # re-try to import   - DOES NOT WORK HERE...?!?!
++    # re-try to import
 +    from zbar import *
 Gemeinsame Unterverzeichnisse: TEST__zbar/test und _zbar/test.
