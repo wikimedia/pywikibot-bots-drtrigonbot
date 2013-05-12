@@ -42,7 +42,7 @@ modules_needed = {
                'jseg': ({},
                         {  'url': 'http://vision.ece.ucsb.edu/segmentation/jseg/software/jseg.zip',
                           'path': 'jseg',
-                         # $ diff -Nau --exclude="*.o" --exclude="*.pyc" --exclude="segdist_cpp*" TEST_jseg/ jseg/ > patch-jseg
+                         #$ diff -Nau --exclude="*.o" --exclude="*.pyc" --exclude="segdist_cpp*" TEST_jseg/ jseg/ > patch-jseg
                          'patch': 'patch-jseg',}),                         # OK
        'jseg/jpeg-6b': ({},
                         {  'url': 'http://vision.ece.ucsb.edu/segmentation/jseg/software/jpeg-6b.zip',
@@ -53,7 +53,7 @@ modules_needed = {
            '_music21': ({},
                         {  'url': 'http://music21.googlecode.com/files/music21-1.4.0.tar.gz',
                           'path': 'music21-1.4.0',
-                         # $ diff -Naur --exclude="*.pyc" TEST__music21/ _music21/ > patch-music21
+                         #$ diff -Naur --exclude="*.pyc" TEST__music21/ _music21/ > patch-music21
                          'patch': 'patch-music21',}),                      # OK
 # mercurial: $ hg clone -r ocropus-0.6pre3 https://code.google.com/p/ocropus
 #           '_ocropus': ({},
@@ -64,12 +64,12 @@ modules_needed = {
                         {  'url': 'https://svn.toolserver.org/svnroot/drtrigon/externals/haarcascades-full.tar.gz',
                           'path': 'haarcascades',}),                       # OK
 #          'pdfminer' is not used anymore/at the moment...
-#       'pycolorname' is not an 'external' package at all!
+       #'pycolorname': $ svn propset svn:externals 'pycolorname https://svn.toolserver.org/svnroot/drtrigon/externals/pycolorname' .
             '_pydmtx': ({'linux-fedora': ['python-libdmtx'],
                          'linux-ubuntu': ['libdmtx-dev'],},
                         {  'url': 'https://github.com/dmtx/dmtx-wrappers/archive/master.zip',
                           'path': 'dmtx-wrappers-master/python',
-                         # $ diff -Naur TEST__pydmtx/ _pydmtx/ > patch-pydmtx
+                         #$ diff -Naur TEST__pydmtx/ _pydmtx/ > patch-pydmtx
                          'patch': 'patch-pydmtx',}),                       # OK
              'py_w3c': ({},
                         {  'url': 'https://bitbucket.org/nmb10/py_w3c/downloads/py_w3c-v0.1.0.tar.gz',
@@ -85,7 +85,7 @@ modules_needed = {
                          'linux-ubuntu': ['python-zbar'],},
                         {  'url': 'https://pypi.python.org/packages/source/z/zbar/zbar-0.10.tar.bz2',
                           'path': 'zbar-0.10',
-                         # $ diff -Nau --exclude="*.pyc" TEST__zbar/ _zbar/ > patch-zbar
+                         #$ diff -Nau --exclude="*.pyc" TEST__zbar/ _zbar/ > patch-zbar
                          'patch': 'patch-zbar',}),                         # OK
 #               'TEST__bob': ({},
 #                        { 'url': 'https://www.idiap.ch/software/bob/packages/bob-1.1.2.zip',
