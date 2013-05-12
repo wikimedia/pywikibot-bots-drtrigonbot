@@ -20,10 +20,21 @@ __version__ = '$Id$'
 #
 
 
-# supports: - package management system (yum, apt-get, ...)
-#           - download from url (or svn, git repo)
-#          (- checkout from svn/mercurial repo)
+# supports: 1. package management system (yum, apt-get, ...)
+#           2. download from url (or svn, git repo)
+#          (?. checkout from svn/mercurial repo)
+#           3. svn:externals
 modules_needed = {
+#           'crontab' has to be moved and integrated (in)to externals as well
+#               'odf' has to be moved and integrated (in)to externals as well
+#          'openpyxl' has to be moved and integrated (in)to externals as well
+#        'simplejson' has to be moved and integrated (in)to externals as well
+#          'spelling' has to be moved and integrated (in)to externals as well
+#              'i18n' has to be moved and integrated (in)to externals as well
+# $ svn propget svn:externals pywikipedia/
+# spelling http://svn.wikimedia.org/svnroot/pywikipedia/trunk/spelling/
+# simplejson http://simplejson.googlecode.com/svn/tags/simplejson-2.1.3/simplejson/
+# i18n http://svn.wikimedia.org/svnroot/pywikipedia/branches/rewrite/scripts/i18n
           'colormath': ({'linux-fedora': [],
                          'linux-ubuntu': ['python-colormath'],},
                         {  'url': 'https://github.com/gtaylor/python-colormath/archive/master.zip',
@@ -50,7 +61,7 @@ modules_needed = {
 #             'opencv': ({},
 #                        {}),                                               # OPEN
 'opencv/haarcascades': ({},
-                        {  'url': 'https://svn.toolserver.org/svnroot/drtrigon/pywikipedia/dtbext/opencv/haarcascades/haarcascades.tar.gz',
+                        {  'url': 'https://svn.toolserver.org/svnroot/drtrigon/externals/haarcascades-full.tar.gz',
                           'path': 'haarcascades',}),                       # OK
 #          'pdfminer' is not used anymore/at the moment...
 #       'pycolorname' is not an 'external' package at all!
