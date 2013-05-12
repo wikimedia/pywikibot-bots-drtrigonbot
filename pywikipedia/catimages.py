@@ -43,7 +43,7 @@ X                    http://toolserver.org/~daniel/WikiSense/UntaggedImages.php
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: catimages.py 11522 2013-05-10 19:57:56Z drtrigon $'
+__version__ = '$Id: catimages.py 11525 2013-05-12 15:45:43Z drtrigon $'
 #
 
 # python default packages

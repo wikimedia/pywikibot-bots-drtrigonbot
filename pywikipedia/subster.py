@@ -61,7 +61,7 @@ Syntax example:
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__ = '$Id: subster.py 11458 2013-04-26 11:25:54Z drtrigon $'
+__version__ = '$Id: subster.py 11524 2013-05-12 15:36:25Z drtrigon $'
 #
 
 
@@ -70,8 +70,6 @@ import difflib, traceback
 import BeautifulSoup
 import StringIO, zipfile, csv
 import mailbox, mimetypes, datetime, email.utils
-import openpyxl.reader.excel
-import crontab
 import logging
 import ast
 import shelve, pprint
@@ -81,6 +79,12 @@ import pagegenerators, basic
 import wikipedia as pywikibot
 from pywikibot import i18n
 from pywikibot.comms import http
+import externals                     # check for and install needed 'externals'
+externals.check_setup('crontab')     # 
+externals.check_setup('odf')         # 
+externals.check_setup('openpyxl')    # 
+import openpyxl.reader.excel
+import crontab
 
 
 # TODO: think about what config to move to 'subster-config.css' (per wiki)
