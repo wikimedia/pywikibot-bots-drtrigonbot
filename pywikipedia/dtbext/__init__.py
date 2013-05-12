@@ -58,13 +58,19 @@ modules_needed = {
 # mercurial: $ hg clone -r ocropus-0.6pre3 https://code.google.com/p/ocropus
 #           '_ocropus': ({},
 #                        {}),                                               # OPEN
-#             'opencv': ({},
-#                        {}),                                               # OPEN
+#             'opencv': $ svn propedit svn:externals .
+#                         bagofwords_classification.cpp https://svn.toolserver.org/svnroot/drtrigon/externals/opencv/bagofwords_classification.cpp
+#                         bagofwords_classification_python.cpp https://svn.toolserver.org/svnroot/drtrigon/externals/opencv/bagofwords_classification_python.cpp
+#                         camera_virtual_default https://svn.toolserver.org/svnroot/drtrigon/externals/opencv/camera_virtual_default
+#                         facetest.pl https://svn.toolserver.org/svnroot/drtrigon/externals/opencv/facetest.pl
+#                         __init.py__ https://svn.toolserver.org/svnroot/drtrigon/externals/opencv/__init__.py
+#                         makefile https://svn.toolserver.org/svnroot/drtrigon/externals/opencv/makefile
+#                         peopledetect.py https://svn.toolserver.org/svnroot/drtrigon/externals/opencv/peopledetect.py
 'opencv/haarcascades': ({},
                         {  'url': 'https://svn.toolserver.org/svnroot/drtrigon/externals/haarcascades-full.tar.gz',
                           'path': 'haarcascades',}),                       # OK
 #          'pdfminer' is not used anymore/at the moment...
-       #'pycolorname': $ svn propset svn:externals 'pycolorname https://svn.toolserver.org/svnroot/drtrigon/externals/pycolorname' .
+#       'pycolorname': $ svn propset svn:externals 'pycolorname https://svn.toolserver.org/svnroot/drtrigon/externals/pycolorname' .
             '_pydmtx': ({'linux-fedora': ['python-libdmtx'],
                          'linux-ubuntu': ['libdmtx-dev'],},
                         {  'url': 'https://github.com/dmtx/dmtx-wrappers/archive/master.zip',
