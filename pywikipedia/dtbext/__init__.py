@@ -66,6 +66,13 @@ modules_needed = {
 #                         __init.py__ https://svn.toolserver.org/svnroot/drtrigon/externals/opencv/__init__.py
 #                         makefile https://svn.toolserver.org/svnroot/drtrigon/externals/opencv/makefile
 #                         peopledetect.py https://svn.toolserver.org/svnroot/drtrigon/externals/opencv/peopledetect.py
+#                       $ svn propedit svn:externals haarcascades/haartraining/
+#                         HaarTraining https://svn.toolserver.org/svnroot/drtrigon/externals/haartraining/HaarTraining
+#                         HaarTraining.tar.gz https://svn.toolserver.org/svnroot/drtrigon/externals/haartraining/HaarTraining.tar.gz
+#                         convert_cascade.c https://svn.toolserver.org/svnroot/drtrigon/externals/haartraining/convert_cascade.c
+#                         create_pos_neg.py https://svn.toolserver.org/svnroot/drtrigon/externals/haartraining/create_pos_neg.py
+#                         createtestsamples.pl https://svn.toolserver.org/svnroot/drtrigon/externals/haartraining/createtestsamples.pl
+#                         createtrainsamples.pl https://svn.toolserver.org/svnroot/drtrigon/externals/haartraining/createtrainsamples.pl
 'opencv/haarcascades': ({},
                         {  'url': 'https://svn.toolserver.org/svnroot/drtrigon/externals/haarcascades-full.tar.gz',
                           'path': 'haarcascades',}),                       # OK
