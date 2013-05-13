@@ -43,7 +43,7 @@ X                    http://toolserver.org/~daniel/WikiSense/UntaggedImages.php
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: catimages.py 11529 2013-05-13 17:33:00Z drtrigon $'
+__version__ = '$Id: catimages.py 11528 2013-05-12 21:55:40Z drtrigon $'
 #
 
 # python default packages
@@ -3362,7 +3362,6 @@ class CatImagesBot(checkimages.checkImagesBot, CatImages_Default):
         self._detect_Faces_CV()
         # Face via Landmark(s)
 #        self._detect_FaceLandmark_xBOB()
-        self._detect_FaceLandmark_xBOB()
         # exclude duplicates (CV and EXIF)
         faces = [item['Position'] for item in self._info['Faces']]
         for i in self._util_merge_Regions(faces)[1]:
@@ -3413,7 +3412,6 @@ class CatImagesBot(checkimages.checkImagesBot, CatImages_Default):
 
         # midi audio feature extraction
 #        self._detect_AudioFeatures_MUSIC21()
-        self._detect_AudioFeatures_MUSIC21()
 
     def _existInformation(self, info, ignore = ['Properties', 'ColorAverage']):
         result = []
