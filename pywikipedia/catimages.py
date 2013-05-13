@@ -43,7 +43,7 @@ X                    http://toolserver.org/~daniel/WikiSense/UntaggedImages.php
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: catimages.py 11528 2013-05-12 21:55:40Z drtrigon $'
+__version__ = '$Id: catimages.py 11532 2013-05-13 19:35:40Z drtrigon $'
 #
 
 # python default packages
@@ -425,6 +425,7 @@ class FileData(object):
         smallImg = np.empty( (cv.Round(video[0].shape[1]/scale), cv.Round(video[0].shape[0]/scale)), dtype=np.uint8 )
         video = [ cv2.resize( img, smallImg.shape, interpolation=cv2.INTER_LINEAR ) for img in video ]
 
+        sys.path.append(os.path.join(scriptdir, 'dtbext'))
         import _bob as bob
         import xbob_flandmark as xbob
 
