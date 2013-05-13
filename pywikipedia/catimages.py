@@ -43,7 +43,7 @@ X                    http://toolserver.org/~daniel/WikiSense/UntaggedImages.php
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: catimages.py 11529 2013-05-13 17:33:00Z drtrigon $'
+__version__ = '$Id: catimages.py 11528 2013-05-12 21:55:40Z drtrigon $'
 #
 
 # python default packages
@@ -101,16 +101,11 @@ externals.check_setup('opencv/haarcascades') #
 externals.check_setup('pydmtx')              # <<< !!! test OS package management here !!!
 externals.check_setup('py_w3c')              #
 externals.check_setup('_zbar')               #
-
-# DrTrigonBot framework packages
-target = os.path.join(scriptdir, 'dtbext')
-sys.path.append(target)
 import pycolorname
 #import _mlpy as mlpy
 from colormath.color_objects import RGBColor
 from py_w3c.validators.html.validator import HTMLValidator, ValidationFault
 #from pdfminer import pdfparser, pdfinterp, pdfdevice, converter, cmapdb, layout
-#sys.path.remove(target)
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -775,6 +770,7 @@ class FileData(object):
         #   BoWclassify /data/toolserver/pywikipedia/dtbext/opencv/VOC2007 /data/toolserver/pywikipedia/dtbext/opencv/data FAST SURF BruteForce | tee run.log
         #   BoWclassify /data/toolserver/pywikipedia/dtbext/opencv/VOC2007 /data/toolserver/pywikipedia/dtbext/opencv/data HARRIS SIFT BruteForce | tee run.log
         # http://experienceopencv.blogspot.com/2011/02/object-recognition-bag-of-keypoints.html
+        sys.path.append(os.path.join(scriptdir, 'dtbext'))
         import opencv
 
         if os.path.exists(bowDescPath):
@@ -3362,7 +3358,6 @@ class CatImagesBot(checkimages.checkImagesBot, CatImages_Default):
         self._detect_Faces_CV()
         # Face via Landmark(s)
 #        self._detect_FaceLandmark_xBOB()
-        self._detect_FaceLandmark_xBOB()
         # exclude duplicates (CV and EXIF)
         faces = [item['Position'] for item in self._info['Faces']]
         for i in self._util_merge_Regions(faces)[1]:
@@ -3413,7 +3408,6 @@ class CatImagesBot(checkimages.checkImagesBot, CatImages_Default):
 
         # midi audio feature extraction
 #        self._detect_AudioFeatures_MUSIC21()
-        self._detect_AudioFeatures_MUSIC21()
 
     def _existInformation(self, info, ignore = ['Properties', 'ColorAverage']):
         result = []
