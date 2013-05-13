@@ -16,7 +16,7 @@ Externals modules automatic setup checker and installer for various OS.
 # Copyright (C) 2006-2010 University of Utah. All rights reserved.
 # GNU General Public License version 2.0 by the Free Software Foundation
 #
-__version__ = '$Id: __init__.py 11528 2013-05-12 21:55:40Z drtrigon $'
+__version__ = '$Id: __init__.py 11530 2013-05-13 17:52:17Z drtrigon $'
 #
 
 
@@ -58,10 +58,9 @@ modules_needed = {
        'jseg/jpeg-6b': ({},
                         {  'url': 'http://vision.ece.ucsb.edu/segmentation/jseg/software/jpeg-6b.zip',
                           'path': 'jpeg-6b',}),                            # OK
-# TODO: vvv (future; enable for and use in 'catimages.py')
-#              '_mlpy': ({},
-#                        {  'url': 'http://downloads.sourceforge.net/project/mlpy/mlpy%203.5.0/mlpy-3.5.0.tar.gz',
-#                          'path': 'mlpy-3.5.0/mlpy',}),                    # OK
+              '_mlpy': ({},
+                        {  'url': 'http://downloads.sourceforge.net/project/mlpy/mlpy%203.5.0/mlpy-3.5.0.tar.gz',
+                          'path': 'mlpy-3.5.0/mlpy',}),                    # OK
            '_music21': ({},
                         {  'url': 'http://music21.googlecode.com/files/music21-1.4.0.tar.gz',
                           'path': 'music21-1.4.0',
@@ -73,13 +72,8 @@ modules_needed = {
 #                        {}),                                               # OPEN
 # TODO: vvv (further clean-up and unlink - check with 'svn list')
 #             'opencv': $ svn propedit svn:externals .
-#                         bagofwords_classification.cpp https://svn.toolserver.org/svnroot/drtrigon/externals/opencv/bagofwords_classification.cpp
-#                         bagofwords_classification_python.cpp https://svn.toolserver.org/svnroot/drtrigon/externals/opencv/bagofwords_classification_python.cpp
-#                         camera_virtual_default https://svn.toolserver.org/svnroot/drtrigon/externals/opencv/camera_virtual_default
-#                         facetest.pl https://svn.toolserver.org/svnroot/drtrigon/externals/opencv/facetest.pl
-#                         __init.py__ https://svn.toolserver.org/svnroot/drtrigon/externals/opencv/__init__.py
-#                         makefile https://svn.toolserver.org/svnroot/drtrigon/externals/opencv/makefile
-#                         peopledetect.py https://svn.toolserver.org/svnroot/drtrigon/externals/opencv/peopledetect.py
+#                         opencv https://svn.toolserver.org/svnroot/drtrigon/externals/opencv
+#                         (in directory 'externals', not 'externals/opencv')
 #                       $ svn propedit svn:externals haarcascades/haartraining/
 #                         HaarTraining https://svn.toolserver.org/svnroot/drtrigon/externals/haartraining/HaarTraining
 #                         HaarTraining.tar.gz https://svn.toolserver.org/svnroot/drtrigon/externals/haartraining/HaarTraining.tar.gz
@@ -131,7 +125,7 @@ modules_needed = {
 #                 '_ocropus', 'opencv', 'opencv/haarcascades', 'pydmtx',
 #                 'py_w3c', 'slic', '_zbar', '_bob', 'xbob_flandmark',]
 modules_order = ['crontab', 'odf', 'openpyxl',
-                 'colormath', 'jseg', 'jseg/jpeg-6b', '_music21',
+                 'colormath', 'jseg', 'jseg/jpeg-6b', '_mlpy', '_music21',
                  'opencv/haarcascades', 'pydmtx', 'py_w3c', '_zbar',]
 
 
