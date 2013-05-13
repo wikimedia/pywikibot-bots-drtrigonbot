@@ -16,7 +16,7 @@ This module is responsible for
 # Distributed under the terms of the MIT license.
 #
 
-__version__ = '$Id: http.py 11478 2013-04-28 12:17:07Z drtrigon $'
+__version__ = '$Id: http.py 11533 2013-05-13 20:15:31Z drtrigon $'
 
 import urllib2
 
@@ -242,6 +242,11 @@ def request(site, uri, retry=None, sysop=False, data=None, compress=True,
                     % (site.protocol(), site.hostname(), uri))
         # We use error='replace' in case of bad encoding.
         text = unicode(text, charset, errors = 'replace')
+    except LookupError:
+        if back_response:
+            pywikibot.exception()
+        else:
+            raise
 
     if back_response:
         return f, text
