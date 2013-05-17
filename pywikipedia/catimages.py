@@ -3359,6 +3359,7 @@ class CatImagesBot(checkimages.checkImagesBot, CatImages_Default):
         self._detect_Faces_CV()
         # Face via Landmark(s)
 #        self._detect_FaceLandmark_xBOB()
+        self._detect_FaceLandmark_xBOB()
         # exclude duplicates (CV and EXIF)
         faces = [item['Position'] for item in self._info['Faces']]
         for i in self._util_merge_Regions(faces)[1]:
@@ -3408,7 +3409,7 @@ class CatImagesBot(checkimages.checkImagesBot, CatImages_Default):
 #        self._detect_AudioFeatures_YAAFE()
 
         # midi audio feature extraction
-#        self._detect_AudioFeatures_MUSIC21()
+        self._detect_AudioFeatures_MUSIC21()
 
     def _existInformation(self, info, ignore = ['Properties', 'ColorAverage']):
         result = []

@@ -57,7 +57,7 @@ your user-config.py:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: cosmetic_changes.py 11412 2013-04-21 13:07:03Z xqt $'
+__version__ = '$Id: cosmetic_changes.py 11534 2013-05-15 04:20:42Z xqt $'
 #
 import sys
 import re
@@ -786,11 +786,11 @@ class CosmeticChangesToolkit:
         text = pywikibot.replaceExcept(
             text,
             r"([\r\n])\=\= *\[\[Commons:Copyright tags\|Licensing\]\]: *\=\=",
-            r"\1== {{int:license}} ==", exceptions, True)
+            r"\1== {{int:license-header}} ==", exceptions, True)
         text = pywikibot.replaceExcept(
             text,
-            r"([\r\n])\=\= *(Licensing|License information|{{int:license-header}}) *\=\=",
-            r"\1== {{int:license}} ==", exceptions, True)
+            r"([\r\n])\=\= *(Licensing|License information|{{int:license}}) *\=\=",
+            r"\1== {{int:license-header}} ==", exceptions, True)
 
         # frequent field values to {{int:}} versions
         text = pywikibot.replaceExcept(
@@ -820,8 +820,8 @@ class CosmeticChangesToolkit:
             r'\1== {{int:filedesc}} ==', exceptions, True)
         text = pywikibot.replaceExcept(
             text,
-            r'([\r\n]|^)\=\= *{{int:license}} *\=\=(?:[\r\n ]*)\=\= *{{int:license}} *\=\=',
-            r'\1== {{int:license}} ==', exceptions, True)
+            r'([\r\n]|^)\=\= *{{int:license-header}} *\=\=(?:[\r\n ]*)\=\= *{{int:license-header}} *\=\=',
+            r'\1== {{int:license-header}} ==', exceptions, True)
         return text
 
 

@@ -130,9 +130,11 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 11522 2013-05-10 19:57:56Z drtrigon $'
+__version__ = '$Id: wikipedia.py 11540 2013-05-17 17:23:42Z drtrigon $'
 
 import os, sys
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                             'externals'))  # allow imports from externals
 import httplib, socket, urllib, urllib2, cookielib
 import traceback, pprint
 import time, threading, Queue

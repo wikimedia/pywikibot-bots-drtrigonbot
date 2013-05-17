@@ -9,9 +9,13 @@ Tool to copy a Panoramio set to Commons
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: panoramiopicker.py 9042 2011-03-13 10:14:47Z xqt $'
+__version__ = '$Id: panoramiopicker.py 11540 2013-05-17 17:23:42Z drtrigon $'
 
 import sys, urllib, re,  StringIO, hashlib, base64, time
+
+import wikipedia as pywikibot
+import config, query, imagerecat, upload
+
 try:
     #For Python 2.6 newer
     import json
@@ -20,9 +24,7 @@ try:
         # http://pypi.python.org/pypi/python-json
         raise ImportError
 except ImportError:
-    import simplejson as json
-import wikipedia as pywikibot
-import config, query, imagerecat, upload
+    import simplejson as json   # after 'wikipedia' because of externals path
 
 from Tkinter import *
 from PIL import Image, ImageTk    # see: http://www.pythonware.com/products/pil/

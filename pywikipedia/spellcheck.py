@@ -55,7 +55,7 @@ Command-line options:
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: spellcheck.py 10271 2012-06-02 23:01:31Z xqt $'
+__version__ = '$Id: spellcheck.py 11541 2013-05-17 17:46:15Z drtrigon $'
 #
 
 import re, sys
@@ -459,7 +459,7 @@ try:
     mysite = pywikibot.getSite()
     if not checklang:
         checklang = mysite.language()
-    filename = pywikibot.config.datafilepath('spelling',
+    filename = pywikibot.config.datafilepath('externals/spelling',
                                       'spelling-' + checklang + '.txt')
     print "Getting wordlist"
     try:
@@ -520,7 +520,7 @@ try:
             title = pywikibot.input(u"Which page to check now? (enter to stop)")
 finally:
     pywikibot.stopme()
-    filename = pywikibot.config.datafilepath('spelling',
+    filename = pywikibot.config.datafilepath('externals/spelling',
                                       'spelling-' + checklang + '.txt')
     if rebuild:
         list = knownwords.keys()

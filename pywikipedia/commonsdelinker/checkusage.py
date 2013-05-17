@@ -35,14 +35,15 @@ Returns the time in seconds since the latest known edit of dbname.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: checkusage.py 10830 2012-12-24 13:50:34Z btongminh $'
+__version__ = '$Id: checkusage.py 11540 2013-05-17 17:23:42Z drtrigon $'
 #
 
 import httplib, urlparse, socket, time
 from urllib import urlencode
-import simplejson
 
 import wikipedia, family
+
+import simplejson   # after 'wikipedia' because of externals path
 
 try:
     import MySQLdb

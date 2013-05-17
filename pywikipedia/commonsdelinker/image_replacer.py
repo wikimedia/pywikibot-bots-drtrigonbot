@@ -9,8 +9,9 @@ Please refer to delinker.txt for full documentation.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: image_replacer.py 11332 2013-04-03 22:39:10Z siebrand $'
-import config, wikipedia, simplejson
+__version__ = '$Id: image_replacer.py 11540 2013-05-17 17:23:42Z drtrigon $'
+import config, wikipedia
+import simplejson   # after 'wikipedia' because of externals path
 import re, time
 import sys, os, signal, traceback
 

@@ -22,7 +22,7 @@ This module allow you to use the API in a simple and easy way.
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: query.py 11103 2013-02-22 16:14:56Z amir $'
+__version__ = '$Id: query.py 11540 2013-05-17 17:23:42Z drtrigon $'
 #
 
 import time
@@ -37,7 +37,7 @@ try:
         # http://pypi.python.org/pypi/python-json
         raise ImportError
 except ImportError:
-    import simplejson as json
+    import simplejson as json   # after 'wikipedia' because of externals path
 
 @deprecate_arg("encodeTitle", None)
 def GetData(params, site=None, useAPI=True, retryCount=config.maxretries,
