@@ -130,11 +130,9 @@ stopme(): Put this on a bot when it is not or not communicating with the Wiki
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id: wikipedia.py 11540 2013-05-17 17:23:42Z drtrigon $'
+__version__ = '$Id: wikipedia.py 11543 2013-05-17 22:26:50Z drtrigon $'
 
 import os, sys
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                             'externals'))  # allow imports from externals
 import httplib, socket, urllib, urllib2, cookielib
 import traceback, pprint
 import time, threading, Queue
@@ -148,6 +146,8 @@ import htmlentitydefs
 import warnings
 import unicodedata
 import xmlreader
+import externals     # allow imports from externals
+externals.check_setup('BeautifulSoup.py')
 from BeautifulSoup import BeautifulSoup, BeautifulStoneSoup, SoupStrainer
 import weakref
 import logging, logging.handlers
@@ -159,6 +159,7 @@ try:
         # http://pypi.python.org/pypi/python-json
         raise ImportError
 except ImportError:
+    externals.check_setup('simplejson')
     import simplejson as json
 # Splitting the bot into library parts
 from pywikibot.support import *

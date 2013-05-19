@@ -12,13 +12,16 @@ http://python-irclib.sourceforge.net/
 # Author: Balasyum
 # http://hu.wikipedia.org/wiki/User:Balasyum
 # License : LGPL
-__version__ = '$Id: articlenos.py 11088 2013-02-19 20:11:53Z drtrigon $'
+__version__ = '$Id: articlenos.py 11550 2013-05-18 19:42:20Z drtrigon $'
 
+import re
+
+import wikipedia as pywikibot
+import externals
+externals.check_setup('irclib')
 from ircbot import SingleServerIRCBot
 from irclib import nm_to_n, nm_to_h, irc_lower, ip_numstr_to_quad
 from irclib import ip_quad_to_numstr
-import wikipedia as pywikibot
-import re
 
 class ArtNoDisp(SingleServerIRCBot):
     def __init__(self, site, channel, nickname, server, port=6667):

@@ -61,13 +61,12 @@ Syntax example:
 #  Distributed under the terms of the MIT license.
 #  @see http://de.wikipedia.org/wiki/MIT-Lizenz
 #
-__version__ = '$Id: subster.py 11524 2013-05-12 15:36:25Z drtrigon $'
+__version__ = '$Id: subster.py 11550 2013-05-18 19:42:20Z drtrigon $'
 #
 
 
 import re, sys, os, string, time, copy
 import difflib, traceback
-import BeautifulSoup
 import StringIO, zipfile, csv
 import mailbox, mimetypes, datetime, email.utils
 import logging
@@ -80,9 +79,10 @@ import wikipedia as pywikibot
 from pywikibot import i18n
 from pywikibot.comms import http
 import externals                     # check for and install needed 'externals'
-externals.check_setup('crontab')     # 
-externals.check_setup('odf')         # 
-externals.check_setup('openpyxl')    # 
+externals.check_setup('crontab')     #
+externals.check_setup('odf')         #
+externals.check_setup('openpyxl')    #
+import BeautifulSoup
 import openpyxl.reader.excel
 import crontab
 

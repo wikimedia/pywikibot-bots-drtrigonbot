@@ -7,13 +7,11 @@ This script requires the Python IRC library http://python-irclib.sourceforge.net
 
 Warning: experimental software, use at your own risk
 """
-__version__ = '$Id: maintainer.py 9483 2011-08-29 19:17:43Z xqt $'
+__version__ = '$Id: maintainer.py 11551 2013-05-19 09:16:42Z drtrigon $'
 
 # Author: Balasyum
 # http://hu.wikipedia.org/wiki/User:Balasyum
 
-from ircbot import SingleServerIRCBot
-from irclib import nm_to_n
 import random
 import thread
 import threading
@@ -21,6 +19,10 @@ import time
 import rciw
 import censure
 import wikipedia as pywikibot
+import externals
+externals.check_setup('irclib')
+from ircbot import SingleServerIRCBot
+from irclib import nm_to_n
 
 ver = 1
 

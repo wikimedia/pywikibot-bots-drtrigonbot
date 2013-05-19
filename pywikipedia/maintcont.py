@@ -8,11 +8,13 @@ This script requires the Python IRC library http://python-irclib.sourceforge.net
 
 Warning: experimental software, use at your own risk
 """
-__version__ = '$Id: maintcont.py 7336 2009-09-29 18:27:04Z alexsh $'
+__version__ = '$Id: maintcont.py 11551 2013-05-19 09:16:42Z drtrigon $'
 
 # Author: Balasyum
 # http://hu.wikipedia.org/wiki/User:Balasyum
 
+import externals
+externals.check_setup('irclib')
 from ircbot import SingleServerIRCBot
 from irclib import nm_to_n
 import threading
