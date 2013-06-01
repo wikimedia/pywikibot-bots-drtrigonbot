@@ -59,8 +59,12 @@ except ImportError, e:
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
 def posit(model, image, crit):
-# TODO: '_model' translation to origin needed? since first point has to be (0, 0, 0) ... ?!?
-    _model = [ tuple(item) for item in numpy.array(model).astype(float) ]
+    # translation to origin (since first point has to be (0, 0, 0))
+    model  = numpy.array(model)
+    origin = model[0]
+    model  = model - origin
+
+    _model = [ tuple(item) for item in model.astype(float) ]
     _image = [ tuple(item) for item in numpy.array(image).astype(float) ]
     #_crit  = tuple(crit.astype(float))
     _crit  = (long(crit[0]), float(crit[1]))
@@ -72,7 +76,7 @@ def posit(model, image, crit):
 
     rmat = numpy.reshape(numpy.array(_rmat), (3,3))
     tvec = numpy.array(_tvec)
-    return (rmat, tvec)
+    return (rmat, tvec, model)
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
@@ -94,6 +98,6 @@ def unit_test():
     #model = np.array(model)
     #image = np.array(image)
     #crit  = np.array(crit)
-    (rmat, tvec) = posit(model, image, crit)
+    (rmat, tvec, mdl) = posit(model, image, crit)
     print rmat
     print tvec
