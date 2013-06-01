@@ -3,9 +3,8 @@ import sys, os
 scriptdir = os.path.dirname(sys.argv[0])
 if not os.path.isabs(scriptdir):
     scriptdir = os.path.abspath(os.path.join(os.curdir, scriptdir))
-#sys.path.append("/home/ursin/data/toolserver/pywikipedia/dtbext/opencv")
     
-libdir = os.path.join(scriptdir, 'dtbext/opencv')
+libdir = os.path.join(scriptdir, 'externals/opencv')
 if not os.path.exists(libdir):
     os.makedirs(libdir)
 # path has to exist BEFORE appending, otherwise the re-import fails
@@ -20,7 +19,7 @@ except ImportError, e:
     print "(re-)compilation triggered because of: '%s'" % e
 
     cur = os.path.abspath(os.curdir)
-    os.chdir( os.path.join(scriptdir, 'dtbext/opencv') )
+    os.chdir( os.path.join(scriptdir, 'externals/opencv') )
 
     # remove/reset if existing already
     if os.path.exists(os.path.join(libdir, 'BoWclassify.so')):
@@ -42,7 +41,7 @@ except ImportError, e:
     print "(re-)compilation triggered because of: '%s'" % e
 
     cur = os.path.abspath(os.curdir)
-    os.chdir( os.path.join(scriptdir, 'dtbext/opencv') )
+    os.chdir( os.path.join(scriptdir, 'externals/opencv') )
 
     # remove/reset if existing already
     if os.path.exists(os.path.join(libdir, 'posit.so')):
