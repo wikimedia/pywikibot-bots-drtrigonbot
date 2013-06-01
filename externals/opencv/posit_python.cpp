@@ -16,7 +16,7 @@
 #endif
 #include <sys/stat.h>
 
-#define DEBUG_DESC_PROGRESS
+//#define DEBUG_DESC_PROGRESS
 
 #define FOCAL_LENGTH 760.0
 
