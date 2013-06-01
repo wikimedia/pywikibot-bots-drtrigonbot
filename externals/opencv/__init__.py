@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, warnings
 
 scriptdir = os.path.dirname(sys.argv[0])
 if not os.path.isabs(scriptdir):
@@ -12,49 +12,54 @@ sys.path.append(libdir)
 
 import numpy
 
-try:
-    # try to import
-    import BoWclassify
-except ImportError, e:
-    print "(re-)compilation triggered because of: '%s'" % e
+# suppress .../pywikipedia/externals/opencv/__init__.py:43: RuntimeWarning: to-Python converter for std::vector<float, std::allocator<float> > already registered; second conversion method ignored.
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    # better would be to catch the warnings into a list... but how? ;)
 
-    cur = os.path.abspath(os.curdir)
-    os.chdir( os.path.join(scriptdir, 'externals/opencv') )
+    try:
+        # try to import
+        import BoWclassify as _BoWclassify
+    except ImportError, e:
+        print "(re-)compilation triggered because of: '%s'" % e
 
-    # remove/reset if existing already
-    if os.path.exists(os.path.join(libdir, 'BoWclassify.so')):
-        os.remove( os.path.join(libdir, 'BoWclassify.so') )
+        cur = os.path.abspath(os.curdir)
+        os.chdir( os.path.join(scriptdir, 'externals/opencv') )
 
-    # compile python module (may be use 'distutil' instead of 'make' here)
-    if os.system("make BoWclassify.so"):
-        raise ImportError("'BoWclassify.so' could not be compiled!")
+        # remove/reset if existing already
+        if os.path.exists(os.path.join(libdir, 'BoWclassify.so')):
+            os.remove( os.path.join(libdir, 'BoWclassify.so') )
 
-    os.chdir( cur )
+        # compile python module (may be use 'distutil' instead of 'make' here)
+        if os.system("make BoWclassify.so"):
+            raise ImportError("'BoWclassify.so' could not be compiled!")
 
-    # re-try to import
-    import BoWclassify
+        os.chdir( cur )
 
-try:
-    # try to import
-    import posit as _posit
-except ImportError, e:
-    print "(re-)compilation triggered because of: '%s'" % e
+        # re-try to import
+        import BoWclassify as _BoWclassify
 
-    cur = os.path.abspath(os.curdir)
-    os.chdir( os.path.join(scriptdir, 'externals/opencv') )
+    try:
+        # try to import
+        import posit as _posit
+    except ImportError, e:
+        print "(re-)compilation triggered because of: '%s'" % e
 
-    # remove/reset if existing already
-    if os.path.exists(os.path.join(libdir, 'posit.so')):
-        os.remove( os.path.join(libdir, 'posit.so') )
+        cur = os.path.abspath(os.curdir)
+        os.chdir( os.path.join(scriptdir, 'externals/opencv') )
 
-    # compile python module (may be use 'distutil' instead of 'make' here)
-    if os.system("make posit.so"):
-        raise ImportError("'posit.so' could not be compiled!")
+        # remove/reset if existing already
+        if os.path.exists(os.path.join(libdir, 'posit.so')):
+            os.remove( os.path.join(libdir, 'posit.so') )
 
-    os.chdir( cur )
+        # compile python module (may be use 'distutil' instead of 'make' here)
+        if os.system("make posit.so"):
+            raise ImportError("'posit.so' could not be compiled!")
 
-    # re-try to import
-    import posit as _posit
+        os.chdir( cur )
+
+        # re-try to import
+        import posit as _posit
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
@@ -77,6 +82,9 @@ def posit(model, image, crit):
     rmat = numpy.reshape(numpy.array(_rmat), (3,3))
     tvec = numpy.array(_tvec)
     return (rmat, tvec, model)
+
+def BoWclassify(*args):
+    return _BoWclassify.main(*args)
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
