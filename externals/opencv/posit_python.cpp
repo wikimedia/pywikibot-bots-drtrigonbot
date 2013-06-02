@@ -141,6 +141,7 @@ bp::tuple worker(const bp::list&  object_points = bp::list(),
         sb = std::cout.rdbuf( new py_ostreambuf(sys_stdout) );
 
     // POSIT tutorial: http://opencv.willowgarage.com/wiki/Posit, POSIT.rar (main.cpp)
+    //                 http://xuvif.blogspot.ch/2011/05/head-pose-estimation-by-using-posit-in.html
 
     // 3D Model Points
     //  Create the model pointss
@@ -228,6 +229,7 @@ bp::tuple worker(const bp::list&  object_points = bp::list(),
     //                       double focal_length, CvTermCriteria criteria,
     //                       float* rotation_matrix, float* translation_vector);
     cvPOSIT( positObject, &imagePoints[0], FOCAL_LENGTH, criteria, rotation_matrix, translation_vector );
+    cvReleasePOSITObject(&positObject);
     //createOpenGLMatrixFrom( rotation_matrix, translation_vector);
 //Show the results
 #ifdef DEBUG_DESC_PROGRESS
