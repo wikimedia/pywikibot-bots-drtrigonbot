@@ -352,7 +352,13 @@ def logging_statistics(logfiles, exclude):
 		etiming[key] = [ timeepoch(item) for item in etiming[key] ]
 	stats['etiming'] = etiming
 	# last message
-	stats['lastmessage'] = regex.match(buffer[-1][1][-1]).groupdict()['message'].strip()
+	#stats['lastmessage'] = regex.match(buffer[-1][1][-1]).groupdict()['message'].strip()
+	stats['lastmessage'] = ''
+	for i in range(len(buffer[-1][1])):
+		m = regex.match(buffer[-1][1][-(i+1)])
+		if m:
+			stats['lastmessage'] = m.groupdict()['message'].strip()
+			break
 
 	return (stats, logfiles[keys[-1]])
 
