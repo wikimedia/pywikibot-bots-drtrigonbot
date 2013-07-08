@@ -236,7 +236,7 @@ def irc_status():
 		line=string.rstrip(line)
 		line=string.split(line)
 
-		if (line[1] == "353"):  # answer to 'NAMES' request
+		if (len(line) > 1) and (line[1] == "353"): # answer to 'NAMES' request
 			i = line.index(CHAN)
 			users += line[(i+1):]
 
