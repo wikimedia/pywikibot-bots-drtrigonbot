@@ -93,7 +93,7 @@ src="http://upload.wikimedia.org/wikipedia/meta/6/66/Wikipedia-free-mini-button.
 """
 
 
-# === functions === === ===
+# === labs conversion patch: functions === === ===
 #
 def change_logo(content, environ):
     # labs patch: adopt logo for labs server instead of TS (default)
@@ -102,3 +102,17 @@ def change_logo(content, environ):
     if ('HTTP_HOST' in environ) and (not (environ['HTTP_HOST'] == 'toolserver.org')):
         content = content.replace(TS, labs)
     return content
+
+def host(environ):
+    if ('HTTP_HOST' in environ) and (not (environ['HTTP_HOST'] == 'toolserver.org')):
+        return 'labs'
+    else:
+        return 'ts'
+
+
+# === labs conversion patch: variables === === ===
+ver_desc = {  'ts': ['trunk', 'rewrite'],
+            'labs': ['compat', 'core'], }
+ 
+localdir = {  'ts': ['..', 'DrTrigonBot', '.'],
+            'labs': ['..', 'public_html', 'logs', '.'], }

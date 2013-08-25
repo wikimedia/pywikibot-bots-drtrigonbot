@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """XSaLT: XSL/XSLT Simple and Lightweight Tool (CGI) for toolserver
 

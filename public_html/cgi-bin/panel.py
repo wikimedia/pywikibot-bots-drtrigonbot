@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """DrTrigon Bot status panel (CGI) for toolserver
 
@@ -138,12 +138,15 @@ html_color = {	'green':	'#00ff00',
 		'red':		'#ff0000',
 		}
 
+ver_desc = style.ver_desc[style.host(os.environ)]
+localdir = style.localdir[style.host(os.environ)]
+
 
 # === bot status surveillance === === ===
 #
 bottimeout = 24
 botdonemsg = 'DONE'
-botcontinuous = ['trunk/pwb.py-subster_irc.log', 'rewrite/script_wui-bot.log', 'trunk/nosetests.log']
+botcontinuous = [ver_desc[0]+'/pwb.py-subster_irc.log', ver_desc[1]+'/script_wui-bot.log', ver_desc[0]+'/nosetests.log']
 
 # use classic 're' since 'pyparsing' does not work with unicode
 ## fmt='%(asctime)s %(name)18s: %(levelname)-8s %(message)s'
@@ -155,15 +158,15 @@ timefmt  = "%Y-%m-%d %H:%M:%S,%f"
 timefmt2 = "%Y-%m-%d %H:%M:%S"
 datefmt  = "%Y-%m-%d"
 
-localdir = os.path.dirname(os.path.join('..','DrTrigonBot','.'))
+localdir = os.path.dirname(os.path.join(*localdir))
 
 
 # === functions === === ===
 #
 def oldlogfiles(all=False, exclude=['commands.log', 'throttle.log']):
 #	files  = os.listdir( localdir )
-	files  = [os.path.join('trunk', item) for item in os.listdir( os.path.join(localdir, 'trunk') )]
-	files += [os.path.join('rewrite', item) for item in os.listdir( os.path.join(localdir, 'rewrite') )]
+	files  = [os.path.join(ver_desc[0], item) for item in os.listdir( os.path.join(localdir, ver_desc[0]) )]
+	files += [os.path.join(ver_desc[1], item) for item in os.listdir( os.path.join(localdir, ver_desc[1]) )]
 	archive, current = {}, []
 	files.sort()
 	for item in files:
@@ -255,7 +258,7 @@ def logging_statistics(logfiles, exclude):
 	for k in keys:
 		file = logfiles[k]
 # skip rewrite logs for the moment
-		if 'rewrite' in file:	# cheat (since trunk and rewrite have different formats)
+		if ver_desc[1] in file:	# cheat (since trunk and rewrite have different formats)
 			continue	#  "
 		#if file in exclude:
 		#	continue

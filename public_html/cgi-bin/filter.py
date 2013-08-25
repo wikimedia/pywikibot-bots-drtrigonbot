@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """filter: Versatile/Generic (text) Page Filter Tool (CGI) for toolserver
 (description)

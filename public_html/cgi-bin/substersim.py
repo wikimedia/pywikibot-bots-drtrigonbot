@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """DrTrigonBot subster simulation panel (CGI) for toolserver
 
