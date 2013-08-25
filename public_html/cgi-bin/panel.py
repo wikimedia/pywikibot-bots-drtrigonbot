@@ -582,7 +582,7 @@ def displaystate(form):
 	status += "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': irc_subster_color, 'bot': 'subster:', 'state': irc_subster_state_text}
 	status += "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': irc_wui_color, 'bot': 'wui:', 'state': irc_wui_state_text}
 
-	data['currentlog'] = ", ".join([ '<a href="%s">%s</a>' % (os.path.join(localdir, item), item) for item in current ])
+	data['currentlog'] = ", ".join([ '<a href="%s">%s</a>' % (os.path.join(localdir, item).replace('public_html/', ''), item) for item in current ])
 
 	data.update({	'time':		asctime(localtime(time())),
 			'oldlog':	", ".join(files),
