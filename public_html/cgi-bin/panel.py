@@ -523,6 +523,7 @@ def displaystate(form):
 
 	(localdir, files, current) = oldlogfiles()
 	files = [item for key, value in files for item in value]	# flatten
+	files = [item.replace('public_html/', '') for item in value]	# (lapbs patch)
 
 	stat, recent = logging_statistics(current, botcontinuous)
 	if stat is None:
