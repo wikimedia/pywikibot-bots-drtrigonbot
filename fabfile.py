@@ -1,7 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Sep 14 18:22:30 2013
+HOW TO INSTALL DrTrigonBot TO TOOLSERVER AND/OR LABS-TOOLS
 
+1.) download and install fabric
+2.) download the fabfile:
+    $ wget https://git.wikimedia.org/raw/pywikibot%2Fbots%2Fdrtrigonbot/HEAD/fabfile.py
+3.) run the fabfile:
+    $ fab -H localhost install
+
+It will automatically clone the needed repos and setup the server home
+directory in order to be able to run DrTrigonBot.
+
+Created on Sat Sep 14 18:22:30 2013
 @author: drtrigon
 """
 # http://yuji.wordpress.com/2011/04/09/django-python-fabric-deployment-script-and-example/
@@ -19,7 +29,7 @@ def __host_info():
 LABS = ('tools-login' in __host_info())
 
 
-def _get_git_path(repo, path):
+def _get_git_path(repo, dest, path):
     #local('wget --content-disposition https://git.wikimedia.org/zip/?r=pywikibot/bots/drtrigonbot\&p=public_html\&h=HEAD\&format=gz')
     local('wget -O temp.tar.gz https://git.wikimedia.org/zip/?r=%s\&p=%s\&h=HEAD\&format=gz' % (repo, path))
     local('tar -zxvf temp.tar.gz')
@@ -40,6 +50,14 @@ def _clone_git_user(repo='pywikibot/compat', dest='pywikipedia-git'):
 
 def _clone_git(repo, dest):
     _clone_git_user(repo=repo, dest=dest)
+
+def _clone_git_path(repo, dest, paths=[]):
+    # http://vmiklos.hu/blog/sparse-checkout-example-in-git-1-7
+    _clone_git_user(repo=repo, dest=dest)
+    local('cd %s; git config core.sparsecheckout true' % dest)
+    for item in paths:
+        local('cd %s; echo %s > .git/info/sparse-checkout' % (dest, item))
+    local('cd %s; git read-tree -m -u HEAD' % dest)
 
 def _clean_git(repos=[]):
     for path in repos:
@@ -65,9 +83,11 @@ def setup():
 
 def dl_webstuff():
     if LABS:    # labs-tools
-        _get_git_path(repo='pywikibot/bots/drtrigonbot', path='public_html/cgi-bin')
+        _get_git_path(repo='pywikibot/bots/drtrigonbot', dest=None, path='public_html/cgi-bin')
+        _clone_git_path(repo='pywikibot/bots/drtrigonbot', dest='pywikibot-web/', paths=['public_html/'])
     else:       # toolserver
-        _get_git_path(repo='pywikibot/bots/drtrigonbot', path='public_html')
+        _get_git_path(repo='pywikibot/bots/drtrigonbot', dest=None, path='public_html')
+        _clone_git_path(repo='pywikibot/bots/drtrigonbot', dest='pywikibot-web/', paths=['public_html/'])
 
 def dl_compat():
     # https://www.mediawiki.org/wiki/Manual:Pywikipediabot/Installation#Setup_on_Wikimedia_Labs.2FTool_Labs_server
