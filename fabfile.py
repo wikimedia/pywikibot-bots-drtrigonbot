@@ -86,6 +86,7 @@ def dl_drtrigonbot():
         _get_git_path(repo='pywikibot/bots/drtrigonbot', dest=None, path='public_html/cgi-bin')
         _clone_git_path(repo='pywikibot/bots/drtrigonbot', dest='pywikibot-drtrigonbot/',
                         paths=['public_html/',
+                               'README',
                                'backup',
                                'fabfile.py',
                                'warnuserquota.py',])
@@ -93,6 +94,7 @@ def dl_drtrigonbot():
         _get_git_path(repo='pywikibot/bots/drtrigonbot', dest=None, path='public_html')
         _clone_git_path(repo='pywikibot/bots/drtrigonbot', dest='pywikibot-drtrigonbot/',
                         paths=['public_html/',
+                               'README',
                                'backup',
                                'fabfile.py',
                                'warnuserquota.py',])
@@ -122,9 +124,11 @@ def download():
 
 def sl_drtrigonbot():
     if LABS:    # labs-tools
+        local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/README README')
         local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/backup backup')
         local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
     else:       # toolserver
+        local('ln -s /home/drtrigon/pywikibot-drtrigonbot/README README')
         local('ln -s /home/drtrigon/pywikibot-drtrigonbot/backup backup')
         local('ln -s /home/drtrigon/pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
 
