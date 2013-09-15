@@ -2,7 +2,7 @@
 """
 HOW TO INSTALL DrTrigonBot TO TOOLSERVER AND/OR LABS-TOOLS
 
-1.) download and install git and fabric
+1.) download and install git (and fabric)
 2.) download the fabfile, e.g.:
     $ wget https://git.wikimedia.org/raw/pywikibot%2Fbots%2Fdrtrigonbot/HEAD/fabfile.py
 3.) run the fabfile:
@@ -11,13 +11,43 @@ HOW TO INSTALL DrTrigonBot TO TOOLSERVER AND/OR LABS-TOOLS
 It will automatically clone the needed repos and setup the server home
 directory in order to be able to run DrTrigonBot.
 
+To update the repos on the server run:
+$ fab -H localhost update
+
+To backup the config data on the server run:
+$ fab -H localhost backup
+
+To get an overview of the available commands run:
+$ fab -H localhost help
+
+If you did not install fabric or it is not available because you do not have
+permissions, you can use the following syntax alternatively:
+$ python fabfile.py -H localhost cmd1[,cmd2,...]
+instead of
+$ fab -H localhost cmd1[,cmd2,...]
+
+
 Created on Sat Sep 14 18:22:30 2013
 @author: drtrigon
 """
 # http://yuji.wordpress.com/2011/04/09/django-python-fabric-deployment-script-and-example/
-# http://artymiak.com/quick-backups-with-fabric-and-python/
 
-from fabric.api import *
+try:
+    from fabric.api import *
+except ImportError:
+    # setup a simple local replacement, for alternative syntax
+    import sys, os, subprocess
+    def local(cmd, capture=False, *args, **kwargs):
+        print "[%s] local-simple: %s" % (sys.argv[2], cmd)
+        kwargs = {  'cwd': os.path.dirname(os.path.abspath(__file__)),
+                  'shell': True,}
+        if capture:
+            kwargs['stdout'] = subprocess.PIPE
+        res = subprocess.Popen(cmd, **kwargs)
+        res.wait()
+        if res.returncode:
+            raise IOError('returncode %s' % res.returncode)
+        return res.stdout.read().strip() if res.stdout else ""
 
 
 def __host_info():
@@ -63,9 +93,14 @@ def _clean_git(repos=[]):
     for path in repos:
         local('cd %s; git gc --aggressive --prune' % path)
 
+def _update_git(dest):
+    #local('cd %s; git checkout master' % (dest,))  # should always be on 'master'
+    local('cd %s; git pull' % (dest,))
+    #local('cd %s; git submodule update --force' % (dest,))
+
 
 def setup():
-    """ 1.) setup home directory structure and .htaccess files """
+    """ I.1) setup home directory structure and .htaccess files """
     local('mkdir BAK_DIR')
     local('mkdir data')
     local('mkdir data/subster')
@@ -117,7 +152,7 @@ def dl_core():
     # or: _get_git(repo='pywikibot/core')
 
 def download():
-    """ 2.) download (dl) all code """
+    """ I.2) download (dl) all code """
     dl_drtrigonbot()
     dl_compat()
     dl_core()
@@ -155,13 +190,13 @@ def sl_core():
         local('cd public_html/DrTrigonBot/; ln -s /home/drtrigon/rewrite/logs rewrite')
 
 def symlink():
-    """ 3.) symlink (sl) all directories and files """
+    """ I.3) symlink (sl) all directories and files """
     sl_drtrigonbot()
     sl_compat()
     sl_core()
 
 def install():
-    """ install all bot code to the server (ALL steps) """
+    """ I.A) Install all bot code to the server   (all I.# steps) """
     # setup home directory structure
     setup()    
     # download all
@@ -178,3 +213,35 @@ def install():
         local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/fabfile.py fabfile.py')
     else:       # toolserver
         local('ln -s /home/drtrigon/pywikibot-drtrigonbot/fabfile.py fabfile.py')
+
+def up_drtrigonbot():
+    _update_git(dest='pywikibot-drtrigonbot/')
+    if LABS:    # labs-tools
+        local('cp -r pywikibot-drtrigonbot/public_html/cgi-bin/* public_html/cgi-bin/')
+    else:       # toolserver
+        local('cp -r pywikibot-drtrigonbot/public_html/* public_html/')
+
+def up_compat():
+    _update_git(dest='pywikibot-compat')
+
+def up_core():
+    _update_git(dest='pywikibot-core')
+
+def update():
+    """ U.A) Update (up) all code on the server   (all U.# steps) """
+    up_drtrigonbot()
+    up_compat()
+    up_core()
+
+def backup():
+    """ B.A) Backup all bot code on the server    (all B.# steps) """
+    # see also 'backup' sh script ...
+    # http://artymiak.com/quick-backups-with-fabric-and-python/
+    raise NotImplementedError
+
+
+if (__name__ == '__main__') and ('sys' in locals()):
+    if sys.argv[3] in locals():
+        locals()[sys.argv[3]]()
+    else:
+        print dir()
