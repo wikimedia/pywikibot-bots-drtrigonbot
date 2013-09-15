@@ -2,8 +2,8 @@
 """
 HOW TO INSTALL DrTrigonBot TO TOOLSERVER AND/OR LABS-TOOLS
 
-1.) download and install fabric
-2.) download the fabfile:
+1.) download and install git and fabric
+2.) download the fabfile, e.g.:
     $ wget https://git.wikimedia.org/raw/pywikibot%2Fbots%2Fdrtrigonbot/HEAD/fabfile.py
 3.) run the fabfile:
     $ fab -H localhost install
@@ -56,7 +56,7 @@ def _clone_git_path(repo, dest, paths=[]):
     _clone_git_user(repo=repo, dest=dest)
     local('cd %s; git config core.sparsecheckout true' % dest)
     for item in paths:
-        local('cd %s; echo %s > .git/info/sparse-checkout' % (dest, item))
+        local('cd %s; echo %s >> .git/info/sparse-checkout' % (dest, item))
     local('cd %s; git read-tree -m -u HEAD' % dest)
 
 def _clean_git(repos=[]):

@@ -1,0 +1,49 @@
+I noticed many people using the framework haven't set the correct access 
+flags to their "login-data" dir. This could lead to someone using those 
+files to run your bot accounts. Although only other toolserver users can 
+see these files, its still an issue. Please make at least that dir "not 
+readable" for anyone but "owner". --Pyr0.
+
+There are other files to protect, so I wrote a small script, to call it:
+ ./backup
+first set it's permissions with:
+ chmod u+x backup
+ chmod go-rwx backup
+
+============================================================
+
+This is the toolserver account of DrTrigon
+and is used primary for DrTrigonBot.
+
+Run DrTrigonBot once (during login):
+ nice -n +15 python ./runbotrun.py
+
+Run DrTrigonBot with screen:
+(without having to remain constantly logged in,
+look at https://wiki.toolserver.org/view/Screen too)
+ screen
+ nice -n +15 python ./runbotrun.py
+use CTRL+A or CTRL+D to logout and
+ screen -r
+to re-login
+
+============================================================
+
+DrTrigonBot runs now as CRON job, use:
+ crontab -l
+
+============================================================
+
+http://de.wikipedia.org/wiki/Benutzer:DrTrigonBot/ToDo-Liste
+
+============================================================
+
+DrTrigonBot runs now through job scheduling (SGE), use:
+
+ cronie -l
+
+from job server (submit.toolserver.org), open e.g. with:
+
+ ssh -i ... drtrigon@submit.toolserver.org
+
+============================================================
