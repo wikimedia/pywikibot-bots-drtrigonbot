@@ -81,13 +81,21 @@ def setup():
 # create redirect to svn and git repo browser in 'public_html/source'
         local('mkdir public_html/test')
 
-def dl_webstuff():
+def dl_drtrigonbot():
     if LABS:    # labs-tools
         _get_git_path(repo='pywikibot/bots/drtrigonbot', dest=None, path='public_html/cgi-bin')
-        _clone_git_path(repo='pywikibot/bots/drtrigonbot', dest='pywikibot-web/', paths=['public_html/'])
+        _clone_git_path(repo='pywikibot/bots/drtrigonbot', dest='pywikibot-drtrigonbot/',
+                        paths=['public_html/',
+                               'backup',
+                               'fabfile.py',
+                               'warnuserquota.py',])
     else:       # toolserver
         _get_git_path(repo='pywikibot/bots/drtrigonbot', dest=None, path='public_html')
-        _clone_git_path(repo='pywikibot/bots/drtrigonbot', dest='pywikibot-web/', paths=['public_html/'])
+        _clone_git_path(repo='pywikibot/bots/drtrigonbot', dest='pywikibot-drtrigonbot/',
+                        paths=['public_html/',
+                               'backup',
+                               'fabfile.py',
+                               'warnuserquota.py',])
 
 def dl_compat():
     # https://www.mediawiki.org/wiki/Manual:Pywikipediabot/Installation#Setup_on_Wikimedia_Labs.2FTool_Labs_server
@@ -108,11 +116,17 @@ def dl_core():
 
 def download():
     """ 2.) download (dl) all code """
-    dl_webstuff()
+    dl_drtrigonbot()
     dl_compat()
     dl_core()
 
-#def sl_webstuff(): pass
+def sl_drtrigonbot():
+    if LABS:    # labs-tools
+        local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/backup backup')
+        local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
+    else:       # toolserver
+        local('ln -s /home/drtrigon/pywikibot-drtrigonbot/backup backup')
+        local('ln -s /home/drtrigon/pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
 
 def sl_compat():
     if LABS:    # labs-tools
@@ -138,7 +152,7 @@ def sl_core():
 
 def symlink():
     """ 3.) symlink (sl) all directories and files """
-    #sl_webstuff()
+    sl_drtrigonbot()
     sl_compat()
     sl_core()
 
@@ -153,3 +167,10 @@ def install():
     # setup server config files ...
     # set file permissions ...
     # ...
+    # replace fabfile.py by a symlink to the one in the repo
+    # done here at the very end instead of in 'sl_drtrigonbot'
+    local('rm fabfile.py')
+    if LABS:    # labs-tools
+        local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/fabfile.py fabfile.py')
+    else:       # toolserver
+        local('ln -s /home/drtrigon/pywikibot-drtrigonbot/fabfile.py fabfile.py')

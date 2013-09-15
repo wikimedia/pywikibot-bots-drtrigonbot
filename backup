@@ -1,0 +1,79 @@
+#!/bin/bash
+
+# Do a backup of sensitive and important data and since that data
+# are private they have to be protected also.
+#
+# - Backup all important user and config data from 'pywikipedia/'
+#   to 'BAK_DIR/'.
+# - I noticed many people using the framework haven't set the correct 
+#   access flags to their "login-data" dir. This could lead to someone 
+#   using those files to run your bot accounts. Although only other 
+#   toolserver users can see these files, its still an issue. Please make 
+#   at least that dir "not readable" for anyone but "owner". --Pyr0.
+
+
+# init backup (trash old one)
+echo init/reset backup on 
+echo - productive
+rm -rf BAK_DIR/
+mkdir BAK_DIR
+
+# backup 'backup' (myself) on productive
+echo backup 'backup' \(myself\) on 
+echo - productive
+cp -a backup BAK_DIR/
+
+
+# backup 'login-data' on productive
+echo
+echo backup 'login-data' on 
+echo - productive
+cp -a pywikipedia/login-data/ BAK_DIR/
+
+# protect 'login-data' on productive (and on html-source)
+echo protect 'login-data' on 
+echo - productive
+chmod -R go-rwx ./pywikipedia/login-data
+##ls ./pywikipedia/login-data -ld
+##ls ./pywikipedia/login-data -l
+#echo - html-source
+#chmod -R go-rwx ./public_html/source/pywikipedia/login-data
+##ls public_html/source/pywikipedia/login-data -ld
+##ls public_html/source/pywikipedia/login-data -l
+
+
+# backup 'user-config.py' on productive
+echo
+echo backup 'user-config.py' on 
+echo - productive
+#cp -a pywikipedia/bot_control.py BAK_DIR/
+#cp -a pywikipedia/clean_user_sandbox.py BAK_DIR/
+#cp -a pywikipedia/subster.py BAK_DIR/
+#cp -a pywikipedia/sum_disc.py BAK_DIR/
+cp -a pywikipedia/user-config.py BAK_DIR/
+
+# protect 'user-config.py' on productive (and on html-source)
+echo protect 'user-config.py' on 
+echo - productive
+chmod go-rwx ./pywikipedia/user-config.py
+#echo - html-source
+#chmod go-rwx ./public_html/source/pywikipedia/user-config.py
+
+
+# backup 'data' on productive
+echo
+echo backup 'data' on 
+echo - productive
+cp -a data/ BAK_DIR/
+
+# protect 'data' on productive
+echo protect 'data' on 
+echo - productive
+chmod -R go-rwx ./data
+
+
+# compress and backup 'logs' on productive
+echo
+echo backup 'logs' on 
+echo - productive
+tar -jcvf BAK_DIR/DrTrigonBot_logs.tar.bz2 public_html/DrTrigonBot/*/*
