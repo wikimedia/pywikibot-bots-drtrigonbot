@@ -1,0 +1,4 @@
+directories     Self-written and self-maintained external code - should finally
+                be moved to pywikibot/... repositories.
+archives        Third-party external code written and maintained by somebody
+                else.
