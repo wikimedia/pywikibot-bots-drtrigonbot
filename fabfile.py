@@ -119,20 +119,16 @@ def setup():
 def dl_drtrigonbot():
     if LABS:    # labs-tools
         _get_git_path(repo='pywikibot/bots/drtrigonbot', dest=None, path='public_html/cgi-bin')
-        _clone_git_path(repo='pywikibot/bots/drtrigonbot', dest='pywikibot-drtrigonbot/',
-                        paths=['public_html/',
-                               'README',
-                               'backup',
-                               'fabfile.py',
-                               'warnuserquota.py',])
     else:       # toolserver
         _get_git_path(repo='pywikibot/bots/drtrigonbot', dest=None, path='public_html')
-        _clone_git_path(repo='pywikibot/bots/drtrigonbot', dest='pywikibot-drtrigonbot/',
-                        paths=['public_html/',
-                               'README',
-                               'backup',
-                               'fabfile.py',
-                               'warnuserquota.py',])
+    _clone_git_path(repo='pywikibot/bots/drtrigonbot', dest='pywikibot-drtrigonbot/',
+                    paths=['public_html/',
+                           'README',
+                           'backup',
+                           'fabfile.py',
+                           'warnuserquota.py',
+                           'crontab',
+                           'literature',])
 
 def dl_compat():
     # https://www.mediawiki.org/wiki/Manual:Pywikipediabot/Installation#Setup_on_Wikimedia_Labs.2FTool_Labs_server
@@ -158,14 +154,17 @@ def download():
     dl_core()
 
 def sl_drtrigonbot():
-    if LABS:    # labs-tools
-        local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/README README')
-        local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/backup backup')
-        local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
-    else:       # toolserver
-        local('ln -s /home/drtrigon/pywikibot-drtrigonbot/README README')
-        local('ln -s /home/drtrigon/pywikibot-drtrigonbot/backup backup')
-        local('ln -s /home/drtrigon/pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
+#    if LABS:    # labs-tools
+#        local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/README README')
+#        local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/backup backup')
+#        local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
+#    else:       # toolserver
+#        local('ln -s /home/drtrigon/pywikibot-drtrigonbot/README README')
+#        local('ln -s /home/drtrigon/pywikibot-drtrigonbot/backup backup')
+#        local('ln -s /home/drtrigon/pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
+    local('ln -s pywikibot-drtrigonbot/README README')
+    local('ln -s pywikibot-drtrigonbot/backup backup')
+    local('ln -s pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
 
 def sl_compat():
     if LABS:    # labs-tools
@@ -209,10 +208,11 @@ def install():
     # replace fabfile.py by a symlink to the one in the repo
     # done here at the very end instead of in 'sl_drtrigonbot'
     local('rm fabfile.py')
-    if LABS:    # labs-tools
-        local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/fabfile.py fabfile.py')
-    else:       # toolserver
-        local('ln -s /home/drtrigon/pywikibot-drtrigonbot/fabfile.py fabfile.py')
+#    if LABS:    # labs-tools
+#        local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/fabfile.py fabfile.py')
+#    else:       # toolserver
+#        local('ln -s /home/drtrigon/pywikibot-drtrigonbot/fabfile.py fabfile.py')
+    local('ln -s pywikibot-drtrigonbot/fabfile.py fabfile.py')
 
 def up_drtrigonbot():
     _update_git(dest='pywikibot-drtrigonbot/')
