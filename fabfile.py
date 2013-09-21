@@ -170,23 +170,28 @@ def sl_compat():
     if LABS:    # labs-tools
         # docs ?
         # logs
-        local('cd public_html/logs/; ln -s /data/project/drtrigonbot/pywikibot-compat/logs compat')
+#        local('cd public_html/logs/; ln -s /data/project/drtrigonbot/pywikibot-compat/logs compat')
+        local('pywikibot-compat/logs public_html/logs/compat')
     else:       # toolserver
         # docs
-        local('cd public_html/doc/; ln -s /home/drtrigon/pywikipedia/docs DrTrigonBot')
+#        local('cd public_html/doc/; ln -s /home/drtrigon/pywikipedia/docs DrTrigonBot')
+        local('ln -s pywikipedia/docs public_html/doc/DrTrigonBot')
         # logs
-        local('cd public_html/DrTrigonBot/; ln -s /home/drtrigon/pywikipedia/logs trunk')
+#        local('cd public_html/DrTrigonBot/; ln -s /home/drtrigon/pywikipedia/logs trunk')
+        local('ln -s pywikipedia/logs public_html/DrTrigonBot/trunk')
 
 def sl_core():
     if LABS:    # labs-tools
         # docs ?
         # logs
-        local('cd public_html/logs/; ln -s /data/project/drtrigonbot/pywikibot-core/logs core')
+#        local('cd public_html/logs/; ln -s /data/project/drtrigonbot/pywikibot-core/logs core')
+        local('ln -s pywikibot-core/logs public_html/logs/core')
     else:       # toolserver
         # docs
 # create symlink to core (rewrite) docs here
         # logs
-        local('cd public_html/DrTrigonBot/; ln -s /home/drtrigon/rewrite/logs rewrite')
+#        local('cd public_html/DrTrigonBot/; ln -s /home/drtrigon/rewrite/logs rewrite')
+        local('ln -s rewrite/logs public_html/DrTrigonBot/rewrite')
 
 def symlink():
     """ I.3) symlink (sl) all directories and files """
