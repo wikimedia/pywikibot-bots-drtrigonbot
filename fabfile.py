@@ -171,7 +171,7 @@ def sl_compat():
         # docs ?
         # logs
 #        local('cd public_html/logs/; ln -s /data/project/drtrigonbot/pywikibot-compat/logs compat')
-        local('pywikibot-compat/logs public_html/logs/compat')
+        local('ln -s pywikibot-compat/logs public_html/logs/compat')
     else:       # toolserver
         # docs
 #        local('cd public_html/doc/; ln -s /home/drtrigon/pywikipedia/docs DrTrigonBot')
