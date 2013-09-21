@@ -130,7 +130,7 @@ def dl_drtrigonbot():
                            'crontab',
                            'literature',])
     if LABS:    # labs-tools
-        local('cp -r pywikibot-drtrigonbot/public_html/cgi-bin/* public_html/cgi-bin/')
+        local('cp -r pywikibot-drtrigonbot/public_html/cgi-bin/* cgi-bin/')
     else:       # toolserver
         local('cp -r pywikibot-drtrigonbot/public_html/* public_html/')
 
@@ -218,7 +218,7 @@ def install():
 def up_drtrigonbot():
     _update_git(dest='pywikibot-drtrigonbot/')
     if LABS:    # labs-tools
-        local('cp -r pywikibot-drtrigonbot/public_html/cgi-bin/* public_html/cgi-bin/')
+        local('cp -r pywikibot-drtrigonbot/public_html/cgi-bin/* cgi-bin/')
     else:       # toolserver
         local('cp -r pywikibot-drtrigonbot/public_html/* public_html/')
 
