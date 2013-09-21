@@ -7,6 +7,9 @@ HOW TO INSTALL DrTrigonBot TO TOOLSERVER AND/OR LABS-TOOLS
     $ wget https://git.wikimedia.org/raw/pywikibot%2Fbots%2Fdrtrigonbot/HEAD/fabfile.py
 3.) run the fabfile:
     $ fab -H localhost install
+4.) setup you config files by generating new or copying existing ones
+5.) run the finalization:
+    $ fab -H localhost backup
 
 It will automatically clone the needed repos and setup the server home
 directory in order to be able to run DrTrigonBot.
@@ -206,13 +209,18 @@ def install():
     download()
     # symlink all
     symlink()
-    # setup server config files ...
-    # set file permissions ...
-    # ...
     # replace fabfile.py by a symlink to the one in the repo
     # done here at the very end instead of in 'sl_drtrigonbot'
     local('rm fabfile.py')
     local('ln -s pywikibot-drtrigonbot/fabfile.py fabfile.py')
+    # setup server config files
+    print ("\nPlease generate or copy the needed config files now:\n"
+           "* user-config.py\n"
+           "* login-data/*\n"
+           "* data (subster mailbox, sum_disc history)\n"
+           "* may be others (devel/, public_html/, quota-SunOS.rrd, ...)\n"
+           "\nThen finish the installation by running:\n"
+           "$ fab -H localhost backup")
 
 def up_drtrigonbot():
     _update_git(dest='pywikibot-drtrigonbot/')
@@ -237,6 +245,8 @@ def backup():
     """ B.A) Backup all bot code on the server    (all B.# steps) """
     # see also 'backup' sh script ...
     # http://artymiak.com/quick-backups-with-fabric-and-python/
+    # * set file permissions ...
+    # * run backup ...
     raise NotImplementedError
 
 def list_large_files():
