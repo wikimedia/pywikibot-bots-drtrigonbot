@@ -123,16 +123,19 @@ def dl_drtrigonbot():
 #        _get_git_path(repo='pywikibot/bots/drtrigonbot', dest=None, path='public_html')
     _clone_git_path(repo='pywikibot/bots/drtrigonbot', dest='pywikibot-drtrigonbot/',
                     paths=['public_html/',
-                           'README',
+                           '/README',       # exclude 'externals/README'
                            'backup',
                            'fabfile.py',
                            'warnuserquota.py',
                            'crontab',
                            'literature',])
+    _clean_git(repos=['pywikibot-drtrigonbot/',])
     if LABS:    # labs-tools
-        local('cp -r pywikibot-drtrigonbot/public_html/cgi-bin/* cgi-bin/')
+#        local('cp -r pywikibot-drtrigonbot/public_html/cgi-bin/* cgi-bin/')
+        local('ln -s ~/pywikibot-drtrigonbot/public_html/cgi-bin/* cgi-bin/')
     else:       # toolserver
-        local('cp -r pywikibot-drtrigonbot/public_html/* public_html/')
+#        local('cp -r pywikibot-drtrigonbot/public_html/* public_html/')
+        local('ln -s ~/pywikibot-drtrigonbot/public_html/* public_html/')
 
 def dl_compat():
     # https://www.mediawiki.org/wiki/Manual:Pywikipediabot/Installation#Setup_on_Wikimedia_Labs.2FTool_Labs_server
@@ -217,10 +220,10 @@ def install():
 
 def up_drtrigonbot():
     _update_git(dest='pywikibot-drtrigonbot/')
-    if LABS:    # labs-tools
-        local('cp -r pywikibot-drtrigonbot/public_html/cgi-bin/* cgi-bin/')
-    else:       # toolserver
-        local('cp -r pywikibot-drtrigonbot/public_html/* public_html/')
+#    if LABS:    # labs-tools
+#        local('cp -r pywikibot-drtrigonbot/public_html/cgi-bin/* cgi-bin/')
+#    else:       # toolserver
+#        local('cp -r pywikibot-drtrigonbot/public_html/* public_html/')
 
 def up_compat():
     _update_git(dest='pywikibot-compat')
