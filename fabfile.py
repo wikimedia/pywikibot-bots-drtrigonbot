@@ -117,10 +117,10 @@ def setup():
         local('mkdir public_html/test')
 
 def dl_drtrigonbot():
-    if LABS:    # labs-tools
-        _get_git_path(repo='pywikibot/bots/drtrigonbot', dest=None, path='public_html/cgi-bin')
-    else:       # toolserver
-        _get_git_path(repo='pywikibot/bots/drtrigonbot', dest=None, path='public_html')
+#    if LABS:    # labs-tools
+#        _get_git_path(repo='pywikibot/bots/drtrigonbot', dest=None, path='public_html/cgi-bin')
+#    else:       # toolserver
+#        _get_git_path(repo='pywikibot/bots/drtrigonbot', dest=None, path='public_html')
     _clone_git_path(repo='pywikibot/bots/drtrigonbot', dest='pywikibot-drtrigonbot/',
                     paths=['public_html/',
                            'README',
@@ -129,6 +129,10 @@ def dl_drtrigonbot():
                            'warnuserquota.py',
                            'crontab',
                            'literature',])
+    if LABS:    # labs-tools
+        local('cp -r pywikibot-drtrigonbot/public_html/cgi-bin/* public_html/cgi-bin/')
+    else:       # toolserver
+        local('cp -r pywikibot-drtrigonbot/public_html/* public_html/')
 
 def dl_compat():
     # https://www.mediawiki.org/wiki/Manual:Pywikipediabot/Installation#Setup_on_Wikimedia_Labs.2FTool_Labs_server
@@ -154,14 +158,6 @@ def download():
     dl_core()
 
 def sl_drtrigonbot():
-#    if LABS:    # labs-tools
-#        local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/README README')
-#        local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/backup backup')
-#        local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
-#    else:       # toolserver
-#        local('ln -s /home/drtrigon/pywikibot-drtrigonbot/README README')
-#        local('ln -s /home/drtrigon/pywikibot-drtrigonbot/backup backup')
-#        local('ln -s /home/drtrigon/pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
     local('ln -s pywikibot-drtrigonbot/README README')
     local('ln -s pywikibot-drtrigonbot/backup backup')
     local('ln -s pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
@@ -171,27 +167,27 @@ def sl_compat():
         # docs ?
         # logs
 #        local('cd public_html/logs/; ln -s /data/project/drtrigonbot/pywikibot-compat/logs compat')
-        local('ln -s pywikibot-compat/logs public_html/logs/compat')
+        local('ln -s ~/pywikibot-compat/logs public_html/logs/compat')
     else:       # toolserver
         # docs
 #        local('cd public_html/doc/; ln -s /home/drtrigon/pywikipedia/docs DrTrigonBot')
-        local('ln -s pywikipedia/docs public_html/doc/DrTrigonBot')
+        local('ln -s ~/pywikipedia/docs public_html/doc/DrTrigonBot')
         # logs
 #        local('cd public_html/DrTrigonBot/; ln -s /home/drtrigon/pywikipedia/logs trunk')
-        local('ln -s pywikipedia/logs public_html/DrTrigonBot/trunk')
+        local('ln -s ~/pywikipedia/logs public_html/DrTrigonBot/trunk')
 
 def sl_core():
     if LABS:    # labs-tools
         # docs ?
         # logs
 #        local('cd public_html/logs/; ln -s /data/project/drtrigonbot/pywikibot-core/logs core')
-        local('ln -s pywikibot-core/logs public_html/logs/core')
+        local('ln -s ~/pywikibot-core/logs public_html/logs/core')
     else:       # toolserver
         # docs
 # create symlink to core (rewrite) docs here
         # logs
 #        local('cd public_html/DrTrigonBot/; ln -s /home/drtrigon/rewrite/logs rewrite')
-        local('ln -s rewrite/logs public_html/DrTrigonBot/rewrite')
+        local('ln -s ~/rewrite/logs public_html/DrTrigonBot/rewrite')
 
 def symlink():
     """ I.3) symlink (sl) all directories and files """
