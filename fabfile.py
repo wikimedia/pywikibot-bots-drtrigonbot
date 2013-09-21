@@ -212,10 +212,6 @@ def install():
     # replace fabfile.py by a symlink to the one in the repo
     # done here at the very end instead of in 'sl_drtrigonbot'
     local('rm fabfile.py')
-#    if LABS:    # labs-tools
-#        local('ln -s /data/project/drtrigonbot/pywikibot-drtrigonbot/fabfile.py fabfile.py')
-#    else:       # toolserver
-#        local('ln -s /home/drtrigon/pywikibot-drtrigonbot/fabfile.py fabfile.py')
     local('ln -s pywikibot-drtrigonbot/fabfile.py fabfile.py')
 
 def up_drtrigonbot():
@@ -242,6 +238,19 @@ def backup():
     # see also 'backup' sh script ...
     # http://artymiak.com/quick-backups-with-fabric-and-python/
     raise NotImplementedError
+
+def list_large_files():
+    """ L.A) List all files exceeding 5 and 10MB  (all L.# steps) """
+    # List all files exceeding an size of 10MB. Use this to find e.g.
+    # core dump files.
+    # list files >5MB
+    print "files larger than 5MB"
+    local("""find . -type f -size +5000k -exec ls -lh {} \; | awk '{ print $9 ": " $5 }'""")
+    print
+    # list files >10MB
+    print "files larger than 10MB"
+    local("""find . -type f -size +10000k -exec ls -lh {} \; | awk '{ print $9 ": " $5 }'""")
+    print
 
 
 if (__name__ == '__main__') and ('sys' in locals()):
