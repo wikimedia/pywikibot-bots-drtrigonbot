@@ -184,7 +184,7 @@ _SQL_query_wiki_info = \
    lang,
    CONCAT("sql-s", server) AS dbserver,
    dbname,
-   CONCAT("http://", DOMAIN, script_path, "api.php") AS url
+   CONCAT("//", DOMAIN, script_path, "api.php") AS url
  FROM toolserver.wiki
  WHERE family = "wikipedia"
  ORDER BY SIZE DESC LIMIT %s;"""
@@ -313,6 +313,8 @@ def displayhtmlpage(form):
 	lang = locale.locale_alias.get(wiki, locale.locale_alias['en']).split('.')[0]
 	locale.setlocale(locale.LC_TIME, lang)
 
+	#scheme = {'NO': 'http', 'YES': 'https'}[os.environ.get('HTTP_X_TS_SSL', 'NO')]
+
 	s = datetime.datetime.strptime(start, wikitime)
 	p = datetime.timedelta(hours=int(period))
 	end = s - p
@@ -354,7 +356,7 @@ def displayhtmlpage(form):
 				data['output'] += "<tr>\n  <td>"
 				title = subrow[0][0]
 				title = site.namespace(subrow[0][1]).encode('utf8') + ':' + title
-				data['output'] += '<a href="http://%s.wikipedia.org/wiki/%s" target="_blank">%s</a>' % (wiki, title, title.replace('_', ' '))
+				data['output'] += '<a href="//%s.wikipedia.org/wiki/%s" target="_blank">%s</a>' % (wiki, title, title.replace('_', ' '))
 				data['output'] += "</td>\n  <td>"
 #				data['output'] += str(subrow[0][1:])
 				try:
@@ -363,7 +365,7 @@ def displayhtmlpage(form):
 					tmsp = subrow[0][2] + " (!)"
 				data['output'] += tmsp
 				data['output'] += "</td>\n  <td>"
-				data['output'] += '<a href="http://%s.wikipedia.org/wiki/User:%s" target="_blank">%s</a>' % (wiki, subrow[0][3], subrow[0][3])
+				data['output'] += '<a href="//%s.wikipedia.org/wiki/User:%s" target="_blank">%s</a>' % (wiki, subrow[0][3], subrow[0][3])
 				data['output'] += "</td>\n  <td>"
 				data['output'] += subrow[0][4]
 				data['output'] += "</td>\n</tr>\n"
@@ -384,6 +386,7 @@ def displayhtmlpage(form):
 			'refresh':	'',
 			'tsnotice': 	style.print_tsnotice(),
 			'p-status':	'<tr><td><small><a href="http://status.toolserver.org/" target="_blank">DB status</a></small></td></tr>',
+			#'p-status':	'<tr><td><small><a href="//status.toolserver.org/" target="_blank">DB status</a></small></td></tr>',
 			'footer': 	style.footer + style.footer_w3c, # wiki (new) not CSS 2.1 compilant
 			'wiki':		wiki,
 			'cat':		cgi.escape(   cat, quote=True), # proper XSS secure output
