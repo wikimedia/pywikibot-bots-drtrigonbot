@@ -259,16 +259,18 @@ def backup():
     print "  * productive"
     local('rm -rf ~/BAK_DIR/')
     local('mkdir ~/BAK_DIR')
+    local('mkdir ~/BAK_DIR/compat')
+    local('mkdir ~/BAK_DIR/core')
 
     # backup and protect 'login-data' on productive
     print "processing 'login-data':"
     print "  * backup"
     if LABS:    # labs-tools
-        local('cp -a ~/pywikibot-compat/login-data/ ~/BAK_DIR/')
-        local('cp -a ~/pywikibot-core/*.lwp ~/BAK_DIR/')
+        local('cp -a ~/pywikibot-compat/login-data/ ~/BAK_DIR/compat/')
+        local('cp -a ~/pywikibot-core/*.lwp ~/BAK_DIR/core/')
     else:
-        local('cp -a ~/pywikipedia/login-data/ ~/BAK_DIR/')
-        local('cp -a ~/rewrite/*.lwp ~/BAK_DIR/')
+        local('cp -a ~/pywikipedia/login-data/ ~/BAK_DIR/compat/')
+        local('cp -a ~/rewrite/*.lwp ~/BAK_DIR/core/')
     print "  * protect"
     if LABS:    # labs-tools
         local('chmod -R go-rwx ~/pywikibot-compat/login-data')
@@ -281,11 +283,11 @@ def backup():
     print "processing 'user-config.py':"
     print "  * backup"
     if LABS:    # labs-tools
-        local('cp -a ~/pywikibot-compat/user-config.py ~/BAK_DIR/')
-        local('cp -a ~/pywikibot-core/user-config.py ~/BAK_DIR/')
+        local('cp -a ~/pywikibot-compat/user-config.py ~/BAK_DIR/compat/')
+        local('cp -a ~/pywikibot-core/user-config.py ~/BAK_DIR/core/')
     else:
-        local('cp -a ~/pywikipedia/user-config.py ~/BAK_DIR/')
-        local('cp -a ~/rewrite/user-config.py ~/BAK_DIR/')
+        local('cp -a ~/pywikipedia/user-config.py ~/BAK_DIR/compat/')
+        local('cp -a ~/rewrite/user-config.py ~/BAK_DIR/core/')
     print "  * protect"
     if LABS:    # labs-tools
         local('chmod go-rwx ~/pywikibot-compat/user-config.py')
