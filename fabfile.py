@@ -138,6 +138,7 @@ def dl_drtrigonbot():
     else:       # toolserver
 #        local('cp -r pywikibot-drtrigonbot/public_html/* public_html/')
         local('ln -s ~/pywikibot-drtrigonbot/public_html/* public_html/')
+        local('ln -s ~/pywikibot-drtrigonbot/public_html/cgi-bin/* public_html/cgi-bin/')
 
 def dl_compat():
     # https://www.mediawiki.org/wiki/Manual:Pywikipediabot/Installation#Setup_on_Wikimedia_Labs.2FTool_Labs_server
@@ -173,6 +174,7 @@ def sl_compat():
 #        local('cd public_html/logs/; ln -s /data/project/drtrigonbot/pywikibot-compat/logs compat')
         local('ln -s ~/pywikibot-compat/logs public_html/logs/compat')
     else:       # toolserver
+        local('ln -s ~/pywikibot-compat pywikipedia')
         # docs
 #        local('cd public_html/doc/; ln -s /home/drtrigon/pywikipedia/docs DrTrigonBot')
         local('ln -s ~/pywikipedia/docs public_html/doc/DrTrigonBot')
@@ -187,6 +189,7 @@ def sl_core():
 #        local('cd public_html/logs/; ln -s /data/project/drtrigonbot/pywikibot-core/logs core')
         local('ln -s ~/pywikibot-core/logs public_html/logs/core')
     else:       # toolserver
+        local('ln -s ~/pywikibot-core rewrite')
         # docs
 # create symlink to core (rewrite) docs here
         # logs
