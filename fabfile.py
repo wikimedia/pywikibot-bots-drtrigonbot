@@ -137,7 +137,7 @@ def dl_drtrigonbot():
         local('ln -s ~/pywikibot-drtrigonbot/public_html/cgi-bin/* cgi-bin/')
     else:       # toolserver
 #        local('cp -r pywikibot-drtrigonbot/public_html/* public_html/')
-        local('ln -s ~/pywikibot-drtrigonbot/public_html/* public_html/')
+        local('ln -s ~/pywikibot-drtrigonbot/public_html/tsnotice.css public_html/tsnotice.css')
         local('ln -s ~/pywikibot-drtrigonbot/public_html/cgi-bin/* public_html/cgi-bin/')
 
 def dl_compat():
