@@ -255,8 +255,7 @@ def backup():
     #   make at least that dir "not readable" for anyone but "owner". --Pyr0.
 
     # init backup (trash old one)
-    print "init/reset backup on"
-    print "  * productive"
+    print "init/reset backup"
     local('rm -rf ~/BAK_DIR/')
     local('mkdir ~/BAK_DIR')
     local('mkdir ~/BAK_DIR/compat')
@@ -310,6 +309,10 @@ def backup():
         local('tar -jcvf ~/BAK_DIR/DrTrigonBot_logs.tar.bz2 ~/public_html/*/*')
     else:
         local('tar -jcvf ~/BAK_DIR/DrTrigonBot_logs.tar.bz2 ~/public_html/DrTrigonBot/*/*')
+
+    # finally protect backup as well
+    print "protect backup"
+    local('chmod -R go-rwx ~/BAK_DIR')
 
 def list_large_files():
     """ L.A) List all files exceeding 5 and 10MB  (all L.# steps) """
