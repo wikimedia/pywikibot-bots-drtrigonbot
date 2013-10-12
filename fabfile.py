@@ -216,7 +216,7 @@ def install():
     # setup server config files
     print ("\nPlease generate or copy the needed config files now:\n"
            "* user-config.py\n"
-           "* login-data/*\n"
+           "* login-data/* and *.lwp\n"
            "* data (subster mailbox, sum_disc history)\n"
            "* may be others (devel/, public_html/, quota-SunOS.rrd, ...)\n"
            "\nThen finish the installation by running:\n"

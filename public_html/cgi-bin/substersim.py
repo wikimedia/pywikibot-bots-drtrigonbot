@@ -224,7 +224,7 @@ def timeout_handler(signum, frame):
 
 
 def maindisplay():
-	param_default = subster.SubsterBot._param_default
+	param_default = subster.bot_config['param_default']
 	param_default.update(sim_param_default)
 	params = {}
 	for key in param_default.keys():
