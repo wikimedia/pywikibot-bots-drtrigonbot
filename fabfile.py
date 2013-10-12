@@ -127,7 +127,6 @@ def dl_drtrigonbot():
     _clone_git_path(repo='pywikibot/bots/drtrigonbot', dest='pywikibot-drtrigonbot/',
                     paths=['public_html/',
                            '/README',       # exclude 'externals/README'
-                           'backup',
                            'fabfile.py',
                            'warnuserquota.py',
                            'crontab',
@@ -165,7 +164,6 @@ def download():
 
 def sl_drtrigonbot():
     local('ln -s pywikibot-drtrigonbot/README README')
-    local('ln -s pywikibot-drtrigonbot/backup backup')
     local('ln -s pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
 
 def sl_compat():
@@ -243,11 +241,73 @@ def update():
 
 def backup():
     """ B.A) Backup all bot code on the server    (all B.# steps) """
-    # see also 'backup' sh script ...
     # http://artymiak.com/quick-backups-with-fabric-and-python/
-    # * set file permissions ...
-    # * run backup ...
-    raise NotImplementedError
+    #
+    # See 'backup' sh script:
+    # Do a backup of sensitive and important data and since that data
+    # are private they have to be protected also.
+    # * run backup: Backup all important user and config data from
+    #   'pywikipedia/' to 'BAK_DIR/'.
+    # * set file permissions: I noticed many people using the framework haven't
+    #   set the correct access flags to their "login-data" dir. This could lead
+    #   to someone using those files to run your bot accounts. Although only
+    #   other toolserver users can see these files, its still an issue. Please
+    #   make at least that dir "not readable" for anyone but "owner". --Pyr0.
+
+    # init backup (trash old one)
+    print "init/reset backup on"
+    print "  * productive"
+    local('rm -rf ~/BAK_DIR/')
+    local('mkdir ~/BAK_DIR')
+
+    # backup and protect 'login-data' on productive
+    print "processing 'login-data':"
+    print "  * backup"
+    if LABS:    # labs-tools
+        local('cp -a ~/pywikibot-compat/login-data/ ~/BAK_DIR/')
+        local('cp -a ~/pywikibot-core/*.lwp ~/BAK_DIR/')
+    else:
+        local('cp -a ~/pywikipedia/login-data/ ~/BAK_DIR/')
+        local('cp -a ~/rewrite/*.lwp ~/BAK_DIR/')
+    print "  * protect"
+    if LABS:    # labs-tools
+        local('chmod -R go-rwx ~/pywikibot-compat/login-data')
+        local('chmod go-rwx ~/pywikibot-core/*.lwp')
+    else:
+        local('chmod -R go-rwx ~/pywikipedia/login-data')
+        local('chmod go-rwx ~/rewrite/*.lwp')
+
+    # backup and protect 'user-config.py' on productive
+    print "processing 'user-config.py':"
+    print "  * backup"
+    if LABS:    # labs-tools
+        local('cp -a ~/pywikibot-compat/user-config.py ~/BAK_DIR/')
+        local('cp -a ~/pywikibot-core/user-config.py ~/BAK_DIR/')
+    else:
+        local('cp -a ~/pywikipedia/user-config.py ~/BAK_DIR/')
+        local('cp -a ~/rewrite/user-config.py ~/BAK_DIR/')
+    print "  * protect"
+    if LABS:    # labs-tools
+        local('chmod go-rwx ~/pywikibot-compat/user-config.py')
+        local('chmod go-rwx ~/pywikibot-core/user-config.py')
+    else:
+        local('chmod go-rwx ~/pywikipedia/user-config.py')
+        local('chmod go-rwx ~/rewrite/user-config.py')
+
+    # backup and protect 'data' on productive
+    print "processing 'data':"
+    print "  * backup"
+    local('cp -a ~/data/ ~/BAK_DIR/')
+    print "  * protect"
+    local('chmod -R go-rwx ~/data')
+
+    # compress and backup 'logs' on productive
+    print "processing 'logs':"
+    print "  * compress and backup"
+    if LABS:    # labs-tools
+        local('tar -jcvf ~/BAK_DIR/DrTrigonBot_logs.tar.bz2 ~/public_html/*/*')
+    else:
+        local('tar -jcvf ~/BAK_DIR/DrTrigonBot_logs.tar.bz2 ~/public_html/DrTrigonBot/*/*')
 
 def list_large_files():
     """ L.A) List all files exceeding 5 and 10MB  (all L.# steps) """
