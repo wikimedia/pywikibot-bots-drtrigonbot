@@ -367,7 +367,7 @@ def displayhtmlpage(form):
 				data['output'] += "</td>\n  <td>"
 				data['output'] += '<a href="//%s.wikipedia.org/wiki/User:%s" target="_blank">%s</a>' % (wiki, subrow[0][3], subrow[0][3])
 				data['output'] += "</td>\n  <td>"
-				data['output'] += subrow[0][4]
+				data['output'] += str(subrow[0][4])
 				data['output'] += "</td>\n</tr>\n"
 
 			data['output'] += "</table>\n"
