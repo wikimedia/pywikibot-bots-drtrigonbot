@@ -139,6 +139,7 @@ def dl_drtrigonbot():
 #        local('cp -r pywikibot-drtrigonbot/public_html/* public_html/')
         local('ln -s ~/pywikibot-drtrigonbot/public_html/tsnotice.css public_html/tsnotice.css')
         local('ln -s ~/pywikibot-drtrigonbot/public_html/cgi-bin/* public_html/cgi-bin/')
+    local('ln -s ~/pywikibot-drtrigonbot/public_html/index.html public_html/index.html')
 
 def dl_compat():
     # https://www.mediawiki.org/wiki/Manual:Pywikipediabot/Installation#Setup_on_Wikimedia_Labs.2FTool_Labs_server
@@ -166,6 +167,7 @@ def download():
 def sl_drtrigonbot():
     local('ln -s pywikibot-drtrigonbot/README README')
     local('ln -s pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
+    local('ln -s pywikibot-drtrigonbot/.description .description')
 
 def sl_compat():
     if LABS:    # labs-tools
