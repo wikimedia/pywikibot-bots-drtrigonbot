@@ -126,6 +126,7 @@ def dl_drtrigonbot():
 #        _get_git_path(repo='pywikibot/bots/drtrigonbot', dest=None, path='public_html')
     _clone_git_path(repo='pywikibot/bots/drtrigonbot', dest='pywikibot-drtrigonbot/',
                     paths=['public_html/',
+                           '.description',
                            '/README',       # exclude 'externals/README'
                            'fabfile.py',
                            'warnuserquota.py',
