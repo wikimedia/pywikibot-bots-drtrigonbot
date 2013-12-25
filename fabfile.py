@@ -127,6 +127,8 @@ def dl_drtrigonbot():
     _clone_git_path(repo='pywikibot/bots/drtrigonbot', dest='pywikibot-drtrigonbot/',
                     paths=['public_html/',
                            '.description',
+                           '.forward',
+                           '.forward+subster',
                            '/README',       # exclude 'externals/README'
                            'fabfile.py',
                            'warnuserquota.py',
@@ -168,7 +170,13 @@ def download():
 def sl_drtrigonbot():
     local('ln -s pywikibot-drtrigonbot/README README')
     local('ln -s pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
-    local('ln -s pywikibot-drtrigonbot/.description .description')
+    local('ln -s pywikibot-drtrigonbot/.forward .forward')
+    if LABS:    # labs-tools
+        local('ln -s pywikibot-drtrigonbot/.description .description')
+    else:       # toolserver
+        # .about.me file...?
+        local('ln -s pywikibot-drtrigonbot/.forward+subster .forward+subster')
+    local('chmod 600 ~/.forward*')
 
 def sl_compat():
     if LABS:    # labs-tools
