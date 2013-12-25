@@ -176,7 +176,7 @@ def sl_drtrigonbot():
     else:       # toolserver
         # .about.me file...?
         local('ln -s pywikibot-drtrigonbot/.forward+subster .forward+subster')
-    local('chmod 600 ~/.forward*')
+    local('chmod 600 ~/.forward*')  # changes 'pywikibot-drtrigonbot/.forward*'
 
 def sl_compat():
     if LABS:    # labs-tools
