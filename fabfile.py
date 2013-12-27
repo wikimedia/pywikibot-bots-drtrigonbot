@@ -169,12 +169,11 @@ def download():
 
 def sl_drtrigonbot():
     local('ln -s pywikibot-drtrigonbot/README README')
-    local('ln -s pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
     local('ln -s pywikibot-drtrigonbot/.forward .forward')
     if LABS:    # labs-tools
         local('ln -s pywikibot-drtrigonbot/.description .description')
     else:       # toolserver
-        # .about.me file...?
+        local('ln -s pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
         local('ln -s pywikibot-drtrigonbot/.forward+subster .forward+subster')
     local('chmod 600 ~/.forward*')  # changes 'pywikibot-drtrigonbot/.forward*'
 

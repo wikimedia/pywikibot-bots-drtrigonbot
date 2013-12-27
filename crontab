@@ -78,29 +78,39 @@
 PATH=/usr/local/bin:/usr/bin:/bin
 
 # pywikibot-core: script_wui.py
-06 0 * * * jstart -l h_vmem=512M -N script_wui python $HOME/pywikibot-core/pwb.py script_wui.py -log
+06 0 * * * jstart -l h_vmem=512M -quiet -N script_wui python $HOME/pywikibot-core/pwb.py script_wui.py -log
+#06 0 * * * jstart -l h_vmem=512M -quiet -N script_wui python $HOME/pywikibot-core/pwb.py script_wui.py -log >/dev/null
 
-# pywikibot-compat: sum_disc.py
-36 2 * * * jsub -l h_vmem=1024M -N sum_disc python $HOME/pywikibot-compat/pwb.py -sum_disc -simulate
-06 2 */14 * * jsub -l h_vmem=256M -N compbot python $HOME/pywikibot-compat/pwb.py -sum_disc -compress_history:[] -simulate
+# pywikibot-compat: sum_disc.py [SIMULATE]
+36 2 * * * jsub -l h_vmem=1024M -quiet -N sum_disc python $HOME/pywikibot-compat/pwb.py -sum_disc -simulate
+06 2 */14 * * jsub -l h_vmem=256M -quiet -N compbot python $HOME/pywikibot-compat/pwb.py -sum_disc -compress_history:[] -simulate
 
 ## pywikibot-compat: sum_disc.py
-#36 2 * * * jsub -l h_vmem=1024M -N sum_disc python $HOME/pywikibot-compat/pwb.py -sum_disc
-#06 2 */14 * * jsub -l h_vmem=256M -N compbot python $HOME/pywikibot-compat/pwb.py -sum_disc -compress_history:[]
+#36 2 * * * jsub -l h_vmem=1024M -quiet -N sum_disc python $HOME/pywikibot-compat/pwb.py -sum_disc
+#06 2 */14 * * jsub -l h_vmem=256M -quiet -N compbot python $HOME/pywikibot-compat/pwb.py -sum_disc -compress_history:[]
+
+## pywikibot-compat: catimages.py [SIMULATE]
+#06 20 * * * jsub -l h_vmem=1024M -quiet -N catimages python $HOME/pywikibot-compat/pwb.py -catimages -cat -simulate
 
 ## pywikibot-compat: catimages.py
-#06 20 * * * jsub -l h_vmem=1024M -N catimages python $HOME/pywikibot-compat/pwb.py -catimages
+#06 20 * * * jsub -l h_vmem=1024M -quiet -N catimages python $HOME/pywikibot-compat/pwb.py -catimages
+
+## pywikibot-compat: subster.py, subster_irc.py [SIMULATE]
+#36 6 * * * jsub -l h_vmem=1024M -quiet -N subster python $HOME/pywikibot-compat/pwb.py -subster -simulate
+#06 * * * * jstart -l h_vmem=512M -quiet -N ircbot python $HOME/pywikibot-compat/pwb.py -subster_irc -simulate
+06 0 * * * jsub -l h_vmem=512M -quiet -N subster_meta python $HOME/pywikibot-compat/pwb.py -subster -family:meta -lang: -simulate
+36 0 * * * jsub -l h_vmem=512M -quiet -N subster_frr python $HOME/pywikibot-compat/pwb.py -subster -lang:frr -simulate
+#06 1 * * * jsub -l h_vmem=512M -quiet -N subster_en python $HOME/pywikibot-compat/pwb.py -subster -lang:en -simulate
+#36 1 * * * jsub -l h_vmem=512M -quiet -N subster_nl python $HOME/pywikibot-compat/pwb.py -subster -lang:nl -simulate
+06 * * * * jsub -l h_vmem=512M -quiet -N subster_ar python $HOME/pywikibot-compat/pwb.py -subster -lang:ar -simulate
+#06 3 * * * jsub -l h_vmem=512M -quiet -N subster_data python $HOME/pywikibot-compat/pwb.py -subster -family:wikidata -lang:wikidata -simulate
 
 ## pywikibot-compat: subster.py, subster_irc.py
-#36 6 * * * jsub -l h_vmem=1024M -N subster python $HOME/pywikibot-compat/pwb.py -subster
-#06 * * * * jstart -l h_vmem=512M -N ircbot python $HOME/pywikibot-compat/pwb.py -subster_irc
-#06 0 * * * jsub -l h_vmem=512M -N subster_meta python $HOME/pywikibot-compat/pwb.py -subster -family:meta -lang:
-#36 0 * * * jsub -l h_vmem=512M -N subster_frr python $HOME/pywikibot-compat/pwb.py -subster -lang:frr
-#06 1 * * * jsub -l h_vmem=512M -N subster_en python $HOME/pywikibot-compat/pwb.py -subster -lang:en
-#36 1 * * * jsub -l h_vmem=512M -N subster_nl python $HOME/pywikibot-compat/pwb.py -subster -lang:nl
-#06 * * * * jsub -l h_vmem=512M -N subster_ar python $HOME/pywikibot-compat/pwb.py -subster -lang:ar
-#06 3 * * * jsub -l h_vmem=512M -N subster_data python $HOME/pywikibot-compat/pwb.py -subster -family:wikidata -lang:wikidata
-
-## pywikibot-drtrigonbot: fabfile ... maintenance ?!
-## arch=sol; because of rrdtool and 32bit vs. 64bit arch
-#06 0 * * * jsub -l h_vmem=128M -j y -N maintenance python $HOME/warnuserquota.py >/dev/null
+#36 6 * * * jsub -l h_vmem=1024M -quiet -N subster python $HOME/pywikibot-compat/pwb.py -subster
+#06 * * * * jstart -l h_vmem=512M -quiet -N ircbot python $HOME/pywikibot-compat/pwb.py -subster_irc
+#06 0 * * * jsub -l h_vmem=512M -quiet -N subster_meta python $HOME/pywikibot-compat/pwb.py -subster -family:meta -lang:
+#36 0 * * * jsub -l h_vmem=512M -quiet -N subster_frr python $HOME/pywikibot-compat/pwb.py -subster -lang:frr
+#06 1 * * * jsub -l h_vmem=512M -quiet -N subster_en python $HOME/pywikibot-compat/pwb.py -subster -lang:en
+#36 1 * * * jsub -l h_vmem=512M -quiet -N subster_nl python $HOME/pywikibot-compat/pwb.py -subster -lang:nl
+#06 * * * * jsub -l h_vmem=512M -quiet -N subster_ar python $HOME/pywikibot-compat/pwb.py -subster -lang:ar
+#06 3 * * * jsub -l h_vmem=512M -quiet -N subster_data python $HOME/pywikibot-compat/pwb.py -subster -family:wikidata -lang:wikidata
