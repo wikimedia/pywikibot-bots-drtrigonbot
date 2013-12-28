@@ -54,6 +54,7 @@ import MySQLdb, _mysql_exceptions
 import ps_wikinew as style # panel-stylesheet 'wiki (new)' not CSS 2.1 compilant
 
 bot_path = os.path.realpath(style.bot_path[style.host(os.environ)][0])
+db_conf  = style.db_conf[style.host(os.environ)]
 
 
 # === pywikibot framework === === ===
@@ -418,7 +419,8 @@ site = pywikibot.getSite(wiki)
 # Establich a connection
 #db = MySQLdb.connect(db='enwiki_p', host="enwiki-p.rrdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
 #db = MySQLdb.connect(db=wiki+'wiki_p', host=wiki+"wiki-p.rrdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
-db = MySQLdb.connect(db='u_drtrigon', host=wiki+"wiki-p.userdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
+#db = MySQLdb.connect(db='u_drtrigon', host=wiki+"wiki-p.userdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
+db = MySQLdb.connect(db=db_conf[0], host=wiki+db_conf[1], read_default_file=os.path.join(bot_path, "../.my.cnf"))
 # prepare a cursor object using cursor() method
 cursor = db.cursor()
 

@@ -172,6 +172,7 @@ def sl_drtrigonbot():
     local('ln -s pywikibot-drtrigonbot/.forward .forward')
     if LABS:    # labs-tools
         local('ln -s pywikibot-drtrigonbot/.description .description')
+        local('ln -s replica.my.cnf .my.cnf')   # DB config
     else:       # toolserver
         local('ln -s pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
         local('ln -s pywikibot-drtrigonbot/.forward+subster .forward+subster')
