@@ -55,7 +55,19 @@ import os, sys, re
 import StringIO, traceback, signal
 
 
-bot_path = os.path.realpath("../../pywikipedia/")
+# === panel HTML stylesheets === === ===
+# MAY BE USING Cheetah (http://www.cheetahtemplate.org/) WOULD BE BETTER (or needed at any point...)
+#
+#import ps_plain as style   # panel-stylesheet 'plain'
+#import ps_simple as style  # panel-stylesheet 'simple'
+#import ps_wiki as style    # panel-stylesheet 'wiki (monobook)'
+import ps_wikinew as style # panel-stylesheet 'wiki (new)' not CSS 2.1 compilant
+
+bot_path = os.path.realpath(style.bot_path[style.host(os.environ)][0])
+
+
+# === pywikibot framework === === ===
+#
 #importglobal("subster_beta", bot_path)
 #importglobal(["wikipedia", "xmlreader", "config", "dtbext", "subster_beta"], bot_path)
 # http://stackoverflow.com/questions/279237/python-import-a-module-from-a-folder
@@ -65,15 +77,8 @@ import config						#
 import wikipedia as pywikibot
 
 
-# === panel HTML stylesheets === === ===
-# MAY BE USING Cheetah (http://www.cheetahtemplate.org/) WOULD BE BETTER (or needed at any point...)
+# === page HTML contents === === ===
 #
-#import ps_plain as style   # panel-stylesheet 'plain'
-#import ps_simple as style  # panel-stylesheet 'simple'
-#import ps_wiki as style    # panel-stylesheet 'wiki (monobook)'
-import ps_wikinew as style # panel-stylesheet 'wiki (new)' not CSS 2.1 compilant
-
-
 maindisplay_content = \
 """<small>(analog to <a href="http://meta.wikimedia.org/wiki/Special:ExpandTemplates">Special:ExpandTemplates</a>)</small><br><br>
 Version:<br>
@@ -194,6 +199,8 @@ Bot output:
 <br>"""
 
 
+# === variables === === ===
+#
 sim_param_default = {	'value': 	'val',
 			'action':	'',
 			'content':	'<!--SUBSTER-val--><!--SUBSTER-val-->',
@@ -201,6 +208,8 @@ sim_param_default = {	'value': 	'val',
 timeout = 60		# xx-sec. max. delay for url request
 
 
+# === code === === ===
+#
 # from 'runbotrun.py'
 def gettraceback(exc_info):
 	output = StringIO.StringIO()

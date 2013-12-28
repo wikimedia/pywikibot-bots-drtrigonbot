@@ -112,6 +112,9 @@ def host(environ):
 # === labs conversion patch: variables === === ===
 ver_desc = {  'ts': ['trunk', 'rewrite'],
             'labs': ['compat', 'core'], }
- 
+
 localdir = {  'ts': ['..', 'DrTrigonBot', '.'],
             'labs': ['..', 'public_html', 'logs', '.'], }
+
+bot_path = {  'ts': ["../../pywikipedia/", "../../rewrite/"],
+            'labs': ["../pywikibot-compat/", "../pywikibot-core/"], }

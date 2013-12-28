@@ -51,6 +51,8 @@ import mailbox
 #import ps_wiki as style    # panel-stylesheet 'wiki (monobook)'
 import ps_wikinew as style # panel-stylesheet 'wiki (new)' not CSS 2.1 compilant
 
+bot_path = os.path.realpath(style.bot_path[style.host(os.environ)][0])
+
 
 # === page HTML contents === === ===
 #
@@ -75,7 +77,7 @@ b = "<a href='/~drtrigon/cgi-bin/subster_mail_queue.py?action=content&amp;no=%s'
 def displaystate(form):
 	data = {}
 
-        mbox = mailbox.mbox('../../data/subster/mail_inbox')
+        mbox = mailbox.mbox(os.path.join(bot_path, '../data/subster/mail_inbox'))
 
         buf = []
         buf.append( '\n<table>' )

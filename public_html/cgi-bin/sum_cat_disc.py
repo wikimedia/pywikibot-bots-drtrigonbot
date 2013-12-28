@@ -46,7 +46,18 @@ import locale
 import MySQLdb, _mysql_exceptions 
 
 
-bot_path = os.path.realpath("../../pywikipedia/")
+# === panel HTML stylesheets === === ===
+#
+#import ps_plain as style   # panel-stylesheet 'plain'
+#import ps_simple as style  # panel-stylesheet 'simple'
+#import ps_wiki as style    # panel-stylesheet 'wiki (monobook)'
+import ps_wikinew as style # panel-stylesheet 'wiki (new)' not CSS 2.1 compilant
+
+bot_path = os.path.realpath(style.bot_path[style.host(os.environ)][0])
+
+
+# === pywikibot framework === === ===
+#
 sys.path.append( bot_path )				# bot import form other path (!)
 import query						#
 import wikipedia as pywikibot				#
@@ -56,14 +67,8 @@ import family
 # may be best would be to get namespace info from DB?!
 
 
-# === panel HTML stylesheets === === ===
+# === page HTML contents === === ===
 #
-#import ps_plain as style   # panel-stylesheet 'plain'
-#import ps_simple as style  # panel-stylesheet 'simple'
-#import ps_wiki as style    # panel-stylesheet 'wiki (monobook)'
-import ps_wikinew as style # panel-stylesheet 'wiki (new)' not CSS 2.1 compilant
-
-
 displaystate_content = \
 """<br>
 <form action="sum_cat_disc.py">
@@ -97,6 +102,8 @@ displaystate_content = \
 %(output)s"""
 
 
+# === SQL query contents === === ===
+#
 # http://www.mediawiki.org/wiki/Manual:Database_layout
 # http://en.wikipedia.org/wiki/Wikipedia:Namespace
 # http://sql.1keydata.com/de/sql-like.php
@@ -190,6 +197,8 @@ _SQL_query_wiki_info = \
  ORDER BY SIZE DESC LIMIT %s;"""
 
 
+# === variables === === ===
+#
 SQL_LIMIT_max = 1000
 
 wikitime    = "%Y%m%d%H%M%S"
@@ -197,6 +206,8 @@ wikitime    = "%Y%m%d%H%M%S"
 asctime_fmt = "%a %b %d %H:%M:%S %Y"
 
 
+# === code === === ===
+#
 def call_db(query, args=(), limit=SQL_LIMIT_max):
 	#db.query(query % args)
 
