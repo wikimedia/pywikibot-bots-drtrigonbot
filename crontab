@@ -78,8 +78,8 @@
 PATH=/usr/local/bin:/usr/bin:/bin
 
 # pywikibot-core: script_wui.py
-06 0 * * * jstart -l h_vmem=512M -quiet -N script_wui python $HOME/pywikibot-core/pwb.py script_wui.py -log
-#06 0 * * * jstart -l h_vmem=512M -quiet -N script_wui python $HOME/pywikibot-core/pwb.py script_wui.py -log >/dev/null
+#06 0 * * * jstart -l h_vmem=512M -quiet -N script_wui python $HOME/pywikibot-core/pwb.py script_wui.py -log
+06 0 * * * jstart -l h_vmem=512M -quiet -N script_wui python $HOME/pywikibot-core/pwb.py script_wui.py -log >/dev/null
 
 # pywikibot-compat: sum_disc.py [SIMULATE]
 36 2 * * * jsub -l h_vmem=1024M -quiet -N sum_disc python $HOME/pywikibot-compat/pwb.py -sum_disc -simulate
@@ -89,13 +89,13 @@ PATH=/usr/local/bin:/usr/bin:/bin
 #36 2 * * * jsub -l h_vmem=1024M -quiet -N sum_disc python $HOME/pywikibot-compat/pwb.py -sum_disc
 #06 2 */14 * * jsub -l h_vmem=256M -quiet -N compbot python $HOME/pywikibot-compat/pwb.py -sum_disc -compress_history:[]
 
-## pywikibot-compat: catimages.py [SIMULATE]
-#06 20 * * * jsub -l h_vmem=1024M -quiet -N catimages python $HOME/pywikibot-compat/pwb.py -catimages -cat -simulate
+# pywikibot-compat: catimages.py [SIMULATE]
+06 20 * * * jsub -l h_vmem=1024M -quiet -N catimages python $HOME/pywikibot-compat/pwb.py -catimages -cat -simulate
 
 ## pywikibot-compat: catimages.py
 #06 20 * * * jsub -l h_vmem=1024M -quiet -N catimages python $HOME/pywikibot-compat/pwb.py -catimages
 
-## pywikibot-compat: subster.py, subster_irc.py [SIMULATE]
+# pywikibot-compat: subster.py, subster_irc.py [SIMULATE]
 #36 6 * * * jsub -l h_vmem=1024M -quiet -N subster python $HOME/pywikibot-compat/pwb.py -subster -simulate
 #06 * * * * jstart -l h_vmem=512M -quiet -N ircbot python $HOME/pywikibot-compat/pwb.py -subster_irc -simulate
 06 0 * * * jsub -l h_vmem=512M -quiet -N subster_meta python $HOME/pywikibot-compat/pwb.py -subster -family:meta -lang: -simulate
