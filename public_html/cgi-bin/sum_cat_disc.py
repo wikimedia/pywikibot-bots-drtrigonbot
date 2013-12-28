@@ -186,8 +186,9 @@ _SQL_query_cattree = [
 
 """SELECT VERSION();""", ]
 
-# https://wiki.toolserver.org/view/Database_access#wiki
-_SQL_query_wiki_info = \
+if style.host(os.environ) == 'ts':
+    # https://wiki.toolserver.org/view/Database_access#wiki
+    _SQL_query_wiki_info = \
 """SELECT 
    lang,
    CONCAT("sql-s", server) AS dbserver,
@@ -196,6 +197,20 @@ _SQL_query_wiki_info = \
  FROM toolserver.wiki
  WHERE family = "wikipedia"
  ORDER BY SIZE DESC LIMIT %s;"""
+else:
+    # https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools/Help#Metadata_database
+    _SQL_query_wiki_info = \
+"""SELECT
+   lang,
+   slice,
+   dbname,
+   url
+ FROM meta_p.wiki
+ WHERE family = "wikipedia"
+ ORDER BY SIZE DESC LIMIT %s;"""
+
+_SQL_create_database = \
+"""CREATE DATABASE IF NOT EXISTS %s"""
 
 
 # === variables === === ===
@@ -205,6 +220,16 @@ SQL_LIMIT_max = 1000
 wikitime    = "%Y%m%d%H%M%S"
 
 asctime_fmt = "%a %b %d %H:%M:%S %Y"
+
+cnf_file    = os.path.join(bot_path, "../.my.cnf")
+
+db_name     = db_conf[0]
+if style.host(os.environ) == 'labs':
+    import ConfigParser
+    config = ConfigParser.RawConfigParser()
+    config.read(cnf_file)
+    user_name = config.get('client', 'user').replace("'", "")
+    db_name   = '%s__%s' % (user_name, db_name)
 
 
 # === code === === ===
@@ -311,7 +336,7 @@ def checkRecentEdits_API(cat, end):
 
 def get_wikiinfo_db(wiki, limit=SQL_LIMIT_max):
 	for item in read_db(_SQL_query_wiki_info, (limit,), limit):
-		if item[2] == (wiki + "wiki_p"):
+		if item[0] == wiki:
 			return item
 	return None
 
@@ -416,11 +441,18 @@ if len(wiki) > 4: wiki = 'de'  # cheap protection for SQL injection
 
 site = pywikibot.getSite(wiki)
 
+# check existence of user database (for temporary table to join with)
+db = MySQLdb.connect(host=wiki+db_conf[1], read_default_file=cnf_file)
+cursor = db.cursor()
+call_db(_SQL_create_database % db_name)
+cursor.close()
+db.close()
+
 # Establich a connection
 #db = MySQLdb.connect(db='enwiki_p', host="enwiki-p.rrdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
 #db = MySQLdb.connect(db=wiki+'wiki_p', host=wiki+"wiki-p.rrdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
 #db = MySQLdb.connect(db='u_drtrigon', host=wiki+"wiki-p.userdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
-db = MySQLdb.connect(db=db_conf[0], host=wiki+db_conf[1], read_default_file=os.path.join(bot_path, "../.my.cnf"))
+db = MySQLdb.connect(db=db_name, host=wiki+db_conf[1], read_default_file=cnf_file)
 # prepare a cursor object using cursor() method
 cursor = db.cursor()
 
