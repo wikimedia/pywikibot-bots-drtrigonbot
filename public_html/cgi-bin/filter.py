@@ -149,9 +149,9 @@ if secure and url:
             bs          = BeautifulSoup.BeautifulSoup(unshort_buf)
             #if (bs.status.contents[0] == "1"):
             #    longurl  = str(bs.real.contents[0])
-            #if not bs.findAll('error'):
+            if not bs.findAll('error'):
             #    longurl  = str(bs.fullurl.contents[0])
-            if (bs.success.contents[0] == "true"):
+            #if (bs.success.contents[0] == "true"):
                 longurl  = str(bs.resolvedurl.contents[0])
                 page_buf = page_buf.replace(url, longurl)
 
