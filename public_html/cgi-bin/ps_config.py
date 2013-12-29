@@ -3,7 +3,7 @@
 Configuration variables (config for cgi-bin scripts)
 """
 
-## @package config
+## @package ps_config
 #  @brief   configuration variables
 #
 #  @copyright Dr. Trigon, 2008-2013

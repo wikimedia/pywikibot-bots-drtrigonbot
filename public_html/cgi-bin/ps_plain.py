@@ -141,4 +141,4 @@ def host(environ):
 
 # === labs conversion patch: variables === === ===
 #
-from config import *
+from ps_config import *
