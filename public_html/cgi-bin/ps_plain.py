@@ -120,3 +120,25 @@ def secure_url(url):
     secure = s1
 
     return secure
+
+
+# === labs conversion patch: functions === === ===
+#
+def change_logo(content, environ):
+    # labs patch: adopt logo for labs server instead of TS (default)
+    TS   = 'http://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Wikimedia_Community_Logo-Toolserver.svg/135px-Wikimedia_Community_Logo-Toolserver.svg.png'
+    labs = 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Wikimedia_labs_logo.svg/135px-Wikimedia_labs_logo.svg.png'
+    if ('HTTP_HOST' in environ) and (not (environ['HTTP_HOST'] == 'toolserver.org')):
+        content = content.replace(TS, labs)
+    return content
+
+def host(environ):
+    if ('HTTP_HOST' in environ) and (not (environ['HTTP_HOST'] == 'toolserver.org')):
+        return 'labs'
+    else:
+        return 'ts'
+
+
+# === labs conversion patch: variables === === ===
+#
+from config import *

@@ -41,6 +41,7 @@ from time import *
 import datetime
 import os, re, sys
 import locale
+import ConfigParser
 
 
 import MySQLdb, _mysql_exceptions 
@@ -186,9 +187,8 @@ _SQL_query_cattree = [
 
 """SELECT VERSION();""", ]
 
-if style.host(os.environ) == 'ts':
-    # https://wiki.toolserver.org/view/Database_access#wiki
-    _SQL_query_wiki_info = \
+_SQL_query_wiki_info = {
+'ts':       # https://wiki.toolserver.org/view/Database_access#wiki
 """SELECT 
    lang,
    CONCAT("sql-s", server) AS dbserver,
@@ -196,10 +196,8 @@ if style.host(os.environ) == 'ts':
    CONCAT("//", DOMAIN, script_path, "api.php") AS url
  FROM toolserver.wiki
  WHERE family = "wikipedia"
- ORDER BY SIZE DESC LIMIT %s;"""
-else:
-    # https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools/Help#Metadata_database
-    _SQL_query_wiki_info = \
+ ORDER BY SIZE DESC LIMIT %s;""",
+'labs':     # https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools/Help#Metadata_database
 """SELECT
    lang,
    slice,
@@ -207,7 +205,8 @@ else:
    url
  FROM meta_p.wiki
  WHERE family = "wikipedia"
- ORDER BY SIZE DESC LIMIT %s;"""
+ ORDER BY SIZE DESC LIMIT %s;""", }
+_SQL_query_wiki_info = _SQL_query_wiki_info[style.host(os.environ)]
 
 _SQL_create_database = \
 """CREATE DATABASE IF NOT EXISTS %s"""
@@ -223,13 +222,10 @@ asctime_fmt = "%a %b %d %H:%M:%S %Y"
 
 cnf_file    = os.path.join(bot_path, "../.my.cnf")
 
-db_name     = db_conf[0]
-if style.host(os.environ) == 'labs':
-    import ConfigParser
-    config = ConfigParser.RawConfigParser()
-    config.read(cnf_file)
-    user_name = config.get('client', 'user').replace("'", "")
-    db_name   = '%s__%s' % (user_name, db_name)
+config = ConfigParser.RawConfigParser()
+config.read(cnf_file)
+user_name   = config.get('client', 'user').replace("'", "")
+db_name     = db_conf[0] % {'user': user_name, 'dbname': 'u_%s' % user_name}
 
 
 # === code === === ===
