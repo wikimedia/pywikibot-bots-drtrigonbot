@@ -344,7 +344,10 @@ def displayhtmlpage(form):
 	period = form.getvalue('period', '24')
 
 	lang = locale.locale_alias.get(wiki, locale.locale_alias['en']).split('.')[0]
-	locale.setlocale(locale.LC_TIME, lang)
+	try:
+		locale.setlocale(locale.LC_TIME, lang + '.utf8')
+	except locale.Error:
+		locale.setlocale(locale.LC_TIME, lang)
 
 	#scheme = {'NO': 'http', 'YES': 'https'}[os.environ.get('HTTP_X_TS_SSL', 'NO')]
 
@@ -437,18 +440,21 @@ if len(wiki) > 4: wiki = 'de'  # cheap protection for SQL injection
 
 site = pywikibot.getSite(wiki)
 
-# check existence of user database (for temporary table to join with)
-db = MySQLdb.connect(host=wiki+db_conf[1], read_default_file=cnf_file)
-cursor = db.cursor()
-call_db(_SQL_create_database % db_name)
-cursor.close()
-db.close()
-
 # Establich a connection
 #db = MySQLdb.connect(db='enwiki_p', host="enwiki-p.rrdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
 #db = MySQLdb.connect(db=wiki+'wiki_p', host=wiki+"wiki-p.rrdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
 #db = MySQLdb.connect(db='u_drtrigon', host=wiki+"wiki-p.userdb.toolserver.org", read_default_file="/home/drtrigon/.my.cnf")
-db = MySQLdb.connect(db=db_name, host=wiki+db_conf[1], read_default_file=cnf_file)
+try:
+	db = MySQLdb.connect(db=db_name, host=wiki+db_conf[1], read_default_file=cnf_file)
+except _mysql_exceptions.OperationalError:
+	# check existence of user database (for temporary table to join with)
+	db = MySQLdb.connect(host=wiki+db_conf[1], read_default_file=cnf_file)
+	cursor = db.cursor()
+	call_db(_SQL_create_database % db_name)
+	cursor.close()
+	db.close()
+	# re-try to connect
+	db = MySQLdb.connect(db=db_name, host=wiki+db_conf[1], read_default_file=cnf_file)
 # prepare a cursor object using cursor() method
 cursor = db.cursor()
 
