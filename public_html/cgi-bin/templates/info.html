@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block body %}
+    <p><b>Server Architecture</b>: {{ arch.desc }}</p>
+    <p><b>Flask</b>: {{ flask.desc }}</p>
+    {% if compat %}
+    <p><b>pywikibot-compat</b>: {{ compat.hsh }}</p>
+    <p><b>pywikibot-core</b>: {{ core.hsh }}</p>
+    <p><b>pywikibot-drtrigonbot</b>: {{ drtrigonbot.hsh }}</p>
+    <p><small><a href="{{ url_for('action_about') }}">less...</a> - <a href="?raw=1">raw...</a></small></p>
+    {% else %}
+    <p><small><a href="{{ url_for('main_route') }}">more...</a></small></p>
+    {% endif %}
+{% endblock %}
