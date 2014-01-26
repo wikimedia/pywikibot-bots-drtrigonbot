@@ -138,14 +138,14 @@ def dl_drtrigonbot():
     if LABS:    # labs-tools
 #        local('cp -r pywikibot-drtrigonbot/public_html/cgi-bin/* cgi-bin/')
         local('ln -s ~/pywikibot-drtrigonbot/public_html/cgi-bin/* cgi-bin/')
+        local('ln -s ~/pywikibot-drtrigonbot/public_html/SearchRequest.xml public_html/SearchRequest.xml')
+        local('ln -s ~/pywikibot-drtrigonbot/public_html/batch.css public_html/batch.css')
+        local('ln -s ~/pywikibot-drtrigonbot/public_html/jira.webresources:global-static.css public_html/jira.webresources:global-static.css')
     else:       # toolserver
 #        local('cp -r pywikibot-drtrigonbot/public_html/* public_html/')
         local('ln -s ~/pywikibot-drtrigonbot/public_html/tsnotice.css public_html/tsnotice.css')
         local('ln -s ~/pywikibot-drtrigonbot/public_html/cgi-bin/* public_html/cgi-bin/')
     local('ln -s ~/pywikibot-drtrigonbot/public_html/index.html public_html/index.html')
-    local('ln -s ~/pywikibot-drtrigonbot/public_html/SearchRequest.xml public_html/SearchRequest.xml')
-    local('ln -s ~/pywikibot-drtrigonbot/public_html/batch.css public_html/batch.css')
-    local('ln -s ~/pywikibot-drtrigonbot/public_html/jira.webresources:global-static.css public_html/jira.webresources:global-static.css')
 
 def dl_compat():
     # https://www.mediawiki.org/wiki/Manual:Pywikipediabot/Installation#Setup_on_Wikimedia_Labs.2FTool_Labs_server
