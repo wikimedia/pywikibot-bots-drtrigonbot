@@ -98,13 +98,14 @@ Generated at Sun Jan 26 12:29:37 UTC 2014 using JIRA 5.0.6#733-sha1:f48fab7a0aba
     <tr>
         <td bgcolor="#f0f0f0" width="100%" colspan="2" valign="top">
             <xsl:if test="parent != ''">
+                <xsl:variable name="data" select="parent"/>
                             <b><a><xsl:attribute name="id">
                                    parent_issue_summary
                                   </xsl:attribute>
                                   <xsl:attribute name="href">
                                    https://jira.toolserver.org/browse/<xsl:value-of select="parent"/>
                                   </xsl:attribute>
-                                  ???</a></b> 
+                                  <xsl:value-of select="//item[key=$data]/summary"/><xsl:if test="not(//item[key=$data])">(n/a)</xsl:if></a></b>
                 <span style="font-size: 9px">(<a><xsl:attribute name="id">
                                                   parent_issue_key
                                                  </xsl:attribute>
@@ -288,7 +289,7 @@ Generated at Sun Jan 26 12:29:37 UTC 2014 using JIRA 5.0.6#733-sha1:f48fab7a0aba
 			<b>Environment:</b>
 		</td>
 		<td bgcolor="#ffffff" valign="top" colspan="3">
-                <xsl:value-of select="environment"/>
+                <xsl:value-of select="environment" disable-output-escaping="yes"/>
 		</td>
 	</tr>
       </xsl:if> 
@@ -308,7 +309,7 @@ Generated at Sun Jan 26 12:29:37 UTC 2014 using JIRA 5.0.6#733-sha1:f48fab7a0aba
             <td bgcolor="#ffffff" valign="top">
                 <xsl:for-each select="attachments/attachment">
                     <img src="https://jira.toolserver.org/images/icons/attach/file.gif" height="16" width="16" alt="File" />
-                    <xsl:value-of select="./@name"/>, 
+                    <xsl:value-of select="./@name"/> &#160;&#160;&#160;&#160;
                 </xsl:for-each>
                 </td>
             </tr>
@@ -333,14 +334,25 @@ Generated at Sun Jan 26 12:29:37 UTC 2014 using JIRA 5.0.6#733-sha1:f48fab7a0aba
             <td>
                 <xsl:value-of select="../@description"/>
             </td>
+            <xsl:variable name="data" select="issuekey"/>
             <td>
-                <xsl:value-of select="issuekey"/>
+                <a><xsl:attribute name="href">
+                    https://jira.toolserver.org/browse/<xsl:value-of select="issuekey"/>
+                   </xsl:attribute>
+                   <xsl:choose>
+                     <xsl:when test="//item[key=$data]/status = 'Closed' or //item[key=$data]/status = 'Resolved'">
+                       <strike><xsl:value-of select="issuekey"/></strike>
+                     </xsl:when>
+                     <xsl:otherwise>
+                       <xsl:value-of select="issuekey"/>
+                     </xsl:otherwise>
+                   </xsl:choose></a>
             </td>
             <td>
-                ???
+                <xsl:value-of select="//item[key=$data]/summary"/><xsl:if test="not(//item[key=$data])">(n/a)</xsl:if>
             </td>
             <td>
-                ???
+                <xsl:value-of select="//item[key=$data]/status"/><xsl:if test="not(//item[key=$data])">(n/a)</xsl:if>
             </td>
         </tr>
                     </xsl:for-each>
@@ -380,17 +392,18 @@ Generated at Sun Jan 26 12:29:37 UTC 2014 using JIRA 5.0.6#733-sha1:f48fab7a0aba
                            </xsl:attribute>
                            <xsl:value-of select="."/></a>
                     </td>
+                    <xsl:variable name="data" select="."/>
                     <td valign="top" width="25%">
-                        ???
+                        <xsl:value-of select="substring(//item[key=$data]/summary,0,38)"/><xsl:if test="string-length(//item[key=$data]/summary)>38">...</xsl:if><xsl:if test="not(//item[key=$data])">(n/a)</xsl:if>
                     </td>
                     <td>
                         Sub-task
                     </td>
                     <td>
-                        ???
+                        <xsl:value-of select="//item[key=$data]/status"/><xsl:if test="not(//item[key=$data])">(n/a)</xsl:if>
                     </td>
                     <td>
-                        ???
+                        <xsl:value-of select="//item[key=$data]/assignee"/><xsl:if test="not(//item[key=$data])">(n/a)</xsl:if>
                     </td>
                 </tr>
             </xsl:for-each>
@@ -405,7 +418,17 @@ Generated at Sun Jan 26 12:29:37 UTC 2014 using JIRA 5.0.6#733-sha1:f48fab7a0aba
                 <td bgcolor="#f0f0f0" width="20%" valign="top"><b><xsl:value-of select="customfieldname"/>:</b></td>
                 <td id="customfield_10010-27325-value" class="value" bgcolor="#ffffff" width="80%">
                 <xsl:for-each select="customfieldvalues">
-                    <xsl:value-of select="customfieldvalue"/><br />
+                    <xsl:choose>
+                      <xsl:when test="../customfieldname = 'URL'">
+                        <a><xsl:attribute name="href">
+                            <xsl:value-of select="customfieldvalue"/>
+                           </xsl:attribute>
+                           <xsl:value-of select="customfieldvalue"/></a><br />
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:value-of select="customfieldvalue"/><br />
+                      </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:for-each>
                 </td>
             </tr>
