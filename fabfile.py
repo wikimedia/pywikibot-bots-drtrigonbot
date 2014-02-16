@@ -30,6 +30,30 @@ instead of
 $ fab -H localhost cmd1[,cmd2,...]
 
 
+LICENSE - https://wikitech.wikimedia.org/wiki/DrTrigonBot
+
+ i) Generally: http://opensource.org/licenses/GPL-3.0
+ii) Uses libraries might be licensed different, e.g.: MIT or other ...
+    (check mw:Manual:Pywikibot/Installation#Dependencies)
+
+DrTrigonBot runs parts of the Pywikibot repertory in order to work on
+jobs and own tasks as defined on its wiki pages.
+Copyright (C) 2013 DrTrigon (and the Pywikibot team)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
 Created on Sat Sep 14 18:22:30 2013
 @author: drtrigon
 """
@@ -112,6 +136,7 @@ def setup():
         local('echo Options +Indexes > public_html/.htaccess')
         local('mkdir public_html/logs')         # contains symlinks
         local('echo AddType text/plain .log > public_html/logs/.htaccess')
+        local('mkdir public_html/logs/archive') # target for log archive
     else:       # toolserver
         local('mkdir public_html/doc')          # contains symlinks
         local('mkdir public_html/DrTrigonBot')  # contains symlinks
@@ -343,6 +368,21 @@ def list_large_files():
     print "files larger than 10MB"
     local("""find . -type f -size +10000k -exec ls -lh {} \; | awk '{ print $9 ": " $5 }'""")
     print
+
+def archive_logs():
+    """ A.A) Archive all log files on the server  (all A.# steps) """
+    # http://serverlinux.blogspot.ch/2006/08/simple-rotation-backup-with-tar.html
+    # fecha has a formated date
+    import time
+    #fecha=`date +"%d-%m-%Y"`
+    fecha = time.strftime("%Y-%m-%d").decode('utf8')
+    # Backup and gzip the directory
+    #tar zcvf /backups/trunk-$fecha.tgz /var/www/repository
+    local('tar zcvfh ~/public_html/logs/archive/logs-%s.tgz ~/public_html/logs --exclude=public_html/logs/archive' % fecha)
+    # Rotate the logs, delete older than 7 days
+    #find /backups/ -mtime +7 -exec rm {} \; 
+    local('find ~/public_html/logs/archive/ -mtime +200 -exec rm {} \;')
+    local('find -L ~/public_html/logs/*/*.log.* -mtime +40 -exec rm {} \;')
 
 
 if (__name__ == '__main__') and ('sys' in locals()):

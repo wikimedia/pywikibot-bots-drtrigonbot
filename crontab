@@ -107,3 +107,6 @@ PATH=/usr/local/bin:/usr/bin:/bin
 #36 1 * * * jsub -l h_vmem=512M -quiet -N subster_nl python $HOME/pywikibot-compat/pwb.py -subster -lang:nl
 #06 * * * * jsub -l h_vmem=512M -quiet -N subster_ar python $HOME/pywikibot-compat/pwb.py -subster -lang:ar
 #06 3 * * * jsub -l h_vmem=512M -quiet -N subster_data python $HOME/pywikibot-compat/pwb.py -subster -family:wikidata -lang:wikidata
+
+# maintenance: archive_logs     
+06 23 1 * * jsub -l h_vmem=256M -quiet -N maint_archive fab -f $HOME/fabfile.py -H localhost archive_logs
