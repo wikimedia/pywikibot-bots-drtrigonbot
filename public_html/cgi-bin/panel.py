@@ -140,6 +140,10 @@ html_color = {	'green':	'#00ff00',
 
 ver_desc = style.ver_desc[style.host(os.environ)]
 localdir = style.localdir[style.host(os.environ)]
+links    = {'log': {  'ts': localdir, 
+                    'labs': '../logs'},
+            'old': {  'ts': r"../DrTrigonBot/", 
+                    'labs': r"../logs/"},}
 
 
 # === bot status surveillance === === ===
@@ -534,7 +538,7 @@ def displaystate(form):
 		data['botlog']      = stat['lastmessage']
 		data['messages']    = "\n".join(stat['messages'])
 		data['successfull'] = "%s of %s" % (stat['ecount']['end'], stat['ecount']['start'])
-		data['loglink']     = '<a href="%s">Latest</a>' % os.path.join(localdir, recent)
+		data['loglink']     = '<a href="%s">Latest</a>' % os.path.join(links['log'][style.host(os.environ)], recent)
 	lastrun = max([os.stat(os.path.join(localdir, item)).st_mtime for item in files]+[0])
 	botmsg = data['botlog'].strip()
 
@@ -586,7 +590,7 @@ def displaystate(form):
 
 	data.update({	'time':		asctime(localtime(time())),
 			'oldlog':	", ".join(files),
-			'oldlink':	r"../DrTrigonBot/",
+			'oldlink':	links['old'][style.host(os.environ)],
 			'logstat':	os.path.basename(sys.argv[0]) + r"?action=logstat",
 			'logstatraw':	os.path.basename(sys.argv[0]) + r"?action=logstat&amp;format=plain",
 			'refresh':	'15',

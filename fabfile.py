@@ -380,7 +380,7 @@ def archive_logs():
     #tar zcvf /backups/trunk-$fecha.tgz /var/www/repository
     local('tar zcvfh ~/public_html/logs/archive/logs-%s.tgz ~/public_html/logs --exclude=public_html/logs/archive' % fecha)
     # Rotate the logs, delete older than 7 days
-    #find /backups/ -mtime +7 -exec rm {} \; 
+    #find /backups/ -mtime +7 -exec rm {} \;
     local('find ~/public_html/logs/archive/ -mtime +200 -exec rm {} \;')
     local('find -L ~/public_html/logs/*/*.log.* -mtime +40 -exec rm {} \;')
 
