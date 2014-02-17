@@ -632,4 +632,8 @@ Generated at Sun Jan 26 12:29:37 UTC 2014 using JIRA 5.0.6#733-sha1:f48fab7a0aba
 <xsl:template match="item/timespent">
 </xsl:template>
 
+<xsl:template match="issue">
+  from <xsl:value-of select="./@start"/> to <xsl:value-of select="./@end"/> (<xsl:value-of select="./@total"/>)
+</xsl:template>
+
 </xsl:stylesheet>     

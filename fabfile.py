@@ -7,7 +7,7 @@ HOW TO INSTALL DrTrigonBot TO TOOLSERVER AND/OR LABS-TOOLS
     $ wget https://git.wikimedia.org/raw/pywikibot%2Fbots%2Fdrtrigonbot/HEAD/fabfile.py
 3.) run the fabfile:
     $ fab -H localhost install
-4.) setup you config files by generating new or copying existing ones
+4.) setup your config files by generating new or copying existing ones
 5.) run the finalization:
     $ fab -H localhost backup
 
