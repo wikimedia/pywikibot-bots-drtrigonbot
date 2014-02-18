@@ -61,9 +61,10 @@ url(http://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Wikimedia_Community
 href="/" title="Home"></a></div>
 <div class="portal" id='p-navigation'><h5>navigation</h5><div class="body">
 <ul>
-<li><a href="https://wiki.toolserver.org/view/User:DrTrigon">Main Page</a>, <a href="https://labsconsole.wikimedia.org/wiki/DrTrigonBot">labs</a></li>
-<li><a href="https://jira.toolserver.org/browse/DrTrigon">Bug tracker</a></li>
-<li><a href="https://fisheye.toolserver.org/browse/drtrigon">SVN repository</a></li>
+<li><a href="https://wiki.toolserver.org/view/User:DrTrigon">TS</a> / <a href="https://labsconsole.wikimedia.org/wiki/DrTrigonBot">labs</a> Main Page</li>
+<li><a href="https://bugzilla.wikimedia.org/describecomponents.cgi?product=Tool%%20Labs%%20tools">Bugzilla</a> tracker</li>
+<li><a href="https://fisheye.toolserver.org/browse/drtrigon">SVN</a> / <a href="https://gerrit.wikimedia.org/r/#/admin/projects/?filter=pywikibot">GIT</a> repository</li>
+<li><a href="info.py">Info</a></li>
 </ul>
 </div></div>
 <div class="portal" id='p-status'><h5>status</h5><div class="body">
