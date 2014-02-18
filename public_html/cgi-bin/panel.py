@@ -64,10 +64,19 @@ displaystate_content = \
                  <img src="%(botstate_wui)s" width="15" height="15" alt="Botstate: wui"><br><br>
 Time now: %(time)s<br><br>
 
-%(loglink)s gathered bot status message log: <b>%(botlog)s</b><br><br>
+Latest gathered bot status message log: <b>%(botlog)s</b><br><br>
 Successfully finished bot runs: <b>%(successfull)s</b><br><br>
-Current log files: %(currentlog)s<br>
+
+<h2>Log files</h2>
+Current log files:
+<table class="wikitable">
+%(currentlog)s
+</table>
+%(logbrowse)s
+
 <a href="%(oldlink)s">Old log</a> files: <i>%(oldlog)s</i><br><br>
+
+<h2>Messages</h2>
 See also <a href="%(logstat)s">logging statistics</a> and the important messages:
 <p style="white-space:pre-wrap;">%(messages)s</p>
 <br>"""
@@ -528,17 +537,29 @@ def displaystate(form):
 	(localdir, files, current) = oldlogfiles()
 	files = [item for key, value in files for item in value]	# flatten
 
+	# < prev | next > browsing
+	date = form.getvalue('date', None)
+	if date:
+		current = [item for item in files if date in item]
+		today = datetime.datetime.strptime(date, '%Y-%m-%d')
+	else:
+		today = datetime.datetime.today()
+	yesterday = (today - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+	tomorrow  = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+	data['logbrowse'] = "<a href='?date=%s'>< prev</a> | <a href='?'>now</a>" % yesterday
+	if (datetime.datetime.today() - today) >= datetime.timedelta(days=2):
+		data['logbrowse'] += " | <a href='?date=%s'>next ></a><br><br>" % tomorrow
+	data['logbrowse'] += "<br><br>"
+
 	stat, recent = logging_statistics(current, botcontinuous)
 	if stat is None:
 		data['botlog']      = 'n/a'
 		data['messages']    = 'n/a'
 		data['successfull'] = "n/a"
-		data['loglink']     = 'Latest'
 	else:
 		data['botlog']      = stat['lastmessage']
 		data['messages']    = "\n".join(stat['messages'])
 		data['successfull'] = "%s of %s" % (stat['ecount']['end'], stat['ecount']['start'])
-		data['loglink']     = '<a href="%s">Latest</a>' % os.path.join(links['log'][style.host(os.environ)], recent)
 	lastrun = max([os.stat(os.path.join(localdir, item)).st_mtime for item in files]+[0])
 	botmsg = data['botlog'].strip()
 
@@ -586,7 +607,35 @@ def displaystate(form):
 	status += "<tr style='background-color: %(color)s'><td>%(bot)s</td><td>%(state)s</td></tr>\n" % {'color': irc_wui_color, 'bot': 'wui:', 'state': irc_wui_state_text}
 
 	# ('replace' below is a lapbs patch)
-	data['currentlog'] = ", ".join([ '<a href="%s">%s</a>' % (os.path.join(localdir, item).replace('public_html/', ''), item) for item in current ])
+	data['currentlog'] = []
+	for item in current:
+		s, r = logging_statistics([item], [])#botcontinuous)
+		if not s:
+			s = {'lastmessage': 'n/a', 'ecount': {'end': 'n/a', 'start': 'n/a'}}
+		logfile = os.path.join(localdir, item)
+		lasttime = os.stat(logfile).st_mtime
+		logstate = botstate_img['red']
+		if (lasttime-time()) <= (bottimeout*60*60):
+			if   (s['lastmessage'] == botdonemsg) and not (s['ecount']['end'] - s['ecount']['start']):
+				logstate = botstate_img['green']
+			elif (botmsg.find(botdonemsg) == 0):
+				logstate = botstate_img['orange']
+			else:
+				logstate = botstate_img['orange']
+		data['currentlog'].append( '<tr%s><td><a href="%s">%s</a></td><td>%s</td><td>%s of %s</td><td>%s</td><td><img src="%s" width="15" height="15" alt=""></td></tr>' %
+                                       (' bgcolor="#CCCCCC"' if item == recent else '', 
+                                        logfile.replace('public_html/', ''), item,
+                                        s['lastmessage'], 
+                                        s['ecount']['end'], s['ecount']['start'],
+                                        asctime(localtime(lasttime)),
+                                        logstate) )
+	data['currentlog'].append( '<tr%s><td><b>%s</b></td><td>%s</td><td>%s of %s</td><td></td><td><img src="%s" width="15" height="15" alt=""></td></tr>' %
+                                  (' style="font-weight:bold;"', 
+                                   'Summary / Total',
+                                   stat['lastmessage'], 
+                                   stat['ecount']['end'], stat['ecount']['start'],
+                                   data['botstate_daily']) )
+	data['currentlog'] = "\n".join(data['currentlog'])
 
 	data.update({	'time':		asctime(localtime(time())),
 			'oldlog':	", ".join(files),
