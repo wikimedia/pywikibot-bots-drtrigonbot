@@ -96,7 +96,7 @@ PATH=/usr/local/bin:/usr/bin:/bin
 #06 1 * * * jsub -l h_vmem=512M -quiet -N subster_en python $HOME/pywikibot-compat/pwb.py -subster -lang:en -simulate
 36 1 * * * jsub -l h_vmem=512M -quiet -N subster_nl python $HOME/pywikibot-compat/pwb.py -subster -lang:nl -simulate
 #06 * * * * jsub -l h_vmem=512M -quiet -N subster_ar python $HOME/pywikibot-compat/pwb.py -subster -lang:ar -simulate
-06 3 * * * jsub -l h_vmem=512M -quiet -N subster_data python $HOME/pywikibot-compat/pwb.py -subster -family:wikidata -lang:wikidata -simulate
+#06 3 * * * jsub -l h_vmem=512M -quiet -N subster_data python $HOME/pywikibot-compat/pwb.py -subster -family:wikidata -lang:wikidata -simulate
 
 ## pywikibot-compat: subster.py, subster_irc.py
 #36 6 * * * jsub -l h_vmem=1024M -quiet -N subster python $HOME/pywikibot-compat/pwb.py -subster
@@ -106,7 +106,7 @@ PATH=/usr/local/bin:/usr/bin:/bin
 06 1 * * * jsub -l h_vmem=512M -quiet -N subster_en python $HOME/pywikibot-compat/pwb.py -subster -lang:en
 #36 1 * * * jsub -l h_vmem=512M -quiet -N subster_nl python $HOME/pywikibot-compat/pwb.py -subster -lang:nl
 06 * * * * jsub -l h_vmem=512M -quiet -N subster_ar python $HOME/pywikibot-compat/pwb.py -subster -lang:ar
-#06 3 * * * jsub -l h_vmem=512M -quiet -N subster_data python $HOME/pywikibot-compat/pwb.py -subster -family:wikidata -lang:wikidata
+06 3 * * * jsub -l h_vmem=512M -quiet -N subster_data python $HOME/pywikibot-compat/pwb.py -subster -family:wikidata -lang:wikidata
 
 # maintenance: archive_logs
 06 23 1 * * jsub -l h_vmem=256M -quiet -N maint_archive fab -f $HOME/fabfile.py -H localhost archive_logs
