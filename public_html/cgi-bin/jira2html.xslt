@@ -16,6 +16,14 @@
 
         <style type="text/css">
 
+<!-- html added for default -->
+html *
+{
+   font-family: Arial;
+   font-size: 10pt;
+}
+<!-- html added for default -->
+
 .tableBorder, .grid
 {
     background-color: #fff;
