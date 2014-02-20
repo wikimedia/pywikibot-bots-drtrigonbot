@@ -550,6 +550,7 @@ def displaystate(form):
 	if (datetime.datetime.today() - today) >= datetime.timedelta(days=2):
 		data['logbrowse'] += " | <a href='?date=%s'>next ></a><br><br>" % tomorrow
 	data['logbrowse'] += "<br><br>"
+	today = mktime(today.timetuple())
 
 	stat, recent = logging_statistics(current, botcontinuous)
 	if stat is None:
@@ -566,7 +567,7 @@ def displaystate(form):
 	data['botstate_daily'] = botstate_img['red']
 	color = html_color['red']
 	state_text = "n/a"
-	if lastrun and ((time()-lastrun) <= (bottimeout*60*60)):
+	if lastrun and ((today-lastrun) <= (bottimeout*60*60)):
 		if   (botmsg == botdonemsg) and not (stat['ecount']['end'] - stat['ecount']['start']):
 			data['botstate_daily'] = botstate_img['green']
 			color = html_color['green']
@@ -615,7 +616,7 @@ def displaystate(form):
 		logfile = os.path.join(localdir, item)
 		lasttime = os.stat(logfile).st_mtime
 		logstate = botstate_img['red']
-		if (time()-lasttime) <= (bottimeout*60*60):
+		if (today-lasttime) <= (bottimeout*60*60):
 			if   (s['lastmessage'] == botdonemsg) and not (s['ecount']['end'] - s['ecount']['start']):
 				logstate = botstate_img['green']
 			elif (botmsg.find(botdonemsg) == 0):
