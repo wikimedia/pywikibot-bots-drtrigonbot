@@ -141,7 +141,7 @@ def main_route():
     #return render_template_string(mainTemplate, test=viewfunc+'/abc/'+a)
     #return render_cheetah(mainTemplate, {'title': 'Welcome to "/"!'})
     #return render_template('info.html', title='Info',
-    res =  render_template('info.html', title       = 'Info',
+    res =  render_template('info.html', title       = 'DrTrigonBot info panel',
                                         refresh     = '',
                                         tsnotice    = '',
                                         footer      = ['default', 'w3c'],# 'css'],
@@ -157,7 +157,7 @@ def main_route():
 #@app.route('/about')
 @app.route('/' + viewfunc + '/about')
 def action_about():
-    return render_template('info.html', title  = 'Info',
+    return render_template('info.html', title  = 'DrTrigonBot info panel',
                                         footer = ['default', 'w3c'],# 'css'],
                                         arch   = info_arch(),
                                         flask  = info_flask(),)

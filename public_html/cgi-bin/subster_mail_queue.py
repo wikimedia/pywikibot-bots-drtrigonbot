@@ -145,4 +145,4 @@ form = cgi.FieldStorage()
 
 # operational mode
 action = form.getvalue('action', 'displaystate')
-print locals()[action](form)
+print style.change_logo(locals()[action](form), os.environ)    # labs patch

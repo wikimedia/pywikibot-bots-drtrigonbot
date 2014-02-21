@@ -459,7 +459,7 @@ except _mysql_exceptions.OperationalError:
 cursor = db.cursor()
 
 # operational mode
-print displayhtmlpage(form)
+print style.change_logo(displayhtmlpage(form), os.environ)  # labs patch
 
 cursor.close()
 db.close()

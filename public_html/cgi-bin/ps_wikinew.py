@@ -83,7 +83,7 @@ href="/" title="Home"></a></div>
 ></a></li>
 	<li><a href="http://wikimediafoundation.org/"><img src="http://de.wikipedia.org/images/wikimedia-button.png" width="88" height="31" alt="Wikimedia Foundation"></a></li>
 
-	<li><a href="http://tools.wikimedia.de/"><img src="http://tools.wikimedia.de/images/wikimedia-toolserver-button.png" alt="Toolserver project"></a></li>
+	<li><a href="http://tools.wikimedia.de/"><img src="https://upload.wikimedia.org/wikipedia/commons/4/46/Powered_by_labs_button.png" alt="Tool-Labs project"></a></li>
 	<!--<li><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0 Strict" height="31" width="88"></a></li>
 	<li><a href="http://wikimediafoundation.org/wiki/Fundraising?s=cl-Wikipedia-free-mini-button.png"><img 
 src="http://upload.wikimedia.org/wikipedia/meta/6/66/Wikipedia-free-mini-button.png" alt="Wikipedia...keep it free."></a></li>-->

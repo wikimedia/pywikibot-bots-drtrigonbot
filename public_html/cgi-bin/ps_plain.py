@@ -69,8 +69,8 @@ footer = \
 (<a href="http://toolserver.org/~daniel/stats/">stat</a> /
 <a href="http://toolserver.org/~daniel/stats/url_201007.html">url</a> /
 <a href="http://munin.toolserver.org/index.html">info</a>).
-<img src="https://wiki.toolserver.org/favicon.ico" border="0" 
-alt="Toolserver"> <a href="http://tools.wikimedia.de/">Powered by Wikimedia Toolserver</a>.
+<img src="https://wikitech.wikimedia.org/favicon.ico" border="0" 
+alt="Wikitech tool-labs"> <a href="http://tools.wikimedia.de/">Powered by Wikimedia Tool-Labs</a>.
 <img src="http://de.selfhtml.org/src/favicon.ico" border="0" width="16" 
 height="16" alt="SELFHTML"> <a href="http://de.selfhtml.org/index.htm">Thanks to SELFHTML</a>.</small>
 """
