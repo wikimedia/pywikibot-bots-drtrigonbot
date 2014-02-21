@@ -137,6 +137,7 @@ def setup():
         local('mkdir public_html/logs')         # contains symlinks
         local('echo AddType text/plain .log > public_html/logs/.htaccess')
         local('mkdir public_html/logs/archive') # target for log archive
+        local('mkdir public_html/logs/sge')     # sge stdout/-err files
     else:       # toolserver
         local('mkdir public_html/doc')          # contains symlinks
         local('mkdir public_html/DrTrigonBot')  # contains symlinks
@@ -371,6 +372,9 @@ def list_large_files():
 
 def archive_logs():
     """ A.A) Archive all log files on the server  (all A.# steps) """
+    # how does this scheme/system interact with backup?
+    # https://wikitech.wikimedia.org/wiki/Nova_Resource:Tools/Help#Backups
+
     # http://serverlinux.blogspot.ch/2006/08/simple-rotation-backup-with-tar.html
     # fecha has a formated date
     import time
@@ -383,6 +387,11 @@ def archive_logs():
     #find /backups/ -mtime +7 -exec rm {} \;
     local('find ~/public_html/logs/archive/ -mtime +200 -exec rm {} \;')
     local('find -L ~/public_html/logs/*/*.log.* -mtime +40 -exec rm {} \;')
+
+    # "Rotate" (delete old) sge stdout/-err files (they are NOT archived)
+    local('find ~/public_html/logs/sge/ -mtime +40 -exec rm {} \;')
+    # Remove all but the last 1000 lines from web access log (NOT archived)
+    local('tail -n -1000 ~/access.log > ~/access.log')
 
 
 if (__name__ == '__main__') and ('sys' in locals()):
