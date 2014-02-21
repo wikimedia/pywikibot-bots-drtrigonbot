@@ -78,8 +78,8 @@
 PATH=/usr/local/bin:/usr/bin:/bin
 
 # pywikibot-core: script_wui.py
-#06 0 * * * jstart -l h_vmem=512M -quiet -o $HOME/public_html/logs/sge -j y -N script_wui python $HOME/pywikibot-core/pwb.py script_wui.py -log
-06 0 * * * jstart -l h_vmem=512M -quiet -o $HOME/public_html/logs/sge -j y -N script_wui python $HOME/pywikibot-core/pwb.py script_wui.py -log >/dev/null
+06 0 * * * jstart -l h_vmem=512M -quiet -o $HOME/public_html/logs/sge -j y -N script_wui python $HOME/pywikibot-core/pwb.py script_wui.py -log
+#06 0 * * * jstart -l h_vmem=512M -quiet -o $HOME/public_html/logs/sge -j y -N script_wui python $HOME/pywikibot-core/pwb.py script_wui.py -log >/dev/null
 
 # pywikibot-compat: sum_disc.py
 36 2 * * * jsub -l h_vmem=1024M -quiet -o $HOME/public_html/logs/sge -j y -N sum_disc python $HOME/pywikibot-compat/pwb.py -sum_disc
