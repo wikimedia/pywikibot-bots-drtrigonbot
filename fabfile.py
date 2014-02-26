@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-HOW TO INSTALL DrTrigonBot TO TOOLSERVER AND/OR LABS-TOOLS
+HOW TO INSTALL DrTrigonBot TO TOOLSERVER AND/OR TOOL-LABS
 
 1.) download and install git (and fabric)
 2.) download the fabfile, e.g.:
