@@ -139,11 +139,11 @@ def setup():
         local('mkdir public_html/logs/archive') # target for log archive
         local('mkdir public_html/logs/sge')     # sge stdout/-err files
     else:       # toolserver
-        local('mkdir public_html/doc')          # contains symlinks
         local('mkdir public_html/DrTrigonBot')  # contains symlinks
         local('mkdir public_html/source')
 # create redirect to svn and git repo browser in 'public_html/source'
         local('mkdir public_html/test')
+    local('mkdir public_html/docs')             # contains symlinks (like logs)
 
 def dl_drtrigonbot():
 #    if LABS:    # labs-tools
@@ -209,7 +209,8 @@ def sl_drtrigonbot():
 
 def sl_compat():
     if LABS:    # labs-tools
-        # docs ?
+        # docs
+        local('ln -s ~/pywikibot-compat/docs public_html/docs/compat')
         # logs
 #        local('cd public_html/logs/; ln -s /data/project/drtrigonbot/pywikibot-compat/logs compat')
         local('ln -s ~/pywikibot-compat/logs public_html/logs/compat')

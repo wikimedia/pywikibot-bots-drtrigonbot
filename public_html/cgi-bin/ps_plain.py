@@ -65,7 +65,7 @@ debug_page = content_type + _minimal_page % { 'title': 'DEBUG PAGE',
 # === footer HTML codes === === ===
 #
 footer = \
-"""<small>DrTrigonBot web-interface, written by <a href="https://wiki.toolserver.org/view/User:DrTrigon">DrTrigon</a> 
+"""<small>DrTrigonBot web-interface, written by <a href="https://wikitech.wikimedia.org/wiki/User:DrTrigon">DrTrigon</a> 
 (<a href="http://toolserver.org/~daniel/stats/">stat</a> /
 <a href="http://toolserver.org/~daniel/stats/url_201007.html">url</a> /
 <a href="http://munin.toolserver.org/index.html">info</a>).

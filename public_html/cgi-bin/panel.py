@@ -68,13 +68,13 @@ Latest gathered bot status message log: <b>%(botlog)s</b><br><br>
 Successfully finished bot runs: <b>%(successfull)s</b><br><br>
 
 <h2>Log files</h2>
-Current log files:
+Current <a href="%(oldlink)s">log files</a>:
 <table class="wikitable">
 %(currentlog)s
 </table>
 %(logbrowse)s
 
-<a href="%(oldlink)s">Old log</a> files: <i>%(oldlog)s</i><br><br>
+Old log files: <i>%(oldlog)s</i><br><br>
 
 <h2>Messages</h2>
 See also <a href="%(logstat)s">logging statistics</a> and the important messages:
@@ -176,7 +176,7 @@ localdir = os.path.dirname(os.path.join(*localdir))
 
 # === functions === === ===
 #
-def oldlogfiles(all=False, exclude=['commands.log', 'throttle.log']):
+def oldlogfiles(all=False, exclude=['commands.log', 'throttle.log', 'nosetests.log']):
 #	files  = os.listdir( localdir )
 	files  = [os.path.join(ver_desc[0], item) for item in os.listdir( os.path.join(localdir, ver_desc[0]) )]
 	files += [os.path.join(ver_desc[1], item) for item in os.listdir( os.path.join(localdir, ver_desc[1]) )]
@@ -188,7 +188,7 @@ def oldlogfiles(all=False, exclude=['commands.log', 'throttle.log']):
 		if (len(info) < 2) or (bn[1:] == info[-1]) or (bn in exclude):
 			continue
 		ext = info[-1].lower()
-		if ext == 'log':
+		if ext == 'log' and not info[-2].isdigit():  # isdigit() for core log filename style
 			current.append( item )
 			if all:
 				e = strftime(datefmt)
@@ -242,7 +242,7 @@ def irc_status():
 	while True:
 		buf=s.recv(1024)
 		readbuffer=readbuffer+buf
-		if (':End of /NAMES' in readbuffer) or (len(buf) < 1024):
+		if (':End of /NAMES' in readbuffer):# or (len(buf) < 1024):
 			break
 	s.close()
 	del s
