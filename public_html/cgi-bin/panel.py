@@ -270,9 +270,6 @@ def logging_statistics(logfiles, exclude):
 	#for file in logfiles:
 	for k in keys:
 		file = logfiles[k]
-# skip rewrite logs for the moment
-		if ver_desc[1] in file:	# cheat (since trunk and rewrite have different formats)
-			continue	#  "
 		#if file in exclude:
 		#	continue
 		f = open(os.path.join(localdir, file), "r")
@@ -561,7 +558,7 @@ def displaystate(form):
 		data['botlog']      = stat['lastmessage']
 		data['messages']    = "\n".join(stat['messages'])
 		data['successfull'] = "%s of %s" % (stat['ecount']['end'], stat['ecount']['start'])
-	lastrun = max([os.stat(os.path.join(localdir, item)).st_mtime for item in files]+[0])
+	lastrun = max([os.stat(os.path.join(localdir, item)).st_mtime for item in current]+[0])
 	botmsg = data['botlog'].strip()
 
 	data['botstate_daily'] = botstate_img['red']
