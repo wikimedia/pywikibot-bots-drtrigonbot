@@ -66,7 +66,8 @@ debug_page = content_type + _minimal_page % { 'title': 'DEBUG PAGE',
 #
 footer = \
 """<small>DrTrigonBot web-interface, written by <a href="https://wikitech.wikimedia.org/wiki/User:DrTrigon">DrTrigon</a> 
-(<a href="http://toolserver.org/~daniel/stats/">stat</a> /
+(<a href="http://tools.wmflabs.org/drtrigonbot/server-statistics">stat</a>
+<a href="http://tools.wmflabs.org/drtrigonbot/server-status">us</a> /
 <a href="http://toolserver.org/~daniel/stats/url_201007.html">url</a> /
 <a href="http://munin.toolserver.org/index.html">info</a>).
 <img src="https://wikitech.wikimedia.org/favicon.ico" border="0" 

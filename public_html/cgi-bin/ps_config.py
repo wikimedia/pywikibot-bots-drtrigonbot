@@ -32,7 +32,7 @@ localdir = {  'ts': ['..', 'DrTrigonBot', '.'],
             'labs': ['..', 'logs', '.'], }
 
 bot_path = {  'ts': ["../../pywikipedia/", "../../rewrite/"],
-            'labs': ["../pywikibot-compat/", "../pywikibot-core/"], }
+            'labs': ["../../pywikibot-compat/", "../../pywikibot-core/"], }
 
 db_conf  = {  'ts': ['u_%(user)s', "wiki-p.userdb.toolserver.org"],
             'labs': ['%(user)s__%(dbname)s', "wiki.labsdb"], }
