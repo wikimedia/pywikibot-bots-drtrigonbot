@@ -133,16 +133,19 @@ def setup():
     local('mkdir data/subster')
     local('mkdir data/sum_disc')
     if LABS:    # labs-tools
+        local('echo \|jmail cat \>\> \~/data/subster/mail_inbox > .forward.subster')
         local('mkdir public_html/cgi-bin')
         local('mkdir public_html/logs')         # contains symlinks
         local('mkdir public_html/logs/archive') # target for log archive
         local('mkdir public_html/logs/sge')     # sge stdout/-err files
     else:       # toolserver
+        local('echo \> \~/data/subster/mail_inbox > .forward+subster')
         local('mkdir public_html/DrTrigonBot')  # contains symlinks
         local('mkdir public_html/source')
 # create redirect to svn and git repo browser in 'public_html/source'
         local('mkdir public_html/test')
     local('mkdir public_html/docs')             # contains symlinks (like logs)
+    # permission are set in sl_drtrigonbot()
 
 def dl_drtrigonbot():
 #    if LABS:    # labs-tools
@@ -153,7 +156,8 @@ def dl_drtrigonbot():
                     paths=['public_html/',
                            '.description',
                            '.forward',
-                           '.forward+subster',
+                           #'.forward+subster',
+                           '.lighttpd.conf',
                            '/README',       # exclude 'externals/README'
                            'fabfile.py',
                            'warnuserquota.py',
@@ -202,10 +206,11 @@ def sl_drtrigonbot():
         local('ln -s pywikibot-drtrigonbot/.lighttpd.conf .lighttpd.conf')
         local('webservice restart')             # apply '.lighttpd.conf'
         local('ln -s replica.my.cnf .my.cnf')   # DB config
+        local('chmod o+r ~/.forward*')  # changes 'pywikibot-drtrigonbot/.forward*'
     else:       # toolserver
         local('ln -s pywikibot-drtrigonbot/warnuserquota.py warnuserquota.py')
-        local('ln -s pywikibot-drtrigonbot/.forward+subster .forward+subster')
-    local('chmod 600 ~/.forward*')  # changes 'pywikibot-drtrigonbot/.forward*'
+        #local('ln -s pywikibot-drtrigonbot/.forward+subster .forward+subster')
+        local('chmod 600 ~/.forward*')  # changes 'pywikibot-drtrigonbot/.forward*'
 
 def sl_compat():
     if LABS:    # labs-tools
@@ -393,6 +398,8 @@ def archive_logs():
     local('find ~/public_html/logs/sge/ -mtime +40 -exec rm {} \;')
     # Remove all but the last 1000 lines from web access log (NOT archived)
     local('tail -n -1000 ~/access.log > ~/access.log')
+    # Remove all but the last 1000 lines from web error log (NOT archived)
+    local('tail -n -1000 ~/error.log > ~/error.log')
 
 
 if (__name__ == '__main__') and ('sys' in locals()):
