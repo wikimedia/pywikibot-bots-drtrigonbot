@@ -65,7 +65,7 @@ a = """<tr>
 <td>%s</td>
 <td>%s</td>
 </tr>"""
-b = "<a href='/~drtrigon/cgi-bin/subster_mail_queue.py?action=content&amp;no=%s'>%s</a>"
+b = "<a href='subster_mail_queue.py?action=content&amp;no=%s'>%s</a>"
 
 
 # === functions === === ===
