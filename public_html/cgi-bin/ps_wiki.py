@@ -36,7 +36,7 @@ page = content_type + """
   <title>%(title)s</title>
   <!-- Idea to use Wiki stylesheet from: http://toolserver.org/~vvv/sulutil.php -->
   <link rel="stylesheet" href="http://en.wikipedia.org/skins-1.5/monobook/main.css">
-  <link rel="stylesheet" href="http://bits.wikimedia.org/skins-1.5/common/shared.css">
+  <link rel="stylesheet" href="https://meta.wikimedia.org/skins-1.5/common/shared.css">
   <link rel="stylesheet" href="../tsnotice.css">
   <!--<link rel="stylesheet" media="all" type="text/css" href="http://tools.wikimedia.de/~vvv/inc/ts.css" />-->
   <meta http-equiv="refresh" content="%(refresh)s">

@@ -37,9 +37,9 @@ page = content_type + """
   <link rel="copyright" href="//creativecommons.org/licenses/by-sa/3.0/" >
   <!-- Idea to use Wiki stylesheet from: http://toolserver.org/~vvv/sulutil.php 
   BUT this is the new!! (done by myself) -->
-  <!--<link rel="stylesheet" href="http://bits.wikimedia.org/de.wikipedia.org/load.php?debug=false&amp;lang=de&amp;modules=ext%%21wikihiero%%7Cmediawiki%%21legacy%%21commonPrint%%7Cmediawiki%%21legacy%%21shared%%7Cskins%%21vector&amp;only=styles&amp;skin=vector" type="text/css" media="all">-->
-  <!--<link rel="stylesheet" href="//bits.wikimedia.org/de.wikipedia.org/load.php?debug=false&amp;lang=de&amp;modules=ext.gadget.CommonsDirekt%%2CExtra-Editbuttons%%2CVorlagenmeister%%2Cold-movepage%%7Cext.rtlcite%%2Cwikihiero%%7Cext.uls.nojs%%7Cext.visualEditor.viewPageTarget.noscript%%7Cmediawiki.legacy.commonPrint%%2Cshared%%7Cmw.PopUpMediaTransform%%7Cskins.vector&amp;only=styles&amp;skin=vector&amp;*" >-->
-  <link rel="stylesheet" href="//bits.wikimedia.org/de.wikipedia.org/load.php?debug=false&amp;lang=de&amp;modules=ext.echo.badge%%7Cext.gadget.CommonsDirekt%%2CExtra-Editbuttons%%2CVorlagenmeister%%2Cold-movepage%%7Cext.visualEditor.viewPageTarget.noscript%%7Cext.wikihiero%%7Cmediawiki.legacy.commonPrint%%2Cshared%%7Cskins.common.interface%%7Cskins.vector.styles&amp;only=styles&amp;skin=vector&amp;*" >
+  <!--<link rel="stylesheet" href="//meta.wikimedia.org/de.wikipedia.org/load.php?debug=false&amp;lang=de&amp;modules=ext%%21wikihiero%%7Cmediawiki%%21legacy%%21commonPrint%%7Cmediawiki%%21legacy%%21shared%%7Cskins%%21vector&amp;only=styles&amp;skin=vector" type="text/css" media="all">-->
+  <!--<link rel="stylesheet" href="//meta.wikimedia.org/de.wikipedia.org/load.php?debug=false&amp;lang=de&amp;modules=ext.gadget.CommonsDirekt%%2CExtra-Editbuttons%%2CVorlagenmeister%%2Cold-movepage%%7Cext.rtlcite%%2Cwikihiero%%7Cext.uls.nojs%%7Cext.visualEditor.viewPageTarget.noscript%%7Cmediawiki.legacy.commonPrint%%2Cshared%%7Cmw.PopUpMediaTransform%%7Cskins.vector&amp;only=styles&amp;skin=vector&amp;*" >-->
+  <link rel="stylesheet" href="//meta.wikimedia.org/de.wikipedia.org/load.php?debug=false&amp;lang=de&amp;modules=ext.echo.badge%%7Cext.gadget.CommonsDirekt%%2CExtra-Editbuttons%%2CVorlagenmeister%%2Cold-movepage%%7Cext.visualEditor.viewPageTarget.noscript%%7Cext.wikihiero%%7Cmediawiki.legacy.commonPrint%%2Cshared%%7Cskins.common.interface%%7Cskins.vector.styles&amp;only=styles&amp;skin=vector&amp;*" >
   <link rel="stylesheet" href="../tsnotice.css">
   <meta http-equiv="refresh" content="%(refresh)s">
 </head>
@@ -79,7 +79,7 @@ href="/" title="Home"></a></div>
 	<li><!--<a href="/wiki/Wikipedia:Datenschutz">...</a>--></li>
 </ul>
 <ul id="footer-icons" class="noprint">
-	<li><a href="http://www.mediawiki.org/"><img src="http://bits.wikimedia.org/skins-1.5/common/images/poweredby_mediawiki_88x31.png" height="31" width="88" alt="Powered by MediaWiki" 
+	<li><a href="http://www.mediawiki.org/"><img src="http://meta.wikimedia.org/skins-1.5/common/images/poweredby_mediawiki_88x31.png" height="31" width="88" alt="Powered by MediaWiki" 
 ></a></li>
 	<li><a href="http://wikimediafoundation.org/"><img src="http://de.wikipedia.org/images/wikimedia-button.png" width="88" height="31" alt="Wikimedia Foundation"></a></li>
 
